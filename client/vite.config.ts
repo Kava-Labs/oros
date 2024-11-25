@@ -10,6 +10,7 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
-     setupFiles: './tests/setup.js'
+     setupFiles: './tests/setup.js',
+     exclude: ['./e2e'],
   }
 })
