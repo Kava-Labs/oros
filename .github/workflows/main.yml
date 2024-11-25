@@ -1,8 +1,8 @@
-name: Unit Test CI
+name: Client Unit Test CI
 on: [push]
 
 jobs:
-  tests:
+  client-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
