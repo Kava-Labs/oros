@@ -11,6 +11,6 @@ jobs:
         with:
           node-version: 20
       - name: npm install
-        run: npm install
+        run: cd ./client && npm install
       - name: tests
-        run: cd ./client && npm test
+        run: npm test
