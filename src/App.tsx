@@ -5,7 +5,17 @@ import { useAppContext } from "./contexts/AppContext";
 import { DeepChat } from 'deep-chat-react';
 import { DemoBanner } from "./components/DemoBanner";
 import styles from "./style.module.css";
+import { getToken } from './utils';
 
+
+const connectionConfig = {
+  url: "/api/openai/chat-stream",
+  stream: true,
+  additionalBodyProps: { model: "gpt-4o", chaos: false },
+  headers: {
+    "Authorization": `Bearer ${getToken()}`,
+  }
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Message = any; // TODO: define appropriate type for this
@@ -273,11 +283,7 @@ export function App() {
             introMessage={{
               text: INTRO_MESSAGE,
             }}
-            connect={{
-              url: "/api/openai/chat-stream",
-              stream: true,
-              additionalBodyProps: { model: "gpt-4o", chaos: false },
-            }}
+            connect={connectionConfig}
             requestBodyLimits={{ maxMessages: 100 }}
             errorMessages={{ displayServiceErrorMessages: true }}
           />
