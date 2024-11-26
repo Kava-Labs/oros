@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"log/slog"
 	"os"
@@ -17,7 +16,7 @@ func main() {
 		logFatal(logger, ErrOpenAIKeyRequired)
 	}
 
-	fmt.Println("Welcome to the Kavachat API!")
+	logger.Info("Starting Kavachat API!")
 }
 
 func logFatal(logger *slog.Logger, err error) {

@@ -46,7 +46,7 @@ func TestNoArgs(t *testing.T) {
 	out, err := cmd.CombinedOutput()
 
 	require.NoError(t, err, fmt.Sprintf("expected %s to not fail", cmd.String()))
-	assert.Contains(t, string(out), "Welcome to the Kavachat API!")
+	assert.Contains(t, string(out), "level=INFO msg=\"Starting Kavachat API!\"")
 }
 
 func TestNoKeyForOpenAI(t *testing.T) {
