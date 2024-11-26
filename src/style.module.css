@@ -1,57 +1,59 @@
 .main {
-    text-align: center;
-    /* padding-bottom: 40px; */
-  }
-  .header {
-    padding: 16px 16px 16px 24px;
-  }
-  
-  .deployControls {
-    display: flex;
-    justify-content: center;
-    background-color: #2D2D2D;
-    border-radius: 10px;
-  
-    width: 100%;
-    max-width: 1000px;
-    margin: 10px auto 0; /* Added top margin for spacing */
-  }
-  
-  .deployControls button {
-    margin: 20px 10px;
-    padding: 10px 20px;
-    font-size: 1rem;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .active {
-    background-color: rgb(160, 181, 255);
-    color: rgb(45, 45, 45);
-  }
-  
-  .deployControls .inactive {
-    background-color: rgb(75, 75, 75);
-    color: rgb(45, 45, 45);
-    cursor: unset;
-  }
-  
-  .active:hover {
-    background-color: rgb(78,87,246);
-    color: rgb(238, 238, 238);
-  }
-  
-  .demoBanner {
-    position: fixed;
-    top: 25px;
-    right: -180px;
-    background-color: rgb(254, 96, 95); /* Same color as user chat messages */
-    color: white;
-    padding: 5px 200px;
-    font-size: 1rem;
-    font-weight: bold;
-    transform: rotate(45deg);
-    z-index: 1000;
-  }
-  
+  text-align: center;
+  /* padding-bottom: 40px; */
+}
+
+.header {
+  padding: 16px 16px 16px 24px;
+}
+
+.deployControls {
+  display: flex;
+  justify-content: center;
+  background-color: #2D2D2D;
+  border-radius: 10px;
+
+  width: 100%;
+  max-width: 1000px;
+  margin: 10px auto 0;
+  /* Added top margin for spacing */
+}
+
+.deployControls button {
+  margin: 20px 10px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.active {
+  background-color: rgb(160, 181, 255);
+  color: rgb(45, 45, 45);
+}
+
+.deployControls .inactive {
+  background-color: rgb(75, 75, 75);
+  color: rgb(45, 45, 45);
+  cursor: unset;
+}
+
+.active:hover {
+  background-color: rgb(78, 87, 246);
+  color: rgb(238, 238, 238);
+}
+
+.demoBanner {
+  position: fixed;
+  top: 25px;
+  right: -180px;
+  background-color: rgb(254, 96, 95);
+  /* Same color as user chat messages */
+  color: white;
+  padding: 5px 200px;
+  font-size: 1rem;
+  font-weight: bold;
+  transform: rotate(45deg);
+  z-index: 1000;
+}
