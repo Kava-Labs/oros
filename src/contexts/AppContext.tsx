@@ -41,7 +41,6 @@ export function AppContextProvider({
       return;
     }
 
-    // @ts-ignore
     const deepChat = deepChatRef.current.children[0] as DeepChat;
     if (!deepChat) {
       return;

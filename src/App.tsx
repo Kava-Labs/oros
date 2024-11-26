@@ -134,7 +134,6 @@ export function App() {
   const getChatMessages = () => {
     if (deepChatRef.current) {
       // probably a better way to setup types
-      // @ts-ignore
       const deepChatElement = deepChatRef.current.children[0] as DeepChatCore;
       return deepChatElement.getMessages();
     } else {
@@ -145,7 +144,6 @@ export function App() {
   const submitChatMessage = useCallback(
     (text: string, delay = 1500) => {
       if (deepChatRef.current) {
-        // @ts-ignore
         const deepChatElement = deepChatRef.current.children[0] as DeepChatCore;
         // for some reason if the backend is streaming a response and we submit a message, the message gets lost
         // setting a timeout for now just to avoid this bug
@@ -159,7 +157,6 @@ export function App() {
 
   const clearChatMessages = () => {
     if (deepChatRef.current) {
-      // @ts-ignore
       const deepChatElement = deepChatRef.current.children[0] as DeepChatCore;
       return deepChatElement.clearMessages(false);
     }
