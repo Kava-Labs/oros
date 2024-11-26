@@ -69,8 +69,8 @@ func TestNoKeyForOpenAI(t *testing.T) {
 	err := cmd.Run()
 	require.Error(t, err, fmt.Sprintf("expected %s to fail", cmd.String()))
 
-	assert.Equal(t, stdout.String(), "")
-	assert.Contains(t, stderr.String(), "OPENAI_API_KEY is required")
+	assert.Contains(t, stdout.String(), "level=ERROR msg=\"OPENAI_API_KEY is required\"")
+	assert.Contains(t, stderr.String(), "fatal: OPENAI_API_KEY is required")
 
 	if exitErr, ok := err.(*exec.ExitError); ok {
 		assert.Equal(t, 1, exitErr.ExitCode(), "expected exit code to equal 1")
