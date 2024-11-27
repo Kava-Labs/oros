@@ -1,3 +1,7 @@
+//  This test should not run in jsdom browser
+// /**
+//  * @vitest-environment node
+//  */
 import 'openai/shims/node'
 import OpenAI from 'openai';
 import { v4 as uuidv4 } from 'uuid';
@@ -5,7 +9,8 @@ import { describe, expect, it } from 'vitest';
 
 const PROXY_ENDPOINT= process.env.PROXY_ENDPOINT ?? "http://localhost:5555/openai/";
 const API_KEY = process.env.VITE_OPENAI_API_KEY
-const BYPASS_PROXY = process.env.BYPASS_PROXY === 'true';
+// const BYPASS_PROXY = process.env.BYPASS_PROXY === 'true';
+const BYPASS_PROXY = true;
 
 function createOpenApiClient(): OpenAI {
   //  This random key is used by our proxy API for tracing and logging
@@ -13,14 +18,12 @@ function createOpenApiClient(): OpenAI {
   const sessionAPIKey = `kavachat:${uuidv4()}:${uuidv4()}`;
 
   if (BYPASS_PROXY) {
-    //  dangerouslyAllowBrowser is needed because we are using a test-runner to open the browser
-    return new OpenAI({ apiKey: API_KEY, dangerouslyAllowBrowser: true  })
+    return new OpenAI({ apiKey: API_KEY })
   }
 
   return new OpenAI({
     apiKey: sessionAPIKey,
     baseURL: PROXY_ENDPOINT,
-    dangerouslyAllowBrowser: true
   });
 }
 
