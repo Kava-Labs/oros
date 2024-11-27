@@ -1,7 +1,5 @@
-// chat.test.ts
-
 import { describe, it, expect, vi, Mock } from 'vitest';
-import { chat } from './chat'; 
+import { chat } from './chat';
 import OpenAI from 'openai';
 import type { ChatCompletionChunk } from 'openai/resources/index';
 

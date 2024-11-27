@@ -99,7 +99,7 @@ export function chat(cfg: ChatConfig) {
     // otherwise use the provided one (this is very useful for mocking openAI during testing)
     if (!cfg.openAI && !client) {
         client = new OpenAI({
-            apiKey: import.meta.env['VITE_OPENAI_API_KEY'],
+            apiKey: import.meta.env['VITE_OPENAI_API_KEY'], // once Proxy is up, use getToken() here
             dangerouslyAllowBrowser: true,
         });
     }
