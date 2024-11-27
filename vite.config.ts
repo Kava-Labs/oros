@@ -13,5 +13,10 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: './vitestSetup.ts',
     exclude: [...configDefaults.exclude, "e2e"],
-  }
+  },
+    define: {
+      //  define this env variable without the VITE_ prefix
+      //  so OpenAI() can find that value without explicitly defining it each time
+      //  https://vite.dev/config/shared-options.html#envprefix
+      'import.meta.env.OPENAI_API_KEY': JSON.stringify(process.env.VITE_OPENAI_API_KEY)    }
 })
