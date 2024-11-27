@@ -10,9 +10,10 @@ const BYPASS_PROXY = process.env.BYPASS_PROXY === 'true';
 function createOpenApiClient(): OpenAI {
   //  This random key is used by our proxy API for tracing and logging
   //  It is NOT our real, secure OpenAI Key
-  const sessionAPIKey = uuidv4();
+  const sessionAPIKey = `kavachat:${uuidv4()}:${uuidv4()}`;
 
   if (BYPASS_PROXY) {
+    //  dangerouslyAllowBrowser is needed because we are using a test-runner to open the browser
     return new OpenAI({ apiKey: API_KEY, dangerouslyAllowBrowser: true  })
   }
 
@@ -33,7 +34,7 @@ describe('OpenAI Client', () => {
 
     const chatCompletion = await client.chat.completions.create({
       messages: [{ role: 'user', content: userPrompt }],
-      model: 'gpt-4o',
+      model: 'gpt-4o-mini',
     });
 
     const { id, choices } = chatCompletion;
@@ -56,7 +57,7 @@ describe('OpenAI Client', () => {
 
     const chatStream = await client.chat.completions.create({
       messages: [{ role: 'user', content: userPrompt }],
-      model: 'gpt-4o',
+      model: 'gpt-4o-mini',
       stream: true,
     });
 
