@@ -9,7 +9,7 @@ import { getToken } from './utils';
 
 
 const connectionConfig = {
-  url: "/api/openai/chat-stream",
+  url: "http://localhost:5555/openai/v1/chat/completions",
   stream: true,
   additionalBodyProps: { model: "gpt-4o", chaos: false },
   headers: {
