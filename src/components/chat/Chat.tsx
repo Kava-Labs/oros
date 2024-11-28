@@ -56,7 +56,7 @@ export const Chat = () => {
             model: 'gpt-4',
             messages: selectMessageHistory(appStore.getState()),
             onData: onChatStreamData,
-            onDone: onChatStreamDone,
+            onDone: () => { onChatStreamDone(); setCancelStream(null); },
             onToolCallRequest: onChatStreamToolCallRequest,
         });
 
@@ -68,7 +68,7 @@ export const Chat = () => {
                     dispatch(streamingMessageClear());
                     dispatch(messageHistoryDropLast());
                 })
-                
+
                 setCancelStream(null);
             }
         })
@@ -79,20 +79,9 @@ export const Chat = () => {
 
     console.info('render: Chat');
 
-    const messageHistory = useSelector(selectMessageHistory);
-
     return <div>
         <div className={styles.chatContainer} id='chatContainer'>
-            <StaticMessage role='assistant' content={INTRO_MESSAGE} />
-            {
-                messageHistory.map((msg, i) => {
-                    if (msg.role === 'assistant' || msg.role === 'user') {
-                        return <StaticMessage key={i} role={msg.role} content={msg.content as string} />
-                    } else {
-                        return null;
-                    }
-                })
-            }
+            <Messages />
             <StreamingMessage />
         </div>
         <PromptArea submitUserMessage={handleSubmit} cancelStream={cancelStream} />
@@ -101,6 +90,24 @@ export const Chat = () => {
 
 
 const markDownCache = new Map<string, string>();
+
+
+const Messages = () => {
+    const history = useSelector(selectMessageHistory);
+
+    return <>
+        <StaticMessage role='assistant' content={INTRO_MESSAGE} />
+        {
+            history.map((msg, i) => {
+                if (msg.role === 'assistant' || msg.role === 'user') {
+                    return <StaticMessage key={i} role={msg.role} content={msg.content as string} />
+                } else {
+                    return null;
+                }
+            })
+        }
+    </>
+};
 
 const StaticMessage = (props: ChatCompletionMessageParam) => {
     const content = props.content as string;
