@@ -11,6 +11,7 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@fontsource/inter": "^5.1.0",
     "@reduxjs/toolkit": "^2.3.0",
     "bech32": "^2.0.0",
     "deep-chat-react": "^2.0.1",

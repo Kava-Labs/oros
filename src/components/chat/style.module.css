@@ -5,35 +5,36 @@
     max-width: 1000px;
     margin: 0 auto;
     display: block;
-    height: calc(100vh - 200px);
-    padding-top: 10px;
+    height: calc(100vh - 250px);
     background-color: #2D2D2D;
     border: 0px;
+    padding: 12px;
 }
 
 .chatBubble {
-    padding: 12px;
     margin-bottom: 12px;
     background-color: unset;
     color: rgb(238, 238, 238);
     font-weight: 400;
-    font-size: 13 / 16rem;
-    line-height: 18 / 13rem;
+    font-size: 0.8125rem;
+    line-height: 1.38462;
+    padding: .42em .55em;
 }
-
 
 .chatBubbleUser {
     width: fit-content;
     background-color: rgb(254, 96, 95);
-    max-width: 75%;
+    max-width: 60%;
     margin-left: auto;
+    border-radius: 10px;
 }
 
 .chatBubbleAssistant {
     width: fit-content;
     background-color: #1E1E1E;
-    max-width: 75%;
+    max-width: 60%;
     margin-right: auto;
+    border-radius: 10px;
 }
 
 .promptForm {
@@ -45,7 +46,7 @@
 
 /* Input field styles */
 .inputField {
-    max-width: 900px;
+    max-width: 910px;
     height: 50px;
     width: 100%;
     color: #eeeeee;
@@ -74,6 +75,7 @@
     border-radius: 10px; 
     transition: background-color 0.3s;
     margin-top: 0.5rem;
+    margin-left: 12px;
 }
 
 .submitButton:hover {
