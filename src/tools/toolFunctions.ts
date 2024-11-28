@@ -116,7 +116,7 @@ export async function getAccountBalances(arg: { address: string }): Promise<stri
         return balanceResults.join(", ");
     } catch (error) {
         console.error("Error fetching account balances:", error);
-        return `failed to fetch account balances: ${JSON.stringify(error)}`;
+        throw new Error(`failed to fetch account balances: ${JSON.stringify(error)}`);
     }
 }
 
@@ -200,7 +200,7 @@ export const transferERC20 = async (args: TransferErc20Params) => {
         };
     } catch (e) {
         console.error(`Error: ${e}`);
-        return `Failed to find contract address for: ${args.assetName}`;
+        throw new Error(`Failed to find contract address for: ${args.assetName}`);
     }
 
 };
