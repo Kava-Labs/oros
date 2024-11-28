@@ -5,7 +5,7 @@ import { systemPrompt } from '../../config';
 
 export type MsgStore = {
     history: ChatCompletionMessageParam[];
-    streamingMessage: '',
+    streamingMessage: string,
 }
 
 export const msgStoreSlice = createSlice({
@@ -59,6 +59,6 @@ export const selectMessageStore = (state: MessageStoreSlice) => state[msgStoreSl
 
 export const selectStreamingMessage = createSelector(selectMessageStore, (state) => state.streamingMessage);
 
-export const selectMessageHistroy = createSelector(selectMessageStore, (state) => state.history);
+export const selectMessageHistory = createSelector(selectMessageStore, (state) => state.history);
 
 export const msgStoreReducer = msgStoreSlice.reducer;

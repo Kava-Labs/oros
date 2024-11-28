@@ -4,7 +4,7 @@ import {
     appStore,
     messageHistoryAddMessage,
     messageHistoryDropLast,
-    selectMessageHistroy,
+    selectMessageHistory,
     selectStreamingMessage,
     streamingMessageClear,
     streamingMessageConcat
@@ -54,7 +54,7 @@ export const Chat = () => {
         const cancelFN = doChat({
             tools,
             model: 'gpt-4',
-            messages: selectMessageHistroy(appStore.getState()),
+            messages: selectMessageHistory(appStore.getState()),
             onData: onChatStreamData,
             onDone: onChatStreamDone,
             onToolCallRequest: onChatStreamToolCallRequest,
@@ -79,7 +79,7 @@ export const Chat = () => {
 
     console.info('render: Chat');
 
-    const messageHistory = useSelector(selectMessageHistroy);
+    const messageHistory = useSelector(selectMessageHistory);
 
     return <div>
         <div className={styles.chatContainer} id='chatContainer'>
