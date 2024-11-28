@@ -36,7 +36,7 @@ const onChatStreamDone = () => {
 };
 
 const onChatStreamToolCallRequest = (toolCalls: ChatCompletionChunk.Choice.Delta.ToolCall[]) => {
-    console.info(`tool_calls: ${toolCalls}`); // todo
+    console.info("tool_calls", toolCalls); // todo
 };
 
 
