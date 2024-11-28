@@ -6,7 +6,7 @@ let client: OpenAI | null = null;
 /**
  * Configuration object for the chat function.
  */
-interface ChatConfig {
+export interface ChatConfig {
     /** The model to use for the chat completion. */
     model: string;
     /** Array of message parameters for the chat completion. */
