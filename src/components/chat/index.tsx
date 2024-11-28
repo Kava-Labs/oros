@@ -3,7 +3,7 @@ import styles from './style.module.css';
 import { Messages } from './Messages';
 import { PromptInput } from './PromptInput';
 import { StreamingMessage } from './StreamingMessage';
-import { useChat } from './useChat';
+import { useChat } from '../hooks/useChat';
 
 
 
