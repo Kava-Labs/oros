@@ -46,26 +46,30 @@ export const tools: ChatCompletionTool[] = [
     {
         type: "function",
         function: {
-            name: "sendUsdt",
-            description: "Transfers USDt tokens to another address",
+            name: "transferERC20",
+            description: "Transfers ERC20 tokens from one address to another address",
             parameters: {
                 type: "object",
                 properties: {
+                    assetName: {
+                        type: "string",
+                        description: "The name of the ERC20 token to be transferred (i.e. USDt, WHARD, WKAVA, etc.)",
+                    },
                     senderAddress: {
                         type: "string",
-                        description: "The address sending the USDt token (the connected wallet)",
+                        description: "The address sending the ERC20 tokens (the wallet that is connected)",
                     },
                     receiverAddress: {
                         type: "string",
-                        description: "The address receiving the USDt tokens",
+                        description: "The address receiving the ERC20 tokens",
                     },
                     amount: {
                         type: "number",
-                        description: "The amount of USDt tokens to send",
+                        description: "The amount of ERC20 tokens to send",
                     },
                 },
-                required: ["senderAddress", "receiverAddress", "amount"],
+                required: ["assetName", "senderAddress", "receiverAddress", "amount"],
             },
         },
     },
-];
+]; 
