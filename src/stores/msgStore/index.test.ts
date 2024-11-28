@@ -10,6 +10,7 @@ import {
     selectStreamingMessage,
     selectMessageHistory,
     MsgStore,
+    selectHasToolCallInProgress,
 } from './index';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 
@@ -148,4 +149,43 @@ describe('selectors', () => {
         const selected = selectMessageHistory(mockState);
         expect(selected).toEqual(mockState.msgStore.history);
     });
+
+    it('selectHasToolCallInProgress should return false when there is no tool call in progress', () => {
+        const selected = selectHasToolCallInProgress(mockState);
+        expect(selected).toBe(false);
+    })
+
+    it('selectHasToolCallInProgress should return true when there is a tool call in progress', () => {
+        const selected = selectHasToolCallInProgress({
+            msgStore: {
+                history: [
+                    ...initialState.history,
+                    { role: 'user', content: 'Hello' },
+                    { role: 'assistant', content: null, tool_calls: [{ id: '', type: 'function', function: { name: '', arguments: '' } }] }
+                ],
+                streamingMessage: '',
+            },
+        });
+
+        expect(selected).toBe(true);
+    })
+
+
+    it('selectHasToolCallInProgress should return false when there is a tool call is finished', () => {
+        const selected = selectHasToolCallInProgress({
+            msgStore: {
+                history: [
+                    ...initialState.history,
+                    { role: 'user', content: 'Hello' },
+                    { role: 'assistant', content: null, tool_calls: [{ id: '', type: 'function', function: { name: '', arguments: '' } }] },
+                    { role: 'tool', content: '', tool_call_id: '' }
+                ],
+                streamingMessage: '',
+            },
+        });
+
+        expect(selected).toBe(false);
+    })
+
+
 });

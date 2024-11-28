@@ -1,6 +1,14 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterAll, Mock } from 'vitest';
 import { PromptInput } from './PromptInput'; // Adjust the import path as needed
+import { useSelector } from 'react-redux';
+import { selectHasToolCallInProgress } from '../../stores';
+
+
+vi.mock('react-redux', () => ({
+    useSelector: vi.fn(),
+}));
+
 
 describe('PromptInput Component', () => {
     const mockSubmitUserMessage = vi.fn();
@@ -9,7 +17,12 @@ describe('PromptInput Component', () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
-    
+
+    afterAll(() => {
+        vi.restoreAllMocks();
+    })
+
+
     it('renders input field and submit button', () => {
         render(
             <PromptInput
@@ -132,4 +145,23 @@ describe('PromptInput Component', () => {
 
         expect(screen.getByText('Submit')).toBeInTheDocument();
     });
+
+    it('disables the Submit button when there is a tool_call in progress', () => {
+        (useSelector as unknown as Mock).mockImplementation((selector) => {
+            if (selector === selectHasToolCallInProgress) {
+                return true;
+            }
+        });
+
+        render(
+            <PromptInput
+                submitUserMessage={mockSubmitUserMessage}
+                cancelStream={null}
+            />
+        );
+
+        expect(screen.getByRole('button')).toBeInTheDocument();
+        expect(screen.getByRole('button')).toBeDisabled();
+    })
+
 });

@@ -61,4 +61,9 @@ export const selectStreamingMessage = createSelector(selectMessageStore, (state)
 
 export const selectMessageHistory = createSelector(selectMessageStore, (state) => state.history);
 
+export const selectHasToolCallInProgress = createSelector(selectMessageStore, (state) => {
+    const lastMsg = state.history[state.history.length - 1];
+    return lastMsg.role === 'assistant' && lastMsg.content === null && Array.isArray(lastMsg.tool_calls);
+})
+
 export const msgStoreReducer = msgStoreSlice.reducer;

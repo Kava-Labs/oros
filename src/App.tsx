@@ -17,7 +17,7 @@ export function App() {
     return (
         <>
             <Header />
-            <main className={styles.main}>
+            <main>
                 {/* a wrapper element to get a reference for the getMessages call */}
                 <DemoBanner />
                 <Chat />

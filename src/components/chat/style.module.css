@@ -78,6 +78,11 @@
     margin-left: 12px;
 }
 
+button[disabled=disabled], button:disabled {
+  cursor: not-allowed;
+  opacity: 0.3;
+}
+
 .submitButton:hover {
     background-color: #555; /* Darker background on hover */
 }
