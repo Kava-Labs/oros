@@ -14,7 +14,6 @@
     "@fontsource/inter": "^5.1.0",
     "@reduxjs/toolkit": "^2.3.0",
     "bech32": "^2.0.0",
-    "deep-chat-react": "^2.0.1",
     "ethers": "^6.13.4",
     "marked": "^15.0.2",
     "openai": "^4.73.1",
