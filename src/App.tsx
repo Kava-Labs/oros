@@ -13,7 +13,7 @@ export function App() {
 
     const clearChatMessages = useCallback(() => {
         dispatch(messageHistoryClear());
-    }, []);
+    }, [dispatch]);
 
     return (
         <>
