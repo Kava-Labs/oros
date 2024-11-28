@@ -6,7 +6,7 @@ import styles from './style.module.css';
 import { marked } from 'marked';
 
 
-export const StreamingMessage = () => {
+export const StreamingMessage = ({ chatContainerRef }: { chatContainerRef: React.RefObject<HTMLDivElement> }) => {
     const content = useSelector(selectStreamingMessage);
     if (!content) {
         return null;
@@ -14,8 +14,9 @@ export const StreamingMessage = () => {
 
     console.info('render: StreamingMessage');
 
-    const chatContainer = document.getElementById('chatContainer')!;
-    chatContainer.scrollTop = chatContainer.scrollHeight;
+    if (chatContainerRef.current) {
+        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
 
 
     return <div className={styles.chatBubbleAssistant}>

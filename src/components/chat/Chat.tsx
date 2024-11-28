@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { batch, useDispatch } from 'react-redux';
 import {
     appStore,
@@ -78,10 +78,14 @@ export function Chat() {
 
     console.info('render: Chat');
 
+
+    const chatContainerRef = useRef<HTMLDivElement>(null);
+
+
     return <div>
-        <div className={styles.chatContainer} id='chatContainer'>
+        <div ref={chatContainerRef} className={styles.chatContainer} id='chatContainer'>
             <Messages />
-            <StreamingMessage />
+            <StreamingMessage chatContainerRef={chatContainerRef}/>
         </div>
         <PromptInput submitUserMessage={handleSubmit} cancelStream={cancelStream} />
     </div>
