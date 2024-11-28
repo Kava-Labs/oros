@@ -10,7 +10,6 @@ import { useCallback } from 'react';
 
 export function App() {
     const dispatch = useDispatch();
-
     const clearChatMessages = useCallback(() => {
         dispatch(messageHistoryClear());
     }, [dispatch]);
