@@ -33,7 +33,14 @@ export const msgStoreSlice = createSlice({
         messageHistoryClear(state: MsgStore, _: PayloadAction<void>) {
             const systemMsg = { ...state.history[0] }; // keep system prompt
             state.history = [systemMsg];
+        },
+
+        messageHistoryDropLast(state: MsgStore, _: PayloadAction<void>) {
+            if (state.history[state.history.length - 1].role === 'user') {
+                state.history = state.history.slice(0, -1);
+            }
         }
+
     },
 });
 
@@ -42,6 +49,7 @@ export const {
     streamingMessageConcat,
     messageHistoryAddMessage,
     messageHistoryClear,
+    messageHistoryDropLast,
 } = msgStoreSlice.actions;
 
 

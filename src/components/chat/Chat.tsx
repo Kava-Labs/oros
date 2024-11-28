@@ -3,6 +3,7 @@ import { batch, useDispatch, useSelector } from 'react-redux';
 import {
     appStore,
     messageHistoryAddMessage,
+    messageHistoryDropLast,
     selectMessageHistroy,
     selectStreamingMessage,
     streamingMessageClear,
@@ -43,12 +44,14 @@ const onChatStreamToolCallRequest = (toolCalls: ChatCompletionChunk.Choice.Delta
 export const Chat = () => {
     const dispatch = useDispatch();
 
+    const [cancelStream, setCancelStream] = useState<null | (() => void)>(null);
+
     const handleSubmit = useCallback((inputContent: string) => {
         if (!inputContent.length) return;
         // add to history 
         dispatch(messageHistoryAddMessage({ role: 'user', content: inputContent }));
         // submit request with updated history 
-        doChat({
+        const cancelFN = doChat({
             tools,
             model: 'gpt-4',
             messages: selectMessageHistroy(appStore.getState()),
@@ -56,6 +59,21 @@ export const Chat = () => {
             onDone: onChatStreamDone,
             onToolCallRequest: onChatStreamToolCallRequest,
         });
+
+        setCancelStream(() => {
+            return () => {
+                cancelFN();
+
+                batch(() => {
+                    dispatch(streamingMessageClear());
+                    dispatch(messageHistoryDropLast());
+                })
+                
+                setCancelStream(null);
+            }
+        })
+
+
 
     }, [dispatch]);
 
@@ -77,7 +95,7 @@ export const Chat = () => {
             }
             <StreamingMessage />
         </div>
-        <PromptArea submitUserMessage={handleSubmit} />
+        <PromptArea submitUserMessage={handleSubmit} cancelStream={cancelStream} />
     </div>
 };
 
@@ -122,7 +140,7 @@ const StreamingMessage = () => {
 
 
 
-const PromptArea = ({ submitUserMessage }: { submitUserMessage: (content: string) => void }) => {
+const PromptArea = ({ submitUserMessage, cancelStream }: { submitUserMessage: (content: string) => void, cancelStream: null | (() => void) }) => {
     const [input, setInput] = useState('');
 
     return (
@@ -140,8 +158,16 @@ const PromptArea = ({ submitUserMessage }: { submitUserMessage: (content: string
                 placeholder="Enter your prompt here..."
                 className={styles.inputField}
             />
-            <button type="submit" className={styles.submitButton} onClick={(e) => { e.preventDefault(); submitUserMessage(input); setInput('') }}>
-                Submit
+            <button type="submit" className={styles.submitButton} onClick={(e) => {
+                if (cancelStream) {
+                    cancelStream();
+                } else {
+                    e.preventDefault();
+                    submitUserMessage(input);
+                    setInput('')
+                }
+            }}>
+                {cancelStream ? "Cancel" : "Submit"}
             </button>
         </form>
     );
