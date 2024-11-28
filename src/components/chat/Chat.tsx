@@ -13,9 +13,9 @@ import { chat as doChat } from '../../utils';
 import { tools } from '../../config';
 import styles from './style.module.css';
 import type { ChatCompletionChunk } from 'openai/resources/index';
-import { Messages, StreamingMessage } from './Messages';
+import { Messages } from './Messages';
 import { PromptInput } from './PromptInput';
-
+import { StreamingMessage } from './StreamingMessage';
 
 const onChatStreamData = (chunk: string) => {
     // store each chunk in redux as we get it
