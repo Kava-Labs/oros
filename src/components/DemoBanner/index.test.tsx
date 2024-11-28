@@ -1,7 +1,6 @@
 import { render } from '@testing-library/react'
 import { describe, it } from 'vitest';
-
-import { DemoBanner } from './DemoBanner'
+import { DemoBanner } from './';
 
 describe('DemoBanner', () => {
     it('renders the DemoBanner component', () => {

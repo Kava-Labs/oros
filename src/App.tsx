@@ -2,7 +2,7 @@ import kavaLogo from "./assets/kavaLogo.svg";
 import { useAppContext } from "./contexts/AppContext";
 import { DemoBanner } from "./components/DemoBanner";
 import styles from "./style.module.css";
-import { Chat } from './components/chat/Chat';
+import { Chat } from './components/chat';
 import { useDispatch } from 'react-redux';
 import { messageHistoryClear } from './stores';
 import { useCallback } from 'react';
