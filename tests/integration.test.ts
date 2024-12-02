@@ -5,7 +5,6 @@ import { describe, expect, it } from 'vitest';
 
 const PROXY_ENDPOINT= process.env.PROXY_ENDPOINT ?? "http://localhost:5555/openai/";
 const BYPASS_PROXY = process.env.BYPASS_PROXY === 'true';
-// const BYPASS_PROXY = true;
 
 function createOpenApiClient(): OpenAI {
   //  This random key is used by our proxy API for tracing and logging
