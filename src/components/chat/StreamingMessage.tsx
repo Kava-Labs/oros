@@ -12,7 +12,6 @@ export const StreamingMessage = ({ chatContainerRef }: { chatContainerRef: React
         return null;
     }
 
-    console.info('render: StreamingMessage');
 
     if (chatContainerRef.current) {
         chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;

@@ -154,7 +154,6 @@ export function chat(cfg: ChatConfig) {
             }
 
         } catch (err) {
-            console.error(err, 'here');
             onError(err);
         }
     })(cfg);
