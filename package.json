@@ -15,7 +15,6 @@
   "dependencies": {
     "bech32": "^2.0.0",
     "deep-chat-react": "^2.0.1",
-    "dotenv": "^16.4.5",
     "ethers": "^6.13.4",
     "openai": "^4.73.1",
     "react": "^18.3.1",
