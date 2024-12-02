@@ -1,20 +1,22 @@
 import styles from './style.module.css';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { marked } from 'marked';
+import { useAppContext } from '../../contexts/AppContext';
 
 
-export const markDownCache = new Map<string, string>();
 
 export const StaticMessage = (props: ChatCompletionMessageParam) => {
+    const { markDownCache } = useAppContext();
+
     const content = props.content as string;
     const role = props.role;
     if ((role !== 'assistant' && role !== 'user') || !content) return null;
     let __html: string | undefined;
 
     // save the markdown if cache miss 
-    if (!(__html = markDownCache.get(content))) {
+    if (!(__html = markDownCache.current.get(content))) {
         __html = marked.parse(content, { async: false });
-        markDownCache.set(content, __html);
+        markDownCache.current.set(content, __html);
     }
 
     return <div className={role === 'assistant' ? styles.chatBubbleAssistant : styles.chatBubbleUser}>

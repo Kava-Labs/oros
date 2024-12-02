@@ -3,16 +3,10 @@ import { useAppContext } from "./contexts/AppContext";
 import { DemoBanner } from "./components/DemoBanner";
 import styles from "./style.module.css";
 import { Chat } from './components/chat';
-import { useDispatch } from 'react-redux';
-import { messageHistoryClear } from './stores';
-import { useCallback } from 'react';
 
 
 export function App() {
-    const dispatch = useDispatch();
-    const clearChatMessages = useCallback(() => {
-        dispatch(messageHistoryClear());
-    }, [dispatch]);
+    const { clearChatMessages } = useAppContext();
 
     return (
         <>

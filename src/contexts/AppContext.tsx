@@ -1,6 +1,7 @@
 import {
   createContext,
   useContext,
+  useRef,
 } from "react";
 import type { ReactNode } from "react";
 import { useCallback, useState } from 'react';
@@ -8,6 +9,7 @@ import { batch } from 'react-redux';
 import {
   appStore as _appStore,
   messageHistoryAddMessage,
+  messageHistoryClear,
   messageHistoryDropLast,
   selectMessageHistory,
   selectStreamingMessage,
@@ -24,8 +26,11 @@ interface AppContext {
   connectWallet: () => Promise<void>;
   submitChatMessage: (msg: string) => void;
   cancelStream: (() => void) | null;
+  clearChatMessages: () => void;
+  markDownCache: React.MutableRefObject<Map<string, string>>;
 }
 
+const mdCache = new Map<string, string>();
 const initValues = {
   address: "",
   connectWallet: async () => {
@@ -34,7 +39,11 @@ const initValues = {
   submitChatMessage: () => {
     throw new Error('Uninitialized');
   },
+  clearChatMessages: () => {
+    throw new Error('Uninitialized');
+  },
   cancelStream: null,
+  markDownCache: { current: mdCache }
 };
 
 export const AppContext = createContext<AppContext>(initValues);
@@ -49,6 +58,9 @@ export function AppContextProvider({
 
   const [address, setAddress] = useState("");
   const [cancelStream, setCancelStream] = useState<null | (() => void)>(null);
+
+  const markDownCache = useRef<Map<string, string>>(mdCache);
+
 
   const doChat = useCallback(() => {
     const cancelFN = chat({
@@ -183,13 +195,21 @@ export function AppContextProvider({
   }, [store]);
 
 
+  const clearChatMessages = useCallback(() => {
+    store.dispatch(messageHistoryClear());
+    markDownCache.current.clear();
+  }, [store]);
+
+
   return (
     <AppContext.Provider
       value={{
         submitChatMessage,
         cancelStream,
-        address,
         connectWallet,
+        clearChatMessages,
+        address,
+        markDownCache,
       }}
     >
       {children}
