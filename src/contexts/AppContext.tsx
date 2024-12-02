@@ -24,7 +24,7 @@ import { getAccountBalances, sendKava, transactionToolCallFunctionNames, transfe
 interface AppContext {
   address: string;
   connectWallet: () => Promise<void>;
-  submitChatMessage: (msg: string) => void;
+  submitUserChatMessage: (msg: string) => void;
   cancelStream: (() => void) | null;
   clearChatMessages: () => void;
   markDownCache: React.MutableRefObject<Map<string, string>>;
@@ -36,7 +36,7 @@ const initValues = {
   connectWallet: async () => {
     throw new Error("Uninitialized");
   },
-  submitChatMessage: () => {
+  submitUserChatMessage: () => {
     throw new Error('Uninitialized');
   },
   clearChatMessages: () => {
@@ -91,7 +91,7 @@ export function AppContextProvider({
 
   }, [store]);
 
-  const submitChatMessage = useCallback((inputContent: string) => {
+  const submitUserChatMessage = useCallback((inputContent: string) => {
     if (!inputContent.length) return;
     // add to history 
     store.dispatch(messageHistoryAddMessage({ role: 'user', content: inputContent }));
@@ -208,7 +208,7 @@ export function AppContextProvider({
   return (
     <AppContext.Provider
       value={{
-        submitChatMessage,
+        submitUserChatMessage,
         cancelStream,
         connectWallet,
         clearChatMessages,

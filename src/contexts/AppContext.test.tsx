@@ -75,15 +75,15 @@ describe('AppContextProvider', () => {
         );
     });
 
-    it('handles submitChatMessage correctly', () => {
+    it('handles submitUserChatMessage correctly', () => {
         const mockChatCancel = vi.fn();
         (utils.chat as Mock).mockReturnValue(mockChatCancel);
 
         const TestComponent = () => {
-            const { submitChatMessage } = useAppContext();
+            const { submitUserChatMessage } = useAppContext();
 
             return (
-                <button onClick={() => submitChatMessage('Hello')}>
+                <button onClick={() => submitUserChatMessage('Hello')}>
                     Submit Chat Message
                 </button>
             );
@@ -112,11 +112,11 @@ describe('AppContextProvider', () => {
         (utils.chat as Mock).mockReturnValue(mockChatCancel);
 
         const TestComponent = () => {
-            const { submitChatMessage, cancelStream } = useAppContext();
+            const { submitUserChatMessage, cancelStream } = useAppContext();
 
             return (
                 <div>
-                    <button onClick={() => submitChatMessage('Hello')}>
+                    <button onClick={() => submitUserChatMessage('Hello')}>
                         Submit Chat Message
                     </button>
                     {cancelStream && (

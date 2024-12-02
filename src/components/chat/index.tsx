@@ -9,7 +9,7 @@ import { useAppContext } from '../../contexts/AppContext';
 
 
 export function Chat() {
-    const { submitChatMessage, cancelStream } = useAppContext();
+    const { submitUserChatMessage, cancelStream } = useAppContext();
     const chatContainerRef = useRef<HTMLDivElement>(null);
 
     console.info('render: Chat');
@@ -19,6 +19,6 @@ export function Chat() {
             <Messages />
             <StreamingMessage chatContainerRef={chatContainerRef} />
         </div>
-        <PromptInput submitUserMessage={submitChatMessage} cancelStream={cancelStream} />
+        <PromptInput submitUserMessage={submitUserChatMessage} cancelStream={cancelStream} />
     </div>
 };
