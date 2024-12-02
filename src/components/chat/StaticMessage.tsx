@@ -15,8 +15,13 @@ export const StaticMessage = (props: ChatCompletionMessageParam) => {
 
     // save the markdown if cache miss 
     if (!(__html = markDownCache.current.get(content))) {
-        __html = marked.parse(content, { async: false });
-        markDownCache.current.set(content, __html);
+        try {
+            __html = marked.parse(content, { async: false });
+            markDownCache.current.set(content, __html);
+        } catch (err) {
+            console.error(err);
+            __html = content;
+        }
     }
 
     return <div className={role === 'assistant' ? styles.chatBubbleAssistant : styles.chatBubbleUser}>
