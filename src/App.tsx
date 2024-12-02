@@ -18,11 +18,9 @@ export function App() {
         <>
             <Header />
             <main>
-                {/* a wrapper element to get a reference for the getMessages call */}
                 <DemoBanner />
                 <Chat />
                 <DeployControls
-
                     clearMessages={clearChatMessages}
                 />
             </main>
