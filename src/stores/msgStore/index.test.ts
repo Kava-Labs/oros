@@ -63,6 +63,29 @@ describe('reducers', () => {
             expect(newState.history).toHaveLength(2);
             expect(newState.history[1]).toEqual(newMessage);
         });
+
+        it('should not add a user message to history if last message is already a user message', () => {
+            const newMessage: ChatCompletionMessageParam = {
+                role: 'user',
+                content: 'Hello there!',
+            };
+            const action = messageHistoryAddMessage(newMessage);
+            const newState = msgStoreReducer({
+                history: [
+                    {
+                        role: 'system',
+                        content: 'This is the system prompt.',
+                    },
+                    { role: 'user', content: 'hello from the user' }
+                ],
+                streamingMessage: '',
+            }, action);
+
+            expect(newState.history).toHaveLength(2);
+            // should not have added newMessage
+            expect(newState.history[1]).toEqual({ role: 'user', content: 'hello from the user' });
+        });
+
     });
 
     describe('messageHistoryClear', () => {

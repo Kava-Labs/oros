@@ -27,7 +27,15 @@ export const msgStoreSlice = createSlice({
         },
 
         messageHistoryAddMessage(state: MsgStore, action: PayloadAction<ChatCompletionMessageParam>) {
-            state.history = [...state.history, action.payload]
+            if (action.payload.role === 'user') {
+                const lastMsg = state.history[state.history.length - 1];
+                // don't allow double user messages
+                if (lastMsg.role !== 'user') {
+                    state.history = [...state.history, action.payload];
+                }
+            } else {
+                state.history = [...state.history, action.payload];
+            }
         },
 
         messageHistoryClear(state: MsgStore, _: PayloadAction<void>) {
