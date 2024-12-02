@@ -3,12 +3,13 @@ import styles from './style.module.css';
 import { Messages } from './Messages';
 import { PromptInput } from './PromptInput';
 import { StreamingMessage } from './StreamingMessage';
-import { useChat } from '../hooks/useChat';
+import { useAppContext } from '../../contexts/AppContext';
+
 
 
 
 export function Chat() {
-    const { submitChatMessage, cancelStream } = useChat();
+    const { submitChatMessage, cancelStream } = useAppContext();
     const chatContainerRef = useRef<HTMLDivElement>(null);
 
     console.info('render: Chat');
