@@ -48,7 +48,7 @@ function DeployControls({ clearMessages }: DisplayControlsProps) {
 }
 
 function ConnectWallet() {
-    const { connectWallet } = useAppContext();
+    const { connectWallet, address } = useAppContext();
     return (
         <button
             className={styles.active}
@@ -57,7 +57,7 @@ function ConnectWallet() {
                 connectWallet();
             }}
         >
-            Connect Wallet
+            {address ? 'Re-connect Wallet' : 'Connect Wallet'}
         </button>
     );
 }

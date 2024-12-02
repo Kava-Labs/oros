@@ -91,33 +91,43 @@ export function ethToKavaAddress(ethereumAddress: string) {
 
 export async function getAccountBalances(arg: { address: string }): Promise<string> {
     const { address } = arg;
-    try {
-        const balanceResults: string[] = [];
+    const balanceCalls: (() => Promise<string>)[] = [];
 
-        // Loop through each token and fetch the balance
-        for (const asset in assetAddresses) {
+    // KAVA fetching is a bit different
+    balanceCalls.push(async () => {
+        try {
+            const rawBalance = await kavaEVMProvider.getBalance(address);
+            const formattedBalance = ethers.formatUnits(rawBalance, 18);
+            return `KAVA: ${formattedBalance}`;
+        } catch (err) {
+            return `KAVA: failed to fetch balance ${JSON.stringify(err)}`
+        }
+    })
+
+    // add other assets
+    for (const asset in assetAddresses) {
+        balanceCalls.push(async () => {
             const contract = new ethers.Contract(
                 assetAddresses[asset],
                 balanceOfAbi,
                 kavaEVMProvider
             );
 
-            // Fetch raw balance and decimals
-            const rawBalance = await contract.balanceOf(address);
-            const decimals = await contract.decimals();
 
-            // Format balance to a human-readable string
-            const formattedBalance = ethers.formatUnits(rawBalance, decimals);
-
-            // Add the result to the balance results array
-            balanceResults.push(`${asset}: ${formattedBalance}`);
-        }
-
-        return balanceResults.join(", ");
-    } catch (error) {
-        console.error("Error fetching account balances:", error);
-        throw new Error(`failed to fetch account balances: ${JSON.stringify(error)}`);
+            try {
+                const decimals = await contract.decimals();
+                const rawBalance = await contract.balanceOf(address);
+                const formattedBalance = ethers.formatUnits(rawBalance, decimals);
+                return `${asset}: ${formattedBalance}`;
+            } catch (err) {
+                return `${asset}: failed to fetch balance ${JSON.stringify(err)}`
+            }
+        });
     }
+
+    const results = await Promise.allSettled(balanceCalls.map((fn) => fn()))
+    return results.reduce((acc, res) => acc += `${res.status === 'fulfilled' ? res.value : res.reason}\n`, '');
+
 }
 
 type SendParams = {
