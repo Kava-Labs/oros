@@ -3,10 +3,12 @@ package main
 import (
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"log/slog"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 )
@@ -16,12 +18,18 @@ const (
 )
 
 var ErrOpenAIKeyRequired = errors.New("OPENAI_API_KEY is required")
+var ErrOpenAIBaseURLRequired = errors.New("OPENAI_BASE_URL is required")
 
 func main() {
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
-	if os.Getenv("OPENAI_API_KEY") == "" {
+	apiKey := os.Getenv("OPENAI_API_KEY")
+	if apiKey == "" {
 		logFatal(logger, ErrOpenAIKeyRequired)
+	}
+	baseURL := os.Getenv("OPENAI_BASE_URL")
+	if baseURL == "" {
+		logFatal(logger, ErrOpenAIBaseURLRequired)
 	}
 
 	logger.Info("Starting Kavachat API!")
@@ -29,6 +37,37 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/v1/healthcheck", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "available")
+	})
+
+	authHeader := fmt.Sprintf("Bearer %s", apiKey)
+	chatCompletionsUrl, err := url.JoinPath(baseURL, "/chat/completions")
+	if err != nil {
+		logFatal(logger, err)
+	}
+
+	client := http.Client{}
+	mux.HandleFunc("/openai/v1/chat/completions", func(w http.ResponseWriter, r *http.Request) {
+		request, err := http.NewRequest(r.Method, chatCompletionsUrl, r.Body)
+		if err != nil {
+			logger.Error(fmt.Errorf("error building request for upstream: %w", err).Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		request.Header.Add("Authorization", authHeader)
+		request.Header.Add("Content-Type", r.Header.Get("Content-Type"))
+
+		response, err := client.Do(request)
+		if err != nil {
+			logger.Error(fmt.Errorf("error forwarding request to upstream: %w", err).Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		defer response.Body.Close()
+
+		w.Header().Add("Content-Type", response.Header.Get("Content-Type"))
+		w.WriteHeader(response.StatusCode)
+		io.Copy(w, response.Body)
+
 	})
 
 	port := defaultAPIPort
