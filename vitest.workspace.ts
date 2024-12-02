@@ -5,9 +5,6 @@ import react from '@vitejs/plugin-react';
 export default defineWorkspace([
   {
     plugins: [react()],
-    server: {
-      port: 3000,
-    },
     test: {
       name: 'Unit tests',
       root: './src',
@@ -15,12 +12,9 @@ export default defineWorkspace([
       environment: "jsdom",
       setupFiles: './vitestSetup.ts',
       exclude: [...configDefaults.exclude, "e2e"],
-    },
+    }
   },
   {
-    server: {
-      port: 5555,
-    },
     test: {
       name: 'Integration tests',
       root: './tests',
@@ -36,5 +30,5 @@ export default defineWorkspace([
       'import.meta.env.PROXY_ENDPOINT': JSON.stringify(process.env.VITE_PROXY_ENDPOINT),
       'import.meta.env.BYPASS_PROXY': JSON.stringify(process.env.VITE_BYPASS_PROXY),
     }
-  },
+  }
 ])
