@@ -66,6 +66,7 @@ describe('chat function', () => {
 
     const onData = vi.fn();
     const onDone = vi.fn();
+    const onError = vi.fn();
     const onToolCallRequest = vi.fn();
 
     const cfg = {
@@ -74,7 +75,9 @@ describe('chat function', () => {
       messages: [],
       onData,
       onDone,
+      onError,
       onToolCallRequest,
+
     };
 
     chat(cfg);
@@ -139,6 +142,7 @@ describe('chat function', () => {
 
     const onData = vi.fn();
     const onDone = vi.fn();
+    const onError = vi.fn();
     const onToolCallRequest = vi.fn();
 
     const cfg = {
@@ -147,6 +151,7 @@ describe('chat function', () => {
       messages: [],
       onData,
       onDone,
+      onError,
       onToolCallRequest,
     };
 
@@ -206,6 +211,7 @@ describe('chat function', () => {
 
     const onData = vi.fn();
     const onDone = vi.fn();
+    const onError = vi.fn();
     const onToolCallRequest = vi.fn();
     const onCancel = vi.fn();
 
@@ -214,6 +220,7 @@ describe('chat function', () => {
       model: 'gpt-4',
       messages: [],
       onData,
+      onError,
       onDone,
       onToolCallRequest,
       onCancel,
@@ -274,6 +281,7 @@ describe('chat function', () => {
 
     const onData = vi.fn();
     const onDone = vi.fn();
+    const onError = vi.fn();
     const onToolCallRequest = vi.fn();
 
     const cfg = {
@@ -281,6 +289,7 @@ describe('chat function', () => {
       model: 'gpt-4',
       messages: [],
       onData,
+      onError,
       onDone,
       onToolCallRequest,
     };
@@ -359,6 +368,7 @@ describe('chat function', () => {
 
     const onData = vi.fn();
     const onDone = vi.fn();
+    const onError = vi.fn();
     const onToolCallRequest = vi.fn();
 
     const cfg = {
@@ -366,6 +376,7 @@ describe('chat function', () => {
       model: 'gpt-4',
       messages: [],
       onData,
+      onError,
       onDone,
       onToolCallRequest,
     };

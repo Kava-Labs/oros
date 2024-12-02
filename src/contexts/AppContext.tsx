@@ -70,6 +70,10 @@ export function AppContextProvider({
       onData: onChatStreamData,
       onDone: () => { onChatStreamDone(); setCancelStream(null); },
       onToolCallRequest: onChatStreamToolCallRequest,
+      onError: (err) => {
+        console.error(err);
+        alert('error encountered please check console'); // todo(sah): improved error handling
+      },
     });
 
     setCancelStream(() => {
