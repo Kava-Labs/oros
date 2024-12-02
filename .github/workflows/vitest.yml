@@ -1,4 +1,4 @@
-name: Client Unit Test CI
+name: Client Test CI
 on: [push]
 
 concurrency:
