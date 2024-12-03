@@ -99,15 +99,16 @@ func TestMissingRequiredEnvironmentVariable(t *testing.T) {
 	cmd := startProxyCmd(ctx, newDefaultTestConfig())
 
 	//	back up the original environment before any modifications
-	originalEnv := append([]string{}, cmd.Env...)
+	originalEnv := cmd.Env
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 			//	be sure we start with a fresh environment for each case
-			cmd.Env = append([]string{}, originalEnv...)
+			cmd.Env = originalEnv
 			newEnv := []string{}
+
 			for _, envVar := range cmd.Env {
-				//	find and remove the targeted environment variable
+				//	skip the targeted environment variable when building the new env
 				pattern := fmt.Sprintf("^%s=.*$", testCase.environmentVariable)
 				if match, _ := regexp.MatchString(pattern, envVar); match {
 					continue
