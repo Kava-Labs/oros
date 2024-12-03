@@ -8,7 +8,9 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "test:unit": "vitest src",
+    "test:integration": "vitest tests"
   },
   "dependencies": {
     "@fontsource/inter": "^5.1.0",
