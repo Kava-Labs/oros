@@ -179,38 +179,34 @@ export const transferERC20 = async (args: TransferErc20Params) => {
 
     const rawTxAmount = String(!args.amount || Number.isNaN(Number(args.amount)) ? "0" : args.amount);
 
-    try {
-        //  todo - better validation and mapping?
-        const contractAddress = assetAddresses[args.assetName.toUpperCase()];
+    //  todo - better validation and mapping?
+    const contractAddress = assetAddresses[args.assetName.toUpperCase()];
 
-        const contract = new ethers.Contract(
-            contractAddress,
-            erc20ABI,
-            kavaEVMProvider
-        );
+    const contract = new ethers.Contract(
+        contractAddress,
+        erc20ABI,
+        kavaEVMProvider
+    );
 
-        const decimals = await contract.decimals();
+    const decimals = await contract.decimals();
 
-        const formattedTxAmount = ethers.parseUnits(rawTxAmount, Number(decimals));
+    const formattedTxAmount = ethers.parseUnits(rawTxAmount, Number(decimals));
 
-        const txData = contract.interface.encodeFunctionData('transfer', [formattedReceivingAddress, formattedTxAmount])
+    const txData = contract.interface.encodeFunctionData('transfer', [formattedReceivingAddress, formattedTxAmount])
 
-        return window.ethereum.request({
-            method: "eth_sendTransaction",
-            params: [
-                {
-                    to: contractAddress,
-                    from: formattedSendingAddress,
-                    value: '0', // this must be zero
-                    gasPrice: "0x4a817c800",
-                    gas: "0x16120",
-                    data: txData,
-                },
-            ],
-        });
-    } catch (e) {
-        console.error(e);
-        throw new Error(`Failed to find contract address for: ${args.assetName}`);
-    }
+    return window.ethereum.request({
+        method: "eth_sendTransaction",
+        params: [
+            {
+                to: contractAddress,
+                from: formattedSendingAddress,
+                value: '0', // this must be zero
+                gasPrice: "0x4a817c800",
+                gas: "0x16120",
+                data: txData,
+            },
+        ],
+    });
+
 
 };
