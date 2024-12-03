@@ -1,10 +1,8 @@
 import { configDefaults, defineWorkspace } from 'vitest/config';
-import react from '@vitejs/plugin-react';
 
 //  https://vitest.dev/guide/workspace
 export default defineWorkspace([
   {
-    plugins: [react()],
     test: {
       name: 'Unit tests',
       root: './src',
