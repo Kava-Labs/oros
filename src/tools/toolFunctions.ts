@@ -130,42 +130,14 @@ export async function getAccountBalances(arg: { address: string }): Promise<stri
 
 }
 
-type SendParams = {
+type TransferParams = {
+    assetName: string
     senderAddress: string;
     receiverAddress: string;
     amount: number;
 };
 
-export const sendKava = async (args: SendParams) => {
-    const to = args.receiverAddress.startsWith("kava")
-        ? kavaToEthAddress(args.receiverAddress)
-        : args.receiverAddress;
-    const from = args.senderAddress.startsWith("kava")
-        ? kavaToEthAddress(args.senderAddress)
-        : args.senderAddress;
-
-    const value = ethers.parseEther(String(!args.amount || Number.isNaN(Number(args.amount)) ? "0" : args.amount)).toString(16);
-
-    return window.ethereum.request({
-        method: "eth_sendTransaction",
-        params: [
-            {
-                to,
-                from,
-                value,
-                gasPrice: "0x4a817c800",
-                gas: "0x76c0",
-                data: "0x",
-            },
-        ],
-    });
-};
-
-interface TransferErc20Params extends SendParams {
-    assetName: string
-}
-
-export const transferERC20 = async (args: TransferErc20Params) => {
+export async function transferAsset(args: TransferParams) {
     const addressTo = args.receiverAddress.startsWith("kava")
         ? kavaToEthAddress(args.receiverAddress)
         : args.receiverAddress;
@@ -173,40 +145,55 @@ export const transferERC20 = async (args: TransferErc20Params) => {
         ? kavaToEthAddress(args.senderAddress)
         : args.senderAddress;
 
-    //  if an address is purely lowercase, this will be sure we have the correctly checksummed format
-    const formattedReceivingAddress = ethers.getAddress(addressTo);
-    const formattedSendingAddress = ethers.getAddress(addressFrom);
+    if (args.assetName === 'KAVA') {
+        return window.ethereum.request({
+            method: "eth_sendTransaction",
+            params: [
+                {
+                    to: addressTo,
+                    from: addressFrom,
+                    value: ethers.parseEther(String(!args.amount || Number.isNaN(Number(args.amount)) ? "0" : args.amount)).toString(16),
+                    gasPrice: "0x4a817c800",
+                    gas: "0x76c0",
+                    data: "0x",
+                },
+            ],
+        });
+    } else {
+        const formattedReceivingAddress = ethers.getAddress(addressTo);
+        const formattedSendingAddress = ethers.getAddress(addressFrom);
 
-    const rawTxAmount = String(!args.amount || Number.isNaN(Number(args.amount)) ? "0" : args.amount);
+        const rawTxAmount = String(!args.amount || Number.isNaN(Number(args.amount)) ? "0" : args.amount);
 
-    //  todo - better validation and mapping?
-    const contractAddress = assetAddresses[args.assetName.toUpperCase()];
+        //  todo - better validation and mapping?
+        const contractAddress = assetAddresses[args.assetName.toUpperCase()];
 
-    const contract = new ethers.Contract(
-        contractAddress,
-        erc20ABI,
-        kavaEVMProvider
-    );
+        const contract = new ethers.Contract(
+            contractAddress,
+            erc20ABI,
+            kavaEVMProvider
+        );
 
-    const decimals = await contract.decimals();
+        const decimals = await contract.decimals();
 
-    const formattedTxAmount = ethers.parseUnits(rawTxAmount, Number(decimals));
+        const formattedTxAmount = ethers.parseUnits(rawTxAmount, Number(decimals));
 
-    const txData = contract.interface.encodeFunctionData('transfer', [formattedReceivingAddress, formattedTxAmount])
+        const txData = contract.interface.encodeFunctionData('transfer', [formattedReceivingAddress, formattedTxAmount])
 
-    return window.ethereum.request({
-        method: "eth_sendTransaction",
-        params: [
-            {
-                to: contractAddress,
-                from: formattedSendingAddress,
-                value: '0', // this must be zero
-                gasPrice: "0x4a817c800",
-                gas: "0x16120",
-                data: txData,
-            },
-        ],
-    });
+        return window.ethereum.request({
+            method: "eth_sendTransaction",
+            params: [
+                {
+                    to: contractAddress,
+                    from: formattedSendingAddress,
+                    value: '0', // this must be zero
+                    gasPrice: "0x4a817c800",
+                    gas: "0x16120",
+                    data: txData,
+                },
+            ],
+        });
 
+    }
 
-};
+}

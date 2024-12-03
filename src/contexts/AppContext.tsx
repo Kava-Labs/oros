@@ -19,7 +19,7 @@ import {
 import { chat } from '../utils';
 import { tools } from '../config';
 import type { ChatCompletionChunk, ChatCompletionMessageToolCall } from 'openai/resources/index';
-import { getAccountBalances, sendKava, transferERC20 } from '../tools/toolFunctions';
+import { getAccountBalances, transferAsset } from '../tools/toolFunctions';
 
 interface AppContext {
   address: string;
@@ -126,14 +126,11 @@ export function AppContextProvider({
             console.info("getAccountBalances");
             await doToolCall(tc, getAccountBalances);
             break;
-          case "sendKava":
+          case "transferAsset":
             console.info("sendKava");
-            await doToolCall(tc, sendKava);
+            await doToolCall(tc, transferAsset);
             break;
-          case "transferERC20":
-            console.info("transferERC20");
-            await doToolCall(tc, transferERC20);
-            break;
+
           default:
             throw new Error(`unknown tool call function: ${tc.function?.name}`);
         }

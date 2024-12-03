@@ -21,54 +21,31 @@ export const tools: ChatCompletionTool[] = [
     {
         type: "function",
         function: {
-            name: "sendKava",
-            description: "Transfers KAVA tokens from one address to another",
-            parameters: {
-                type: "object",
-                properties: {
-                    senderAddress: {
-                        type: "string",
-                        description: "The address sending the KAVA tokens",
-                    },
-                    receiverAddress: {
-                        type: "string",
-                        description: "The address receiving the KAVA tokens",
-                    },
-                    amount: {
-                        type: "number",
-                        description: "The amount of KAVA tokens to send",
-                    },
-                },
-                required: ["senderAddress", "receiverAddress", "amount"],
-            },
-        },
-    },
-    {
-        type: "function",
-        function: {
-            name: "transferERC20",
-            description: "Transfers ERC20 tokens from one address to another address",
+            name: "transferAsset",
+            description: "Transfers a token from one address to another address",
             parameters: {
                 type: "object",
                 properties: {
                     assetName: {
                         type: "string",
-                        description: "The name of the ERC20 token to be transferred (i.e. USDt, WHARD, WKAVA, etc.)",
+                        description: "The name of the token to be transferred",
+                        enum: ["KAVA", "USDT", "WHARD", "WKAVA"]
                     },
                     senderAddress: {
                         type: "string",
-                        description: "The address sending the ERC20 tokens (the wallet that is connected)",
+                        description: "The address sending the token",
                     },
                     receiverAddress: {
                         type: "string",
-                        description: "The address receiving the ERC20 tokens",
+                        description: "The address receiving the token",
                     },
                     amount: {
                         type: "number",
-                        description: "The amount of ERC20 tokens to send",
+                        description: "The amount to send",
                     },
                 },
                 required: ["assetName", "senderAddress", "receiverAddress", "amount"],
+                strict: true,
             },
         },
     },
