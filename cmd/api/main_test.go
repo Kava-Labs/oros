@@ -82,6 +82,57 @@ func startProxyCmd(context context.Context, config config, args ...string) *exec
 	return cmd
 }
 
+func TestMissingRequiredEnvironmentVariable(t *testing.T) {
+	testCases := []struct {
+		name                string
+		environmentVariable string
+		errorMessage        string
+	}{
+		{name: "API key missing",
+			environmentVariable: "OPENAI_API_KEY",
+			errorMessage:        "OPENAI_API_KEY is required",
+		},
+		//	todo - should be able to iterate through both -might need to clean out previous error?
+		//{name: "Base url missing",
+		//	environmentVariable: "OPENAI_BASE_URL",
+		//	errorMessage:        "OPENAI_BASE_URL is required",
+		//},
+	}
+	ctx, _ := context.WithTimeout(context.Background(), time.Duration(1*time.Second))
+	cmd := startProxyCmd(ctx, newDefaultTestConfig())
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			newEnv := []string{}
+			for _, envVar := range cmd.Env {
+				pattern := fmt.Sprintf("^%s=.*$", testCase.environmentVariable)
+				if match, _ := regexp.MatchString(pattern, envVar); match {
+					continue
+				}
+
+				newEnv = append(newEnv, envVar)
+			}
+			cmd.Env = newEnv
+
+			var stdout, stderr bytes.Buffer
+			cmd.Stdout = &stdout
+			cmd.Stderr = &stderr
+
+			err := cmd.Run()
+			require.Error(t, err, fmt.Sprintf("expected %s to fail", cmd.String()))
+
+			assert.Contains(t, stderr.String(), fmt.Sprintf("fatal: %s is required", testCase.environmentVariable))
+			assert.Contains(t, stdout.String(), fmt.Sprintf("level=ERROR msg=\"%s is required\"", testCase.environmentVariable))
+
+			if exitErr, ok := err.(*exec.ExitError); ok {
+				assert.Equal(t, 1, exitErr.ExitCode(), "expected exit code to equal 1")
+			} else {
+				t.Fatalf("%v is not an exit error", err)
+			}
+		})
+	}
+}
+
 func TestNoKeyForOpenAI(t *testing.T) {
 	ctx, _ := context.WithTimeout(context.Background(), time.Duration(1*time.Second))
 	cmd := startProxyCmd(ctx, newDefaultTestConfig())
@@ -126,6 +177,7 @@ func TestNoBaseURLForOpenAI(t *testing.T) {
 		newEnv = append(newEnv, envVar)
 	}
 	cmd.Env = newEnv
+	fmt.Println("Here", newEnv)
 
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
