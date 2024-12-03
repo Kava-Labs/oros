@@ -53,8 +53,8 @@ func main() {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		request.Header.Add("Authorization", authHeader)
-		request.Header.Add("Content-Type", r.Header.Get("Content-Type"))
+		request.Header.Set("Authorization", authHeader)
+		request.Header.Set("Content-Type", r.Header.Get("Content-Type"))
 
 		response, err := client.Do(request)
 		if err != nil {
@@ -64,7 +64,8 @@ func main() {
 		}
 		defer response.Body.Close()
 
-		w.Header().Add("Content-Type", response.Header.Get("Content-Type"))
+		w.Header().Set("Content-Type", response.Header.Get("Content-Type"))
+		w.Header().Set("Transfer-Encoding", "identity")
 		w.WriteHeader(response.StatusCode)
 		io.Copy(w, response.Body)
 

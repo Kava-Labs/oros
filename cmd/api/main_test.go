@@ -13,6 +13,7 @@ import (
 	"os/exec"
 	"regexp"
 	"strconv"
+	"strings"
 	"syscall"
 	"testing"
 	"time"
@@ -307,7 +308,20 @@ func TestChatCompletionProxy(t *testing.T) {
 
 			// require that the desired status code was returned before
 			// comparing the response
-			assert.Equal(t, tc.WantStatusCode, response.StatusCode)
+			require.Equal(t, tc.WantStatusCode, response.StatusCode)
+
+			// require content matches the expected one
+			responseContentType := strings.Split(response.Header.Get("Content-Type"), ";")[0]
+			require.Equal(t, tc.WantContentType, responseContentType)
+
+			// Transfer-encoding should not be set for SSE responses
+			// when using http/1.1
+			if responseContentType == "text/event-stream" {
+				// we want to ensure we are testing http/1.1 responses
+				require.Equal(t, 1, response.ProtoMajor)
+				require.Equal(t, 1, response.ProtoMinor)
+				require.Empty(t, response.TransferEncoding)
+			}
 
 			// assert that the response is equal to the upstream
 			// expected response
@@ -316,5 +330,4 @@ func TestChatCompletionProxy(t *testing.T) {
 			assert.Equal(t, string(tc.Response.Body), string(data))
 		})
 	}
-
 }
