@@ -1,4 +1,4 @@
-name: Client Unit Test CI
+name: Client Test CI
 on: [push]
 
 concurrency:
@@ -6,7 +6,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  client-tests:
+  unit-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -16,5 +16,17 @@ jobs:
           node-version: 20
       - name: npm install
         run: npm install
-      - name: Run tests
-        run: npm run test
+      - name: Run unit tests
+        run: npm run test:unit
+#  integration-tests:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#      - name: Use Node.js 20
+#        uses: actions/setup-node@v1
+#        with:
+#          node-version: 20
+#      - name: npm install
+#        run: npm install
+#      - name: Run integration tests
+#        run: npm run test:integration
