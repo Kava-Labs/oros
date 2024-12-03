@@ -11,11 +11,6 @@ test('renders intro message', async ({ page }) => {
   const role = await messageContainer!.getAttribute('data-chat-role')
   expect(role).toBe('assistant');
 
-  // don't reference messageContainer after calling dispose
-  // https://playwright.dev/docs/api/class-elementhandle
-  // preferable we use Locators but they aren't always usable for certain elements
-  await messageContainer!.dispose();
-
   await expect(page.getByTestId('ChatContainer')).toHaveText(/Hey I'm Kava AI/, { useInnerText: true });
 
 });
@@ -58,7 +53,5 @@ test.skip('receiving a response from the model', async ({ page }) => {
  const responseText = await messages[messages.length-1].innerText();
  expect(responseText).toMatch(/THIS IS A TEST/i);
   
- await messages[messages.length-1].dispose();
- 
 });
 
