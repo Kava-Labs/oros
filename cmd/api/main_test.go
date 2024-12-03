@@ -90,27 +90,22 @@ func TestMissingRequiredEnvironmentVariable(t *testing.T) {
 		{name: "API key missing",
 			environmentVariable: "OPENAI_API_KEY",
 		},
-		//	todo - should be able to iterate through both -might need to clean out previous error?
-		//{name: "Base url missing",
-		//	environmentVariable: "OPENAI_BASE_URL",
-		//},
+		{name: "Base url missing",
+			environmentVariable: "OPENAI_BASE_URL",
+		},
 	}
 	ctx, _ := context.WithTimeout(context.Background(), time.Duration(1*time.Second))
-	cmd := startProxyCmd(ctx, newDefaultTestConfig())
-
-	//	back up the original environment before any modifications
-	originalEnv := cmd.Env
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 			//	be sure we start with a fresh environment for each case
-			cmd.Env = originalEnv
+			cmd := startProxyCmd(ctx, newDefaultTestConfig())
 			newEnv := []string{}
 
 			for _, envVar := range cmd.Env {
 				//	skip the targeted environment variable when building the new env
-				pattern := fmt.Sprintf("^%s=.*$", testCase.environmentVariable)
-				if match, _ := regexp.MatchString(pattern, envVar); match {
+				envVariablePattern := fmt.Sprintf("^%s=.*$", testCase.environmentVariable)
+				if match, _ := regexp.MatchString(envVariablePattern, envVar); match {
 					continue
 				}
 				newEnv = append(newEnv, envVar)
