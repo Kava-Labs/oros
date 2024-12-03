@@ -11,6 +11,7 @@ export const PromptInput = ({ submitUserMessage, cancelStream }: PromptInputProp
 
     return (
         <form
+            data-testid='PromptInput'
             role='form'
             className={styles.promptForm}
             onSubmit={(e) => {
@@ -23,6 +24,7 @@ export const PromptInput = ({ submitUserMessage, cancelStream }: PromptInputProp
             <input
                 type='text'
                 value={input}
+                role='textbox'
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Enter your prompt here..."
                 className={styles.inputField}

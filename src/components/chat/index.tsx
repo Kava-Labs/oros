@@ -12,8 +12,8 @@ export function Chat() {
     const { submitUserChatMessage, cancelStream } = useAppContext();
     const chatContainerRef = useRef<HTMLDivElement>(null);
 
-    return <div>
-        <div ref={chatContainerRef} className={styles.chatContainer} id='chatContainer'>
+    return <div data-testid='Chat'>
+        <div ref={chatContainerRef} className={styles.chatContainer} data-testid='ChatContainer'>
             <Messages />
             <StreamingMessage chatContainerRef={chatContainerRef} />
         </div>
