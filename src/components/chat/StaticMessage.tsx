@@ -25,6 +25,6 @@ export const StaticMessage = (props: ChatCompletionMessageParam) => {
     }
 
     return <div className={role === 'assistant' ? styles.chatBubbleAssistant : styles.chatBubbleUser}>
-        <div className={styles.chatBubble} dangerouslySetInnerHTML={{ __html }} />
+        <div data-chat-role={role} className={styles.chatBubble} dangerouslySetInnerHTML={{ __html }} />
     </div>
 };
