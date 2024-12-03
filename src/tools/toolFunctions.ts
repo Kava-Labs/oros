@@ -146,7 +146,7 @@ export const sendKava = async (args: SendParams) => {
 
     const value = ethers.parseEther(String(!args.amount || Number.isNaN(Number(args.amount)) ? "0" : args.amount)).toString(16);
 
-    return {
+    return window.ethereum.request({
         method: "eth_sendTransaction",
         params: [
             {
@@ -158,7 +158,7 @@ export const sendKava = async (args: SendParams) => {
                 data: "0x",
             },
         ],
-    };
+    });
 };
 
 interface TransferErc20Params extends SendParams {
@@ -195,7 +195,7 @@ export const transferERC20 = async (args: TransferErc20Params) => {
 
         const txData = contract.interface.encodeFunctionData('transfer', [formattedReceivingAddress, formattedTxAmount])
 
-        return {
+        return window.ethereum.request({
             method: "eth_sendTransaction",
             params: [
                 {
@@ -207,9 +207,9 @@ export const transferERC20 = async (args: TransferErc20Params) => {
                     data: txData,
                 },
             ],
-        };
+        });
     } catch (e) {
-        console.error(`Error: ${e}`);
+        console.error(e);
         throw new Error(`Failed to find contract address for: ${args.assetName}`);
     }
 

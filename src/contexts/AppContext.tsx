@@ -19,7 +19,7 @@ import {
 import { chat } from '../utils';
 import { tools } from '../config';
 import type { ChatCompletionChunk, ChatCompletionMessageToolCall } from 'openai/resources/index';
-import { getAccountBalances, sendKava, transactionToolCallFunctionNames, transferERC20 } from '../tools/toolFunctions';
+import { getAccountBalances, sendKava, transferERC20 } from '../tools/toolFunctions';
 
 interface AppContext {
   address: string;
@@ -144,7 +144,7 @@ export function AppContextProvider({
 
 
   const doToolCall = useCallback(async (tc: ChatCompletionChunk.Choice.Delta.ToolCall, tcFunction: (arg: any) => Promise<any>) => {
-    const args = tc.function?.arguments as any;
+    const args = tc.function?.arguments;
     store.dispatch(messageHistoryAddMessage({
       role: 'assistant',
       function_call: null,
@@ -154,28 +154,16 @@ export function AppContextProvider({
 
     let results: any;
 
-    let tcError = false;
     try {
-      results = await tcFunction(JSON.parse(args));
+      results = await tcFunction(JSON.parse(args ?? ""));
     } catch (err) {
-      tcError = true;
       results = err;
-    }
-
-    if (!tcError && transactionToolCallFunctionNames.includes(tc.function?.name as string)) {
-      try {
-        results = await window.ethereum.request(results);
-      } catch (err) {
-        console.error(err);
-        results = err;
-      }
     }
 
     store.dispatch(messageHistoryAddMessage({
       role: "tool",
       content: JSON.stringify(results),
-      // @ts-ignore
-      tool_call_id: tc.id,
+      tool_call_id: tc.id!,
     }));
 
     doChat();
