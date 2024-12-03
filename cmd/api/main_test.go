@@ -118,8 +118,6 @@ func TestMissingRequiredEnvironmentVariable(t *testing.T) {
 
 			cmd.Env = newEnv
 
-			fmt.Println(cmd.Env)
-
 			var stdout, stderr bytes.Buffer
 			cmd.Stdout = &stdout
 			cmd.Stderr = &stderr
@@ -136,6 +134,68 @@ func TestMissingRequiredEnvironmentVariable(t *testing.T) {
 				t.Fatalf("%v is not an exit error", err)
 			}
 		})
+	}
+}
+
+func TestNoKeyForOpenAI(t *testing.T) {
+	ctx, _ := context.WithTimeout(context.Background(), time.Duration(1*time.Second))
+	cmd := startProxyCmd(ctx, newDefaultTestConfig())
+
+	newEnv := []string{}
+	for _, envVar := range cmd.Env {
+		if match, _ := regexp.MatchString("^OPENAI_API_KEY=.*$", envVar); match {
+			continue
+		}
+
+		newEnv = append(newEnv, envVar)
+	}
+	cmd.Env = newEnv
+
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	err := cmd.Run()
+	require.Error(t, err, fmt.Sprintf("expected %s to fail", cmd.String()))
+
+	assert.Contains(t, stdout.String(), "level=ERROR msg=\"OPENAI_API_KEY is required\"")
+	assert.Contains(t, stderr.String(), "fatal: OPENAI_API_KEY is required")
+
+	if exitErr, ok := err.(*exec.ExitError); ok {
+		assert.Equal(t, 1, exitErr.ExitCode(), "expected exit code to equal 1")
+	} else {
+		t.Fatalf("%v is not an exit error", err)
+	}
+}
+
+func TestNoBaseURLForOpenAI(t *testing.T) {
+	ctx, _ := context.WithTimeout(context.Background(), time.Duration(1*time.Second))
+	cmd := startProxyCmd(ctx, newDefaultTestConfig())
+
+	newEnv := []string{}
+	for _, envVar := range cmd.Env {
+		if match, _ := regexp.MatchString("^OPENAI_BASE_URL=.*$", envVar); match {
+			continue
+		}
+
+		newEnv = append(newEnv, envVar)
+	}
+	cmd.Env = newEnv
+
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	err := cmd.Run()
+	require.Error(t, err, fmt.Sprintf("expected %s to fail", cmd.String()))
+
+	assert.Contains(t, stdout.String(), "level=ERROR msg=\"OPENAI_BASE_URL is required\"")
+	assert.Contains(t, stderr.String(), "fatal: OPENAI_BASE_URL is required")
+
+	if exitErr, ok := err.(*exec.ExitError); ok {
+		assert.Equal(t, 1, exitErr.ExitCode(), "expected exit code to equal 1")
+	} else {
+		t.Fatalf("%v is not an exit error", err)
 	}
 }
 
