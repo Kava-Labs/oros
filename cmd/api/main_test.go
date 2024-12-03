@@ -177,7 +177,6 @@ func TestNoBaseURLForOpenAI(t *testing.T) {
 		newEnv = append(newEnv, envVar)
 	}
 	cmd.Env = newEnv
-	fmt.Println("Here", newEnv)
 
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
