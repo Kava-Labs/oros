@@ -87,10 +87,12 @@ func TestMissingRequiredEnvironmentVariable(t *testing.T) {
 		name                string
 		environmentVariable string
 	}{
-		{name: "API key missing",
+		{
+			name:                "API key missing",
 			environmentVariable: "OPENAI_API_KEY",
 		},
-		{name: "Base url missing",
+		{
+			name:                "Base url missing",
 			environmentVariable: "OPENAI_BASE_URL",
 		},
 	}
