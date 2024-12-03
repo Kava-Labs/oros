@@ -44,14 +44,9 @@ func newDefaultTestConfig() config {
 }
 
 func TestMain(m *testing.M) {
-	if os.Getenv("OPENAI_API_KEY") == "" {
-		fmt.Fprintf(os.Stderr, "OPENAI_API_KEY is required")
-		os.Exit(1)
-	}
-
-	if os.Getenv("OPENAI_BASE_URL") == "" {
-		fmt.Fprintf(os.Stderr, "OPENAI_BASE_URL is required")
-		os.Exit(1)
+	generateOpenAITestData := false
+	if os.Getenv("KAVACHAT_TEST_GOLDEN") == "true" {
+		generateOpenAITestData = true
 	}
 
 	build := exec.Command("go", "build", "-o", binName, ".")
@@ -63,7 +58,7 @@ func TestMain(m *testing.M) {
 	}
 
 	var err error
-	httpTestCases, err = loadHttpTestCases(false)
+	httpTestCases, err = loadHttpTestCases(generateOpenAITestData)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to load test cases: %v", err)
 		os.Exit(1)
