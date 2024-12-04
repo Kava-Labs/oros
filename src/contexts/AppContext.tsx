@@ -94,9 +94,9 @@ export function AppContextProvider({
 
   const submitUserChatMessage = useCallback((inputContent: string) => {
     if (!inputContent.length) return;
-    // add to history 
+    // add to history
     store.dispatch(messageHistoryAddMessage({ role: 'user', content: inputContent }));
-    // submit request with updated history 
+    // submit request with updated history
     doChat();
   }, [store]);
 
@@ -128,7 +128,11 @@ export function AppContextProvider({
             await doToolCall(tc, getAccountBalances);
             break;
           case "transferAsset":
-            console.info("sendKava");
+            console.info("transferAsset");
+            await doToolCall(tc, transferAsset);
+            break;
+          case "getDisplayStakingApy":
+            console.info("getDisplayStakingApy");
             await doToolCall(tc, transferAsset);
             break;
 
