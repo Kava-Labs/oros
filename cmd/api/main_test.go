@@ -135,7 +135,7 @@ func TestMissingRequiredEnvironmentVariable(t *testing.T) {
 }
 
 func TestIncorrectPortValue(t *testing.T) {
-	unavailablePort := 1234567890000
+	unavailablePort := 123456789000000000
 	ctx, _ := context.WithTimeout(context.Background(), time.Duration(1*time.Second))
 	cmd := startProxyCmd(ctx, newDefaultTestConfig())
 
