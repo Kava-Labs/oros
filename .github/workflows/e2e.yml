@@ -39,6 +39,10 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_BASE_URL: https://api.openai.com/v1
 
+      - name: Show logs if containers are unhealthy
+        if: failure()
+        run: docker compose -f docker-compose.yaml logs
+
       - name: Shutdown kava
         if: always()
         run: docker compose -f docker-compose.yaml down
