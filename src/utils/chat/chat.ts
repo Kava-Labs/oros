@@ -8,28 +8,28 @@ let client: OpenAI | null = null;
  * Configuration object for the chat function.
  */
 export interface ChatConfig {
-    /** The model to use for the chat completion. */
-    model: string;
-    /** Array of message parameters for the chat completion. */
-    messages: ChatCompletionMessageParam[];
-    /** Optional array of tools for the chat completion. */
-    tools?: ChatCompletionTool[];
+  /** The model to use for the chat completion. */
+  model: string;
+  /** Array of message parameters for the chat completion. */
+  messages: ChatCompletionMessageParam[];
+  /** Optional array of tools for the chat completion. */
+  tools?: ChatCompletionTool[];
 
-    /** Callback function called with each content chunk received. */
-    onData: (chunk: string) => void;
-    /** Callback function called when the chat completion is done. */
-    onDone: () => void;
-    /** Callback function called when tool calls are requested. */
-    onToolCallRequest: (toolCalls: ChatCompletionChunk.Choice.Delta.ToolCall[]) => void;
+  /** Callback function called with each content chunk received. */
+  onData: (chunk: string) => void;
+  /** Callback function called when the chat completion is done. */
+  onDone: () => void;
+  /** Callback function called when tool calls are requested. */
+  onToolCallRequest: (toolCalls: ChatCompletionChunk.Choice.Delta.ToolCall[]) => void;
 
-    /** Callback function called when an error is encountered */
-    onError: (err: unknown) => void;
+  /** Callback function called when an error is encountered */
+  onError: (err: unknown) => void;
 
-    /** Optional callback function called when the chat completion is cancelled. */
-    onCancel?: () => void;
+  /** Optional callback function called when the chat completion is cancelled. */
+  onCancel?: () => void;
 
-    /** Optional custom OpenAI client instance (useful for mocks/testing) */
-    openAI?: OpenAI;
+  /** Optional custom OpenAI client instance (useful for mocks/testing) */
+  openAI?: OpenAI;
 };
 
 /**
@@ -38,12 +38,12 @@ export interface ChatConfig {
  * @returns True if the chunk contains content, false otherwise.
  */
 const isContentChunk = (result: ChatCompletionChunk): boolean => {
-    const delta = result.choices[0].delta;
-    // Sometimes content is an empty string, so we check if content is a string property.
-    if (delta && ("content" in delta) && typeof delta.content === 'string') {
-        return true;
-    }
-    return false;
+  const delta = result.choices[0].delta;
+  // Sometimes content is an empty string, so we check if content is a string property.
+  if (delta && ("content" in delta) && typeof delta.content === 'string') {
+    return true;
+  }
+  return false;
 };
 
 /**
@@ -52,10 +52,10 @@ const isContentChunk = (result: ChatCompletionChunk): boolean => {
  * @returns True if the chunk contains tool calls, false otherwise.
  */
 const isToolCallChunk = (result: ChatCompletionChunk): boolean => {
-    if (result.choices[0]?.delta && result.choices[0].delta.tool_calls) {
-        return true;
-    }
-    return false;
+  if (result.choices[0]?.delta && result.choices[0].delta.tool_calls) {
+    return true;
+  }
+  return false;
 };
 
 /**
@@ -64,31 +64,32 @@ const isToolCallChunk = (result: ChatCompletionChunk): boolean => {
  * @param toolCallsState - The state array to assemble tool calls into.
  */
 const assembleToolCallsFromStream = (
-    result: ChatCompletionChunk,
-    toolCallsState: ChatCompletionChunk.Choice.Delta.ToolCall[]
+  result: ChatCompletionChunk,
+  toolCallsState: ChatCompletionChunk.Choice.Delta.ToolCall[]
 ): void => {
-    if (!result.choices[0].delta?.tool_calls) {
-        return;
+  if (!result.choices[0].delta?.tool_calls) {
+    return;
+  }
+
+  // Assemble chunks of the tool call.
+  // Iterate over all tool calls (more than one may be present).
+  for (const tcChunk of result.choices[0].delta.tool_calls) {
+    if (toolCallsState.length <= tcChunk.index) {
+      // Push a new tool call request.
+      toolCallsState.push({
+        index: tcChunk.index,
+        id: "",
+        function: { name: "", arguments: "" },
+      });
     }
 
-    // Assemble chunks of the tool call.
-    // Iterate over all tool calls (more than one may be present).
-    for (const tcChunk of result.choices[0].delta.tool_calls) {
-        if (toolCallsState.length <= tcChunk.index) {
-            // Push a new tool call request.
-            toolCallsState.push({
-                index: tcChunk.index,
-                id: "",
-                function: { name: "", arguments: "" },
-            });
-        }
-        // Fill in info as we get it streamed for the corresponding tool call index.
-        const partialTC = toolCallsState[tcChunk.index];
-        if (tcChunk.id) partialTC.id += tcChunk.id;
-        if (tcChunk.function?.name) partialTC.function!.name += tcChunk.function.name;
-        if (tcChunk.function?.arguments)
-            partialTC.function!.arguments += tcChunk.function.arguments;
-    }
+    // Fill in info as we get it streamed for the corresponding tool call index.
+    const partialTC = toolCallsState[tcChunk.index];
+    if (tcChunk.id) partialTC.id += tcChunk.id;
+    if (tcChunk.function?.name) partialTC.function!.name += tcChunk.function.name;
+    if (tcChunk.function?.arguments)
+      partialTC.function!.arguments += tcChunk.function.arguments;
+  }
 };
 
 /**
@@ -96,69 +97,69 @@ const assembleToolCallsFromStream = (
  * @param cfg - The configuration object for the chat completion.
  * @returns A function to cancel the streaming request.
  */
-export function chat(cfg: ChatConfig) {
-    let cancel = false; // Stream cancellation flag.
+export const chat = (cfg: ChatConfig) => {
+  let cancel = false; // Stream cancellation flag.
 
-    // if no openAI object is given
-    // create one 
-    // otherwise use the provided one (this is very useful for mocking openAI during testing)
-    if (!cfg.openAI && !client) {
-        try {
-            client = new OpenAI({
-                baseURL: import.meta.env['VITE_OPENAI_BASE_URL'],
-                apiKey: getToken(),
-                dangerouslyAllowBrowser: true,
-            });
-        } catch (err) {
-            cfg.onError(err);
-        }
+  // if no openAI object is given
+  // create one 
+  // otherwise use the provided one (this is very useful for mocking openAI during testing)
+  if (!cfg.openAI && !client) {
+    try {
+      client = new OpenAI({
+        baseURL: import.meta.env['VITE_OPENAI_BASE_URL'],
+        apiKey: getToken(),
+        dangerouslyAllowBrowser: true,
+      });
+    } catch (err) {
+      cfg.onError(err);
+    }
+  }
+
+  // Launch an async IIFE with closure on the cancel flag.
+  // This allows us to return a cancel function to the caller.
+  // The function ends when either the stream is finished or the cancel function is called.
+  (async (cfg: ChatConfig) => {
+    const { model, messages, tools, onData, onDone, onToolCallRequest, onCancel, onError, openAI } = cfg;
+    const toolCallsState: ChatCompletionChunk.Choice.Delta.ToolCall[] = [];
+    const cl = openAI ? openAI : client!;
+    if (!cl) {
+      console.error('OpenAI client is unavailable');
+      return;
     }
 
-    // Launch an async IIFE with closure on the cancel flag.
-    // This allows us to return a cancel function to the caller.
-    // The function ends when either the stream is finished or the cancel function is called.
-    (async (cfg: ChatConfig) => {
-        const { model, messages, tools, onData, onDone, onToolCallRequest, onCancel, onError, openAI } = cfg;
-        const toolCallsState: ChatCompletionChunk.Choice.Delta.ToolCall[] = [];
-        const cl = openAI ? openAI : client!;
-        if (!cl) {
-            console.error('OpenAI client is unavailable');
-            return;
+    try {
+      const stream = await cl.chat.completions.create({
+        model,
+        messages,
+        tools,
+        stream: true,
+      });
+
+      for await (const chunk of stream) {
+        if (cancel) {
+          stream.controller.abort();
+          if (onCancel) onCancel();
+          break;
         }
 
-        try {
-            const stream = await cl.chat.completions.create({
-                model,
-                messages,
-                tools,
-                stream: true,
-            });
-
-            for await (const chunk of stream) {
-                if (cancel) {
-                    stream.controller.abort();
-                    if (onCancel) onCancel();
-                    break;
-                }
-
-                if (isContentChunk(chunk)) {
-                    onData(chunk.choices[0].delta.content as string);
-                } else if (isToolCallChunk(chunk)) {
-                    assembleToolCallsFromStream(chunk, toolCallsState);
-                } else {
-                    // console.info(`finish_reason: ${chunk.choices[0].finish_reason}`);
-                    if (toolCallsState.length) {
-                        onToolCallRequest([...toolCallsState]);
-                        toolCallsState.length = 0;
-                    }
-                    onDone();
-                }
-            }
-
-        } catch (err) {
-            onError(err);
+        if (isContentChunk(chunk)) {
+          onData(chunk.choices[0].delta.content as string);
+        } else if (isToolCallChunk(chunk)) {
+          assembleToolCallsFromStream(chunk, toolCallsState);
+        } else {
+          // console.info(`finish_reason: ${chunk.choices[0].finish_reason}`);
+          if (toolCallsState.length) {
+            onToolCallRequest([...toolCallsState]);
+            toolCallsState.length = 0;
+          }
+          onDone();
         }
-    })(cfg);
+      }
 
-    return () => { cancel = true; };
+    } catch (err) {
+      onError(err);
+    }
+  })(cfg);
+
+  return () => { cancel = true; };
 };

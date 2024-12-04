@@ -4,38 +4,28 @@ import OpenAI from 'openai';
 import type { ChatCompletionChunk } from 'openai/resources/index';
 
 // Helper functions to create mock chunks
-function createContentChunk(content: string): ChatCompletionChunk {
+const createContentChunk = (content: string): ChatCompletionChunk => {
   return {
     choices: [
-      {
-        delta: {
-          content,
-        },
-      },
+      {  delta: { content }, },
     ],
   } as unknown as ChatCompletionChunk;
 }
 
-function createToolCallChunk(
+const createToolCallChunk = (
   toolCalls: ChatCompletionChunk.Choice.Delta.ToolCall[]
-): ChatCompletionChunk {
+): ChatCompletionChunk => {
   return {
     choices: [
-      {
-        delta: {
-          tool_calls: toolCalls,
-        },
-      },
+      { delta: { tool_calls: toolCalls }, },
     ],
   } as unknown as ChatCompletionChunk;
 }
 
-function createFinishChunk(): ChatCompletionChunk {
+const createFinishChunk = (): ChatCompletionChunk => {
   return {
     choices: [
-      {
-        finish_reason: 'stop',
-      },
+      { finish_reason: 'stop' },
     ],
   } as unknown as ChatCompletionChunk;
 }
