@@ -47,6 +47,15 @@ func main() {
 
 	client := http.Client{}
 	mux.HandleFunc("/openai/v1/chat/completions", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodOptions {
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, x-stainless-os, x-stainless-runtime-version, x-stainless-package-version, x-stainless-runtime, x-stainless-arch, x-stainless-retry-count, x-stainless-lang")
+
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
 		request, err := http.NewRequest(r.Method, chatCompletionsUrl, r.Body)
 		if err != nil {
 			logger.Error(fmt.Errorf("error building request for upstream: %w", err).Error())
@@ -66,6 +75,7 @@ func main() {
 
 		w.Header().Set("Content-Type", response.Header.Get("Content-Type"))
 		w.Header().Set("Transfer-Encoding", "identity")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.WriteHeader(response.StatusCode)
 		io.Copy(w, response.Body)
 
