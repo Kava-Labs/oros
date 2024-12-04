@@ -85,7 +85,7 @@ func main() {
 	if envPort := os.Getenv("KAVACHAT_API_PORT"); envPort != "" {
 		parsedPort, err := strconv.Atoi(envPort)
 		if err != nil {
-			logFatal(logger, err)
+			logFatal(logger, fmt.Errorf("error setting KAVACHAT_API_PORT to %s: %w", envPort, err))
 		}
 		port = parsedPort
 	}
