@@ -1,12 +1,13 @@
 import { defineConfig, devices } from '@playwright/test';
+import { fileURLToPath } from 'url';
 
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
  */
-// import dotenv from 'dotenv';
-// import path from 'path';
-// dotenv.config({ path: path.resolve(__dirname, '.env') });
+import dotenv from 'dotenv';
+import path from 'path';
+dotenv.config({ path: [path.resolve(path.dirname(fileURLToPath(import.meta.url)), '.env.local'), path.resolve(process.cwd(), '.env')] });
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -42,7 +43,7 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'npm run dev',
+    command: `OPENAI_BASE_URL=${process.env.OPENAI_BASE_URL} OPENAI_API_KEY=${process.env.OPENAI_API_KEY} go run ./cmd/api/main.go & npm run dev`,
     url: 'http://localhost:3000',
   },
 });

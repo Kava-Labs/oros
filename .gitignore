@@ -31,3 +31,5 @@ dist-ssr
 __pycache__
 
 kavachat-api
+
+.env
