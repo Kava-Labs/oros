@@ -86,14 +86,30 @@ func TestMissingRequiredEnvironmentVariable(t *testing.T) {
 	testCases := []struct {
 		name                string
 		environmentVariable string
+		value               string
+		expectedError       string
 	}{
 		{
 			name:                "API key missing",
 			environmentVariable: "OPENAI_API_KEY",
+			expectedError:       "OPENAI_API_KEY is required",
 		},
 		{
 			name:                "Base url missing",
 			environmentVariable: "OPENAI_BASE_URL",
+			expectedError:       "OPENAI_BASE_URL is required",
+		},
+		{
+			name:                "Non-integer for port",
+			environmentVariable: "KAVACHAT_API_PORT",
+			value:               "abc",
+			expectedError:       "error setting KAVACHAT_API_PORT to abc",
+		},
+		{
+			name:                "Integer outside range for port",
+			environmentVariable: "KAVACHAT_API_PORT",
+			value:               "123456789000000000000000000000",
+			expectedError:       "error setting KAVACHAT_API_PORT to 123456789000000000000000000000",
 		},
 	}
 	ctx, _ := context.WithTimeout(context.Background(), time.Duration(1*time.Second))
@@ -105,10 +121,16 @@ func TestMissingRequiredEnvironmentVariable(t *testing.T) {
 			newEnv := []string{}
 
 			for _, envVar := range cmd.Env {
-				//	skip the targeted environment variable when building the new env
 				envVariablePattern := fmt.Sprintf("^%s=.*$", testCase.environmentVariable)
+
 				if match, _ := regexp.MatchString(envVariablePattern, envVar); match {
-					continue
+					//	To trigger the port error, replace its value with an incorrect one
+					if match, _ := regexp.MatchString(fmt.Sprintf("^KAVACHAT_API_PORT=.*$"), envVar); match {
+						envVar = fmt.Sprintf("KAVACHAT_API_PORT=%s", testCase.value)
+					} else {
+						//	to trigger the API key or base url error, skip over those when building the new slice of env vars
+						continue
+					}
 				}
 				newEnv = append(newEnv, envVar)
 			}
@@ -122,57 +144,14 @@ func TestMissingRequiredEnvironmentVariable(t *testing.T) {
 			err := cmd.Run()
 			require.Error(t, err, fmt.Sprintf("expected %s to fail", cmd.String()))
 
-			assert.Contains(t, stderr.String(), fmt.Sprintf("fatal: %s is required", testCase.environmentVariable))
-			assert.Contains(t, stdout.String(), fmt.Sprintf("level=ERROR msg=\"%s is required\"", testCase.environmentVariable))
+			assert.Contains(t, stderr.String(), fmt.Sprintf("fatal: %s", testCase.expectedError))
+			assert.Contains(t, stdout.String(), fmt.Sprintf("level=ERROR msg=\"%s", testCase.expectedError))
 
 			if exitErr, ok := err.(*exec.ExitError); ok {
 				assert.Equal(t, 1, exitErr.ExitCode(), "expected exit code to equal 1")
 			} else {
 				t.Fatalf("%v is not an exit error", err)
 			}
-		})
-	}
-}
-
-func TestInvalidPortValue(t *testing.T) {
-	testCases := []struct {
-		name      string
-		portValue string
-	}{
-		{
-			name:      "Non-integer",
-			portValue: "abc",
-		},
-		{
-			name:      "Integer outside range",
-			portValue: "123456789000000000000000000000",
-		},
-	}
-
-	ctx, _ := context.WithTimeout(context.Background(), time.Duration(1*time.Second))
-
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(t *testing.T) {
-			cmd := startProxyCmd(ctx, newDefaultTestConfig())
-
-			newEnv := []string{}
-			for _, envVar := range cmd.Env {
-				if match, _ := regexp.MatchString("^KAVACHAT_API_PORT=.*$", envVar); match {
-					envVar = fmt.Sprintf("KAVACHAT_API_PORT=%s", testCase.portValue)
-				}
-				newEnv = append(newEnv, envVar)
-			}
-			cmd.Env = newEnv
-
-			var stdout, stderr bytes.Buffer
-			cmd.Stdout = &stdout
-			cmd.Stderr = &stderr
-
-			err := cmd.Run()
-			require.Error(t, err, fmt.Sprintf("expected %s to fail", cmd.String()))
-
-			assert.Contains(t, stdout.String(), fmt.Sprintf("level=ERROR msg=\"error setting KAVACHAT_API_PORT to %s", testCase.portValue))
-			assert.Contains(t, stderr.String(), fmt.Sprintf("fatal: error setting KAVACHAT_API_PORT to %s", testCase.portValue))
 		})
 	}
 }
