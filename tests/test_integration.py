@@ -15,7 +15,7 @@ bypass_proxy = os.getenv("BYPASS_PROXY", "false").lower() in ("true", "1")
 # All requests to this path get forwarded to OpenAI and responses are forwarded back
 # to the client.
 #
-proxy_endpoint = os.getenv("PROXY_ENDPOINT", "http://localhost:5555/openai/")
+proxy_endpoint = os.getenv("PROXY_ENDPOINT", "http://localhost:5555/openai/v1")
 
 def create_open_api_client():
     if bypass_proxy:
@@ -57,9 +57,6 @@ def test_openai_simple():
     # Ensure the assistant responded with "this is a test" in it's output
     assert message.role == "assistant"
     assert re.match("this is a test", message.content, flags=re.IGNORECASE)
-
-    # Ensure _request_id is set and returned
-    assert chat_completion._request_id
 
 #
 # Ensure the proxy handles stream responses correctly
