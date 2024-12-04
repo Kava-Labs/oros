@@ -1,68 +1,7 @@
 import { ethers } from "ethers";
 import { bech32 } from "bech32";
 import { erc20ABI } from './erc20ABI';
-
-export const transactionToolCallFunctionNames = ["sendKava", "transferERC20"];
-
-// kava evm rpc url
-const kavaEvmRpc = "https://evm.kava-rpc.com";
-
-// kava evm provider
-const kavaEVMProvider = new ethers.JsonRpcProvider(kavaEvmRpc);
-
-// evm contract addresses
-const assetAddresses: Record<string, string> = {
-    WHARD: "0x25e9171C98Fc1924Fa9415CF50750274F0664764",
-    USDT: "0x919C1c267BC06a7039e03fcc2eF738525769109c",
-    WKAVA: "0xc86c7C0eFbd6A49B35E8714C5f59D99De09A225b",
-    AXLETH: "0xE3F5a90F9cb311505cd691a46596599aA1A0AD7D",
-    AXLWBTC: "0x1a35EE4640b0A3B87705B0A4B45D227Ba60Ca2ad",
-    MULTIWBTC: "0x818ec0A7Fe18Ff94269904fCED6AE3DaE6d6dC0b",
-    MULTIUSDC: "0xfA9343C3897324496A05fC75abeD6bAC29f8A40f",
-    AXLUSDC: "0xEB466342C4d449BC9f53A865D5Cb90586f405215",
-    AXLDAI: "0x5C7e299CF531eb66f2A1dF637d37AbB78e6200C7",
-    AXLUSDT: "0x7f5373AE26c3E8FfC4c77b7255DF7eC1A9aF52a6",
-    MULTIUSDT: "0xb44a9b6905af7c801311e8f4e76932ee959c663c",
-    MULTIDAI: "0x765277EebeCA2e31912C9946eAe1021199B39C61",
-    WATOM: "0x15932E26f5BD4923d46a2b205191C4b5d5f43FE3",
-    AXLBNB: "0x23A6486099f740B7688A0bb7AED7C912015cA2F0",
-    AXLBUSD: "0x4D84E25cEa9447581867fE9f2329B972f532Da2c",
-    AXLXRPB: "0x8e20A0a1B4664D1ae5d18cc48bA6FAD4d9569406",
-    AXLBTCB: "0x94FC70EF7791EE857A1f420B9A471a55F32382be",
-    WBTC: "0xb5c4423a65B953905949548276654C96fcaE6992",
-    MBTC: "0x59889b7021243dB5B1e065385F918316cD90D46c",
-};
-
-// abi for balanceOf
-const balanceOfAbi = [
-    {
-        constant: true,
-        inputs: [
-            {
-                name: "_owner",
-                type: "address",
-            },
-        ],
-        name: "balanceOf",
-        outputs: [
-            {
-                name: "balance",
-                type: "uint256",
-            },
-        ],
-        payable: false,
-        stateMutability: "view",
-        type: "function",
-    },
-    // This is hacky, not even sure this part is correct, but it works..
-    {
-        inputs: [],
-        name: "decimals",
-        outputs: [{ internalType: "uint8", name: "", type: "uint8" }],
-        stateMutability: "view",
-        type: "function",
-    },
-];
+import { ASSET_ADDRESSES, kavaEVMProvider } from '../config/evm';
 
 /**
  *
@@ -105,11 +44,11 @@ export async function getAccountBalances(arg: { address: string }): Promise<stri
     })
 
     // add other assets
-    for (const asset in assetAddresses) {
+    for (const asset in ASSET_ADDRESSES) {
         balanceCalls.push(async () => {
             const contract = new ethers.Contract(
-                assetAddresses[asset],
-                balanceOfAbi,
+                ASSET_ADDRESSES[asset],
+                erc20ABI,
                 kavaEVMProvider
             );
 
@@ -166,7 +105,7 @@ export async function transferAsset(args: TransferParams) {
         const rawTxAmount = String(!args.amount || Number.isNaN(Number(args.amount)) ? "0" : args.amount);
 
         //  todo - better validation and mapping?
-        const contractAddress = assetAddresses[args.assetName.toUpperCase()];
+        const contractAddress = ASSET_ADDRESSES[args.assetName.toUpperCase()];
 
         const contract = new ethers.Contract(
             contractAddress,
@@ -195,5 +134,4 @@ export async function transferAsset(args: TransferParams) {
         });
 
     }
-
 }
