@@ -135,3 +135,20 @@ export async function transferAsset(args: TransferParams) {
 
     }
 }
+
+//  todo - remove hardcoded base URL
+//  todo - implement webapp helper functions like "formatPercentage"
+/**
+ * Fetches the raw staking rewards value from our JSON api (0.081456) and converts it to a human-readable string with percent sign (8.1456%)
+ * @returns {Promise<string>} A promise that resolves to a string representing the staking APY in percentage format or a wrapped error of why the call failed
+ */
+export async function getDisplayStakingApy(): Promise<string> {
+    try {
+        const response = await fetch("https://api2.kava.io/kava/community/v1beta1/annualized_rewards");
+        const result = await response.json();
+
+        return String(Number(result.staking_rewards) * 100).concat("%");
+    } catch (e) {
+        return `Error fetching staking APY: ${e}`;
+    }
+}
