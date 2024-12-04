@@ -155,6 +155,7 @@ func TestIncorrectPortValue(t *testing.T) {
 	err := cmd.Run()
 	require.Error(t, err, fmt.Sprintf("expected %s to fail", cmd.String()))
 
+	assert.Contains(t, stdout.String(), fmt.Sprintf("level=ERROR msg=\"error setting KAVACHAT_API_PORT to %s", unavailablePort))
 	assert.Contains(t, stderr.String(), fmt.Sprintf("fatal: error setting KAVACHAT_API_PORT to %s", unavailablePort))
 }
 
