@@ -20,7 +20,7 @@ import {
 import { chat } from '../utils';
 import { tools } from '../config';
 import type { ChatCompletionChunk, ChatCompletionMessageToolCall } from 'openai/resources/index';
-import { getAccountBalances, transferAsset } from '../tools/toolFunctions';
+import { getAccountBalances, getDisplayStakingApy, transferAsset } from '../tools/toolFunctions';
 
 interface AppContext {
   address: string;
@@ -133,7 +133,7 @@ export function AppContextProvider({
             break;
           case "getDisplayStakingApy":
             console.info("getDisplayStakingApy");
-            await doToolCall(tc, transferAsset);
+            await doToolCall(tc, getDisplayStakingApy);
             break;
 
           default:
