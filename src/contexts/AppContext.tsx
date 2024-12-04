@@ -12,6 +12,7 @@ import {
   messageHistoryClear,
   messageHistoryDropLast,
   selectMessageHistory,
+  selectMessageStore,
   selectStreamingMessage,
   streamingMessageClear,
   streamingMessageConcat
@@ -157,13 +158,26 @@ export function AppContextProvider({
       results = err;
     }
 
-    store.dispatch(messageHistoryAddMessage({
-      role: "tool",
-      content: JSON.stringify(results),
-      tool_call_id: tc.id!,
-    }));
 
-    doChat();
+    const commitToolCall = selectMessageStore(store.getState())
+      .history
+      .find((msg) => {
+        return msg.role === 'assistant' &&
+          msg.content === null &&
+          Array.isArray(msg.tool_calls) &&
+          (msg.tool_calls.find(toolCall => toolCall.id === tc.id) !== undefined);
+      }) !== undefined;
+
+    if (commitToolCall) {
+      store.dispatch(messageHistoryAddMessage({
+        role: "tool",
+        content: JSON.stringify(results),
+        tool_call_id: tc.id!,
+      }));
+
+      doChat();
+    }
+
   }, [store])
 
 

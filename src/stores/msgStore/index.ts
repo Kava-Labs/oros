@@ -44,9 +44,16 @@ export const msgStoreSlice = createSlice({
         },
 
         messageHistoryDropLast(state: MsgStore, _: PayloadAction<void>) {
-            if (state.history[state.history.length - 1].role === 'user') {
-                state.history = state.history.slice(0, -1);
+            let i = state.history.length-1;
+            
+            while (i > 1){
+                if (state.history[i].role === 'user'){
+                    break;
+                }
+                i--;
             }
+
+            if (i) state.history = state.history.slice(0, i);
         }
 
     },

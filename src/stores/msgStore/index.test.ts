@@ -122,7 +122,7 @@ describe('reducers', () => {
             expect(newState.history[2]).toEqual({ role: 'assistant', content: 'Answer.' });
         });
 
-        it('should not drop the last message if it is not from the user', () => {
+        it('should drop the last message and the user question', () => {
             const stateWithHistory: MsgStore = {
                 ...initialState,
                 history: [
@@ -133,8 +133,8 @@ describe('reducers', () => {
             };
             const action = messageHistoryDropLast();
             const newState = msgStoreReducer(stateWithHistory, action);
-            expect(newState.history).toHaveLength(3);
-            expect(newState.history[2]).toEqual({ role: 'assistant', content: 'Hi there!' });
+            expect(newState.history).toHaveLength(1);
+            expect(newState.history[0]).toEqual(initialState.history[0]);
         });
 
         it('should handle history with only the system prompt', () => {
@@ -143,6 +143,30 @@ describe('reducers', () => {
             expect(newState.history).toHaveLength(1);
             expect(newState.history[0]).toEqual(initialState.history[0]);
         });
+
+        it('should handle removal of tool call messages and the triggering question', () => {
+            const stateWithHistory: MsgStore = {
+                ...initialState,
+                history: [
+                    ...initialState.history,
+                    { role: 'user', content: 'hi' },
+                    { role: 'assistant', content: 'how can i help you?' },
+                    { role: 'user', content: 'get my balances' },
+                    {
+                        role: 'assistant',
+                        content: null,
+                        tool_calls: [{ type: 'function', function: { name: 'getBalances', arguments: '' }, id: '1' }],
+                    },
+                    { role: 'tool', content: 'System message after assistant response.', tool_call_id: '1' },
+                ],
+            };
+            const action = messageHistoryDropLast();
+            const newState = msgStoreReducer(stateWithHistory, action);
+            expect(newState.history).toHaveLength(3);
+            expect(newState.history[2]).toEqual( { role: 'assistant', content: 'how can i help you?' });
+
+        })
+
 
     });
 });
