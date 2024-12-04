@@ -9,7 +9,7 @@ jobs:
   e2e-test:
     runs-on: ubuntu-latest
     env:
-      KAVA_TAG: local
+      KAVA_TAG: v0.27.0-goleveldb
       KVTOOL_CONFIGTEMPLATE: v0.26
     steps:
       - name: Checkout current commit
