@@ -16,7 +16,6 @@ test('renders intro message', async ({ page }) => {
 });
 
 
-// enable this later when proxy is ready (currently only runnable locally)
 test('receiving a response from the model', async ({ page }) => {
   test.setTimeout(90 * 1000);
   await page.goto('http://localhost:3000/');
