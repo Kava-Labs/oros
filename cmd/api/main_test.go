@@ -82,7 +82,7 @@ func startProxyCmd(context context.Context, config config, args ...string) *exec
 	return cmd
 }
 
-func TestMissingRequiredEnvironmentVariable(t *testing.T) {
+func TestIncorrectRequiredEnvironmentVariable(t *testing.T) {
 	testCases := []struct {
 		name                string
 		environmentVariable string
