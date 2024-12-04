@@ -134,7 +134,7 @@ func TestMissingRequiredEnvironmentVariable(t *testing.T) {
 	}
 }
 
-func TestIncorrectPortValue(t *testing.T) {
+func TestStringPortValue(t *testing.T) {
 	unavailablePort := "abc"
 	ctx, _ := context.WithTimeout(context.Background(), time.Duration(1*time.Second))
 	cmd := startProxyCmd(ctx, newDefaultTestConfig())
