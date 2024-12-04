@@ -17,7 +17,7 @@ test('renders intro message', async ({ page }) => {
 
 
 // enable this later when proxy is ready (currently only runnable locally)
-test.skip('receiving a response from the model', async ({ page }) => {
+test('receiving a response from the model', async ({ page }) => {
   await page.goto('http://localhost:3000/');
 
   await page.waitForLoadState();

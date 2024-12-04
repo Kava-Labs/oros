@@ -1,4 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
+import {config} from 'dotenv';
+
+config();
 
 /**
  * Read environment variables from file.
@@ -42,7 +45,7 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'npm run dev',
+    command: `OPENAI_BASE_URL=${process.env.OPENAI_BASE_URL} OPENAI_API_KEY=${process.env.OPENAI_API_KEY} go run ./cmd/api/main.go & npm run dev`,
     url: 'http://localhost:3000',
   },
 });
