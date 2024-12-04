@@ -137,7 +137,7 @@ func TestMissingRequiredEnvironmentVariable(t *testing.T) {
 func TestInvalidPortValue(t *testing.T) {
 	testCases := []struct {
 		name      string
-		portValue any
+		portValue string
 	}{
 		{
 			name:      "Non-integer",
@@ -145,7 +145,7 @@ func TestInvalidPortValue(t *testing.T) {
 		},
 		{
 			name:      "Integer outside range",
-			portValue: 1234567890000000,
+			portValue: "123456789000000000000000000000",
 		},
 	}
 
