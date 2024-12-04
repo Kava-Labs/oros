@@ -82,65 +82,55 @@ func startProxyCmd(context context.Context, config config, args ...string) *exec
 	return cmd
 }
 
-func TestNoKeyForOpenAI(t *testing.T) {
+func TestMissingRequiredEnvironmentVariable(t *testing.T) {
+	testCases := []struct {
+		name                string
+		environmentVariable string
+	}{
+		{
+			name:                "API key missing",
+			environmentVariable: "OPENAI_API_KEY",
+		},
+		{
+			name:                "Base url missing",
+			environmentVariable: "OPENAI_BASE_URL",
+		},
+	}
 	ctx, _ := context.WithTimeout(context.Background(), time.Duration(1*time.Second))
-	cmd := startProxyCmd(ctx, newDefaultTestConfig())
 
-	newEnv := []string{}
-	for _, envVar := range cmd.Env {
-		if match, _ := regexp.MatchString("^OPENAI_API_KEY=.*$", envVar); match {
-			continue
-		}
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			//	be sure we start with a fresh environment for each case
+			cmd := startProxyCmd(ctx, newDefaultTestConfig())
+			newEnv := []string{}
 
-		newEnv = append(newEnv, envVar)
-	}
-	cmd.Env = newEnv
+			for _, envVar := range cmd.Env {
+				//	skip the targeted environment variable when building the new env
+				envVariablePattern := fmt.Sprintf("^%s=.*$", testCase.environmentVariable)
+				if match, _ := regexp.MatchString(envVariablePattern, envVar); match {
+					continue
+				}
+				newEnv = append(newEnv, envVar)
+			}
 
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
+			cmd.Env = newEnv
 
-	err := cmd.Run()
-	require.Error(t, err, fmt.Sprintf("expected %s to fail", cmd.String()))
+			var stdout, stderr bytes.Buffer
+			cmd.Stdout = &stdout
+			cmd.Stderr = &stderr
 
-	assert.Contains(t, stdout.String(), "level=ERROR msg=\"OPENAI_API_KEY is required\"")
-	assert.Contains(t, stderr.String(), "fatal: OPENAI_API_KEY is required")
+			err := cmd.Run()
+			require.Error(t, err, fmt.Sprintf("expected %s to fail", cmd.String()))
 
-	if exitErr, ok := err.(*exec.ExitError); ok {
-		assert.Equal(t, 1, exitErr.ExitCode(), "expected exit code to equal 1")
-	} else {
-		t.Fatalf("%v is not an exit error", err)
-	}
-}
+			assert.Contains(t, stderr.String(), fmt.Sprintf("fatal: %s is required", testCase.environmentVariable))
+			assert.Contains(t, stdout.String(), fmt.Sprintf("level=ERROR msg=\"%s is required\"", testCase.environmentVariable))
 
-func TestNoBaseURLForOpenAI(t *testing.T) {
-	ctx, _ := context.WithTimeout(context.Background(), time.Duration(1*time.Second))
-	cmd := startProxyCmd(ctx, newDefaultTestConfig())
-
-	newEnv := []string{}
-	for _, envVar := range cmd.Env {
-		if match, _ := regexp.MatchString("^OPENAI_BASE_URL=.*$", envVar); match {
-			continue
-		}
-
-		newEnv = append(newEnv, envVar)
-	}
-	cmd.Env = newEnv
-
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
-	err := cmd.Run()
-	require.Error(t, err, fmt.Sprintf("expected %s to fail", cmd.String()))
-
-	assert.Contains(t, stdout.String(), "level=ERROR msg=\"OPENAI_BASE_URL is required\"")
-	assert.Contains(t, stderr.String(), "fatal: OPENAI_BASE_URL is required")
-
-	if exitErr, ok := err.(*exec.ExitError); ok {
-		assert.Equal(t, 1, exitErr.ExitCode(), "expected exit code to equal 1")
-	} else {
-		t.Fatalf("%v is not an exit error", err)
+			if exitErr, ok := err.(*exec.ExitError); ok {
+				assert.Equal(t, 1, exitErr.ExitCode(), "expected exit code to equal 1")
+			} else {
+				t.Fatalf("%v is not an exit error", err)
+			}
+		})
 	}
 }
 
