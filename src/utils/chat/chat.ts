@@ -104,6 +104,7 @@ export function chat(cfg: ChatConfig) {
     if (!cfg.openAI && !client) {
         try {
             client = new OpenAI({
+                baseURL: import.meta.env['VITE_OPENAI_BASE_URL'],
                 apiKey: import.meta.env['VITE_OPENAI_API_KEY'], // once Proxy is up, use getToken() here
                 dangerouslyAllowBrowser: true,
             });
