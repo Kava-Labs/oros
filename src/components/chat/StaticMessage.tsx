@@ -2,8 +2,7 @@ import styles from './style.module.css';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { marked } from 'marked';
 import { useAppContext } from '../../contexts/AppContext';
-
-
+import DOMPurify from 'dompurify';
 
 export const StaticMessage = (props: ChatCompletionMessageParam) => {
     const { markDownCache } = useAppContext();
@@ -16,7 +15,7 @@ export const StaticMessage = (props: ChatCompletionMessageParam) => {
     // save the markdown if cache miss 
     if (!(__html = markDownCache.current.get(content))) {
         try {
-            __html = marked.parse(content, { async: false });
+            __html = DOMPurify.sanitize(marked.parse(content, { async: false }));
             markDownCache.current.set(content, __html);
         } catch (err) {
             console.error(err);

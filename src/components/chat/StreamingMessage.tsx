@@ -4,7 +4,7 @@ import {
 } from '../../stores';
 import styles from './style.module.css';
 import { marked } from 'marked';
-
+import DOMPurify from 'dompurify';
 
 export const StreamingMessage = ({ chatContainerRef }: { chatContainerRef: React.RefObject<HTMLDivElement> }) => {
     const content = useSelector(selectStreamingMessage);
@@ -19,7 +19,7 @@ export const StreamingMessage = ({ chatContainerRef }: { chatContainerRef: React
 
     let __html: string;
     try {
-        __html = marked.parse(content, { async: false });
+        __html = DOMPurify.sanitize(marked.parse(content, { async: false }));
     } catch (err) {
         console.error(err);
         __html = content;
