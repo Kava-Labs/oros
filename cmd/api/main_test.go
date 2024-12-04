@@ -142,10 +142,9 @@ func TestIncorrectPortValue(t *testing.T) {
 	newEnv := []string{}
 	for _, envVar := range cmd.Env {
 		if match, _ := regexp.MatchString("^KAVACHAT_API_PORT=.*$", envVar); match {
-			newEnv = append(newEnv, fmt.Sprintf("KAVACHAT_API_PORT=%d", unavailablePort))
-		} else {
-			newEnv = append(newEnv, envVar)
+			envVar = fmt.Sprintf("KAVACHAT_API_PORT=%d", unavailablePort)
 		}
+		newEnv = append(newEnv, envVar)
 	}
 	cmd.Env = newEnv
 
