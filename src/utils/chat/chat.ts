@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import type { ChatCompletionMessageParam, ChatCompletionTool, ChatCompletionChunk } from 'openai/resources/index';
+import { getToken } from '../token/token';
 
 let client: OpenAI | null = null;
 
@@ -105,7 +106,7 @@ export function chat(cfg: ChatConfig) {
         try {
             client = new OpenAI({
                 baseURL: import.meta.env['VITE_OPENAI_BASE_URL'],
-                apiKey: import.meta.env['VITE_OPENAI_API_KEY'], // once Proxy is up, use getToken() here
+                apiKey: getToken(),
                 dangerouslyAllowBrowser: true,
             });
         } catch (err) {
