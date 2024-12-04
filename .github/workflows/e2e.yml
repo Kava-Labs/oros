@@ -1,4 +1,4 @@
-name: Client Test CI
+name: End-to-End Tests
 on: [push]
 
 concurrency:
