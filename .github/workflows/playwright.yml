@@ -36,4 +36,4 @@ jobs:
     
     # Run Playwright tests
     - name: Run Playwright tests
-      run: npx playwright test
+      run: DEBUG=pw:webserver npx playwright test
