@@ -158,7 +158,6 @@ func TestIncorrectPortValue(t *testing.T) {
 
 	assert.Contains(t, stdout.String(), fmt.Sprintf("level=ERROR msg=\"listen tcp: address %d: invalid port\"", unavailablePort))
 	assert.Contains(t, stderr.String(), fmt.Sprintf("fatal: listen tcp: address %d: invalid port", unavailablePort))
-
 }
 
 func launchApiServer(ctx context.Context, conf config) (string, func() error, error) {
