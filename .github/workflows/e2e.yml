@@ -1,0 +1,44 @@
+name: Client Test CI
+on: [push]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e-test:
+    runs-on: ubuntu-latest
+    env:
+      KAVA_TAG: local
+      KVTOOL_CONFIGTEMPLATE: v0.26
+    steps:
+      - name: Checkout current commit
+        uses: actions/checkout@v4
+        with:
+          # Also clone kvtool submodule
+          submodules: true
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: |
+            go.sum
+
+      - name: Install kvtool
+        run: make -C tests/kvtool install
+
+      # kvtool is only used to generate the kava config files for the container to mount
+      - name: Generate kava config
+        run: kvtool testnet gen-config kava --kava.configTemplate $KVTOOL_CONFIGTEMPLATE
+
+      - name: Start proxy and kava
+        # Wait for containers to be healthy or fail after 30 seconds
+        run: docker compose -f docker-compose.yaml up -d --build --wait --wait-timeout 30
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: https://api.openai.com/v1
+
+      - name: Shutdown kava
+        if: always()
+        run: docker compose -f docker-compose.yaml down
