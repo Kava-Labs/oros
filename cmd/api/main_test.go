@@ -135,14 +135,14 @@ func TestMissingRequiredEnvironmentVariable(t *testing.T) {
 }
 
 func TestIncorrectPortValue(t *testing.T) {
-	unavailablePort := 123456789000000000
+	unavailablePort := "abc"
 	ctx, _ := context.WithTimeout(context.Background(), time.Duration(1*time.Second))
 	cmd := startProxyCmd(ctx, newDefaultTestConfig())
 
 	newEnv := []string{}
 	for _, envVar := range cmd.Env {
 		if match, _ := regexp.MatchString("^KAVACHAT_API_PORT=.*$", envVar); match {
-			envVar = fmt.Sprintf("KAVACHAT_API_PORT=%d", unavailablePort)
+			envVar = fmt.Sprintf("KAVACHAT_API_PORT=%s", unavailablePort)
 		}
 		newEnv = append(newEnv, envVar)
 	}
@@ -155,8 +155,7 @@ func TestIncorrectPortValue(t *testing.T) {
 	err := cmd.Run()
 	require.Error(t, err, fmt.Sprintf("expected %s to fail", cmd.String()))
 
-	assert.Contains(t, stdout.String(), fmt.Sprintf("level=ERROR msg=\"listen tcp: address %d: invalid port\"", unavailablePort))
-	assert.Contains(t, stderr.String(), fmt.Sprintf("fatal: listen tcp: address %d: invalid port", unavailablePort))
+	assert.Contains(t, stderr.String(), fmt.Sprintf("fatal: error setting KAVACHAT_API_PORT to %s", unavailablePort))
 }
 
 func launchApiServer(ctx context.Context, conf config) (string, func() error, error) {
