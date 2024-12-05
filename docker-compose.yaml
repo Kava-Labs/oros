@@ -32,6 +32,7 @@ services:
       - "sh"
       - "-c"
       - "/root/.kava/config/init-data-directory.sh && kava start --rpc.laddr=tcp://0.0.0.0:26657"
+    # kava image does not have healthcheck built in, so we add one here
     healthcheck:
       # Check if kava EVM JSON-RPC is up
       test:

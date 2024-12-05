@@ -38,7 +38,7 @@ jobs:
         # Wait for containers to be healthy or fail after 30 seconds
         run: docker compose -f docker-compose.yaml up -d --build --wait --wait-timeout 30
 
-      - name: Show logs if containers are unhealthy
+      - name: Output logs if containers are unhealthy
         if: failure()
         run: docker compose -f docker-compose.yaml logs
 
