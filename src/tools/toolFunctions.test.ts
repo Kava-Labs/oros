@@ -15,11 +15,12 @@ describe.skip('getStakingApy', () => {
   });
 
   it('returns a wrapped error message on network failure', async () => {
+    const mockError = "Error: 404 Unauthorized";
     const fetchStakingApySpy = vi.spyOn(apiModule, 'fetchStakingApy');
-    fetchStakingApySpy.mockRejectedValueOnce(new Error('404 Unauthorized'));
+    fetchStakingApySpy.mockRejectedValueOnce(mockError);
 
     const result = await getDisplayStakingApy();
 
-    expect(result).toBe("Error fetching staking APY: Error: 404 Unauthorized");
+    expect(result).toBe(`Error fetching staking APY: "${mockError}"`);
   });
 })
