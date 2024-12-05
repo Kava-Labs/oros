@@ -149,6 +149,6 @@ export async function getDisplayStakingApy(): Promise<string> {
 
         return displayValue.concat("%");
     } catch (e) {
-        return `Error fetching staking APY: ${e}`;
+        return `Error fetching staking APY: ${JSON.stringify(e)}`;
     }
 }
