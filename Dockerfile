@@ -10,7 +10,7 @@ RUN go mod download && go mod verify
 COPY . .
 RUN go build -v -o /usr/local/bin/kavachat ./...
 
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=30s --start-period=30s  --start-interval=5s --retries=3 \
     CMD curl -f http://localhost:5555/v1/healthcheck || exit 1
 
 EXPOSE 5555
