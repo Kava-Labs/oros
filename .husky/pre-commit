@@ -1,2 +1,2 @@
-npx lint-staged
+npx run lint-staged
 npx vitest run src --reporter=default
