@@ -9,7 +9,6 @@
     "check": "tsc -p tsconfig.app.json",
     "fix": "eslint . --fix",
     "lint": "eslint .",
-    "prepare": "husky",
     "preview": "vite preview",
     "test": "vitest",
     "test:unit": "vitest src",
