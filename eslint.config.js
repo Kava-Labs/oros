@@ -12,7 +12,7 @@ export default tseslint.config(
     extends: [
       js.configs.recommended,
       ...tseslint.configs.recommended,
-      prettier // Extend Prettier to disable conflicting rules
+      prettier, // Extend Prettier to disable conflicting rules
     ],
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
@@ -30,8 +30,15 @@ export default tseslint.config(
         'warn',
         { allowConstantExport: true },
       ],
-      "no-unused-vars": "error",
-      'prettier/prettier': 'error', // Prettier issues will be treated as errors
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          ignoreRestSiblings: true,
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+        },
+      ],
+      'prettier/prettier': 'warn', // Prettier issues will be treated as warnings
     },
   },
 );
