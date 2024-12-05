@@ -10,16 +10,16 @@ export const StaticMessage = (props: ChatCompletionMessageParam) => {
   const content = props.content as string;
   const role = props.role;
   if ((role !== 'assistant' && role !== 'user') || !content) return null;
-  let __html: string | undefined;
+  let html: string | undefined;
 
   // save the markdown if cache miss 
-  if (!(__html = markDownCache.current.get(content))) {
+  if (!(html = markDownCache.current.get(content))) {
     try {
-      __html = DOMPurify.sanitize(marked.parse(content, { async: false }));
-      markDownCache.current.set(content, __html);
+      html = DOMPurify.sanitize(marked.parse(content, { async: false }));
+      markDownCache.current.set(content, html);
     } catch (err) {
       console.error(err);
-      __html = content;
+      html = content;
     }
   }
 

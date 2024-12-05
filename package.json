@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "check": "tsc -p tsconfig.app.json",
+    "fix": "eslint . --fix",
     "lint": "eslint .",
     "prepare": "husky install",
     "preview": "vite preview",
