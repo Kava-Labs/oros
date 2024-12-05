@@ -22,7 +22,7 @@ export const StreamingMessage = ({ chatContainerRef }: { chatContainerRef: React
 
   return (
     <div data-testid='StreamingMessage' className={styles.chatBubbleAssistant}>
-      <div className={styles.chatBubble} dangerouslySetInnerHTML={{ __html: html }} />
+      <div className={styles.chatBubble} dangerouslySetInnerHTML={{ __html: hml }} />
     </div>
   )
 };
