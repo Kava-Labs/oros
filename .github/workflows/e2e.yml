@@ -34,7 +34,7 @@ jobs:
       - name: Generate kava config
         run: kvtool testnet gen-config kava --kava.configTemplate $KVTOOL_CONFIGTEMPLATE
 
-      - name: Start proxy and kava
+      - name: Start proxy and kava node
         # Wait for containers to be healthy or fail after 30 seconds
         run: docker compose -f docker-compose.yaml up -d --build --wait --wait-timeout 30
 
