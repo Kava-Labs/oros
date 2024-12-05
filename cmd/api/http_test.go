@@ -20,6 +20,7 @@ const (
 	basic              = `{"model": "gpt-4o-mini", "messages": [{"role": "user", "content": "Say this is a test!"}], "temperature": 0.7 }`
 	basicStreaming     = `{"model": "gpt-4o-mini", "messages": [{"role": "user", "content": "Say this is a test!"}], "temperature": 0.7, "stream": true}`
 	streamWithNewLines = `{"model": "gpt-4o-mini", "messages": [{"role": "user", "content": "Please send me a response with new lines."}], "temperature": 0.7, "stream": true}`
+	basicImageGen      = `{"model": "dall-e-2", "prompt": "generate an image of a tabby cat", "size": "256x256"}`
 
 	testCaseFileName = "httpTestCases.json"
 )
@@ -137,6 +138,17 @@ func generateTestCases() ([]*HttpTestCase, error) {
 			Body:            json.RawMessage(streamWithNewLines),
 			WantStatusCode:  200,
 			WantContentType: "text/event-stream",
+		},
+		{
+			Name:   "Basic Image Generation",
+			Method: http.MethodPost,
+			Path:   ImageGenerationPath,
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+			},
+			Body:            json.RawMessage(basicImageGen),
+			WantStatusCode:  200,
+			WantContentType: "application/json",
 		},
 	}
 
