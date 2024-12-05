@@ -9,7 +9,7 @@
     "check": "tsc -p tsconfig.app.json",
     "fix": "eslint . --fix",
     "lint": "eslint .",
-    "prepare": "husky install",
+    "prepare": "git config core.hooksPath .husky",
     "preview": "vite preview",
     "test": "vitest",
     "test:unit": "vitest src",
