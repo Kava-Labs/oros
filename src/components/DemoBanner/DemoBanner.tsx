@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import styles from "../../style.module.css";
+import React, { useEffect } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import styles from '../../style.module.css';
 
 export const DemoBanner: React.FC = () => {
   useEffect(() => {

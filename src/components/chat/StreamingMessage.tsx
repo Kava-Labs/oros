@@ -1,31 +1,28 @@
 import { useSelector } from 'react-redux';
-import {
-    selectStreamingMessage,
-} from '../../stores';
+import { selectStreamingMessage, } from '../../stores';
 import styles from './style.module.css';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 
 export const StreamingMessage = ({ chatContainerRef }: { chatContainerRef: React.RefObject<HTMLDivElement> }) => {
-    const content = useSelector(selectStreamingMessage);
-    if (!content) {
-        return null;
-    }
+  const content = useSelector(selectStreamingMessage);
+  if (!content) { return null; };
 
+  if (chatContainerRef.current) {
+    chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+  }
 
-    if (chatContainerRef.current) {
-        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-    }
+  let html: string;
+  try {
+    html = DOMPurify.sanitize(marked.parse(content, { async: false }));
+  } catch (err) {
+    console.error(err);
+    html = content;
+  }
 
-    let __html: string;
-    try {
-        __html = DOMPurify.sanitize(marked.parse(content, { async: false }));
-    } catch (err) {
-        console.error(err);
-        __html = content;
-    }
-
-    return <div data-testid='StreamingMessage' className={styles.chatBubbleAssistant}>
-        <div className={styles.chatBubble} dangerouslySetInnerHTML={{ __html }} />
+  return (
+    <div data-testid='StreamingMessage' className={styles.chatBubbleAssistant}>
+      <div className={styles.chatBubble} dangerouslySetInnerHTML={{ __html: html }} />
     </div>
+  )
 };

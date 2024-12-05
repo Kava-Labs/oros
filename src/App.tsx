@@ -1,7 +1,7 @@
 import { useAppContext } from './contexts/AppContext';
 import { Header } from './components/Header';
 import { DemoBanner } from './components/DemoBanner';
-import { Chat } from './components/chat';
+import { Chat } from './components/Chat';
 import { ChatControls } from './components/ChatControls';
 
 export const App = () => {
