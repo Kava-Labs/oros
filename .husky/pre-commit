@@ -1,2 +1,2 @@
 npx lint-staged
-npx vitest run src --reporter=verbose
+npx vitest run src --reporter=default
