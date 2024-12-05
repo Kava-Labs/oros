@@ -15,6 +15,7 @@ import (
 
 const (
 	ChatCompletionsPath = "/chat/completions"
+	ImageGenerationPath = "/images/generations"
 
 	basic              = `{"model": "gpt-4o-mini", "messages": [{"role": "user", "content": "Say this is a test!"}], "temperature": 0.7 }`
 	basicStreaming     = `{"model": "gpt-4o-mini", "messages": [{"role": "user", "content": "Say this is a test!"}], "temperature": 0.7, "stream": true}`
