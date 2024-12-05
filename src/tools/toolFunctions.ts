@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { bech32 } from "bech32";
 import { erc20ABI } from './erc20ABI';
 import { ASSET_ADDRESSES, kavaEVMProvider } from '../config/evm';
-import { fetchStakingApy } from './api.ts';
+import { Coin, fetchDelegatedBalance, fetchStakingApy } from './api';
 
 /**
  *
@@ -150,5 +150,34 @@ export async function getDisplayStakingApy(): Promise<string> {
         return displayValue.concat("%");
     } catch (e) {
         return `Error fetching staking APY: ${JSON.stringify(e)}`;
+    }
+}
+/**
+ * * Retrieves the delegated balance for a given address.
+ *  *
+ *  * @param {string} arg.address - The address to query delegated balances (either a kava or eth address).
+ * @returns {Promise<string>} A user's total delegated KAVA (in display units)
+ */
+export async function getDelegatedBalance(arg: { address: string }): Promise<string> {
+    const COSMOS_CONVERSION_FACTOR = 10 ** 6;
+    const { address } = arg;
+    const kavaAddress = address.startsWith("kava") ? address : ethToKavaAddress(address);
+
+    try {
+        const response = await fetchDelegatedBalance(kavaAddress);
+
+        //  this endpoint returns two ukava Coins, one for "vested" and one for "vesting"
+       const sumOfVestingAndVested: number = Object.values(response).reduce((acc: number, currentValue: Coin) => {
+            acc += Number(currentValue.amount)
+
+            return acc;
+        }, 0);
+
+       const displayedSum = sumOfVestingAndVested / COSMOS_CONVERSION_FACTOR;
+
+       return String(displayedSum);
+
+    } catch (e) {
+        return `Error fetching delegated balance for: ${kavaAddress}, ${e}`;
     }
 }
