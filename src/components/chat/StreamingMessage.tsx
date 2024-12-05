@@ -3,6 +3,7 @@ import { selectStreamingMessage, } from '../../stores';
 import styles from './style.module.css';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
+const foo = 'bar'
 
 export const StreamingMessage = ({ chatContainerRef }: { chatContainerRef: React.RefObject<HTMLDivElement> }) => {
   const content = useSelector(selectStreamingMessage);
@@ -22,7 +23,7 @@ export const StreamingMessage = ({ chatContainerRef }: { chatContainerRef: React
 
   return (
     <div data-testid='StreamingMessage' className={styles.chatBubbleAssistant}>
-      <div className={styles.chatBubble} dangerouslySetInnerHTML={{ __html: hml }} />
+      <div className={styles.chatBubble} dangerouslySetInnerHTML={{ __html: html }} />
     </div>
   )
 };

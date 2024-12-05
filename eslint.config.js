@@ -30,6 +30,7 @@ export default tseslint.config(
         'warn',
         { allowConstantExport: true },
       ],
+      "no-unused-vars": "error",
       'prettier/prettier': 'error', // Prettier issues will be treated as errors
     },
   },
