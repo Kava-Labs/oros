@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import { ethers } from 'ethers';
 
 // kava evm rpc url
 export const kavaEvmRpc = "https://evm.kava-rpc.com";

@@ -1,5 +1,5 @@
-import { ethers } from "ethers";
-import { bech32 } from "bech32";
+import { ethers } from 'ethers';
+import { bech32 } from 'bech32';
 import { erc20ABI } from './erc20ABI';
 import { ASSET_ADDRESSES, kavaEVMProvider } from '../config/evm';
 
