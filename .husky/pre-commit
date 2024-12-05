@@ -1,2 +1,5 @@
-npx run lint-staged
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+npx lint-staged
 npx vitest run src --reporter=default
