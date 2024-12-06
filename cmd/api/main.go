@@ -125,7 +125,7 @@ func main() {
 		ErrorLog: slog.NewLogLogger(logger.Handler(), slog.LevelError),
 	}
 
-	logger.Info("serving", "addr", listener.Addr())
+	logger.Info("serving", "addr", address)
 
 	if err := server.Serve(listener); err != http.ErrServerClosed {
 		logFatal(logger, err)
