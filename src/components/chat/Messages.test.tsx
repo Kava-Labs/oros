@@ -95,7 +95,7 @@ describe('Messages Component', () => {
     render(<Messages />);
 
     expect(
-      screen.queryByText('{\"kava\":\"1000\",\"hard\":\"34142\"}'),
+      screen.queryByText('{"kava":"1000","hard":"34142"}'),
     ).not.toBeInTheDocument();
     expect(screen.queryByText('getAccountBalances')).not.toBeInTheDocument();
 

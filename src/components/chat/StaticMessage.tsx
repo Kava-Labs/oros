@@ -1,7 +1,7 @@
 import styles from './style.module.css';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { marked } from 'marked';
-import { useAppContext } from '../../contexts/AppContext';
+import { useAppContext } from '../../contexts/useAppContext';
 import DOMPurify from 'dompurify';
 
 export const StaticMessage = (props: ChatCompletionMessageParam) => {

@@ -1,4 +1,4 @@
-import { useAppContext } from './contexts/AppContext';
+import { useAppContext } from './contexts/useAppContext';
 import { Header } from './components/Header';
 import { DemoBanner } from './components/DemoBanner';
 import { Chat } from './components/Chat';

@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
-import { AppContextProvider } from './AppContext';
-import { useAppContext } from './AppContext';
+import { AppContextProvider } from './AppContextProvider';
+import { useAppContext } from './useAppContext';
 import * as stores from '../stores';
 import * as utils from '../utils';
 

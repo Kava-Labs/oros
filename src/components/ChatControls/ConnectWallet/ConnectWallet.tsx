@@ -1,4 +1,4 @@
-import { useAppContext } from '../../../contexts/AppContext';
+import { useAppContext } from '../../../contexts/useAppContext';
 import styles from '../../../style.module.css';
 
 export const ConnectWallet = () => {

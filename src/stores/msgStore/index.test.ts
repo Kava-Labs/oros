@@ -191,6 +191,7 @@ describe('selectors', () => {
       history: [...initialState.history, { role: 'user', content: 'Hello' }],
       streamingMessage: 'Typing...',
     },
+    /* eslint-disable  @typescript-eslint/no-explicit-any */
   } as any;
 
   it('selectMessageStore should return the msgStore slice', () => {

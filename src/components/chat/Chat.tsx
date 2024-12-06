@@ -3,7 +3,7 @@ import styles from './style.module.css';
 import { Messages } from './Messages';
 import { PromptInput } from './PromptInput';
 import { StreamingMessage } from './StreamingMessage';
-import { useAppContext } from '../../contexts/AppContext';
+import { useAppContext } from '../../contexts/useAppContext';
 
 export const Chat = () => {
   const { submitUserChatMessage, cancelStream } = useAppContext();
