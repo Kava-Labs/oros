@@ -1,4 +1,4 @@
-import styles from "./style.module.css";
+import styles from "../../../style.module.css";
 import type { ChatCompletionMessageParam } from "openai/resources/index";
 import { marked } from "marked";
 import { useAppContext } from "../../../contexts/AppContext";
