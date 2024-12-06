@@ -20,7 +20,7 @@ import {
 import { chat } from '../utils';
 import { tools } from '../config';
 import type { ChatCompletionChunk, ChatCompletionMessageToolCall } from 'openai/resources/index';
-import { getAccountBalances, transferAsset, getDisplayStakingApy } from '../tools/toolFunctions';
+import { getAccountBalances, getDisplayStakingApy, transferAsset } from '../tools/toolFunctions';
 import { toast } from 'react-toastify';
 
 interface AppContext {
