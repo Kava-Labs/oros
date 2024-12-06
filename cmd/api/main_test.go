@@ -103,6 +103,11 @@ func TestIncorrectRequiredEnvironmentVariable(t *testing.T) {
 			expectedError:       "OPENAI_BASE_URL is required",
 		},
 		{
+			name:                "API host missing",
+			environmentVariable: "KAVACHAT_API_HOST",
+			expectedError:       "KAVACHAT_API_HOST is required",
+		},
+		{
 			name:                "Non-integer for port",
 			environmentVariable: "KAVACHAT_API_PORT",
 			value:               "abc",
@@ -251,20 +256,20 @@ func launchApiServer(ctx context.Context, conf config) (string, func() error, er
 	return fmt.Sprintf("http://localhost:%d", port), shutdownServer, nil
 }
 
-//func TestHttpHealthCheck(t *testing.T) {
-//	ctx, _ := context.WithTimeout(context.Background(), time.Duration(1*time.Second))
-//
-//	serverUrl, shutdown, err := launchApiServer(ctx, newDefaultTestConfig())
-//	require.NoError(t, err, "expected server to start without error")
-//	defer shutdown()
-//
-//	healthcheckUrl, err := url.JoinPath(serverUrl, "/v1/healthcheck")
-//	require.NoError(t, err, "could not build healthcheck url")
-//
-//	response, err := http.Get(healthcheckUrl)
-//	require.NoError(t, err, "expected server to be ready for requests")
-//	assert.Equal(t, http.StatusOK, response.StatusCode, "expected healthcheck to be successful")
-//}
+func TestHttpHealthCheck(t *testing.T) {
+	ctx, _ := context.WithTimeout(context.Background(), time.Duration(1*time.Second))
+
+	serverUrl, shutdown, err := launchApiServer(ctx, newDefaultTestConfig())
+	require.NoError(t, err, "expected server to start without error")
+	defer shutdown()
+
+	healthcheckUrl, err := url.JoinPath(serverUrl, "/v1/healthcheck")
+	require.NoError(t, err, "could not build healthcheck url")
+
+	response, err := http.Get(healthcheckUrl)
+	require.NoError(t, err, "expected server to be ready for requests")
+	assert.Equal(t, http.StatusOK, response.StatusCode, "expected healthcheck to be successful")
+}
 
 func TestChatCompletionProxy(t *testing.T) {
 	config := newDefaultTestConfig()

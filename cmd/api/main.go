@@ -21,6 +21,7 @@ var allowedHosts = []string{"127.0.0.1", "0.0.0.0"}
 
 var ErrOpenAIKeyRequired = errors.New("OPENAI_API_KEY is required")
 var ErrOpenAIBaseURLRequired = errors.New("OPENAI_BASE_URL is required")
+var ErrAPIHostRequired = errors.New("KAVACHAT_API_HOST is required")
 
 func main() {
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
@@ -32,6 +33,11 @@ func main() {
 	baseURL := os.Getenv("OPENAI_BASE_URL")
 	if baseURL == "" {
 		logFatal(logger, ErrOpenAIBaseURLRequired)
+	}
+
+	host := os.Getenv("KAVACHAT_API_HOST")
+	if host == "" {
+		logFatal(logger, ErrAPIHostRequired)
 	}
 
 	logger.Info("Starting Kavachat API!")
@@ -92,7 +98,6 @@ func main() {
 		port = parsedPort
 	}
 
-	host := os.Getenv("KAVACHAT_API_HOST")
 	validatedHost := false
 
 	for _, h := range allowedHosts {
