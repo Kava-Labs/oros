@@ -1,6 +1,5 @@
 import OpenAI from 'openai';
 import { v4 as uuidv4 } from 'uuid';
-import { describe, expect, it } from 'vitest';
 
 const PROXY_ENDPOINT= process.env.PROXY_ENDPOINT
 const BYPASS_PROXY = process.env.BYPASS_PROXY === 'true';

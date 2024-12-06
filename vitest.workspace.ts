@@ -10,6 +10,7 @@ export default defineWorkspace([
       environment: "jsdom",
       setupFiles: './vitestSetup.ts',
       exclude: [...configDefaults.exclude, "e2e"],
+      globals: true,
     }
   },
   {
@@ -18,6 +19,7 @@ export default defineWorkspace([
       root: './tests',
       include: ['**/*.test.ts'],
       environment: 'node',
+      globals: true,
     }
   }
 ])

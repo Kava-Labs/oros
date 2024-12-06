@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach, afterAll, Mock } from "vitest";
+import { Mock } from "vitest";
 import { PromptInput } from "./PromptInput";
 import { useSelector } from "react-redux";
 import { selectHasToolCallInProgress } from "../../../stores";
