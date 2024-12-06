@@ -10,12 +10,19 @@ export const Chat = () => {
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div data-testid='Chat'>
-      <div ref={chatContainerRef} className={styles.chatContainer} data-testid='ChatContainer'>
+    <div data-testid="Chat">
+      <div
+        ref={chatContainerRef}
+        className={styles.chatContainer}
+        data-testid="ChatContainer"
+      >
         <Messages />
         <StreamingMessage chatContainerRef={chatContainerRef} />
       </div>
-      <PromptInput submitUserMessage={submitUserChatMessage} cancelStream={cancelStream} />
+      <PromptInput
+        submitUserMessage={submitUserChatMessage}
+        cancelStream={cancelStream}
+      />
     </div>
-  )
-  };
+  );
+};

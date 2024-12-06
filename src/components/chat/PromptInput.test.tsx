@@ -18,18 +18,19 @@ describe('PromptInput Component', () => {
 
   afterAll(() => {
     vi.restoreAllMocks();
-  })
-
+  });
 
   it('renders input field and submit button', () => {
     render(
       <PromptInput
         submitUserMessage={mockSubmitUserMessage}
         cancelStream={null}
-      />
+      />,
     );
 
-    expect(screen.getByPlaceholderText('Enter your prompt here...')).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText('Enter your prompt here...'),
+    ).toBeInTheDocument();
     expect(screen.getByText('Submit')).toBeInTheDocument();
   });
 
@@ -38,11 +39,11 @@ describe('PromptInput Component', () => {
       <PromptInput
         submitUserMessage={mockSubmitUserMessage}
         cancelStream={null}
-      />
+      />,
     );
 
     const inputElement = screen.getByPlaceholderText(
-        'Enter your prompt here...'
+      'Enter your prompt here...',
     ) as HTMLInputElement;
 
     fireEvent.change(inputElement, { target: { value: 'Hello' } });
@@ -54,11 +55,11 @@ describe('PromptInput Component', () => {
       <PromptInput
         submitUserMessage={mockSubmitUserMessage}
         cancelStream={null}
-      />
+      />,
     );
 
     const inputElement = screen.getByPlaceholderText(
-        'Enter your prompt here...'
+      'Enter your prompt here...',
     ) as HTMLInputElement;
     const formElement = screen.getByRole('form');
 
@@ -74,7 +75,7 @@ describe('PromptInput Component', () => {
       <PromptInput
         submitUserMessage={mockSubmitUserMessage}
         cancelStream={mockCancelStream}
-      />
+      />,
     );
 
     const buttonElement = screen.getByText('Cancel');
@@ -89,11 +90,11 @@ describe('PromptInput Component', () => {
       <PromptInput
         submitUserMessage={mockSubmitUserMessage}
         cancelStream={null}
-      />
+      />,
     );
 
     const inputElement = screen.getByPlaceholderText(
-        'Enter your prompt here...'
+      'Enter your prompt here...',
     ) as HTMLInputElement;
     const buttonElement = screen.getByText('Submit');
 
@@ -109,7 +110,7 @@ describe('PromptInput Component', () => {
       <PromptInput
         submitUserMessage={mockSubmitUserMessage}
         cancelStream={null}
-      />
+      />,
     );
 
     const buttonElement = screen.getByText('Submit');
@@ -119,13 +120,12 @@ describe('PromptInput Component', () => {
     expect(mockSubmitUserMessage).not.toHaveBeenCalled();
   });
 
-
   it('renders Cancel button when cancelStream is provided', () => {
     render(
       <PromptInput
         submitUserMessage={mockSubmitUserMessage}
         cancelStream={mockCancelStream}
-      />
+      />,
     );
 
     expect(screen.getByText('Cancel')).toBeInTheDocument();
@@ -136,7 +136,7 @@ describe('PromptInput Component', () => {
       <PromptInput
         submitUserMessage={mockSubmitUserMessage}
         cancelStream={null}
-      />
+      />,
     );
 
     expect(screen.getByText('Submit')).toBeInTheDocument();
@@ -144,18 +144,19 @@ describe('PromptInput Component', () => {
 
   it('disables the Submit button when there is a tool_call in progress', () => {
     (useSelector as unknown as Mock).mockImplementation((selector) => {
-      if (selector === selectHasToolCallInProgress) { return true; }
+      if (selector === selectHasToolCallInProgress) {
+        return true;
+      }
     });
 
     render(
       <PromptInput
         submitUserMessage={mockSubmitUserMessage}
         cancelStream={null}
-      />
+      />,
     );
 
     expect(screen.getByRole('button')).toBeInTheDocument();
     expect(screen.getByRole('button')).toBeDisabled();
-  })
-
+  });
 });

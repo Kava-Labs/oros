@@ -8,11 +8,11 @@ describe('ResetButton Component', () => {
   it('button calls clearMessages onClick', () => {
     render(<ResetButton clearMessages={clearMessages} />);
 
-    const resetButtonElement = screen.getByText('Reset Chat')
+    const resetButtonElement = screen.getByText('Reset Chat');
     expect(resetButtonElement).toBeInTheDocument();
-    expect(clearMessages).not.toHaveBeenCalled()
-    
+    expect(clearMessages).not.toHaveBeenCalled();
+
     fireEvent.click(resetButtonElement);
-    expect(clearMessages).toHaveBeenCalledTimes(1)
+    expect(clearMessages).toHaveBeenCalledTimes(1);
   });
 });

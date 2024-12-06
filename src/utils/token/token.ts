@@ -24,11 +24,11 @@ export const getIDFromStorage = (storage: Storage) => {
     // https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage
     // It is very rare but possible that localStorage or sessionStorage access fails.
     // In that case, we fall back to an in-memory solution.
+    console.log(err);
     if (!id) id = uuidv4();
   }
   return id;
-}
-
+};
 
 /**
  * Generates or returns token by combining uuids from localStorage and sessionStorage.
@@ -38,4 +38,4 @@ export const getToken = () => {
   const clientToken = getIDFromStorage(window.localStorage);
   const sessionToken = getIDFromStorage(window.sessionStorage);
   return `kavachat:${clientToken}:${sessionToken}`;
-}
+};

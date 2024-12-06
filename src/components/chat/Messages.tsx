@@ -9,18 +9,21 @@ export const Messages = () => {
 
   return (
     <>
-      <StaticMessage role='assistant' content={INTRO_MESSAGE} />
+      <StaticMessage role="assistant" content={INTRO_MESSAGE} />
 
-      {
-        history.map((msg, i) => {
-          if (msg.role === 'assistant' || msg.role === 'user') {
-            return <StaticMessage key={i} role={msg.role} content={msg.content as string} />
-          } else {
-            return null;
-          }
-        })
-      }
+      {history.map((msg, i) => {
+        if (msg.role === 'assistant' || msg.role === 'user') {
+          return (
+            <StaticMessage
+              key={i}
+              role={msg.role}
+              content={msg.content as string}
+            />
+          );
+        } else {
+          return null;
+        }
+      })}
     </>
-  )
+  );
 };
-

@@ -100,6 +100,9 @@ describe('getToken', () => {
     expect(mockLocalStorage.getItem).toHaveBeenCalledWith(IDKEY);
     expect(mockLocalStorage.setItem).toHaveBeenCalledWith(IDKEY, 'local-uuid');
     expect(mockSessionStorage.getItem).toHaveBeenCalledWith(IDKEY);
-    expect(mockSessionStorage.setItem).toHaveBeenCalledWith(IDKEY, 'session-uuid');
+    expect(mockSessionStorage.setItem).toHaveBeenCalledWith(
+      IDKEY,
+      'session-uuid',
+    );
   });
 });

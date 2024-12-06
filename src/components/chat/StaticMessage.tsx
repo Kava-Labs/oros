@@ -12,7 +12,7 @@ export const StaticMessage = (props: ChatCompletionMessageParam) => {
   if ((role !== 'assistant' && role !== 'user') || !content) return null;
   let html: string | undefined;
 
-  // save the markdown if cache miss 
+  // save the markdown if cache miss
   if (!(html = markDownCache.current.get(content))) {
     try {
       html = DOMPurify.sanitize(marked.parse(content, { async: false }));
@@ -24,8 +24,18 @@ export const StaticMessage = (props: ChatCompletionMessageParam) => {
   }
 
   return (
-    <div className={role === 'assistant' ? styles.chatBubbleAssistant : styles.chatBubbleUser}>
-      <div data-chat-role={role} className={styles.chatBubble} dangerouslySetInnerHTML={{ __html: html }} />
+    <div
+      className={
+        role === 'assistant'
+          ? styles.chatBubbleAssistant
+          : styles.chatBubbleUser
+      }
+    >
+      <div
+        data-chat-role={role}
+        className={styles.chatBubble}
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
     </div>
-  )
+  );
 };

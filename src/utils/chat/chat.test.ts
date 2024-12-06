@@ -6,29 +6,23 @@ import type { ChatCompletionChunk } from 'openai/resources/index';
 // Helper functions to create mock chunks
 const createContentChunk = (content: string): ChatCompletionChunk => {
   return {
-    choices: [
-      {  delta: { content }, },
-    ],
+    choices: [{ delta: { content } }],
   } as unknown as ChatCompletionChunk;
-}
+};
 
 const createToolCallChunk = (
-  toolCalls: ChatCompletionChunk.Choice.Delta.ToolCall[]
+  toolCalls: ChatCompletionChunk.Choice.Delta.ToolCall[],
 ): ChatCompletionChunk => {
   return {
-    choices: [
-      { delta: { tool_calls: toolCalls }, },
-    ],
+    choices: [{ delta: { tool_calls: toolCalls } }],
   } as unknown as ChatCompletionChunk;
-}
+};
 
 const createFinishChunk = (): ChatCompletionChunk => {
   return {
-    choices: [
-      { finish_reason: 'stop' },
-    ],
+    choices: [{ finish_reason: 'stop' }],
   } as unknown as ChatCompletionChunk;
-}
+};
 
 describe('chat function', () => {
   it('should call onData when content chunks are received', async () => {
@@ -67,7 +61,6 @@ describe('chat function', () => {
       onDone,
       onError,
       onToolCallRequest,
-
     };
 
     chat(cfg);
@@ -242,8 +235,7 @@ describe('chat function', () => {
     expect(onToolCallRequest).not.toHaveBeenCalled();
   });
 
-
-  // sometimes openAI sends empty content chunks 
+  // sometimes openAI sends empty content chunks
   // this tests that we can handle that and not call onDone
   it('should handle empty content chunks gracefully', async () => {
     // Mock OpenAI client

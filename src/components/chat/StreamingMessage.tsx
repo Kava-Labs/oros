@@ -1,13 +1,18 @@
 import { useSelector } from 'react-redux';
-import { selectStreamingMessage, } from '../../stores';
+import { selectStreamingMessage } from '../../stores';
 import styles from './style.module.css';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
-const foo = 'bar'
 
-export const StreamingMessage = ({ chatContainerRef }: { chatContainerRef: React.RefObject<HTMLDivElement> }) => {
+export const StreamingMessage = ({
+  chatContainerRef,
+}: {
+  chatContainerRef: React.RefObject<HTMLDivElement>;
+}) => {
   const content = useSelector(selectStreamingMessage);
-  if (!content) { return null; };
+  if (!content) {
+    return null;
+  }
 
   if (chatContainerRef.current) {
     chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
@@ -22,8 +27,11 @@ export const StreamingMessage = ({ chatContainerRef }: { chatContainerRef: React
   }
 
   return (
-    <div data-testid='StreamingMessage' className={styles.chatBubbleAssistant}>
-      <div className={styles.chatBubble} dangerouslySetInnerHTML={{ __html: html }} />
+    <div data-testid="StreamingMessage" className={styles.chatBubbleAssistant}>
+      <div
+        className={styles.chatBubble}
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
     </div>
-  )
+  );
 };

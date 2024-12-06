@@ -38,7 +38,12 @@ export default tseslint.config(
           varsIgnorePattern: '^_',
         },
       ],
-      'prettier/prettier': 'warn', // Prettier issues will be treated as warnings
+      'prettier/prettier': [
+        'warn',
+        {
+          endOfLine: 'auto',
+        }
+      ]
     },
   },
 );

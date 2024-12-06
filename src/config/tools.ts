@@ -2,51 +2,51 @@ import type { ChatCompletionTool } from 'openai/resources/index';
 
 export const tools: ChatCompletionTool[] = [
   {
-    type: "function",
+    type: 'function',
     function: {
-      name: "getAccountBalances",
-      description: "Gets The Account Balances for a Kava Chain User",
+      name: 'getAccountBalances',
+      description: 'Gets The Account Balances for a Kava Chain User',
       parameters: {
-        type: "object",
+        type: 'object',
         properties: {
           address: {
-            type: "string",
-            description: "The account address to fetch the balances for",
+            type: 'string',
+            description: 'The account address to fetch the balances for',
           },
         },
-        required: ["address"],
+        required: ['address'],
       },
     },
   },
   {
-    type: "function",
+    type: 'function',
     function: {
-      name: "transferAsset",
-      description: "Transfers a token from one address to another address",
+      name: 'transferAsset',
+      description: 'Transfers a token from one address to another address',
       parameters: {
-        type: "object",
+        type: 'object',
         properties: {
           assetName: {
-            type: "string",
-            description: "The name of the token to be transferred",
-            enum: ["KAVA", "USDT", "WHARD", "WKAVA"]
+            type: 'string',
+            description: 'The name of the token to be transferred',
+            enum: ['KAVA', 'USDT', 'WHARD', 'WKAVA'],
           },
           senderAddress: {
-            type: "string",
-            description: "The address sending the token",
+            type: 'string',
+            description: 'The address sending the token',
           },
           receiverAddress: {
-            type: "string",
-            description: "The address receiving the token",
+            type: 'string',
+            description: 'The address receiving the token',
           },
           amount: {
-            type: "number",
-            description: "The amount to send",
+            type: 'number',
+            description: 'The amount to send',
           },
         },
-        required: ["assetName", "senderAddress", "receiverAddress", "amount"],
+        required: ['assetName', 'senderAddress', 'receiverAddress', 'amount'],
         strict: true,
       },
     },
   },
-]; 
+];

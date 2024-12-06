@@ -1,5 +1,9 @@
 import OpenAI from 'openai';
-import type { ChatCompletionMessageParam, ChatCompletionTool, ChatCompletionChunk } from 'openai/resources/index';
+import type {
+  ChatCompletionMessageParam,
+  ChatCompletionTool,
+  ChatCompletionChunk,
+} from 'openai/resources/index';
 import { getToken } from '../token/token';
 
 let client: OpenAI | null = null;
@@ -20,7 +24,9 @@ export interface ChatConfig {
   /** Callback function called when the chat completion is done. */
   onDone: () => void;
   /** Callback function called when tool calls are requested. */
-  onToolCallRequest: (toolCalls: ChatCompletionChunk.Choice.Delta.ToolCall[]) => void;
+  onToolCallRequest: (
+    toolCalls: ChatCompletionChunk.Choice.Delta.ToolCall[],
+  ) => void;
 
   /** Callback function called when an error is encountered */
   onError: (err: unknown) => void;
@@ -30,7 +36,7 @@ export interface ChatConfig {
 
   /** Optional custom OpenAI client instance (useful for mocks/testing) */
   openAI?: OpenAI;
-};
+}
 
 /**
  * Checks if the given ChatCompletionChunk is a content chunk.
@@ -40,7 +46,7 @@ export interface ChatConfig {
 const isContentChunk = (result: ChatCompletionChunk): boolean => {
   const delta = result.choices[0].delta;
   // Sometimes content is an empty string, so we check if content is a string property.
-  if (delta && ("content" in delta) && typeof delta.content === 'string') {
+  if (delta && 'content' in delta && typeof delta.content === 'string') {
     return true;
   }
   return false;
@@ -65,7 +71,7 @@ const isToolCallChunk = (result: ChatCompletionChunk): boolean => {
  */
 const assembleToolCallsFromStream = (
   result: ChatCompletionChunk,
-  toolCallsState: ChatCompletionChunk.Choice.Delta.ToolCall[]
+  toolCallsState: ChatCompletionChunk.Choice.Delta.ToolCall[],
 ): void => {
   if (!result.choices[0].delta?.tool_calls) {
     return;
@@ -78,15 +84,16 @@ const assembleToolCallsFromStream = (
       // Push a new tool call request.
       toolCallsState.push({
         index: tcChunk.index,
-        id: "",
-        function: { name: "", arguments: "" },
+        id: '',
+        function: { name: '', arguments: '' },
       });
     }
 
     // Fill in info as we get it streamed for the corresponding tool call index.
     const partialTC = toolCallsState[tcChunk.index];
     if (tcChunk.id) partialTC.id += tcChunk.id;
-    if (tcChunk.function?.name) partialTC.function!.name += tcChunk.function.name;
+    if (tcChunk.function?.name)
+      partialTC.function!.name += tcChunk.function.name;
     if (tcChunk.function?.arguments)
       partialTC.function!.arguments += tcChunk.function.arguments;
   }
@@ -101,7 +108,7 @@ export const chat = (cfg: ChatConfig) => {
   let cancel = false; // Stream cancellation flag.
 
   // if no openAI object is given
-  // create one 
+  // create one
   // otherwise use the provided one (this is very useful for mocking openAI during testing)
   if (!cfg.openAI && !client) {
     try {
@@ -119,7 +126,17 @@ export const chat = (cfg: ChatConfig) => {
   // This allows us to return a cancel function to the caller.
   // The function ends when either the stream is finished or the cancel function is called.
   (async (cfg: ChatConfig) => {
-    const { model, messages, tools, onData, onDone, onToolCallRequest, onCancel, onError, openAI } = cfg;
+    const {
+      model,
+      messages,
+      tools,
+      onData,
+      onDone,
+      onToolCallRequest,
+      onCancel,
+      onError,
+      openAI,
+    } = cfg;
     const toolCallsState: ChatCompletionChunk.Choice.Delta.ToolCall[] = [];
     const cl = openAI ? openAI : client!;
     if (!cl) {
@@ -155,11 +172,12 @@ export const chat = (cfg: ChatConfig) => {
           onDone();
         }
       }
-
     } catch (err) {
       onError(err);
     }
   })(cfg);
 
-  return () => { cancel = true; };
+  return () => {
+    cancel = true;
+  };
 };

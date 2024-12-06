@@ -22,16 +22,20 @@ describe('StreamingMessage Component', () => {
 
   afterAll(() => {
     vi.restoreAllMocks();
-  })
+  });
 
   it('returns null when content is empty', () => {
     (useSelector as unknown as Mock).mockImplementation((selector) => {
-      if (selector === selectStreamingMessage) { return ''; }
+      if (selector === selectStreamingMessage) {
+        return '';
+      }
     });
 
     const chatContainerRef = React.createRef<HTMLDivElement>();
 
-    const { container } = render(<StreamingMessage chatContainerRef={chatContainerRef} />);
+    const { container } = render(
+      <StreamingMessage chatContainerRef={chatContainerRef} />,
+    );
     expect(container.firstChild).toBeNull();
   });
 
@@ -39,7 +43,9 @@ describe('StreamingMessage Component', () => {
     const content = 'Streaming content';
 
     (useSelector as unknown as Mock).mockImplementation((selector) => {
-      if (selector === selectStreamingMessage) { return content; }
+      if (selector === selectStreamingMessage) {
+        return content;
+      }
     });
 
     const chatContainerRef = React.createRef<HTMLDivElement>();

@@ -9,7 +9,6 @@ vi.mock('react-redux', () => ({
   useSelector: vi.fn(),
 }));
 
-
 describe('Messages Component', () => {
   beforeEach(() => {
     // Clear all mocks before each test
@@ -18,17 +17,19 @@ describe('Messages Component', () => {
 
   afterAll(() => {
     vi.restoreAllMocks();
-  })
+  });
 
   it('renders messages from history', () => {
     const history = [
       { role: 'system', content: 'System message' },
       { role: 'user', content: 'Hello' },
-      { role: 'assistant', content: 'Hi there!' }
+      { role: 'assistant', content: 'Hi there!' },
     ];
 
     (useSelector as unknown as Mock).mockImplementation((selector) => {
-      if (selector === selectMessageHistory) { return history; }
+      if (selector === selectMessageHistory) {
+        return history;
+      }
     });
 
     render(<Messages />);
@@ -61,42 +62,46 @@ describe('Messages Component', () => {
       { role: 'user', content: 'What is my balance?' },
       {
         content: null,
-        role: "assistant",
+        role: 'assistant',
         function_call: null,
         tool_calls: [
           {
-            id: "call_4ntfprsIyMoTs9PZ1ThYbkFy",
+            id: 'call_4ntfprsIyMoTs9PZ1ThYbkFy',
             function: {
-              name: "getAccountBalances",
-              arguments: "{\"address\":\"mock-address\"}"
+              name: 'getAccountBalances',
+              arguments: '{"address":"mock-address"}',
             },
-            type: "function"
-          }
-        ]
+            type: 'function',
+          },
+        ],
       },
       {
-        role: "tool",
-        content: "{\"kava\":\"1000\",\"hard\":\"34142\"}",
-        tool_call_id: "call_4ntfprsIyMoTs9PZ1ThYbkFy"
+        role: 'tool',
+        content: '{"kava":"1000","hard":"34142"}',
+        tool_call_id: 'call_4ntfprsIyMoTs9PZ1ThYbkFy',
       },
       {
-        role: "assistant",
-        content: "your balance is 1000 kava, and 34142 hard"
-      }
-
+        role: 'assistant',
+        content: 'your balance is 1000 kava, and 34142 hard',
+      },
     ];
 
     (useSelector as unknown as Mock).mockImplementation((selector) => {
-      if (selector === selectMessageHistory) { return history; }
+      if (selector === selectMessageHistory) {
+        return history;
+      }
     });
 
     render(<Messages />);
 
-    expect(screen.queryByText('{\"kava\":\"1000\",\"hard\":\"34142\"}')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('{\"kava\":\"1000\",\"hard\":\"34142\"}'),
+    ).not.toBeInTheDocument();
     expect(screen.queryByText('getAccountBalances')).not.toBeInTheDocument();
 
     expect(screen.queryByText('What is my balance?')).toBeInTheDocument();
-    expect(screen.queryByText('your balance is 1000 kava, and 34142 hard')).toBeInTheDocument();
-  })
-
+    expect(
+      screen.queryByText('your balance is 1000 kava, and 34142 hard'),
+    ).toBeInTheDocument();
+  });
 });

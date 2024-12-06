@@ -25,14 +25,16 @@ const initialState: MsgStore = {
 };
 
 describe('reducers', () => {
-
   describe('streamingMessageConcat', () => {
     it('should append payload to streamingMessage', () => {
       const action = streamingMessageConcat('Hello, ');
       const state = msgStoreReducer(initialState, action);
       expect(state.streamingMessage).toBe('Hello, ');
 
-      const nextState = msgStoreReducer(state, streamingMessageConcat('World!'));
+      const nextState = msgStoreReducer(
+        state,
+        streamingMessageConcat('World!'),
+      );
       expect(nextState.streamingMessage).toBe('Hello, World!');
     });
   });
@@ -67,19 +69,24 @@ describe('reducers', () => {
         content: 'Hello there!',
       };
       const action = messageHistoryAddMessage(newMessage);
-      const newState = msgStoreReducer({
-        history: [
-          { role: 'system', content: 'This is the system prompt.', },
-          { role: 'user', content: 'hello from the user' }
-        ],
-        streamingMessage: '',
-      }, action);
+      const newState = msgStoreReducer(
+        {
+          history: [
+            { role: 'system', content: 'This is the system prompt.' },
+            { role: 'user', content: 'hello from the user' },
+          ],
+          streamingMessage: '',
+        },
+        action,
+      );
 
       expect(newState.history).toHaveLength(2);
       // should not have added newMessage
-      expect(newState.history[1]).toEqual({ role: 'user', content: 'hello from the user' });
+      expect(newState.history[1]).toEqual({
+        role: 'user',
+        content: 'hello from the user',
+      });
     });
-
   });
 
   describe('messageHistoryClear', () => {
@@ -113,7 +120,10 @@ describe('reducers', () => {
       const action = messageHistoryDropLast();
       const newState = msgStoreReducer(stateWithHistory, action);
       expect(newState.history).toHaveLength(3);
-      expect(newState.history[2]).toEqual({ role: 'assistant', content: 'Answer.' });
+      expect(newState.history[2]).toEqual({
+        role: 'assistant',
+        content: 'Answer.',
+      });
     });
 
     it('should drop the last message and the user question', () => {
@@ -132,10 +142,10 @@ describe('reducers', () => {
     });
 
     it('should handle history with only the system prompt', () => {
-        const action = messageHistoryDropLast();
-        const newState = msgStoreReducer(initialState, action);
-        expect(newState.history).toHaveLength(1);
-        expect(newState.history[0]).toEqual(initialState.history[0]);
+      const action = messageHistoryDropLast();
+      const newState = msgStoreReducer(initialState, action);
+      expect(newState.history).toHaveLength(1);
+      expect(newState.history[0]).toEqual(initialState.history[0]);
     });
 
     it('should handle removal of tool call messages and the triggering question', () => {
@@ -149,26 +159,36 @@ describe('reducers', () => {
           {
             role: 'assistant',
             content: null,
-            tool_calls: [{ type: 'function', function: { name: 'getBalances', arguments: '' }, id: '1' }],
+            tool_calls: [
+              {
+                type: 'function',
+                function: { name: 'getBalances', arguments: '' },
+                id: '1',
+              },
+            ],
           },
-          { role: 'tool', content: 'System message after assistant response.', tool_call_id: '1' },
+          {
+            role: 'tool',
+            content: 'System message after assistant response.',
+            tool_call_id: '1',
+          },
         ],
       };
       const action = messageHistoryDropLast();
       const newState = msgStoreReducer(stateWithHistory, action);
       expect(newState.history).toHaveLength(3);
-      expect(newState.history[2]).toEqual( { role: 'assistant', content: 'how can i help you?' });
-    })
+      expect(newState.history[2]).toEqual({
+        role: 'assistant',
+        content: 'how can i help you?',
+      });
+    });
   });
 });
 
 describe('selectors', () => {
   const mockState = {
     msgStore: {
-      history: [
-        ...initialState.history,
-        { role: 'user', content: 'Hello' },
-      ],
+      history: [...initialState.history, { role: 'user', content: 'Hello' }],
       streamingMessage: 'Typing...',
     },
   } as any;
@@ -191,7 +211,7 @@ describe('selectors', () => {
   it('selectHasToolCallInProgress should return false when there is no tool call in progress', () => {
     const selected = selectHasToolCallInProgress(mockState);
     expect(selected).toBe(false);
-  })
+  });
 
   it('selectHasToolCallInProgress should return true when there is a tool call in progress', () => {
     const selected = selectHasToolCallInProgress({
@@ -199,15 +219,24 @@ describe('selectors', () => {
         history: [
           ...initialState.history,
           { role: 'user', content: 'Hello' },
-          { role: 'assistant', content: null, tool_calls: [{ id: '', type: 'function', function: { name: '', arguments: '' } }] }
+          {
+            role: 'assistant',
+            content: null,
+            tool_calls: [
+              {
+                id: '',
+                type: 'function',
+                function: { name: '', arguments: '' },
+              },
+            ],
+          },
         ],
         streamingMessage: '',
       },
     });
 
     expect(selected).toBe(true);
-  })
-
+  });
 
   it('selectHasToolCallInProgress should return false when there is a tool call is finished', () => {
     const selected = selectHasToolCallInProgress({
@@ -215,13 +244,23 @@ describe('selectors', () => {
         history: [
           ...initialState.history,
           { role: 'user', content: 'Hello' },
-          { role: 'assistant', content: null, tool_calls: [{ id: '', type: 'function', function: { name: '', arguments: '' } }] },
-          { role: 'tool', content: '', tool_call_id: '' }
+          {
+            role: 'assistant',
+            content: null,
+            tool_calls: [
+              {
+                id: '',
+                type: 'function',
+                function: { name: '', arguments: '' },
+              },
+            ],
+          },
+          { role: 'tool', content: '', tool_call_id: '' },
         ],
         streamingMessage: '',
       },
     });
 
     expect(selected).toBe(false);
-  })
+  });
 });

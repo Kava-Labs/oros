@@ -7,7 +7,12 @@ import { fileURLToPath } from 'url';
  */
 import dotenv from 'dotenv';
 import path from 'path';
-dotenv.config({ path: [path.resolve(path.dirname(fileURLToPath(import.meta.url)), '.env.local'), path.resolve(process.cwd(), '.env')] });
+dotenv.config({
+  path: [
+    path.resolve(path.dirname(fileURLToPath(import.meta.url)), '.env.local'),
+    path.resolve(process.cwd(), '.env'),
+  ],
+});
 
 /**
  * See https://playwright.dev/docs/test-configuration.

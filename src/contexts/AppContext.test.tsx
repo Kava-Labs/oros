@@ -6,13 +6,21 @@ import * as stores from '../stores';
 import * as utils from '../utils';
 
 vi.mock('../stores', () => ({
-  messageHistoryAddMessage: vi.fn().mockReturnValue({ type: 'messageHistoryAddMessage' }),
+  messageHistoryAddMessage: vi
+    .fn()
+    .mockReturnValue({ type: 'messageHistoryAddMessage' }),
   messageHistoryClear: vi.fn().mockReturnValue({ type: 'messageHistoryClear' }),
-  messageHistoryDropLast: vi.fn().mockReturnValue({ type: 'messageHistoryDropLast' }),
+  messageHistoryDropLast: vi
+    .fn()
+    .mockReturnValue({ type: 'messageHistoryDropLast' }),
   selectMessageHistory: vi.fn().mockReturnValue([]),
   selectStreamingMessage: vi.fn().mockReturnValue(''),
-  streamingMessageClear: vi.fn().mockReturnValue({ type: 'streamingMessageClear' }),
-  streamingMessageConcat: vi.fn().mockReturnValue({ type: 'streamingMessageConcat' }),
+  streamingMessageClear: vi
+    .fn()
+    .mockReturnValue({ type: 'streamingMessageClear' }),
+  streamingMessageConcat: vi
+    .fn()
+    .mockReturnValue({ type: 'streamingMessageConcat' }),
   appStore: {
     dispatch: vi.fn(),
     getState: vi.fn(() => ({})),
@@ -50,7 +58,7 @@ describe('AppContextProvider', () => {
     render(
       <AppContextProvider>
         <TestComponent />
-      </AppContextProvider>
+      </AppContextProvider>,
     );
 
     const button = screen.getByText('Connect Wallet');
@@ -69,7 +77,7 @@ describe('AppContextProvider', () => {
       stores.messageHistoryAddMessage({
         role: 'system',
         content: `user's current wallet address: ${mockAccounts[0]}`,
-      })
+      }),
     );
   });
 
@@ -90,7 +98,7 @@ describe('AppContextProvider', () => {
     render(
       <AppContextProvider>
         <TestComponent />
-      </AppContextProvider>
+      </AppContextProvider>,
     );
 
     const button = screen.getByText('Submit Chat Message');
@@ -98,7 +106,7 @@ describe('AppContextProvider', () => {
 
     // Verify that messageHistoryAddMessage was dispatched
     expect(stores.appStore.dispatch).toHaveBeenCalledWith(
-      stores.messageHistoryAddMessage({ role: 'user', content: 'Hello' })
+      stores.messageHistoryAddMessage({ role: 'user', content: 'Hello' }),
     );
 
     // Verify that chat was called
@@ -127,10 +135,9 @@ describe('AppContextProvider', () => {
     render(
       <AppContextProvider>
         <TestComponent />
-      </AppContextProvider>
+      </AppContextProvider>,
     );
 
-      
     fireEvent.click(screen.getByText('Submit Chat Message'));
 
     expect(screen.getByText('Cancel Stream')).toBeInTheDocument();
@@ -142,10 +149,10 @@ describe('AppContextProvider', () => {
 
     // Verify that streamingMessageClear and messageHistoryDropLast were dispatched
     expect(stores.appStore.dispatch).toHaveBeenCalledWith(
-      stores.streamingMessageClear()
+      stores.streamingMessageClear(),
     );
     expect(stores.appStore.dispatch).toHaveBeenCalledWith(
-      stores.messageHistoryDropLast()
+      stores.messageHistoryDropLast(),
     );
   });
 
@@ -163,18 +170,15 @@ describe('AppContextProvider', () => {
     render(
       <AppContextProvider>
         <TestComponent />
-      </AppContextProvider>
+      </AppContextProvider>,
     );
-
 
     // Click the clearChatMessages button
     fireEvent.click(screen.getByText('Clear Chat Messages'));
 
     // Verify that messageHistoryClear was dispatched
     expect(stores.appStore.dispatch).toHaveBeenCalledWith(
-      stores.messageHistoryClear()
+      stores.messageHistoryClear(),
     );
-
   });
-
 });

@@ -14,4 +14,4 @@ export const ChatControls = ({ clearMessages }: ChatControlsProps) => {
       <ResetButton clearMessages={clearMessages} />
     </div>
   );
-}
+};

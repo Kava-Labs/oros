@@ -14,4 +14,4 @@ export const ConnectWallet = () => {
       {address ? 'Re-connect Wallet' : 'Connect Wallet'}
     </button>
   );
-}
+};

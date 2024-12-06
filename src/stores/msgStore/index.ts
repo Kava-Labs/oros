@@ -2,22 +2,23 @@ import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { systemPrompt } from '../../config';
 
-
 export type MsgStore = {
   history: ChatCompletionMessageParam[];
-  streamingMessage: string,
-}
+  streamingMessage: string;
+};
 
 export const msgStoreSlice = createSlice({
   name: 'msgStore',
   initialState: {
-    history: [{
-      role: 'system',
-      content: systemPrompt,
-    }],
+    history: [
+      {
+        role: 'system',
+        content: systemPrompt,
+      },
+    ],
     streamingMessage: '',
   } as MsgStore,
-  
+
   reducers: {
     streamingMessageConcat(state: MsgStore, action: PayloadAction<string>) {
       state.streamingMessage += action.payload;
@@ -27,7 +28,10 @@ export const msgStoreSlice = createSlice({
       state.streamingMessage = '';
     },
 
-    messageHistoryAddMessage(state: MsgStore, action: PayloadAction<ChatCompletionMessageParam>) {
+    messageHistoryAddMessage(
+      state: MsgStore,
+      action: PayloadAction<ChatCompletionMessageParam>,
+    ) {
       if (action.payload.role === 'user') {
         const lastMsg = state.history[state.history.length - 1];
         // don't allow double user messages
@@ -45,18 +49,17 @@ export const msgStoreSlice = createSlice({
     },
 
     messageHistoryDropLast(state: MsgStore, _: PayloadAction<void>) {
-      let i = state.history.length-1;
-        
-      while (i > 1){
-        if (state.history[i].role === 'user'){
+      let i = state.history.length - 1;
+
+      while (i > 1) {
+        if (state.history[i].role === 'user') {
           break;
         }
         i--;
       }
 
       if (i) state.history = state.history.slice(0, i);
-    }
-
+    },
   },
 });
 
@@ -68,18 +71,31 @@ export const {
   messageHistoryDropLast,
 } = msgStoreSlice.actions;
 
-
 export type MessageStoreSlice = { [msgStoreSlice.name]: MsgStore };
 
-export const selectMessageStore = (state: MessageStoreSlice) => state[msgStoreSlice.name];
+export const selectMessageStore = (state: MessageStoreSlice) =>
+  state[msgStoreSlice.name];
 
-export const selectStreamingMessage = createSelector(selectMessageStore, (state) => state.streamingMessage);
+export const selectStreamingMessage = createSelector(
+  selectMessageStore,
+  (state) => state.streamingMessage,
+);
 
-export const selectMessageHistory = createSelector(selectMessageStore, (state) => state.history);
+export const selectMessageHistory = createSelector(
+  selectMessageStore,
+  (state) => state.history,
+);
 
-export const selectHasToolCallInProgress = createSelector(selectMessageStore, (state) => {
-  const lastMsg = state.history[state.history.length - 1];
-  return lastMsg.role === 'assistant' && lastMsg.content === null && Array.isArray(lastMsg.tool_calls);
-})
+export const selectHasToolCallInProgress = createSelector(
+  selectMessageStore,
+  (state) => {
+    const lastMsg = state.history[state.history.length - 1];
+    return (
+      lastMsg.role === 'assistant' &&
+      lastMsg.content === null &&
+      Array.isArray(lastMsg.tool_calls)
+    );
+  },
+);
 
 export const msgStoreReducer = msgStoreSlice.reducer;
