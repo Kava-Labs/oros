@@ -8,7 +8,7 @@ type ChatControlsProps = {
 
 export const ChatControls = ({ clearMessages }: ChatControlsProps) => {
   return (
-    <div className={styles.deployControls}>
+    <div className={styles.chatControls}>
       <ConnectWallet />
       <button className={styles.inactive}>Deploy</button>
       <ResetButton clearMessages={clearMessages} />
