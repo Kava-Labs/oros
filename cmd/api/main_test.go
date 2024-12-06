@@ -103,17 +103,6 @@ func TestIncorrectRequiredEnvironmentVariable(t *testing.T) {
 			expectedError:       "OPENAI_BASE_URL is required",
 		},
 		{
-			name:                "API host missing",
-			environmentVariable: "KAVACHAT_API_HOST",
-			expectedError:       "KAVACHAT_API_HOST is required",
-		},
-		{
-			name:                "Invalid host",
-			environmentVariable: "KAVACHAT_API_HOST",
-			susbstitutedValue:   "0.0.0.1",
-			expectedError:       "Invalid host: must be set to either 127.0.0.1 or 0.0.0.0 but got 0.0.0.1",
-		},
-		{
 			name:                "Non-integer for port",
 			environmentVariable: "KAVACHAT_API_PORT",
 			susbstitutedValue:   "abc",

@@ -17,7 +17,9 @@ const (
 	defaultAPIPort = 5555
 )
 
-var allowedHosts = []string{"127.0.0.1", "0.0.0.0"}
+const (
+	defaultHost = "127.0.0.1"
+)
 
 var ErrOpenAIKeyRequired = errors.New("OPENAI_API_KEY is required")
 var ErrOpenAIBaseURLRequired = errors.New("OPENAI_BASE_URL is required")
@@ -33,11 +35,6 @@ func main() {
 	baseURL := os.Getenv("OPENAI_BASE_URL")
 	if baseURL == "" {
 		logFatal(logger, ErrOpenAIBaseURLRequired)
-	}
-
-	host := os.Getenv("KAVACHAT_API_HOST")
-	if host == "" {
-		logFatal(logger, ErrAPIHostRequired)
 	}
 
 	logger.Info("Starting Kavachat API!")
@@ -98,17 +95,10 @@ func main() {
 		port = parsedPort
 	}
 
-	validatedHost := false
+	host := defaultHost
 
-	for _, h := range allowedHosts {
-		if host == h {
-			validatedHost = true
-			break
-		}
-	}
-
-	if !validatedHost {
-		logFatal(logger, fmt.Errorf("Invalid host: must be set to either %s or %v but got %s", allowedHosts[0], allowedHosts[1], host))
+	if envHost := os.Getenv("KAVACHAT_HOST"); envHost != "" {
+		host = envHost
 	}
 
 	address := fmt.Sprintf("%s:%d", host, port)
