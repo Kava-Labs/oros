@@ -30,6 +30,7 @@ type config struct {
 	apiKey  string
 	baseURL string
 	port    int
+	host    string
 }
 
 var httpTestCases []*HttpTestCase
@@ -40,6 +41,7 @@ func newDefaultTestConfig() config {
 		// don't use external URL's by default
 		baseURL: "http://localhost:5556/v1",
 		port:    0,
+		host:    "127.0.0.1",
 	}
 }
 
@@ -77,6 +79,7 @@ func startProxyCmd(context context.Context, config config, args ...string) *exec
 		fmt.Sprintf("OPENAI_API_KEY=%s", config.apiKey),
 		fmt.Sprintf("OPENAI_BASE_URL=%s", config.baseURL),
 		fmt.Sprintf("KAVACHAT_API_PORT=%d", config.port),
+		fmt.Sprintf("KAVACHAT_API_HOST=%s", config.host),
 	)
 
 	return cmd
@@ -86,7 +89,7 @@ func TestIncorrectRequiredEnvironmentVariable(t *testing.T) {
 	testCases := []struct {
 		name                string
 		environmentVariable string
-		value               string
+		susbstitutedValue   string
 		expectedError       string
 	}{
 		{
@@ -102,13 +105,13 @@ func TestIncorrectRequiredEnvironmentVariable(t *testing.T) {
 		{
 			name:                "Non-integer for port",
 			environmentVariable: "KAVACHAT_API_PORT",
-			value:               "abc",
+			susbstitutedValue:   "abc",
 			expectedError:       "error setting KAVACHAT_API_PORT to abc",
 		},
 		{
 			name:                "Integer outside range for port",
 			environmentVariable: "KAVACHAT_API_PORT",
-			value:               "123456789000000000000000000000",
+			susbstitutedValue:   "123456789000000000000000000000",
 			expectedError:       "error setting KAVACHAT_API_PORT to 123456789000000000000000000000",
 		},
 	}
@@ -124,11 +127,11 @@ func TestIncorrectRequiredEnvironmentVariable(t *testing.T) {
 				envVariablePattern := fmt.Sprintf("^%s=.*$", testCase.environmentVariable)
 
 				if match, _ := regexp.MatchString(envVariablePattern, envVar); match {
-					//	To trigger the port error, replace its value with an incorrect one
-					if match, _ := regexp.MatchString(fmt.Sprintf("^KAVACHAT_API_PORT=.*$"), envVar); match {
-						envVar = fmt.Sprintf("KAVACHAT_API_PORT=%s", testCase.value)
+					//	Some errors are triggered by inserting bad values for environment variables,
+					if testCase.susbstitutedValue != "" {
+						envVar = fmt.Sprintf("%v=%s", testCase.environmentVariable, testCase.susbstitutedValue)
 					} else {
-						//	to trigger the API key or base url error, skip over those when building the new slice of env vars
+						//	While other errors are triggered by their absence
 						continue
 					}
 				}

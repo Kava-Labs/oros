@@ -17,6 +17,10 @@ const (
 	defaultAPIPort = 5555
 )
 
+const (
+	defaultHost = "127.0.0.1"
+)
+
 var ErrOpenAIKeyRequired = errors.New("OPENAI_API_KEY is required")
 var ErrOpenAIBaseURLRequired = errors.New("OPENAI_BASE_URL is required")
 
@@ -129,7 +133,15 @@ func main() {
 		port = parsedPort
 	}
 
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	host := defaultHost
+
+	if envHost := os.Getenv("KAVACHAT_HOST"); envHost != "" {
+		host = envHost
+	}
+
+	address := fmt.Sprintf("%s:%d", host, port)
+
+	listener, err := net.Listen("tcp", address)
 	if err != nil {
 		logFatal(logger, err)
 	}
@@ -141,7 +153,7 @@ func main() {
 		ErrorLog: slog.NewLogLogger(logger.Handler(), slog.LevelError),
 	}
 
-	logger.Info("serving", "addr", listener.Addr())
+	logger.Info("serving", "addr", address)
 
 	if err := server.Serve(listener); err != http.ErrServerClosed {
 		logFatal(logger, err)
