@@ -89,7 +89,7 @@ func TestIncorrectRequiredEnvironmentVariable(t *testing.T) {
 	testCases := []struct {
 		name                string
 		environmentVariable string
-		value               string
+		susbstitutedValue   string
 		expectedError       string
 	}{
 		{
@@ -108,15 +108,21 @@ func TestIncorrectRequiredEnvironmentVariable(t *testing.T) {
 			expectedError:       "KAVACHAT_API_HOST is required",
 		},
 		{
+			name:                "Invalid host",
+			environmentVariable: "KAVACHAT_API_HOST",
+			susbstitutedValue:   "0.0.0.1",
+			expectedError:       "Invalid host: must be set to either 127.0.0.1 or 0.0.0.0 but got 0.0.0.1",
+		},
+		{
 			name:                "Non-integer for port",
 			environmentVariable: "KAVACHAT_API_PORT",
-			value:               "abc",
+			susbstitutedValue:   "abc",
 			expectedError:       "error setting KAVACHAT_API_PORT to abc",
 		},
 		{
 			name:                "Integer outside range for port",
 			environmentVariable: "KAVACHAT_API_PORT",
-			value:               "123456789000000000000000000000",
+			susbstitutedValue:   "123456789000000000000000000000",
 			expectedError:       "error setting KAVACHAT_API_PORT to 123456789000000000000000000000",
 		},
 	}
@@ -132,11 +138,11 @@ func TestIncorrectRequiredEnvironmentVariable(t *testing.T) {
 				envVariablePattern := fmt.Sprintf("^%s=.*$", testCase.environmentVariable)
 
 				if match, _ := regexp.MatchString(envVariablePattern, envVar); match {
-					//	To trigger the port error, replace its value with an incorrect one
-					if match, _ := regexp.MatchString(fmt.Sprintf("^KAVACHAT_API_PORT=.*$"), envVar); match {
-						envVar = fmt.Sprintf("KAVACHAT_API_PORT=%s", testCase.value)
+					//	Some errors are triggered by inserting bad values for environment variables,
+					if testCase.susbstitutedValue != "" {
+						envVar = fmt.Sprintf("%v=%s", testCase.environmentVariable, testCase.susbstitutedValue)
 					} else {
-						//	to trigger the API key or base url error, skip over those when building the new slice of env vars
+						//	While other errors are triggered by their absence
 						continue
 					}
 				}
@@ -344,36 +350,5 @@ func TestChatCompletionProxy(t *testing.T) {
 			require.NoError(t, err)
 			assert.Equal(t, string(tc.Response.Body), string(data))
 		})
-	}
-}
-
-func TestUnavailableHost(t *testing.T) {
-	unavailableHost := "0.0.0.1"
-	ctx, _ := context.WithTimeout(context.Background(), time.Duration(1*time.Second))
-	cmd := startProxyCmd(ctx, newDefaultTestConfig())
-
-	newEnv := []string{}
-	for _, envVar := range cmd.Env {
-		if match, _ := regexp.MatchString("^KAVACHAT_API_HOST=.*$", envVar); match {
-			envVar = fmt.Sprintf("KAVACHAT_API_HOST=%s", unavailableHost)
-		}
-		newEnv = append(newEnv, envVar)
-	}
-	cmd.Env = newEnv
-
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
-	err := cmd.Run()
-	require.Error(t, err, fmt.Sprintf("expected %s to fail", cmd.String()))
-
-	assert.Contains(t, stdout.String(), fmt.Sprintf("level=ERROR msg=\"Invalid host: must be set to either 127.0.0.1 or 0.0.0.0 but got %s", unavailableHost))
-	assert.Contains(t, stderr.String(), fmt.Sprintf("fatal: Invalid host: must be set to either 127.0.0.1 or 0.0.0.0 but got %s", unavailableHost))
-
-	if exitErr, ok := err.(*exec.ExitError); ok {
-		assert.Equal(t, 1, exitErr.ExitCode(), "expected exit code to equal 1")
-	} else {
-		t.Fatalf("%v is not an exit error", err)
 	}
 }
