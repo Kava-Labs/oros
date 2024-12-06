@@ -49,4 +49,11 @@ export const tools: ChatCompletionTool[] = [
             },
         },
     },
-]; 
+    {
+        type: "function",
+        function: {
+            name: "getDisplayStakingApy",
+            description: "Fetches the raw staking apy value from a JSON api and converts it to a human-readable string with percent sign. An example would be converting 0.01234 into 1.234%",
+        },
+    },
+];

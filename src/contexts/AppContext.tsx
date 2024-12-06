@@ -20,7 +20,7 @@ import {
 import { chat } from '../utils';
 import { tools } from '../config';
 import type { ChatCompletionChunk, ChatCompletionMessageToolCall } from 'openai/resources/index';
-import { getAccountBalances, transferAsset } from '../tools/toolFunctions';
+import { getAccountBalances, getDisplayStakingApy, transferAsset } from '../tools/toolFunctions';
 
 interface AppContext {
   address: string;
@@ -94,9 +94,9 @@ export function AppContextProvider({
 
   const submitUserChatMessage = useCallback((inputContent: string) => {
     if (!inputContent.length) return;
-    // add to history 
+    // add to history
     store.dispatch(messageHistoryAddMessage({ role: 'user', content: inputContent }));
-    // submit request with updated history 
+    // submit request with updated history
     doChat();
   }, [store]);
 
@@ -128,8 +128,12 @@ export function AppContextProvider({
             await doToolCall(tc, getAccountBalances);
             break;
           case "transferAsset":
-            console.info("sendKava");
+            console.info("transferAsset");
             await doToolCall(tc, transferAsset);
+            break;
+          case "getDisplayStakingApy":
+            console.info("getDisplayStakingApy");
+            await doToolCall(tc, getDisplayStakingApy);
             break;
 
           default:

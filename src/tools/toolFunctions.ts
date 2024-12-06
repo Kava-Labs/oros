@@ -2,6 +2,7 @@ import { ethers } from "ethers";
 import { bech32 } from "bech32";
 import { erc20ABI } from './erc20ABI';
 import { ASSET_ADDRESSES, kavaEVMProvider } from '../config/evm';
+import { fetchStakingApy } from './api.ts';
 
 /**
  *
@@ -133,5 +134,21 @@ export async function transferAsset(args: TransferParams) {
             ],
         });
 
+    }
+}
+
+/**
+ * Fetches the raw staking rewards value from our JSON api (0.081456) and converts it to a human-readable string to 4 decimals places with percent sign (8.1456%)
+ * @returns {Promise<string>} A promise that resolves to a string representing the staking APY in percentage format or a wrapped error of why the call failed
+ */
+export async function getDisplayStakingApy(): Promise<string> {
+    try {
+        const stakingApyResponse = await fetchStakingApy();
+        const percentage = Number(stakingApyResponse.staking_rewards) * 100;
+        const displayValue = percentage.toFixed(4);
+
+        return displayValue.concat("%");
+    } catch (e) {
+        return `Error fetching staking APY: ${JSON.stringify(e)}`;
     }
 }
