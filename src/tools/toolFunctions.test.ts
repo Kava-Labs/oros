@@ -22,25 +22,27 @@ describe.skip('getStakingApy', () => {
     const result = await getDisplayStakingApy();
 
     expect(result).toBe(`Error fetching staking APY: "${mockError}"`);
-
-describe.skip('getDelegatedBalance', () => {
-  it('returns the display total delegated balance with a kava address', async () => {
-    const fetchDelegatedBalanceSpy = vi.spyOn(apiModule, 'fetchDelegatedBalance');
-    fetchDelegatedBalanceSpy.mockResolvedValue({
-      "vested": {
-        "denom": "ukava",
-        "amount": "199999999"
-      },
-      "vesting": {
-        "denom": "ukava",
-        "amount": "1"
-      }
-    });
-
-    const result = await getDelegatedBalance({
-      address: "kava1vlpsrmdyuywvaqrv7rx6xga224sqfwz3fyfhwq"
-    });
-
-    expect(result).toBe("200");
   });
 });
+
+describe.skip('getDelegatedBalance', () => {
+      it('returns the display total delegated balance with a kava address', async () => {
+        const fetchDelegatedBalanceSpy = vi.spyOn(apiModule, 'fetchDelegatedBalance');
+        fetchDelegatedBalanceSpy.mockResolvedValue({
+          "vested": {
+            "denom": "ukava",
+            "amount": "199999999"
+          },
+          "vesting": {
+            "denom": "ukava",
+            "amount": "1"
+          }
+        });
+
+        const result = await getDelegatedBalance({
+          address: "kava1vlpsrmdyuywvaqrv7rx6xga224sqfwz3fyfhwq"
+        });
+
+        expect(result).toBe("200");
+      });
+  });
