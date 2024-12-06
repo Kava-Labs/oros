@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, Mock } from 'vitest';
+import { Mock } from 'vitest';
 import { getIDFromStorage, getToken, IDKEY } from './token';
 import { v4 as uuidv4 } from 'uuid';
 

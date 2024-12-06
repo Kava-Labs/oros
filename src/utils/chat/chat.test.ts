@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, Mock } from 'vitest';
+import { Mock } from 'vitest';
 import { chat } from './chat';
 import OpenAI from 'openai';
 import type { ChatCompletionChunk } from 'openai/resources/index';
@@ -253,7 +253,7 @@ describe('chat function', () => {
   });
 
 
-  // sometimes openAI sends empty content chunks 
+  // sometimes openAI sends empty content chunks
   // this tests that we can handle that and not call onDone
   it('should handle empty content chunks gracefully', async () => {
     // Mock OpenAI client

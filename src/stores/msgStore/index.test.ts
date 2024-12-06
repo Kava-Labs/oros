@@ -1,4 +1,3 @@
-import { describe, it, expect } from 'vitest';
 import {
     msgStoreReducer,
     streamingMessageConcat,
@@ -14,8 +13,6 @@ import {
 } from './index';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 
-
-
 const initialState: MsgStore = {
     history: [
         {
@@ -26,9 +23,7 @@ const initialState: MsgStore = {
     streamingMessage: '',
 };
 
-
 describe('reducers', () => {
-
     describe('streamingMessageConcat', () => {
         it('should append payload to streamingMessage', () => {
             const action = streamingMessageConcat('Hello, ');
@@ -166,8 +161,6 @@ describe('reducers', () => {
             expect(newState.history[2]).toEqual( { role: 'assistant', content: 'how can i help you?' });
 
         })
-
-
     });
 });
 
@@ -215,8 +208,7 @@ describe('selectors', () => {
         });
 
         expect(selected).toBe(true);
-    })
-
+    });
 
     it('selectHasToolCallInProgress should return false when there is a tool call is finished', () => {
         const selected = selectHasToolCallInProgress({
@@ -232,7 +224,6 @@ describe('selectors', () => {
         });
 
         expect(selected).toBe(false);
-    })
-
+    });
 
 });

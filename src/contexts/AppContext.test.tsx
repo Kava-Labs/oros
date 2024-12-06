@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
+import { Mock } from 'vitest';
 import { AppContextProvider } from './AppContext';
 import { useAppContext } from './AppContext';
 import * as stores from '../stores';
@@ -132,7 +132,7 @@ describe('AppContextProvider', () => {
             </AppContextProvider>
         );
 
-        
+
         fireEvent.click(screen.getByText('Submit Chat Message'));
 
 

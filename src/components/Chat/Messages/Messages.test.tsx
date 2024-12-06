@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach, Mock, afterAll } from "vitest";
+import { Mock } from "vitest";
 import { INTRO_MESSAGE, Messages } from "./Messages";
 import { useSelector } from "react-redux";
 import { selectMessageHistory } from "../../../stores";
