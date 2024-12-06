@@ -23,7 +23,7 @@ export interface ChatConfig {
     onToolCallRequest: (toolCalls: ChatCompletionChunk.Choice.Delta.ToolCall[]) => void;
 
     /** Callback function called when an error is encountered */
-    onError: (err: unknown) => void;
+    onError: (err: any) => void;
 
     /** Optional callback function called when the chat completion is cancelled. */
     onCancel?: () => void;
@@ -100,7 +100,7 @@ export function chat(cfg: ChatConfig) {
     let cancel = false; // Stream cancellation flag.
 
     // if no openAI object is given
-    // create one 
+    // create one
     // otherwise use the provided one (this is very useful for mocking openAI during testing)
     if (!cfg.openAI && !client) {
         try {

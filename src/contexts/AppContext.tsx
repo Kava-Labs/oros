@@ -21,6 +21,7 @@ import { chat } from '../utils';
 import { tools } from '../config';
 import type { ChatCompletionChunk, ChatCompletionMessageToolCall } from 'openai/resources/index';
 import { getAccountBalances, getDisplayStakingApy, transferAsset } from '../tools/toolFunctions';
+import { toast } from 'react-toastify';
 
 interface AppContext {
   address: string;
@@ -72,8 +73,10 @@ export function AppContextProvider({
       onDone: () => { onChatStreamDone(); setCancelStream(null); },
       onToolCallRequest: onChatStreamToolCallRequest,
       onError: (err) => {
-        console.error(err);
-        alert('error encountered please check console'); // todo(sah): improved error handling
+        const errorMessage = err.message ?? err;
+        //  close the existing toast container before opening another
+        toast.dismiss();
+        toast.error(`A problem occurred: ${errorMessage}`);
       },
     });
 
