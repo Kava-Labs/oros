@@ -34,13 +34,15 @@ func TestCors(t *testing.T) {
 	testCases := []struct {
 		name                string
 		requestMethod       string
+		path                string
 		requestHeaders      map[string]string
 		requestBody         []byte
 		wantStatusCode      int
 		wantResponseHeaders map[string]string
 	}{
 		{
-			name:          "Basic preflight request",
+			name:          "Basic preflight request chat endpoint",
+			path:          "chat/completions",
 			requestMethod: "OPTIONS",
 			requestHeaders: map[string]string{
 				"Origin": "http://localhost:5555",
@@ -50,11 +52,13 @@ func TestCors(t *testing.T) {
 			wantResponseHeaders: map[string]string{
 				"Access-Control-Allow-Origin":  "*",
 				"Access-Control-Allow-Methods": "POST, OPTIONS",
-				"Access-Control-Allow-Headers": "Authorization, Content-Type, x-stainless-os, x-stainless-runtime-version, x-stainless-package-version, x-stainless-runtime, x-stainless-arch, x-stainless-retry-count, x-stainless-lang",
+				"Access-Control-Allow-Headers": "Authorization, Content-Type, x-stainless-os, x-stainless-runtime-version, x-stainless-package-version, x-stainless-runtime, x-stainless-arch, x-stainless-retry-count, x-stainless-lang, user-agent",
+				"Access-Control-Max-Age":       "3600",
 			},
 		},
 		{
-			name:          "Basic POST request",
+			name:          "Basic chat completions POST request",
+			path:          "chat/completions",
 			requestMethod: "POST",
 			requestHeaders: map[string]string{
 				"Origin":        "http://localhost:5555",
@@ -67,12 +71,44 @@ func TestCors(t *testing.T) {
 				"Access-Control-Allow-Origin": "*",
 			},
 		},
+
+		{
+			name:          "Basic preflight request image generation endpoint",
+			path:          "images/generations",
+			requestMethod: "OPTIONS",
+			requestHeaders: map[string]string{
+				"Origin": "http://localhost:5555",
+			},
+			requestBody:    nil,
+			wantStatusCode: http.StatusOK,
+			wantResponseHeaders: map[string]string{
+				"Access-Control-Allow-Origin":  "*",
+				"Access-Control-Allow-Methods": "POST, OPTIONS",
+				"Access-Control-Allow-Headers": "Authorization, Content-Type, x-stainless-os, x-stainless-runtime-version, x-stainless-package-version, x-stainless-runtime, x-stainless-arch, x-stainless-retry-count, x-stainless-lang, user-agent",
+				"Access-Control-Max-Age":       "3600",
+			},
+		},
+		{
+			name:          "Basic image generations POST request",
+			path:          "images/generations",
+			requestMethod: "POST",
+			requestHeaders: map[string]string{
+				"Origin":        "http://localhost:5555",
+				"Authorization": "Bearer some-token",
+				"Content-Type":  "application/json",
+			},
+			requestBody:    []byte(basicImageGen),
+			wantStatusCode: http.StatusOK,
+			wantResponseHeaders: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
+		},
 	}
 
 	client := &http.Client{}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			requestUrl, err := url.JoinPath(serverUrl, "/openai/v1", "/chat/completions")
+			requestUrl, err := url.JoinPath(serverUrl, "/openai/v1", tc.path)
 			require.NoError(t, err)
 
 			var buffer io.Reader
