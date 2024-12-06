@@ -1,12 +1,11 @@
-
 .header {
   padding: 16px 16px 16px 24px;
 }
 
-.deployControls {
+.chatControls {
   display: flex;
   justify-content: center;
-  background-color: #2D2D2D;
+  background-color: #2d2d2d;
   border-radius: 10px;
 
   width: 100%;
@@ -15,7 +14,7 @@
   /* Added top margin for spacing */
 }
 
-.deployControls button {
+.chatControls button {
   margin: 20px 10px;
   padding: 10px 20px;
   font-size: 1rem;
@@ -29,7 +28,7 @@
   color: rgb(45, 45, 45);
 }
 
-.deployControls .inactive {
+.chatControls .inactive {
   background-color: rgb(75, 75, 75);
   color: rgb(45, 45, 45);
   cursor: unset;
