@@ -102,7 +102,6 @@ func main() {
 		logFatal(logger, err)
 	}
 	tcpAddr := listener.Addr().(*net.TCPAddr)
-	fmt.Println(tcpAddr)
 	logger.Info("listening", "port", tcpAddr.Port)
 
 	server := &http.Server{
