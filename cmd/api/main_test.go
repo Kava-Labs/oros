@@ -338,3 +338,5 @@ func TestChatCompletionProxy(t *testing.T) {
 		})
 	}
 }
+
+//	Test to assert that host other than 127.0.0.1 or 0.0.0.0 throw specific error

@@ -90,11 +90,19 @@ func main() {
 		port = parsedPort
 	}
 
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	host := os.Getenv("KAVACHAT_API_HOST")
+
+	//	if the host isn't one of the two allowed options
+	//	throw an error
+
+	address := fmt.Sprintf("%s:%d", host, port)
+
+	listener, err := net.Listen("tcp", address)
 	if err != nil {
 		logFatal(logger, err)
 	}
 	tcpAddr := listener.Addr().(*net.TCPAddr)
+	fmt.Println(tcpAddr)
 	logger.Info("listening", "port", tcpAddr.Port)
 
 	server := &http.Server{
