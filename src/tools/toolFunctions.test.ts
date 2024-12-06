@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { getDisplayStakingApy } from './toolFunctions.ts';
+import { getDisplayStakingApy, getDelegatedBalance } from './toolFunctions';
 import * as apiModule from './api'
 
 describe.skip('getStakingApy', () => {
@@ -23,4 +23,26 @@ describe.skip('getStakingApy', () => {
 
     expect(result).toBe(`Error fetching staking APY: "${mockError}"`);
   });
-})
+});
+
+describe.skip('getDelegatedBalance', () => {
+      it('returns the display total delegated balance with a kava address', async () => {
+        const fetchDelegatedBalanceSpy = vi.spyOn(apiModule, 'fetchDelegatedBalance');
+        fetchDelegatedBalanceSpy.mockResolvedValue({
+          "vested": {
+            "denom": "ukava",
+            "amount": "199999999"
+          },
+          "vesting": {
+            "denom": "ukava",
+            "amount": "1"
+          }
+        });
+
+        const result = await getDelegatedBalance({
+          address: "kava1vlpsrmdyuywvaqrv7rx6xga224sqfwz3fyfhwq"
+        });
+
+        expect(result).toBe("200");
+      });
+  });

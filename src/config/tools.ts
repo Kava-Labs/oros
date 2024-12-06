@@ -56,4 +56,21 @@ export const tools: ChatCompletionTool[] = [
             description: "Fetches the raw staking apy value from a JSON api and converts it to a human-readable string with percent sign. An example would be converting 0.01234 into 1.234%",
         },
     },
+    {
+        type: "function",
+        function: {
+            name: "getDelegatedBalance",
+            description: "Gets to total delegated (or total staked) balance for an address",
+            parameters: {
+                type: "object",
+                properties: {
+                    address: {
+                        type: "string",
+                        description: "The account address to fetch the delegated balances for",
+                    },
+                },
+                required: ["address"],
+            },
+        },
+    },
 ];

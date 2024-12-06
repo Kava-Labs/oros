@@ -20,7 +20,7 @@ import {
 import { chat } from '../utils';
 import { tools } from '../config';
 import type { ChatCompletionChunk, ChatCompletionMessageToolCall } from 'openai/resources/index';
-import { getAccountBalances, getDisplayStakingApy, transferAsset } from '../tools/toolFunctions';
+import { getAccountBalances, transferAsset, getDisplayStakingApy, getDelegatedBalance } from '../tools/toolFunctions';
 import { toast } from 'react-toastify';
 
 interface AppContext {
@@ -137,6 +137,10 @@ export function AppContextProvider({
           case "getDisplayStakingApy":
             console.info("getDisplayStakingApy");
             await doToolCall(tc, getDisplayStakingApy);
+            break;
+          case "getDelegatedBalance":
+            console.info("getDelegatedBalance");
+            await doToolCall(tc, getDelegatedBalance);
             break;
 
           default:
