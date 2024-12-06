@@ -41,7 +41,7 @@ func newDefaultTestConfig() config {
 		// don't use external URL's by default
 		baseURL: "http://localhost:5556/v1",
 		port:    0,
-		host:    "0.0.0.0",
+		host:    "127.0.0.1",
 	}
 }
 

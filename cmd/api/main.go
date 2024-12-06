@@ -23,7 +23,6 @@ const (
 
 var ErrOpenAIKeyRequired = errors.New("OPENAI_API_KEY is required")
 var ErrOpenAIBaseURLRequired = errors.New("OPENAI_BASE_URL is required")
-var ErrAPIHostRequired = errors.New("KAVACHAT_API_HOST is required")
 
 func main() {
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
