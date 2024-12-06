@@ -5,7 +5,7 @@ import { PromptInput } from './PromptInput';
 import { StreamingMessage } from './StreamingMessage';
 import { useAppContext } from '../../contexts/useAppContext';
 
-export const Chat = () => {
+export const ChatContainer = () => {
   const { submitUserChatMessage, cancelStream } = useAppContext();
   const chatContainerRef = useRef<HTMLDivElement>(null);
 

@@ -1,7 +1,7 @@
 import { useAppContext } from './contexts/useAppContext';
 import { Header } from './components/Header';
 import { DemoBanner } from './components/DemoBanner';
-import { Chat } from './components/Chat/Chat';
+import { ChatContainer } from './components/Chat';
 import { ChatControls } from './components/ChatControls';
 
 export const App = () => {
@@ -12,7 +12,7 @@ export const App = () => {
       <Header />
       <main>
         <DemoBanner />
-        <Chat />
+        <ChatContainer />
         <ChatControls clearMessages={clearChatMessages} />
       </main>
     </>
