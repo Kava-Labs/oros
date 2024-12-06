@@ -52,10 +52,13 @@ export const tools: ChatCompletionTool[] = [
     {
         type: "function",
         function: {
-<<<<<<< HEAD
             name: "getDisplayStakingApy",
             description: "Fetches the raw staking apy value from a JSON api and converts it to a human-readable string with percent sign. An example would be converting 0.01234 into 1.234%",
-=======
+        },
+    },
+    {
+        type: "function",
+        function: {
             name: "getDelegatedBalance",
             description: "Gets to total delegated (or total staked) balance for an address",
             parameters: {
@@ -68,7 +71,6 @@ export const tools: ChatCompletionTool[] = [
                 },
                 required: ["address"],
             },
->>>>>>> 8b55657 (feat: tool call for delegated balance)
         },
     },
 ];

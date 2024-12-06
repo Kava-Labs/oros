@@ -1,6 +1,5 @@
-<<<<<<< HEAD
 import { describe, it, expect, vi } from 'vitest';
-import { getDisplayStakingApy } from './toolFunctions.ts';
+import { getDisplayStakingApy, getDelegatedBalance } from './toolFunctions';
 import * as apiModule from './api'
 
 describe.skip('getStakingApy', () => {
@@ -23,10 +22,6 @@ describe.skip('getStakingApy', () => {
     const result = await getDisplayStakingApy();
 
     expect(result).toBe(`Error fetching staking APY: "${mockError}"`);
-=======
-import { describe, expect, it, vi } from 'vitest';
-import * as apiModule from './api';
-import { getDelegatedBalance } from './toolFunctions';
 
 describe.skip('getDelegatedBalance', () => {
   it('returns the display total delegated balance with a kava address', async () => {
@@ -47,6 +42,5 @@ describe.skip('getDelegatedBalance', () => {
     });
 
     expect(result).toBe("200");
->>>>>>> 8b55657 (feat: tool call for delegated balance)
   });
-})
+});
