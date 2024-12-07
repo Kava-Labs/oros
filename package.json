@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:unit": "vitest src",
-    "test:integration": "vitest tests"
+    "test:integration": "vitest tests",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@fontsource/inter": "^5.1.0",
