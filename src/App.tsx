@@ -1,8 +1,8 @@
-import { useAppContext } from "./contexts/AppContext";
-import { DemoBanner } from "./components/DemoBanner";
-import { ChatControls } from "./components/ChatControls";
-import { ChatContainer } from "./components/Chat";
-import { Header } from "./components/Header";
+import { useAppContext } from './contexts/AppContext';
+import { DemoBanner } from './components/DemoBanner';
+import { ChatControls } from './components/ChatControls';
+import { ChatContainer } from './components/Chat';
+import { Header } from './components/Header';
 
 export const App = () => {
   const { clearChatMessages } = useAppContext();

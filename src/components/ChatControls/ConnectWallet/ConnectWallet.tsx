@@ -1,5 +1,5 @@
-import { useAppContext } from "../../../contexts/AppContext";
-import styles from "../../../style.module.css";
+import { useAppContext } from '../../../contexts/AppContext';
+import styles from '../../../style.module.css';
 
 export const ConnectWallet = () => {
   const { connectWallet, address } = useAppContext();
@@ -11,7 +11,7 @@ export const ConnectWallet = () => {
         connectWallet();
       }}
     >
-      {address ? "Re-connect Wallet" : "Connect Wallet"}
+      {address ? 'Re-connect Wallet' : 'Connect Wallet'}
     </button>
   );
 };

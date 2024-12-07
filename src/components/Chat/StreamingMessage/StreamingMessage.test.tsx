@@ -1,21 +1,21 @@
-import React from "react";
-import { render, screen } from "@testing-library/react";
-import { Mock } from "vitest";
-import { StreamingMessage } from "./StreamingMessage";
-import { useSelector } from "react-redux";
-import { selectStreamingMessage } from "../../../stores";
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import { Mock } from 'vitest';
+import { StreamingMessage } from './StreamingMessage';
+import { useSelector } from 'react-redux';
+import { selectStreamingMessage } from '../../../stores';
 
-vi.mock("react-redux", () => ({
+vi.mock('react-redux', () => ({
   useSelector: vi.fn(),
 }));
 
-vi.mock("marked", () => ({
+vi.mock('marked', () => ({
   marked: {
     parse: vi.fn((content) => `parsed: ${content}`),
   },
 }));
 
-describe("StreamingMessage Component", () => {
+describe('StreamingMessage Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -24,24 +24,24 @@ describe("StreamingMessage Component", () => {
     vi.restoreAllMocks();
   });
 
-  it("returns null when content is empty", () => {
+  it('returns null when content is empty', () => {
     (useSelector as unknown as Mock).mockImplementation((selector) => {
       if (selector === selectStreamingMessage) {
-        return "";
+        return '';
       }
     });
 
     const chatContainerRef = React.createRef<HTMLDivElement>();
 
     const { container } = render(
-      <StreamingMessage chatContainerRef={chatContainerRef} />
+      <StreamingMessage chatContainerRef={chatContainerRef} />,
     );
 
     expect(container.firstChild).toBeNull();
   });
 
-  it("renders content with parsed markdown", () => {
-    const content = "Streaming content";
+  it('renders content with parsed markdown', () => {
+    const content = 'Streaming content';
 
     (useSelector as unknown as Mock).mockImplementation((selector) => {
       if (selector === selectStreamingMessage) {

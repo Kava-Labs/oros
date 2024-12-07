@@ -16,7 +16,7 @@ const config = {
   tabWidth: 2,
   useTabs: false,
   singleQuote: true,
-  endOfLine: "lf",
+  endOfLine: 'lf',
   bracketSameLine: false,
 };
 export default config;

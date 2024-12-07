@@ -1,7 +1,7 @@
-import { useState } from "react";
-import styles from "../style.module.css";
-import { useSelector } from "react-redux";
-import { selectHasToolCallInProgress } from "../../../stores";
+import { useState } from 'react';
+import styles from '../style.module.css';
+import { useSelector } from 'react-redux';
+import { selectHasToolCallInProgress } from '../../../stores';
 
 type PromptInputProps = {
   submitUserMessage: (content: string) => void;
@@ -12,7 +12,7 @@ export const PromptInput = ({
   submitUserMessage,
   cancelStream,
 }: PromptInputProps) => {
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState('');
   const hasToolCallInProgress = useSelector(selectHasToolCallInProgress);
 
   return (
@@ -24,7 +24,7 @@ export const PromptInput = ({
         e.preventDefault();
         if (!input) return;
         submitUserMessage(input);
-        setInput("");
+        setInput('');
       }}
     >
       <input
@@ -47,11 +47,11 @@ export const PromptInput = ({
           } else {
             if (!input) return;
             submitUserMessage(input);
-            setInput("");
+            setInput('');
           }
         }}
       >
-        {cancelStream ? "Cancel" : "Submit"}
+        {cancelStream ? 'Cancel' : 'Submit'}
       </button>
     </form>
   );

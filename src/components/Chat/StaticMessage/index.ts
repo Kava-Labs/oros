@@ -1,1 +1,1 @@
-export { StaticMessage } from "./StaticMessage";
+export { StaticMessage } from './StaticMessage';

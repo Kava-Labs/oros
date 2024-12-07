@@ -1,2 +1,2 @@
-export * from "./msgStore";
+export * from './msgStore';
 export * from './store';

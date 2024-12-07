@@ -17,7 +17,7 @@ function createContentChunk(content: string): ChatCompletionChunk {
 }
 
 function createToolCallChunk(
-  toolCalls: ChatCompletionChunk.Choice.Delta.ToolCall[]
+  toolCalls: ChatCompletionChunk.Choice.Delta.ToolCall[],
 ): ChatCompletionChunk {
   return {
     choices: [
@@ -77,7 +77,6 @@ describe('chat function', () => {
       onDone,
       onError,
       onToolCallRequest,
-
     };
 
     chat(cfg);
@@ -251,7 +250,6 @@ describe('chat function', () => {
     // Verify that onToolCallRequest was not called
     expect(onToolCallRequest).not.toHaveBeenCalled();
   });
-
 
   // sometimes openAI sends empty content chunks
   // this tests that we can handle that and not call onDone
