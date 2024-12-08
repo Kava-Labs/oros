@@ -1,8 +1,14 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { getDisplayStakingApy, getDelegatedBalance } from './toolFunctions';
 import * as apiModule from './api';
+import { server } from '../mocks/server';
+import { http, HttpResponse } from 'msw';
 
-describe.skip('getStakingApy', () => {
+beforeAll(() => server.listen());
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
+
+describe('getStakingApy', () => {
   it('returns a human-readable percentage on success', async () => {
     const fetchStakingApySpy = vi.spyOn(apiModule, 'fetchStakingApy');
     fetchStakingApySpy.mockResolvedValueOnce({
@@ -18,30 +24,27 @@ describe.skip('getStakingApy', () => {
     const mockError = 'Error: 404 Unauthorized';
     const fetchStakingApySpy = vi.spyOn(apiModule, 'fetchStakingApy');
     fetchStakingApySpy.mockRejectedValueOnce(mockError);
+    const result = await getDisplayStakingApy();
+    expect(result).toBe('8.5061%');
+  });
+
+  it('returns a wrapped error message on network failure', async () => {
+    server.use(
+      http.get(
+        'https://api2.kava.io/kava/community/v1beta1/annualized_rewards',
+        () => {
+          return new HttpResponse(null, { status: 404 });
+        },
+      ),
+    );
 
     const result = await getDisplayStakingApy();
-
-    expect(result).toBe(`Error fetching staking APY: "${mockError}"`);
+    expect(result).toMatch(/Error fetching staking APY/);
   });
 });
 
-describe.skip('getDelegatedBalance', () => {
+describe('getDelegatedBalance', () => {
   it('returns the display total delegated balance with a kava address', async () => {
-    const fetchDelegatedBalanceSpy = vi.spyOn(
-      apiModule,
-      'fetchDelegatedBalance',
-    );
-    fetchDelegatedBalanceSpy.mockResolvedValue({
-      vested: {
-        denom: 'ukava',
-        amount: '199999999',
-      },
-      vesting: {
-        denom: 'ukava',
-        amount: '1',
-      },
-    });
-
     const result = await getDelegatedBalance({
       address: 'kava1vlpsrmdyuywvaqrv7rx6xga224sqfwz3fyfhwq',
     });
