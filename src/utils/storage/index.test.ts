@@ -14,15 +14,19 @@ describe('LStorage', () => {
     expect(currentState).toBeNull();
 
     //  add and reinitialize
-    await store.write({messages: ['testMessage']});
-    currentState = await store.load();
+    const updatedState: ChatHistory = {
+      messages: ['testMessage']
+    };
 
-    expect(currentState?.messages).toStrictEqual(['testMessage']);
+    await store.write(updatedState);
+
+    currentState = await store.load();
+    expect(currentState).toStrictEqual(updatedState);
 
     //  clear and reinitialize
     await store.remove();
-    currentState = await store.load();
 
+    currentState = await store.load();
     expect(currentState).toBeNull();
   });
 })

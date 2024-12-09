@@ -6,6 +6,7 @@ export interface IStorage<T> {
   remove(): Promise<void>;
 }
 
+//  todo - refactor to use constructor?
 export class LStorage<T> implements IStorage<T> {
   private state: T | null = null;
 
