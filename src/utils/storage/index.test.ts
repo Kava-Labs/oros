@@ -4,8 +4,8 @@ type ChatHistory = {
   messages: string[];
 }
 
-describe('LocalStorage', () => {
-  it('load calls "getItem" once with correct key', async () => {
+describe('LStorage', () => {
+  it('load, write, remove for ChatHistory', async () => {
     const store = new LStorage<ChatHistory>();
 
     let currentState = await store.load();
