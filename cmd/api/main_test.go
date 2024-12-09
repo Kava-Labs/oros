@@ -13,6 +13,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"syscall"
 	"testing"
 	"time"
@@ -30,6 +31,14 @@ type config struct {
 	baseURL string
 	port    int
 	host    string
+}
+
+type ProxyServer struct {
+	Url      string
+	Shutdown func() error
+
+	logMu sync.Mutex
+	Logs  []string
 }
 
 var httpTestCases []*HttpTestCase
@@ -158,7 +167,7 @@ func TestIncorrectRequiredEnvironmentVariable(t *testing.T) {
 	}
 }
 
-func launchApiServer(ctx context.Context, conf config) (string, func() error, error) {
+func launchApiServer(ctx context.Context, conf config) (*ProxyServer, error) {
 	cmd := startProxyCmd(ctx, conf)
 
 	shutdownServer := func() error {
@@ -168,13 +177,18 @@ func launchApiServer(ctx context.Context, conf config) (string, func() error, er
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return "", shutdownServer, fmt.Errorf("could not obtain stdout pipe: %w", err)
+		return nil, fmt.Errorf("could not obtain stdout pipe: %w", err)
+	}
+
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		return nil, fmt.Errorf("could not obtain stderr pipe: %w", err)
 	}
 
 	scanner := bufio.NewScanner(stdout)
 	err = cmd.Start()
 	if err != nil {
-		return "", shutdownServer, err
+		return nil, err
 	}
 
 	getPort, readerErr := func() (chan int, chan error) {
@@ -217,7 +231,7 @@ func launchApiServer(ctx context.Context, conf config) (string, func() error, er
 		err = ctx.Err()
 	}
 	if err != nil {
-		return "", shutdownServer, err
+		return nil, err
 	}
 
 	waitUntilReady := func(ctx context.Context) chan error {
@@ -244,20 +258,44 @@ func launchApiServer(ctx context.Context, conf config) (string, func() error, er
 
 	err = <-waitUntilReady
 	if err != nil {
-		return "", shutdownServer, fmt.Errorf("server is not ready: %w", err)
+		return nil, fmt.Errorf("server is not ready: %w", err)
 	}
 
-	return fmt.Sprintf("http://localhost:%d", port), shutdownServer, nil
+	server := &ProxyServer{
+		Url:      fmt.Sprintf("http://localhost:%d", port),
+		Shutdown: shutdownServer,
+		logMu:    sync.Mutex{},
+		Logs:     []string{},
+	}
+
+	recordServerLogs := func(src io.ReadCloser) {
+		scanner := bufio.NewScanner(src)
+		for scanner.Scan() {
+			line := scanner.Text()
+			server.logMu.Lock()
+			server.Logs = append(server.Logs, line)
+			server.logMu.Unlock()
+		}
+	}
+
+	go recordServerLogs(stdout)
+	go recordServerLogs(stderr)
+
+	return server, nil
 }
 
 func TestHttpHealthCheck(t *testing.T) {
 	ctx, _ := context.WithTimeout(context.Background(), time.Duration(1*time.Second))
 
-	serverUrl, shutdown, err := launchApiServer(ctx, newDefaultTestConfig())
+	srv, err := launchApiServer(ctx, newDefaultTestConfig())
 	require.NoError(t, err, "expected server to start without error")
-	defer shutdown()
+	defer func() {
+		if srv != nil {
+			srv.Shutdown()
+		}
+	}()
 
-	healthcheckUrl, err := url.JoinPath(serverUrl, "/v1/healthcheck")
+	healthcheckUrl, err := url.JoinPath(srv.Url, "/v1/healthcheck")
 	require.NoError(t, err, "could not build healthcheck url")
 
 	response, err := http.Get(healthcheckUrl)
@@ -265,7 +303,7 @@ func TestHttpHealthCheck(t *testing.T) {
 	assert.Equal(t, http.StatusOK, response.StatusCode, "expected healthcheck to be successful")
 }
 
-func TestChatCompletionProxy(t *testing.T) {
+func TestProxy(t *testing.T) {
 	config := newDefaultTestConfig()
 
 	authHeader := fmt.Sprintf("Bearer %s", newDefaultTestConfig().apiKey)
@@ -276,9 +314,15 @@ func TestChatCompletionProxy(t *testing.T) {
 	require.NoError(t, err)
 	config.baseURL = baseURL
 	ctx, _ := context.WithTimeout(context.Background(), time.Duration(60*time.Second))
-	serverUrl, shutdown, err := launchApiServer(ctx, config)
+	srv, err := launchApiServer(ctx, config)
+	require.NoError(t, err, "expected server to start without error")
 
-	defer shutdown()
+	defer func() {
+		if srv != nil {
+			srv.Shutdown()
+		}
+	}()
+
 	defer mockServer.Close()
 
 	require.NoError(t, err, "expected server to start without error")
@@ -293,7 +337,7 @@ func TestChatCompletionProxy(t *testing.T) {
 
 		t.Run(tc.Name, func(t *testing.T) {
 			// Send request to proxy server url with openai prefix, not the mock upstream
-			requestUrl, err := url.JoinPath(serverUrl, "/openai/v1", tc.Path)
+			requestUrl, err := url.JoinPath(srv.Url, "/openai/v1", tc.Path)
 			require.NoError(t, err)
 
 			var buffer io.Reader
@@ -313,7 +357,6 @@ func TestChatCompletionProxy(t *testing.T) {
 			request.Header.Add("x-testcase-index", strconv.Itoa(tcIdx))
 
 			if _, ok := tc.Headers["Authorization"]; ok {
-				fmt.Println("added header", tc.Headers["Authorization"])
 				request.Header.Add("AUthorization", tc.Headers["Authorization"])
 			}
 
@@ -348,6 +391,23 @@ func TestChatCompletionProxy(t *testing.T) {
 			data, err := io.ReadAll(response.Body)
 			require.NoError(t, err)
 			assert.Equal(t, string(tc.Response.Body), string(data))
+
+			// assert server logs match expected logs
+			if len(tc.ExpectLogs) != 0 {
+				matchedLogs := 0
+				for _, expectedLog := range tc.ExpectLogs {
+					srv.logMu.Lock()
+					for _, log := range srv.Logs {
+						if strings.Contains(log, expectedLog) {
+							matchedLogs++
+							break
+						}
+					}
+					srv.logMu.Unlock()
+				}
+
+				assert.Equal(t, len(tc.ExpectLogs), matchedLogs, "failed to match logs %s", tc.ExpectLogs)
+			}
 		})
 	}
 }
