@@ -25,6 +25,12 @@ jobs:
           # Also clone kvtool submodule
           submodules: true
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Configure AWS credentials for container registry
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -36,14 +42,22 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build and tag Docker image
-        id: build-image
+      - name: Build Docker image name
+        id: image-name
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          # Do not push before running E2E tests
+          push: false
+          load: true
+          tags: ${{ steps.image-name.outputs.image }}
 
       # Setup kvtool build environment
       - name: Set up Go
@@ -62,7 +76,7 @@ jobs:
 
       - name: Start proxy and kava node
         env:
-          KAVACHAT_IMAGE: ${{ steps.build-image.outputs.image }}
+          KAVACHAT_IMAGE: ${{ steps.image-name.outputs.image }}
         # Wait for containers to be healthy or fail after 30 seconds
         run: |
           echo "Using image $KAVACHAT_IMAGE"
@@ -83,11 +97,14 @@ jobs:
         run: docker compose -f docker-compose.yaml down
 
       - name: Push Docker image to Amazon ECR
-        run: |
-          docker push ${{ steps.build-image.outputs.image }}
+        uses: docker/build-push-action@v6
+        with:
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.image-name.outputs.image }}
 
       - name: Save Docker image name to file
-        run: echo "${{ steps.build-image.outputs.image }}" > image-name.txt
+        run: echo "${{ steps.image-name.outputs.image }}" > image-name.txt
 
       - name: Upload Docker image name to artifact
         uses: actions/upload-artifact@v4
