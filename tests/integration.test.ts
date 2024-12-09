@@ -15,7 +15,7 @@ function createOpenApiClient(): OpenAI {
 
   return new OpenAI({
     apiKey: sessionAPIKey,
-    baseURL: PROXY_ENDPOINT ?? 'http://localhost:5555/openai/v1'
+    baseURL: PROXY_ENDPOINT ?? 'http://localhost:5555/openai/v1',
   });
 }
 
