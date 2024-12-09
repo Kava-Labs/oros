@@ -45,7 +45,7 @@ jobs:
       - name: Download full Docker image name from artifacts
         uses: actions/download-artifact@v4
         with:
-          name: kavachat-api-image
+          name: kavachat-api-docker-image-name
           path: image-name.txt
 
       - name: Read full Docker image name
