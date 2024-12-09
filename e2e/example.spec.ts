@@ -40,8 +40,16 @@ test('receiving a response from the model', async ({ page }) => {
   })
 
 
-  console.info('response stream finished');
-  await page.waitForTimeout(1500); // safe wait for dom to update
+  await page.waitForFunction(() => {
+    const messages = document.querySelectorAll('[data-testid="ChatContainer"] div div');
+    const lastMessage = messages[messages.length - 1];
+    return lastMessage && 
+           lastMessage.getAttribute('data-chat-role') === 'assistant' &&
+           (lastMessage.textContent?.length ?? 0) > 0;
+  }, {
+    timeout: 10000,
+    polling: 100
+  });
 
   const messages = await page.$$(`[data-testid="ChatContainer"] div div`);
   expect(messages.length).toBeGreaterThan(0);

@@ -10,7 +10,13 @@ echo "Started Proxy server PID: ${PROXY_SERVER_PID}"
 
 # Ping the health check endpoint until it succeeds
 echo "Waiting for the Proxy server to become ready..."
-curl --retry-all-errors --retry 12 --retry-delay 5 http://localhost:5555/v1/healthcheck
+curl --retry 12 \
+     --retry-delay 5 \
+     --retry-all-errors \
+     --silent \
+     --fail \
+     --output /dev/null \
+     http://localhost:5555/v1/healthcheck
 
 echo "Proxy server is ready."
 
