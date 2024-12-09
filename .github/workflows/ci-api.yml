@@ -1,0 +1,97 @@
+name: Continuous Integration - API
+on:
+  push:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: kavachat-api
+
+jobs:
+  e2e-test:
+    runs-on: ubuntu-latest
+    env:
+      KAVA_TAG: v0.27.0-goleveldb
+      KVTOOL_CONFIGTEMPLATE: v0.26
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPENAI_BASE_URL: https://api.openai.com/v1
+    steps:
+      - name: Checkout current commit
+        uses: actions/checkout@v4
+        with:
+          # Also clone kvtool submodule
+          submodules: true
+
+      - name: Configure AWS credentials for container registry
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.REPO_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.REPO_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and tag Docker image
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      # Setup kvtool build environment
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: |
+            go.sum
+
+      - name: Install kvtool
+        run: make -C tests/kvtool install
+
+      # kvtool is only used to generate the kava config files for the container to mount
+      - name: Generate kava config
+        run: kvtool testnet gen-config kava --kava.configTemplate $KVTOOL_CONFIGTEMPLATE
+
+      - name: Start proxy and kava node
+        env:
+          KAVACHAT_IMAGE: ${{ steps.build-image.outputs.image }}
+        # Wait for containers to be healthy or fail after 30 seconds
+        run: |
+          echo "Using image $KAVACHAT_IMAGE"
+          docker compose \
+            -f docker-compose.yaml \
+            -f docker-compose.ci.yaml \
+            up -d --wait --wait-timeout 30
+
+      - name: Output logs if containers are unhealthy
+        if: failure()
+        run: docker compose -f docker-compose.yaml logs
+
+      - name: Run E2E tests
+        run: echo "Run E2E tests here!"
+
+      - name: Shutdown proxy and kava node
+        if: always()
+        run: docker compose -f docker-compose.yaml down
+
+      - name: Push Docker image to Amazon ECR
+        run: |
+          docker push ${{ steps.build-image.outputs.image }}
+
+      - name: Save Docker image name to file
+        run: echo "${{ steps.build-image.outputs.image }}" > image-name.txt
+
+      - name: Upload Docker image name to artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: kavachat-api-image
+          path: image-name.txt
+          retention-days: 1

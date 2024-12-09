@@ -1,17 +1,22 @@
-name: Deploy API service to Amazon ECS
+name: Continuous Deployment - API
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 on:
   # TEMP allow push
   push:
   workflow_run:
     workflows:
-      - End-to-End Tests
+      - Continuous Integration - API
     branches: [main]
     types:
       - completed
 
 env:
   AWS_REGION: us-east-1
+  ECR_REGISTRY_ID: "843137275421"
   ECR_REPOSITORY: kavachat-api
   ECS_SERVICE: kavachat-api
   ECS_CLUSTER: kavachat
@@ -30,33 +35,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.REPO_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.REPO_AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Build, tag, and push image to Amazon ECR
-        id: build-image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
-
-      - name: Switch AWS credentials to service user
+      - name: Configure AWS credentials for service deployment
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
+
+      - name: Download full Docker image name from artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: kavachat-api-image
+          path: image-name.txt
+
+      - name: Read full Docker image name
+        id: read-docker-image
+        run: |
+          IMAGE_NAME=$(cat image-name.txt)
+          echo "image_name=$IMAGE_NAME" >> $GITHUB_OUTPUT
 
       - name: Download task definition
         run: |
@@ -70,14 +66,14 @@ jobs:
         with:
           task-definition: task-definition.json
           # Only modify the image, nothing else
-          image: ${{ steps.build-image.outputs.image }}
+          image: ${{ steps.read-docker-image.outputs.image_name }}
           # Container name matches service name
           container-name: ${{ env.ECS_SERVICE }}
 
-      # - name: Deploy Amazon ECS task definition
-      #   uses: aws-actions/amazon-ecs-deploy-task-definition@v2
-      #   with:
-      #     task-definition: ${{ steps.task-def.outputs.task-definition }}
-      #     service: ${{ env.ECS_SERVICE }}
-      #     cluster: ${{ env.ECS_CLUSTER }}
-      #     wait-for-service-stability: true
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
