@@ -2,7 +2,8 @@ name: Deploy API service to Amazon ECS
 
 on:
   workflow_run:
-    workflows: [e2e]
+    workflows:
+      - End-to-End Tests
     branches: [main, dl-deploy-aws]
     types:
       - completed
