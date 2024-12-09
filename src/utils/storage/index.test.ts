@@ -15,7 +15,7 @@ describe('LocalStorage', () => {
 
   let storage: IStorage<any>;
 
-  it('load calls "getItem" once with correct key', async() => {
+  it('load calls "getItem" once with correct key', async () => {
     const expectedResult = {
       'testKey': 'testValue'
     };
@@ -28,8 +28,8 @@ describe('LocalStorage', () => {
 
     const result = await storage.load();
 
-   expect(localStorageMock.getItem.mock.calls.length).toBe(1);
+    expect(localStorageMock.getItem.mock.calls.length).toBe(1);
     expect(localStorageMock.getItem).toBeCalledWith('testKey');
-   expect(result).toBe(expectedResult)
+    expect(result).toBe(expectedResult)
   });
 })

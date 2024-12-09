@@ -1,6 +1,8 @@
 export interface IStorage<T> {
   write(state: T): Promise<void>;
+
   load(): Promise<T>;
+
   remove(): Promise<void>;
 }
 
