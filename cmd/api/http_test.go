@@ -39,6 +39,7 @@ type HttpTestCase struct {
 	Headers map[string]string `json:"headers"`
 	Body    []byte            `json:"body"`
 
+	ExpectLogs          []string `json:"expectLogs,omitempty"`
 	keepAuthHeader      bool
 	WantStatusCode      int               `json:"wantStatusCode"`
 	WantContentType     string            `json:"wantContentType"`
@@ -97,10 +98,11 @@ func generateTestCases() ([]*HttpTestCase, error) {
 
 	testCases := []*HttpTestCase{
 		{
-			Name:   "unauthorized api key",
-			Method: http.MethodPost,
-			Path:   ChatCompletionsPath,
+			Name:           "unauthorized api key",
+			Method:         http.MethodPost,
+			Path:           ChatCompletionsPath,
 			keepAuthHeader: true,
+			ExpectLogs: []string{},
 			Headers: map[string]string{
 				"Authorization": "Bearer not-a-valid-api-key",
 				"Content-Type":  "application/json",
@@ -110,52 +112,64 @@ func generateTestCases() ([]*HttpTestCase, error) {
 			WantContentType: "application/json",
 		},
 		{
-			Name:   "basic",
-			Method: http.MethodPost,
-			Path:   ChatCompletionsPath,
+			Name:           "basic",
+			Method:         http.MethodPost,
+			Path:           ChatCompletionsPath,
 			keepAuthHeader: false,
 			Headers: map[string]string{
 				"Content-Type":  "application/json",
 				"Authorization": "Bearer kavachat:3ecf96d2-2180-423d-9de7-ecf247125524:a496f6c4-90e5-4f56-83bd-47a36b911b9e",
+			},
+			ExpectLogs: []string{
+				`level=INFO msg="request received" clientID=3ecf96d2-2180-423d-9de7-ecf247125524 sessionID=a496f6c4-90e5-4f56-83bd-47a36b911b9e path=/openai/v1/chat/completions`,
 			},
 			Body:            json.RawMessage(basic),
 			WantStatusCode:  200,
 			WantContentType: "application/json",
 		},
 		{
-			Name:   "basic streaming",
-			Method: http.MethodPost,
-			Path:   ChatCompletionsPath,
+			Name:           "basic streaming",
+			Method:         http.MethodPost,
+			Path:           ChatCompletionsPath,
 			keepAuthHeader: false,
 			Headers: map[string]string{
 				"Content-Type":  "application/json",
 				"Authorization": "Bearer kavachat:5e5168ef-42a7-4f24-b490-551b60d9a971:9e080aba-f3fd-44ef-b419-0fa1e801819f",
+			},
+			ExpectLogs: []string{
+				`level=INFO msg="request received" clientID=5e5168ef-42a7-4f24-b490-551b60d9a971 sessionID=9e080aba-f3fd-44ef-b419-0fa1e801819f path=/openai/v1/chat/completions`,
 			},
 			Body:            json.RawMessage(basicStreaming),
 			WantStatusCode:  200,
 			WantContentType: "text/event-stream",
 		},
 		{
-			Name:   "streaming with new lines",
-			Method: http.MethodPost,
-			Path:   ChatCompletionsPath,
+			Name:           "streaming with new lines",
+			Method:         http.MethodPost,
+			Path:           ChatCompletionsPath,
 			keepAuthHeader: false,
 			Headers: map[string]string{
 				"Content-Type":  "application/json",
 				"Authorization": "Bearer kavachat:69b23a03-a7ca-40db-a3b9-48e89e1f54a5:ee989320-98a1-49de-8697-56ce206d26b3",
+			},
+			ExpectLogs: []string{
+				`level=INFO msg="request received" clientID=69b23a03-a7ca-40db-a3b9-48e89e1f54a5 sessionID=ee989320-98a1-49de-8697-56ce206d26b3 path=/openai/v1/chat/completions`,
 			},
 			Body:            json.RawMessage(streamWithNewLines),
 			WantStatusCode:  200,
 			WantContentType: "text/event-stream",
 		},
 		{
-			Name:   "Basic Image Generation",
-			Method: http.MethodPost,
-			Path:   ImageGenerationPath,
+			Name:           "Basic Image Generation",
+			Method:         http.MethodPost,
+			Path:           ImageGenerationPath,
 			keepAuthHeader: false,
 			Headers: map[string]string{
 				"Content-Type":  "application/json",
 				"Authorization": "Bearer kavachat:1e84d3cd-6301-4c49-82ed-e556c4fe2d13:31ecbc1c-2004-4d31-9f45-6868d71bebee",
+			},
+			ExpectLogs: []string{
+				`level=INFO msg="request received" clientID=1e84d3cd-6301-4c49-82ed-e556c4fe2d13 sessionID=31ecbc1c-2004-4d31-9f45-6868d71bebee path=/openai/v1/images/generations`,
 			},
 			Body:            json.RawMessage(basicImageGen),
 			WantStatusCode:  200,
@@ -219,19 +233,18 @@ func generateTestCases() ([]*HttpTestCase, error) {
 			return nil, fmt.Errorf("building new request for %v: %w", tc.Name, err)
 		}
 		for name, value := range tc.Headers {
-			// when generating test cases and keepAuthHeader is false 
+			// when generating test cases and keepAuthHeader is false
 			// use the real auth token and not the client sent set one to the proxy
 			if name == "Authorization" && !tc.keepAuthHeader {
 				continue
 			}
 			request.Header.Add(name, value)
 		}
-		
+
 		if request.Header.Get("Authorization") == "" {
 			request.Header.Add("Authorization", authHeader)
 		}
 
-	
 		response, err := client.Do(request)
 		if err != nil {
 			return nil, fmt.Errorf("sending new request for %v: %w", tc.Name, err)
