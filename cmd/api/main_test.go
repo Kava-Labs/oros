@@ -118,7 +118,7 @@ func TestIncorrectRequiredEnvironmentVariable(t *testing.T) {
 			name:                "Restricted port",
 			environmentVariable: "KAVACHAT_API_PORT",
 			susbstitutedValue:   "80",
-			expectedError:       "listen tcp 127.0.0.1:80: bind: permission denied",
+			expectedError:       "failed to start server: listen tcp 127.0.0.1:80: bind: permission denied",
 		},
 	}
 	ctx, _ := context.WithTimeout(context.Background(), time.Duration(1*time.Second))
