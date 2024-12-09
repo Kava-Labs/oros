@@ -39,8 +39,9 @@ type HttpTestCase struct {
 	Headers map[string]string `json:"headers"`
 	Body    []byte            `json:"body"`
 
-	WantStatusCode  int    `json:"wantStatusCode"`
-	WantContentType string `json:"wantContentType"`
+	WantStatusCode      int               `json:"wantStatusCode"`
+	WantContentType     string            `json:"wantContentType"`
+	WantResponseHeaders map[string]string `json:"wantResponseHeaders"`
 
 	Response HttpResponseData `json:"response"`
 }
@@ -150,12 +151,49 @@ func generateTestCases() ([]*HttpTestCase, error) {
 			WantStatusCode:  200,
 			WantContentType: "application/json",
 		},
+
+		{
+			Name:   "Basic preflight request image generation endpoint",
+			Path:   "images/generations",
+			Method: http.MethodOptions,
+			Headers: map[string]string{
+				"Origin": "http://localhost:5555",
+			},
+			Body:           nil,
+			WantStatusCode: http.StatusOK,
+			WantResponseHeaders: map[string]string{
+				"Access-Control-Allow-Origin":  "*",
+				"Access-Control-Allow-Methods": "POST, OPTIONS",
+				"Access-Control-Allow-Headers": "Authorization, Content-Type, x-stainless-os, x-stainless-runtime-version, x-stainless-package-version, x-stainless-runtime, x-stainless-arch, x-stainless-retry-count, x-stainless-lang, user-agent",
+				"Access-Control-Max-Age":       "3600",
+			},
+		},
+
+		{
+			Name:   "Basic preflight request chat endpoint",
+			Path:   "chat/completions",
+			Method: http.MethodOptions,
+			Headers: map[string]string{
+				"Origin": "http://localhost:5555",
+			},
+			Body:           nil,
+			WantStatusCode: http.StatusOK,
+			WantResponseHeaders: map[string]string{
+				"Access-Control-Allow-Origin":  "*",
+				"Access-Control-Allow-Methods": "POST, OPTIONS",
+				"Access-Control-Allow-Headers": "Authorization, Content-Type, x-stainless-os, x-stainless-runtime-version, x-stainless-package-version, x-stainless-runtime, x-stainless-arch, x-stainless-retry-count, x-stainless-lang, user-agent",
+				"Access-Control-Max-Age":       "3600",
+			},
+		},
 	}
 
 	client := &http.Client{}
 	authHeader := fmt.Sprintf("Bearer %s", apiKey)
 
 	for _, tc := range testCases {
+		if tc.Method == http.MethodOptions {
+			continue
+		}
 		url, err := url.JoinPath(baseURL, tc.Path)
 		if err != nil {
 			return nil, fmt.Errorf("building url for %v: %w", tc.Name, err)

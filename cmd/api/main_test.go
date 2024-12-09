@@ -6,7 +6,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -228,7 +227,7 @@ func launchApiServer(ctx context.Context, conf config) (string, func() error, er
 			for ctx.Err() == nil {
 				resp, err := http.Get(requestURL)
 				if err == nil && resp.StatusCode == 200 {
-					body, err := ioutil.ReadAll(resp.Body)
+					body, err := io.ReadAll(resp.Body)
 					defer resp.Body.Close()
 					if err == nil {
 						if string(body) == "available\n" {
@@ -285,7 +284,7 @@ func TestChatCompletionProxy(t *testing.T) {
 	require.NoError(t, err, "expected server to start without error")
 
 	client := &http.Client{}
-	for _, tc := range httpTestCases {
+	for tcIdx, tc := range httpTestCases {
 		// skip authentication and other upstream failure cases
 		// for now in order to get happy path working
 		if tc.WantStatusCode != 200 {
@@ -305,11 +304,18 @@ func TestChatCompletionProxy(t *testing.T) {
 			request, err := http.NewRequest(tc.Method, requestUrl, buffer)
 			require.NoError(t, err)
 
-			// no authorization header is required, we only use the content type from
-			// the test case to ensure it matches the body
 			requestContentType, ok := tc.Headers["Content-Type"]
-			require.True(t, ok, "content type must be set")
-			request.Header.Add("Content-Type", requestContentType)
+			if tc.Method != http.MethodOptions {
+				require.True(t, ok, "content type must be set")
+				request.Header.Add("Content-Type", requestContentType)
+			}
+
+			request.Header.Add("x-testcase-index", strconv.Itoa(tcIdx))
+
+			if _, ok := tc.Headers["Authorization"]; ok {
+				fmt.Println("added header", tc.Headers["Authorization"])
+				request.Header.Add("AUthorization", tc.Headers["Authorization"])
+			}
 
 			// make the request to the proxy!
 			response, err := client.Do(request)
@@ -323,6 +329,10 @@ func TestChatCompletionProxy(t *testing.T) {
 			// require content matches the expected one
 			responseContentType := strings.Split(response.Header.Get("Content-Type"), ";")[0]
 			require.Equal(t, tc.WantContentType, responseContentType)
+
+			for name, value := range tc.WantResponseHeaders {
+				require.Equal(t, value, response.Header.Get(name))
+			}
 
 			// Transfer-encoding should not be set for SSE responses
 			// when using http/1.1
