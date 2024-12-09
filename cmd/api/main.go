@@ -143,7 +143,7 @@ func main() {
 
 	listener, err := net.Listen("tcp", address)
 	if err != nil {
-		logFatal(logger, err)
+		logFatal(logger, fmt.Errorf("failed to start server: %w", err))
 	}
 	tcpAddr := listener.Addr().(*net.TCPAddr)
 	logger.Info("listening", "port", tcpAddr.Port)
