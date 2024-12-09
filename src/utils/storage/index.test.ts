@@ -15,13 +15,15 @@ describe('LocalStorage', () => {
 
   let storage: IStorage<any>;
 
-  it('load calls "getItem" from localStorage', async() => {
-    storage = new LStorage('test');
+  it('load calls "getItem" from localStorage with correct key', async() => {
+    const testKey = 'testKey';
+    storage = new LStorage(testKey);
 
     expect(localStorageMock.getItem.mock.calls.length).toBe(0);
 
     await storage.load();
 
    expect(localStorageMock.getItem.mock.calls.length).toBe(1);
+   expect(localStorageMock.getItem).toBeCalledWith(testKey);
   })
 })
