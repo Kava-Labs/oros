@@ -18,11 +18,21 @@ export class LStorage<T> implements IStorage<T> {
     });
   }
 
-  //  todo - handle reject
   async load(): Promise<T> {
-    return new Promise<T>((resolve) => {
-      resolve(localStorage.getItem(this.key) as T)
-    })
+    return new Promise<T>((resolve, reject) => {
+      try {
+        const item = localStorage.getItem(this.key);
+
+        if (item) {
+          resolve(item as T);
+        } else {
+          reject(`${this.key} not found in storage`);
+
+        }
+      } catch (error) {
+        reject(error);
+      }
+    });
   }
 
   //  todo
