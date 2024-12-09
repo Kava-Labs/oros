@@ -23,7 +23,7 @@ export class LStorage<T> implements IStorage<T> {
   async load(): Promise<T> {
     return new Promise<T>((resolve, reject) => {
       try {
-        const item = localStorage.getItem(this.key);
+        const item = window.localStorage.getItem(this.key);
 
         if (item) {
           resolve(item as T);
