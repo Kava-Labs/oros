@@ -13,14 +13,14 @@ describe('LStorage', () => {
     //  State initializes as null
     expect(currentState).toBeNull();
 
-    //  update and reinitialize
+    //  add and reinitialize
     await store.write({messages: ['testMessage']});
     currentState = await store.load();
 
     expect(currentState?.messages).toStrictEqual(['testMessage']);
 
+    //  clear and reinitialize
     await store.remove();
-
     currentState = await store.load();
 
     expect(currentState).toBeNull();
