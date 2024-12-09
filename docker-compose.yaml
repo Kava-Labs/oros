@@ -9,6 +9,7 @@ services:
       # Pass through existing environment variables
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       OPENAI_BASE_URL: ${OPENAI_BASE_URL}
+      KAVACHAT_HOST: "0.0.0.0"
 
   kavanode:
     image: "kava/kava:${KAVA_TAG:-v0.27.0-goleveldb}"
