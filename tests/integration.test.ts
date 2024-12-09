@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 import { v4 as uuidv4 } from 'uuid';
 
-const PROXY_ENDPOINT= process.env.PROXY_ENDPOINT
+const PROXY_ENDPOINT = process.env.PROXY_ENDPOINT;
 const BYPASS_PROXY = process.env.BYPASS_PROXY === 'true';
 
 function createOpenApiClient(): OpenAI {
@@ -10,18 +10,17 @@ function createOpenApiClient(): OpenAI {
   const sessionAPIKey = `kavachat:${uuidv4()}:${uuidv4()}`;
 
   if (BYPASS_PROXY) {
-    return new OpenAI()
+    return new OpenAI();
   }
 
   return new OpenAI({
     apiKey: sessionAPIKey,
-    baseURL: PROXY_ENDPOINT ?? 'http://localhost:5555/openai/v1'
+    baseURL: PROXY_ENDPOINT ?? 'http://localhost:5555/openai/v1',
   });
 }
 
 describe('OpenAI Client', () => {
-  it('non-streaming response with appropriate text is built from a user\'s prompt', async () => {
-
+  it("non-streaming response with appropriate text is built from a user's prompt", async () => {
     const userPrompt = 'Say this is a test';
     const expectedContent = 'This is a test';
     const expectedRole = 'assistant';
@@ -75,5 +74,4 @@ describe('OpenAI Client', () => {
 
     expect(output).toMatch(expectedContent);
   });
-})
-
+});

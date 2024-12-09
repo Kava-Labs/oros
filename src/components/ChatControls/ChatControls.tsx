@@ -1,6 +1,6 @@
-import styles from "../../style.module.css";
-import { ConnectWallet } from "./ConnectWallet";
-import { ResetButton } from "./ResetButton";
+import styles from '../../style.module.css';
+import { ConnectWallet } from './ConnectWallet';
+import { ResetButton } from './ResetButton';
 
 type ChatControlsProps = {
   clearMessages: () => void;

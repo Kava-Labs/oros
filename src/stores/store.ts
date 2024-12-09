@@ -3,7 +3,6 @@ import { msgStoreReducer } from './msgStore';
 
 export const appStore = configureStore({
   reducer: {
-    "msgStore": msgStoreReducer,
+    msgStore: msgStoreReducer,
   },
 });
-

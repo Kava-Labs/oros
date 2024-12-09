@@ -5,16 +5,19 @@ test('renders intro message', async ({ page }) => {
 
   await page.waitForLoadState();
 
-  const messageContainer = await page.$(`[data-testid="ChatContainer"] div div`);
+  const messageContainer = await page.$(
+    `[data-testid="ChatContainer"] div div`,
+  );
   expect(messageContainer).not.toBeNull();
 
-  const role = await messageContainer!.getAttribute('data-chat-role')
+  const role = await messageContainer!.getAttribute('data-chat-role');
   expect(role).toBe('assistant');
 
-  await expect(page.getByTestId('ChatContainer')).toHaveText(/Hey I'm Kava AI/, { useInnerText: true });
-
+  await expect(page.getByTestId('ChatContainer')).toHaveText(
+    /Hey I'm Kava AI/,
+    { useInnerText: true },
+  );
 });
-
 
 test('receiving a response from the model', async ({ page }) => {
   test.setTimeout(90 * 1000);
@@ -22,13 +25,13 @@ test('receiving a response from the model', async ({ page }) => {
 
   await page.waitForLoadState();
 
-
   const input = page.getByTestId('PromptInput').getByRole('textbox');
 
-  await input.fill('This is an automated test suite, please respond with the exact text: THIS IS A TEST');
+  await input.fill(
+    'This is an automated test suite, please respond with the exact text: THIS IS A TEST',
+  );
 
   await page.getByTestId('PromptInput').getByRole('button').click();
-
 
   await page.waitForResponse(async (res) => {
     if (res.url().includes('chat')) {
@@ -37,29 +40,33 @@ test('receiving a response from the model', async ({ page }) => {
       return true;
     }
     return false;
-  })
-
-
-  await page.waitForFunction(() => {
-    const messages = document.querySelectorAll('[data-testid="ChatContainer"] div div');
-    const lastMessage = messages[messages.length - 1];
-    return lastMessage && 
-           lastMessage.getAttribute('data-chat-role') === 'assistant' &&
-           (lastMessage.textContent?.length ?? 0) > 0;
-  }, {
-    timeout: 10000,
-    polling: 100
   });
+
+  await page.waitForFunction(
+    () => {
+      const messages = document.querySelectorAll(
+        '[data-testid="ChatContainer"] div div',
+      );
+      const lastMessage = messages[messages.length - 1];
+      return (
+        lastMessage &&
+        lastMessage.getAttribute('data-chat-role') === 'assistant' &&
+        (lastMessage.textContent?.length ?? 0) > 0
+      );
+    },
+    {
+      timeout: 10000,
+      polling: 100,
+    },
+  );
 
   const messages = await page.$$(`[data-testid="ChatContainer"] div div`);
   expect(messages.length).toBeGreaterThan(0);
 
-  const attr = await messages[messages.length-1].getAttribute('data-chat-role');
- expect(attr).toBe('assistant');
+  const attr =
+    await messages[messages.length - 1].getAttribute('data-chat-role');
+  expect(attr).toBe('assistant');
 
-
- const responseText = await messages[messages.length-1].innerText();
- expect(responseText).toMatch(/THIS IS A TEST/i);
-  
+  const responseText = await messages[messages.length - 1].innerText();
+  expect(responseText).toMatch(/THIS IS A TEST/i);
 });
-

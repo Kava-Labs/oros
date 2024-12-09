@@ -1,9 +1,9 @@
-import { useRef } from "react";
-import styles from "./style.module.css";
-import { Messages } from "./Messages";
-import { PromptInput } from "./PromptInput";
-import { StreamingMessage } from "./StreamingMessage";
-import { useAppContext } from "../../contexts/AppContext";
+import { useRef } from 'react';
+import styles from './style.module.css';
+import { Messages } from './Messages';
+import { PromptInput } from './PromptInput';
+import { StreamingMessage } from './StreamingMessage';
+import { useAppContext } from '../../contexts/AppContext';
 
 export const ChatContainer = () => {
   const { submitUserChatMessage, cancelStream } = useAppContext();
