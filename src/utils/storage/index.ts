@@ -6,7 +6,6 @@ export interface IStorage<T> {
   reset(): Promise<void>;
 }
 
-//  todo - refactor to use constructor?
 export class MemoryStorage<T> implements IStorage<T> {
   private state: T;
   private defaultState: T;
