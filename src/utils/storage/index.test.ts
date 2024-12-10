@@ -4,7 +4,7 @@ type ChatHistory = {
   messages: string[];
 };
 
-describe('LStorage', () => {
+describe('MemoryStorage', () => {
   it('load, write, remove for ChatHistory', async () => {
     //  we can initialize as either an 'empty record' or null
     //  and will reset to that value
