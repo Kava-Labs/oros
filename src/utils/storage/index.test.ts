@@ -1,4 +1,4 @@
-import { MemoryStorage } from '.';
+import { LocalStorage, MemoryStorage } from '.';
 import { ChatHistory } from './types';
 
 describe('MemoryStorage', () => {
@@ -33,5 +33,32 @@ describe('MemoryStorage', () => {
       currentState = await store.load();
       expect(currentState).toStrictEqual(defaultState);
     }
+  });
+});
+
+describe('LocalStorage', () => {
+  const defaultState = { messages: [] };
+  localStorage.setItem('chat-messages', JSON.stringify(defaultState));
+
+  it('load, write, remove for ChatHistory', async () => {
+    const store = new LocalStorage<ChatHistory>('chat-messages', defaultState);
+
+    let currentState = await store.load();
+
+    expect(currentState).toStrictEqual(defaultState);
+
+    const updatedState: ChatHistory = {
+      messages: ['Hello world'],
+    };
+
+    await store.write(updatedState);
+
+    currentState = await store.load();
+    expect(currentState).toStrictEqual(updatedState);
+
+    await store.reset();
+
+    currentState = await store.load();
+    expect(currentState).toStrictEqual(defaultState);
   });
 });

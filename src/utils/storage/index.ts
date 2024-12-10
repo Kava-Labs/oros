@@ -21,3 +21,39 @@ export class MemoryStorage<T> implements IStorage<T> {
     this.state = this.defaultState;
   }
 }
+
+export class LocalStorage<T> implements IStorage<T> {
+  private key: string;
+  private defaultState: T;
+
+  constructor(key: string, defaultState: T) {
+    this.key = key;
+    this.defaultState = defaultState;
+  }
+
+  async write(data: T): Promise<void> {
+    return new Promise<void>((resolve) => {
+      localStorage.setItem(this.key, JSON.stringify(data));
+      resolve();
+    });
+  }
+
+  async load(): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+      console.log({ localStorage });
+      const data = localStorage.getItem(this.key);
+      if (data !== null) {
+        resolve(JSON.parse(data) as T);
+      } else {
+        reject(new Error(`No data found for key: ${this.key}`));
+      }
+    });
+  }
+
+  async reset(): Promise<void> {
+    return new Promise<void>((resolve) => {
+      localStorage.setItem(this.key, JSON.stringify(this.defaultState));
+      resolve();
+    });
+  }
+}
