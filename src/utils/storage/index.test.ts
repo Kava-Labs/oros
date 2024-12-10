@@ -1,4 +1,4 @@
-import { MemoryStorage } from './index.ts';
+import { MemoryStorage } from '.';
 import { ChatHistory } from './types';
 
 describe('MemoryStorage', () => {
