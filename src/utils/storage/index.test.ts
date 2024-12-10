@@ -1,8 +1,5 @@
 import { MemoryStorage } from './index.ts';
-
-type ChatHistory = {
-  messages: string[];
-};
+import { ChatHistory } from './types';
 
 describe('MemoryStorage', () => {
   it('load, write, remove for ChatHistory', async () => {

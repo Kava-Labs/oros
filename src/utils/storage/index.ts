@@ -1,10 +1,4 @@
-export interface IStorage<T> {
-  write(state: T): Promise<void>;
-
-  load(): Promise<T>;
-
-  reset(): Promise<void>;
-}
+import { IStorage } from './types';
 
 export class MemoryStorage<T> implements IStorage<T> {
   private state: T;
