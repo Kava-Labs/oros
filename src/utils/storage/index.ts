@@ -1,25 +1,30 @@
 export interface IStorage<T> {
   write(state: T): Promise<void>;
 
-  load(): Promise<T | null>;
+  load(): Promise<T>;
 
-  remove(): Promise<void>;
+  reset(): Promise<void>;
 }
 
 //  todo - refactor to use constructor?
-export class LStorage<T> implements IStorage<T> {
-  private state: T | null = null;
+export class MemoryStorage<T> implements IStorage<T> {
+  private state: T;
+  private defaultState: T;
+
+  constructor(state: T) {
+    this.state = state;
+    this.defaultState = state;
+  }
 
   async write(state: T): Promise<void> {
     this.state = state;
   }
 
-  async load(): Promise<T | null> {
+  async load(): Promise<T> {
     return this.state;
   }
 
-  async remove(): Promise<void> {
-    this.state = null;
+  async reset(): Promise<void> {
+    this.state = this.defaultState;
   }
 }
-

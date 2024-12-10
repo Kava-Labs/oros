@@ -1,32 +1,40 @@
-import { LStorage } from './index.ts';
+import { MemoryStorage } from './index.ts';
 
 type ChatHistory = {
   messages: string[];
-}
+};
 
 describe('LStorage', () => {
   it('load, write, remove for ChatHistory', async () => {
-    const store = new LStorage<ChatHistory>();
+    //  we can initialize as either an 'empty record' or null
+    //  and will reset to that value
+    const defaultStates: Array<ChatHistory | null> = [{ messages: [] }, null];
 
-    let currentState = await store.load();
+    for await (const defaultState of defaultStates) {
+      const store = new MemoryStorage<typeof defaultState>(defaultState);
 
-    //  State initializes as null
-    expect(currentState).toBeNull();
+      let currentState = await store.load();
 
-    //  add and reinitialize
-    const updatedState: ChatHistory = {
-      messages: ['testMessage']
-    };
+      //  State initializes
+      expect(currentState).toStrictEqual(defaultState);
 
-    await store.write(updatedState);
+      //  add a new entry
+      const updatedState: ChatHistory = {
+        messages: ['testMessage'],
+      };
 
-    currentState = await store.load();
-    expect(currentState).toStrictEqual(updatedState);
+      await store.write(updatedState);
 
-    //  clear and reinitialize
-    await store.remove();
+      //  reload and see the update
+      currentState = await store.load();
+      expect(currentState).toStrictEqual(updatedState);
 
-    currentState = await store.load();
-    expect(currentState).toBeNull();
+      //  reset
+      await store.reset();
+
+      //  reload to default
+      currentState = await store.load();
+      expect(currentState).toStrictEqual(defaultState);
+    }
   });
-})
+});
