@@ -1,12 +1,12 @@
 import { LocalStorage, MemoryStorage } from '.';
 import { ChatHistory } from './types';
 
+//  we can initialize as either an 'empty record' or null
+//  and will reset to that value
+const defaultStates: Array<ChatHistory | null> = [{ messages: [] }, null];
+
 describe('MemoryStorage', () => {
   it('load, write, remove for ChatHistory', async () => {
-    //  we can initialize as either an 'empty record' or null
-    //  and will reset to that value
-    const defaultStates: Array<ChatHistory | null> = [{ messages: [] }, null];
-
     for await (const defaultState of defaultStates) {
       const store = new MemoryStorage<typeof defaultState>(defaultState);
 
@@ -37,28 +37,32 @@ describe('MemoryStorage', () => {
 });
 
 describe('LocalStorage', () => {
-  const defaultState = { messages: [] };
-  localStorage.setItem('chat-messages', JSON.stringify(defaultState));
-
   it('load, write, remove for ChatHistory', async () => {
-    const store = new LocalStorage<ChatHistory>('chat-messages', defaultState);
+    for await (const defaultState of defaultStates) {
+      localStorage.setItem('chat-messages', JSON.stringify(defaultState));
 
-    let currentState = await store.load();
+      const store = new LocalStorage<typeof defaultState>(
+        'chat-messages',
+        defaultState,
+      );
 
-    expect(currentState).toStrictEqual(defaultState);
+      let currentState = await store.load();
 
-    const updatedState: ChatHistory = {
-      messages: ['Hello world'],
-    };
+      expect(currentState).toStrictEqual(defaultState);
 
-    await store.write(updatedState);
+      const updatedState: ChatHistory = {
+        messages: ['Hello world'],
+      };
 
-    currentState = await store.load();
-    expect(currentState).toStrictEqual(updatedState);
+      await store.write(updatedState);
 
-    await store.reset();
+      currentState = await store.load();
+      expect(currentState).toStrictEqual(updatedState);
 
-    currentState = await store.load();
-    expect(currentState).toStrictEqual(defaultState);
+      await store.reset();
+
+      currentState = await store.load();
+      expect(currentState).toStrictEqual(defaultState);
+    }
   });
 });
