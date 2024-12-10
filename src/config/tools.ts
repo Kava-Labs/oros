@@ -76,4 +76,23 @@ export const tools: ChatCompletionTool[] = [
       },
     },
   },
+  {
+    type: 'function',
+    function: {
+      name: 'generateImage',
+      description: 'generates an image from the given prompt',
+      parameters: {
+        type: 'object',
+        properties: {
+          prompt: {
+            type: 'string',
+            description:
+              'A text description of the desired image optimized for dalle-2 use the conversation context to help make the image, maximum 1000 characters',
+          },
+        },
+        required: ['prompt'],
+        strict: true,
+      },
+    },
+  },
 ];

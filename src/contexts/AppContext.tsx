@@ -30,6 +30,7 @@ import {
   getDelegatedBalance,
 } from '../tools/toolFunctions';
 import { toast } from 'react-toastify';
+import { generateImage } from '../utils/image/image';
 
 interface AppContext {
   address: string;
@@ -161,6 +162,10 @@ export function AppContextProvider({
               await doToolCall(tc, getDelegatedBalance);
               break;
 
+            case 'generateImage':
+              console.info('generateImage');
+              await doToolCall(tc, generateImage);
+              break;
             default:
               throw new Error(
                 `unknown tool call function: ${tc.function?.name}`,
