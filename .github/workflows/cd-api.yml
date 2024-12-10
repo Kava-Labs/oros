@@ -30,7 +30,8 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    # if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    # Only run this job if the CI job was successful
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     environment: production
 
     steps:
