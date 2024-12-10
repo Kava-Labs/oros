@@ -8,7 +8,7 @@ export interface IStorage<T> {
 
 export class MemoryStorage<T> implements IStorage<T> {
   private state: T;
-  private defaultState: T;
+  private readonly defaultState: T;
 
   constructor(state: T) {
     this.state = state;
