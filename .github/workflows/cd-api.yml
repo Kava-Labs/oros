@@ -1,8 +1,12 @@
 name: Continuous Deployment - API
 
+# Ensure only 1 deployment is running at a time
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  group: production
+  # Do NOT cancel in-progress deployments, ensure each deployment completes
+  # before starting the next one. This allows for rollbacks to the latest most
+  # stable version, instead of potentially skipping over a stable version.
+  cancel-in-progress: false
 
 on:
   workflow_run:
