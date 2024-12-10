@@ -40,7 +40,6 @@ interface AppContext {
   cancelStream: (() => void) | null;
   clearChatMessages: () => void;
   markDownCache: React.MutableRefObject<Map<string, string>>;
-  messageStore: any;
 }
 
 const mdCache = new Map<string, string>();
@@ -57,7 +56,6 @@ const initValues = {
   },
   cancelStream: null,
   markDownCache: { current: mdCache },
-  messageStore: { messages: [] },
 };
 
 export const AppContext = createContext<AppContext>(initValues);
@@ -262,6 +260,8 @@ export function AppContextProvider({
     await messageStore.load();
   }, [store]);
 
+  console.log({ messageStore });
+
   return (
     <AppContext.Provider
       value={{
@@ -271,7 +271,6 @@ export function AppContextProvider({
         clearChatMessages,
         address,
         markDownCache,
-        messageStore,
       }}
     >
       {children}

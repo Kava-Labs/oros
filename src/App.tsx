@@ -5,9 +5,7 @@ import { ChatContainer } from './components/Chat';
 import { Header } from './components/Header';
 
 export const App = () => {
-  const { clearChatMessages, messageStore } = useAppContext();
-
-  console.log({ messageStore });
+  const { clearChatMessages } = useAppContext();
 
   return (
     <>
