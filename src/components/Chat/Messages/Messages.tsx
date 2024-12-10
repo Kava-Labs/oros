@@ -66,8 +66,9 @@ export const Messages = () => {
       {isGeneratingImage ? (
         <div className={styles.chatBubbleAssistant}>
           <div data-chat-role="tool" className={styles.chatBubble}>
-            {/* todo(sah): add loading spinner */}
-            <p>Generating Image...</p>
+            <div className={styles.imagePlaceholder}>
+              <p style={{ textAlign: 'center' }}>generating Image...</p>
+            </div>
           </div>
         </div>
       ) : null}
