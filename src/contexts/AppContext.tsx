@@ -65,8 +65,6 @@ export const AppContext = createContext<AppContext>(initValues);
 const storage = new LocalStorage<ChatHistory>('chat-messages', {
   messages: [],
 });
-//
-await storage.write({ messages: ['Hello world'] });
 
 export function AppContextProvider({
   children,
