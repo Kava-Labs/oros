@@ -32,6 +32,8 @@ import {
 import { toast } from 'react-toastify';
 import { generateImage } from '../utils/image/image';
 import { deleteImages } from '../utils';
+import { LocalStorage } from '../utils/storage';
+import { ChatHistory } from '../utils/storage/types';
 
 interface AppContext {
   address: string;
@@ -60,6 +62,12 @@ const initValues = {
 
 export const AppContext = createContext<AppContext>(initValues);
 
+const storage = new LocalStorage<ChatHistory>('chat-messages', {
+  messages: [],
+});
+//
+await storage.write({ messages: ['Hello world'] });
+
 export function AppContextProvider({
   children,
   store = _appStore,
@@ -69,6 +77,15 @@ export function AppContextProvider({
 }) {
   const [address, setAddress] = useState('');
   const [cancelStream, setCancelStream] = useState<null | (() => void)>(null);
+
+  //  todo - set redux store with messages from local storage
+  // useEffect(() => {
+  //   const loadChatHistory = async () => {
+  //     const chatHistory = await storage.load();
+  //     const messages = chatHistory.messages;
+  //   };
+  //   loadChatHistory();
+  // }, []);
 
   const markDownCache = useRef<Map<string, string>>(mdCache);
 
@@ -112,6 +129,7 @@ export function AppContextProvider({
       store.dispatch(
         messageHistoryAddMessage({ role: 'user', content: inputContent }),
       );
+      storage.write({ messages: [inputContent] });
       // submit request with updated history
       doChat();
     },
