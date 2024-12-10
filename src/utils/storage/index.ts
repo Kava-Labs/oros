@@ -21,3 +21,23 @@ export class MemoryStorage<T> implements IStorage<T> {
     this.state = this.defaultState;
   }
 }
+
+// export class LocalStorage<T> implements IStorage<T> {
+//   private readonly key: string;
+//
+//   constructor(key: string) {
+//     this.key = key;
+//   }
+//
+//   async write(): Promise<void> {
+//     console.log('write');
+//   }
+//
+//   async load() {
+//     return localStorage.getItem(this.key);
+//   }
+//
+//   async reset(): Promise<void> {
+//     console.log('reset');
+//   }
+// }

@@ -30,6 +30,8 @@ import {
   getDelegatedBalance,
 } from '../tools/toolFunctions';
 import { toast } from 'react-toastify';
+import { MemoryStorage } from '../utils/storage';
+import { ChatHistory } from '../utils/storage/types';
 
 interface AppContext {
   address: string;
@@ -38,6 +40,7 @@ interface AppContext {
   cancelStream: (() => void) | null;
   clearChatMessages: () => void;
   markDownCache: React.MutableRefObject<Map<string, string>>;
+  messageStore: any;
 }
 
 const mdCache = new Map<string, string>();
@@ -54,6 +57,7 @@ const initValues = {
   },
   cancelStream: null,
   markDownCache: { current: mdCache },
+  messageStore: { messages: [] },
 };
 
 export const AppContext = createContext<AppContext>(initValues);
@@ -67,6 +71,7 @@ export function AppContextProvider({
 }) {
   const [address, setAddress] = useState('');
   const [cancelStream, setCancelStream] = useState<null | (() => void)>(null);
+  const messageStore = new MemoryStorage<ChatHistory>({ messages: [] });
 
   const markDownCache = useRef<Map<string, string>>(mdCache);
 
@@ -104,12 +109,16 @@ export function AppContextProvider({
   }, [store]);
 
   const submitUserChatMessage = useCallback(
-    (inputContent: string) => {
+    async (inputContent: string) => {
       if (!inputContent.length) return;
       // add to history
       store.dispatch(
         messageHistoryAddMessage({ role: 'user', content: inputContent }),
       );
+      await messageStore.write({
+        messages: [inputContent],
+      });
+      await messageStore.load();
       // submit request with updated history
       doChat();
     },
@@ -246,9 +255,11 @@ export function AppContextProvider({
     }
   }, [store]);
 
-  const clearChatMessages = useCallback(() => {
+  const clearChatMessages = useCallback(async () => {
     store.dispatch(messageHistoryClear());
     markDownCache.current.clear();
+    await messageStore.reset();
+    await messageStore.load();
   }, [store]);
 
   return (
@@ -260,6 +271,7 @@ export function AppContextProvider({
         clearChatMessages,
         address,
         markDownCache,
+        messageStore,
       }}
     >
       {children}
