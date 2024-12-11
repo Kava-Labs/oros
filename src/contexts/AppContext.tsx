@@ -76,15 +76,19 @@ export function AppContextProvider({
 }) {
   const [address, setAddress] = useState('');
   const [cancelStream, setCancelStream] = useState<null | (() => void)>(null);
+  const [initalized, setInitialized] = useState<boolean>(false);
 
   useEffect(() => {
-    const messages = chatHistory.messages;
-    store.dispatch(
-      messageHistoryAddMessage({
-        role: 'user',
-        content: messages[0],
-      }),
-    );
+    if (!initalized) {
+      const messages = chatHistory.messages;
+      store.dispatch(
+        messageHistoryAddMessage({
+          role: 'user',
+          content: messages[0],
+        }),
+      );
+      setInitialized(true);
+    }
   }, []);
 
   const markDownCache = useRef<Map<string, string>>(mdCache);
