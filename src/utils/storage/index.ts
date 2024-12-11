@@ -1,4 +1,5 @@
 import { IStorage } from './types';
+import { toast } from 'react-toastify';
 
 export class LocalStorage<T> implements IStorage<T> {
   private key: string;
@@ -10,7 +11,11 @@ export class LocalStorage<T> implements IStorage<T> {
   }
 
   async write(message: T) {
-    localStorage.setItem(this.key, JSON.stringify(message));
+    try {
+      localStorage.setItem(this.key, JSON.stringify(message));
+    } catch (e: unknown) {
+      toast.error(JSON.stringify(e));
+    }
   }
 
   async load() {

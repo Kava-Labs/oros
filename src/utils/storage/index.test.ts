@@ -8,8 +8,6 @@ const defaultStates: Array<ChatHistory | null> = [{ messages: [] }, null];
 describe('LocalStorage', () => {
   it('load, write, remove for ChatHistory', async () => {
     for await (const defaultState of defaultStates) {
-      localStorage.setItem('chat-messages', JSON.stringify(defaultState));
-
       const store = new LocalStorage<typeof defaultState>(
         'chat-messages',
         defaultState,
