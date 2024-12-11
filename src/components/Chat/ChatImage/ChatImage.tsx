@@ -25,7 +25,10 @@ export const ChatImage = (props: { id: string }) => {
   return (
     <div className={styles.chatBubbleAssistant}>
       <div data-chat-role="tool" className={styles.chatBubble}>
-        <img src={`data:image/png;base64,${imgData}`} />
+        <img
+          alt="Model Generated Image"
+          src={`data:image/png;base64,${imgData}`}
+        />
       </div>
     </div>
   );

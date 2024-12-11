@@ -3,7 +3,7 @@ import styles from './LoadingSpinner.module.css';
 
 export const LoadingSpinner = () => {
   return (
-    <div className={styles['lds-grid']}>
+    <div role="status" className={styles['lds-grid']}>
       <div></div>
       <div></div>
       <div></div>

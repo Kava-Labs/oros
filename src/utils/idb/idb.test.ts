@@ -1,6 +1,10 @@
 import 'fake-indexeddb/auto';
 import { idbGet, saveImage, getImage } from './idb';
 
+afterAll(() => {
+  vi.restoreAllMocks();
+});
+
 describe('IndexedDB Operations', () => {
   it('should initialize the database using idbGet', async () => {
     const db = await idbGet();
