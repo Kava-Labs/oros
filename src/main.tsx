@@ -37,7 +37,7 @@ import { AppContextProvider } from './contexts/AppContext.tsx';
 // Render!
 //
 const root = createRoot(
-  document.getElementById('root')
+  document.getElementById('root')!
 );
 
 root.render(
