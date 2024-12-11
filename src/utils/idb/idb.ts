@@ -10,7 +10,7 @@ const IMAGE_STORE_NAME = 'image';
 
 let initPromise: Promise<IDBDatabase> | null = null;
 
-export const idbGet = async (): Promise<IDBDatabase> => {
+export const idbDatabase = async (): Promise<IDBDatabase> => {
   if (database) {
     return database;
   }
@@ -82,7 +82,7 @@ export const idbGet = async (): Promise<IDBDatabase> => {
 };
 
 export const saveImage = async (base64ImgData: string): Promise<string> => {
-  const db = await idbGet();
+  const db = await idbDatabase();
 
   const tx = db.transaction(IMAGE_STORE_NAME, 'readwrite');
 
@@ -121,7 +121,7 @@ export const saveImage = async (base64ImgData: string): Promise<string> => {
 export const getImage = async (
   id: string,
 ): Promise<{ id: string; data: string } | undefined> => {
-  const db = await idbGet();
+  const db = await idbDatabase();
 
   const tx = db.transaction(IMAGE_STORE_NAME, 'readonly');
 

@@ -8,7 +8,6 @@ export type GenerateImageParams = {
 
 export type GenerateImageResponse = { id: string; message: string };
 
-// todo(sah): error handling 
 export const generateImage = async ({
   prompt,
 }: GenerateImageParams): Promise<GenerateImageResponse> => {
@@ -21,6 +20,7 @@ export const generateImage = async ({
   const res = await client.images.generate({
     model: 'dall-e-2',
     prompt,
+    size: '512x512',
     response_format: 'b64_json',
   });
 
