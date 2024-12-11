@@ -56,7 +56,7 @@ export const Messages = () => {
           const toolResponse: GenerateImageResponse = JSON.parse(
             msg.content as string,
           );
-     
+
           return <ChatImage key={i} id={toolResponse.id} />;
         }
 
@@ -66,7 +66,7 @@ export const Messages = () => {
       {isGeneratingImage ? (
         <div className={styles.chatBubbleAssistant}>
           <div data-chat-role="tool" className={styles.chatBubble}>
-            <ImageLoading/>
+            <ImageLoading />
           </div>
         </div>
       ) : null}

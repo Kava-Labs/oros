@@ -8,6 +8,7 @@ export type GenerateImageParams = {
 
 export type GenerateImageResponse = { id: string; message: string };
 
+// todo(sah): error handling 
 export const generateImage = async ({
   prompt,
 }: GenerateImageParams): Promise<GenerateImageResponse> => {
