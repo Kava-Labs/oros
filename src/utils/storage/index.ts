@@ -31,28 +31,21 @@ export class LocalStorage<T> implements IStorage<T> {
     this.defaultState = defaultState;
   }
 
-  async write(message: T): Promise<void> {
-    return new Promise<void>((resolve) => {
-      localStorage.setItem(this.key, JSON.stringify(message));
-      resolve();
-    });
+  async write(message: T) {
+    localStorage.setItem(this.key, JSON.stringify(message));
   }
 
-  async load(): Promise<T> {
-    return new Promise<T>((resolve, reject) => {
-      const data = localStorage.getItem(this.key);
-      if (data !== null) {
-        resolve(JSON.parse(data) as T);
-      } else {
-        reject(new Error(`No data found for key: ${this.key}`));
-      }
-    });
+  async load() {
+    const data = localStorage.getItem(this.key);
+
+    if (data !== null) {
+      return JSON.parse(data) as T;
+    } else {
+      return this.defaultState as T;
+    }
   }
 
-  async reset(): Promise<void> {
-    return new Promise<void>((resolve) => {
-      localStorage.setItem(this.key, JSON.stringify(this.defaultState));
-      resolve();
-    });
+  async reset() {
+    localStorage.removeItem(this.key);
   }
 }
