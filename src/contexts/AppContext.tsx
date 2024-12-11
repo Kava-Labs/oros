@@ -65,6 +65,7 @@ export const AppContext = createContext<AppContext>(initValues);
 const storage = new LocalStorage<ChatHistory>('chat-messages', {
   messages: [],
 });
+const chatHistory = await storage.load();
 
 export function AppContextProvider({
   children,
@@ -77,17 +78,13 @@ export function AppContextProvider({
   const [cancelStream, setCancelStream] = useState<null | (() => void)>(null);
 
   useEffect(() => {
-    const loadChatHistory = async () => {
-      const chatHistory = await storage.load();
-      const messages = chatHistory.messages;
-      store.dispatch(
-        messageHistoryAddMessage({
-          role: 'user',
-          content: messages[0],
-        }),
-      );
-    };
-    loadChatHistory();
+    const messages = chatHistory.messages;
+    store.dispatch(
+      messageHistoryAddMessage({
+        role: 'user',
+        content: messages[0],
+      }),
+    );
   }, []);
 
   const markDownCache = useRef<Map<string, string>>(mdCache);
