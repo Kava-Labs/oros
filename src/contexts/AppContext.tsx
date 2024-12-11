@@ -34,6 +34,7 @@ import { generateImage } from '../utils/image/image';
 import { deleteImages } from '../utils';
 import { LocalStorage } from '../utils/storage';
 import { ChatHistory } from '../utils/storage/types';
+import { useSelectMessageHistory } from '../utils/storage/hooks';
 
 interface AppContext {
   address: string;
@@ -77,6 +78,8 @@ export function AppContextProvider({
 }) {
   const [address, setAddress] = useState('');
   const [cancelStream, setCancelStream] = useState<null | (() => void)>(null);
+
+  useSelectMessageHistory();
 
   useEffect(() => {
     const messages = chatHistory.messages;
