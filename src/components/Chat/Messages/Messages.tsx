@@ -8,6 +8,7 @@ import styles from '../style.module.css';
 import { useEffect, useState } from 'react';
 import { getImage } from '../../../utils/idbd/idbd';
 import { GenerateImageResponse } from '../../../utils/image/image';
+import { LoadingSpinner } from '../../LoadingSpinner';
 
 export const INTRO_MESSAGE = `Hey I'm Kava AI. You can ask me any question. If you're here for the #KavaAI Launch Competition, try asking a question like "I want to deploy a memecoin on Kava with cool tokenomics".`;
 
@@ -66,12 +67,36 @@ export const Messages = () => {
       {isGeneratingImage ? (
         <div className={styles.chatBubbleAssistant}>
           <div data-chat-role="tool" className={styles.chatBubble}>
-            <div className={styles.imagePlaceholder}>
-              <p style={{ textAlign: 'center' }}>generating Image...</p>
-            </div>
+            <ImageLoading />
           </div>
         </div>
       ) : null}
+    </>
+  );
+};
+
+export const ImageLoading = () => {
+  const [dots, setDots] = useState('');
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setDots((prev) => {
+        if (prev.length > 5) return '.';
+        return prev + '.';
+      });
+    }, 500);
+
+    return () => {
+      clearInterval(id);
+    };
+  }, []);
+
+  return (
+    <>
+      <h3 style={{ width: '170px' }}>generating Image {dots}</h3>
+      <div>
+        <LoadingSpinner />
+      </div>
     </>
   );
 };
