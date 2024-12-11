@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 import { getToken } from '../token/token';
-import { saveImage } from '../idbd/idbd';
+import { saveImage } from '../idb/idb';
 
 export type GenerateImageParams = {
   prompt: string;

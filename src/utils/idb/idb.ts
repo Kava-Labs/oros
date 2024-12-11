@@ -75,14 +75,13 @@ export const idbGet = async (): Promise<IDBDatabase> => {
           ),
         );
       });
-
     });
   });
 
   return initPromise;
 };
 
-export const saveImage = async (base64ImgData: string) : Promise<string> => {
+export const saveImage = async (base64ImgData: string): Promise<string> => {
   const db = await idbGet();
 
   const tx = db.transaction(IMAGE_STORE_NAME, 'readwrite');
@@ -93,7 +92,6 @@ export const saveImage = async (base64ImgData: string) : Promise<string> => {
     id: uuidv4(),
     data: base64ImgData,
   });
-
 
   return new Promise((resolve, reject) => {
     let isSaved = false;
@@ -130,8 +128,6 @@ export const getImage = async (
   const store = tx.objectStore(IMAGE_STORE_NAME);
 
   const req = store.get(id);
-
-
 
   return new Promise((resolve, reject) => {
     tx.addEventListener('complete', () => {

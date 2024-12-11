@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto';
-import { idbGet, saveImage, getImage } from './idbd';
+import { idbGet, saveImage, getImage } from './idb';
 
 describe('IndexedDB Operations', () => {
   it('should initialize the database using idbGet', async () => {

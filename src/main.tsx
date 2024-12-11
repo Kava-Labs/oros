@@ -17,7 +17,7 @@ import '@fontsource/inter/500-italic.css';
 
 import '@fontsource/inter/700.css';
 import '@fontsource/inter/700-italic.css';
-import { idbGet } from './utils/idbd/idbd';
+import { idbGet } from './utils/idb/idb.ts';
 
 idbGet()
   .then(() => {

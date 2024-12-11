@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import styles from '../style.module.css';
-import { getImage } from '../../../utils/idbd/idbd';
+import { getImage } from '../../../utils/idb/idb';
 
 export const ChatImage = (props: { id: string }) => {
   const { id } = props;
