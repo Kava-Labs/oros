@@ -2,7 +2,7 @@
 /**
  * TODO: Remove the eslint-disable and fix linting issues.
  */
-import { createContext, useContext, useRef } from 'react';
+import { createContext, useContext, useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { useCallback, useState } from 'react';
 import { batch } from 'react-redux';
@@ -76,14 +76,19 @@ export function AppContextProvider({
   const [address, setAddress] = useState('');
   const [cancelStream, setCancelStream] = useState<null | (() => void)>(null);
 
-  //  todo - set redux store with messages from local storage
-  // useEffect(() => {
-  //   const loadChatHistory = async () => {
-  //     const chatHistory = await storage.load();
-  //     const messages = chatHistory.messages;
-  //   };
-  //   loadChatHistory();
-  // }, []);
+  useEffect(() => {
+    const loadChatHistory = async () => {
+      const chatHistory = await storage.load();
+      const messages = chatHistory.messages;
+      store.dispatch(
+        messageHistoryAddMessage({
+          role: 'user',
+          content: messages[0],
+        }),
+      );
+    };
+    loadChatHistory();
+  }, []);
 
   const markDownCache = useRef<Map<string, string>>(mdCache);
 
