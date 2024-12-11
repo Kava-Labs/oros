@@ -31,7 +31,7 @@ import {
 } from '../tools/toolFunctions';
 import { toast } from 'react-toastify';
 import { generateImage } from '../utils/image/image';
-import { deleteImages } from '../utils/idb/idb';
+import { deleteImages } from '../utils';
 
 interface AppContext {
   address: string;

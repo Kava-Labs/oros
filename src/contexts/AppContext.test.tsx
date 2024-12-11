@@ -4,7 +4,6 @@ import { AppContextProvider } from './AppContext';
 import { useAppContext } from './AppContext';
 import * as stores from '../stores';
 import * as utils from '../utils';
-import 'fake-indexeddb/auto';
 
 vi.mock('../stores', () => ({
   messageHistoryAddMessage: vi
@@ -30,6 +29,7 @@ vi.mock('../stores', () => ({
 
 vi.mock('../utils', () => ({
   chat: vi.fn(),
+  deleteImages: vi.fn(),
 }));
 
 describe('AppContextProvider', () => {
@@ -181,5 +181,9 @@ describe('AppContextProvider', () => {
     expect(stores.appStore.dispatch).toHaveBeenCalledWith(
       stores.messageHistoryClear(),
     );
+
+    expect(utils.deleteImages as Mock).toHaveBeenCalled()
+   
+
   });
 });
