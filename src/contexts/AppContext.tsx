@@ -143,7 +143,12 @@ export function AppContextProvider({
       store.dispatch(
         messageHistoryAddMessage({ role: 'user', content: inputContent }),
       );
-      storage.write({ messages: [{ role: 'user', content: inputContent }] });
+      storage.write({
+        messages: [
+          ...chatHistory.messages,
+          { role: 'user', content: inputContent },
+        ],
+      });
       // submit request with updated history
       doChat();
     },
