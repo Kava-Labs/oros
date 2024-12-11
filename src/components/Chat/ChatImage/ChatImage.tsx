@@ -27,7 +27,7 @@ export const ChatImage = (props: { id: string }) => {
         }
       })
       .catch((err) => {
-        console.error(err);
+        toast.dismiss();
         toast.error(
           `Error: failed to load requested image ${err instanceof Error ? err.message : ''}`,
         );

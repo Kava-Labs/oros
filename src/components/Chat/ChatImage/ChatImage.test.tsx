@@ -3,10 +3,20 @@ import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ChatImage } from './ChatImage';
 import { getImage } from '../../../utils/idb/idb';
+import { toast } from 'react-toastify';
 
 vi.mock('../../../utils/idb/idb', () => {
   return {
     getImage: vi.fn(),
+  };
+});
+
+vi.mock('react-toastify', () => {
+  return {
+    toast: {
+      error: vi.fn(),
+      dismiss: vi.fn(),
+    },
   };
 });
 
@@ -34,5 +44,19 @@ describe('ChatImage Component', () => {
     // Ensure getImage was called once with "some-id"
     expect(getImage).toHaveBeenCalledTimes(1);
     expect(getImage).toHaveBeenCalledWith('some-id');
+  });
+
+  it('displays a toast when an error is encountered', async () => {
+    // Mock getImage to resolve to a defined object
+    (getImage as Mock).mockRejectedValue(new Error('some error'));
+
+    render(<ChatImage id="some-id" />);
+
+    await waitFor(() => {
+      screen.getByRole('img') as HTMLImageElement;
+    });
+
+    expect(toast.dismiss).toHaveBeenCalled();
+    expect(toast.error).toHaveBeenCalledWith('Error: failed to load requested image some error');
   });
 });
