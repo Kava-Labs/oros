@@ -70,3 +70,36 @@ test('receiving a response from the model', async ({ page }) => {
   const responseText = await messages[messages.length - 1].innerText();
   expect(responseText).toMatch(/THIS IS A TEST/i);
 });
+test('fills in messages from local storage', async ({ page }) => {
+  test.setTimeout(90 * 1000);
+
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      'chat-messages',
+      JSON.stringify({
+        messages: [
+          {
+            role: 'user',
+            content: 'This message was loaded from  local storage',
+          },
+          {
+            role: 'assistant',
+            content: 'That is terrific!',
+          },
+        ],
+      }),
+    );
+  });
+
+  await page.goto('http://localhost:3000/');
+
+  await page.waitForLoadState();
+
+  const messages = await page.$$(`[data-testid="ChatContainer"] div div`);
+
+  const userMessage = await messages[messages.length - 2].innerText();
+  const responseMessage = await messages[messages.length - 1].innerText();
+
+  expect(userMessage).toMatch(/This message was loaded from local storage/i);
+  expect(responseMessage).toMatch(/That is terrific!/i);
+});
