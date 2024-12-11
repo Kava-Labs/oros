@@ -1,13 +1,10 @@
 import { IStorage } from './types';
 
 export class LocalStorage<T> implements IStorage<T> {
-  private key: string;
-  private defaultState: T;
-
-  constructor(key: string, defaultState: T) {
-    this.key = key;
-    this.defaultState = defaultState;
-  }
+  constructor(
+    private key: string,
+    private defaultState: T,
+  ) {}
 
   async write(state: T) {
     localStorage.setItem(this.key, JSON.stringify(state));
