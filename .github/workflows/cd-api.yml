@@ -18,8 +18,6 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  ECR_REGISTRY_ID: "843137275421"
-  ECR_REPOSITORY: kavachat-api
   ECS_SERVICE: kavachat-api
   ECS_CLUSTER: kavachat
   # This is the family name of the task definition, excluding revision to get
