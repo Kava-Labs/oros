@@ -65,20 +65,8 @@ export const AppContext = createContext<AppContext>(initValues);
 const storage = new LocalStorage<ChatHistory>('chat-messages', {
   messages: [],
 });
-const chatHistory = await storage.load();
 
-await storage.write({
-  messages: [
-    {
-      role: 'user',
-      content: 'Hello',
-    },
-    {
-      role: 'assistant',
-      content: 'Hi how are you',
-    },
-  ],
-});
+const chatHistory = await storage.load();
 
 export function AppContextProvider({
   children,
@@ -144,12 +132,6 @@ export function AppContextProvider({
       store.dispatch(
         messageHistoryAddMessage({ role: 'user', content: inputContent }),
       );
-      storage.write({
-        messages: [
-          ...chatHistory.messages,
-          { role: 'user', content: inputContent },
-        ],
-      });
       // submit request with updated history
       doChat();
     },
@@ -174,12 +156,6 @@ export function AppContextProvider({
           messageHistoryAddMessage({ role: 'assistant', content: content }),
         );
         store.dispatch(streamingMessageClear());
-      });
-      storage.write({
-        messages: [
-          ...chatHistory.messages,
-          { role: 'assistant', content: content },
-        ],
       });
     }
   }, [store]);
