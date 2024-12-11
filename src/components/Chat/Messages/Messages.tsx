@@ -5,10 +5,9 @@ import {
 } from '../../../stores';
 import { StaticMessage } from '../StaticMessage';
 import styles from '../style.module.css';
-import { useEffect, useState } from 'react';
-import { getImage } from '../../../utils/idbd/idbd';
 import { GenerateImageResponse } from '../../../utils/image/image';
-import { LoadingSpinner } from '../../LoadingSpinner';
+import { ImageLoading } from '../ImageLoading';
+import { ChatImage } from '../ChatImage';
 
 export const INTRO_MESSAGE = `Hey I'm Kava AI. You can ask me any question. If you're here for the #KavaAI Launch Competition, try asking a question like "I want to deploy a memecoin on Kava with cool tokenomics".`;
 
@@ -57,7 +56,7 @@ export const Messages = () => {
           const toolResponse: GenerateImageResponse = JSON.parse(
             msg.content as string,
           );
-
+     
           return <ChatImage key={i} id={toolResponse.id} />;
         }
 
@@ -67,65 +66,10 @@ export const Messages = () => {
       {isGeneratingImage ? (
         <div className={styles.chatBubbleAssistant}>
           <div data-chat-role="tool" className={styles.chatBubble}>
-            <ImageLoading />
+            <ImageLoading/>
           </div>
         </div>
       ) : null}
     </>
-  );
-};
-
-export const ImageLoading = () => {
-  const [dots, setDots] = useState('');
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setDots((prev) => {
-        if (prev.length > 5) return '.';
-        return prev + '.';
-      });
-    }, 500);
-
-    return () => {
-      clearInterval(id);
-    };
-  }, []);
-
-  return (
-    <>
-      <h3 style={{ width: '170px' }}>generating Image {dots}</h3>
-      <div>
-        <LoadingSpinner />
-      </div>
-    </>
-  );
-};
-
-export const ChatImage = (props: { id: string }) => {
-  const { id } = props;
-  const [imgData, setImageData] = useState('');
-
-  useEffect(() => {
-    if (!id) {
-      return;
-    }
-
-    getImage(id)
-      .then((res) => {
-        if (res) {
-          setImageData(res.data);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }, [id]);
-
-  return (
-    <div className={styles.chatBubbleAssistant}>
-      <div data-chat-role="tool" className={styles.chatBubble}>
-        <img src={`data:image/png;base64,${imgData}`} />
-      </div>
-    </div>
   );
 };
