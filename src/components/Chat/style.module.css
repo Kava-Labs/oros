@@ -27,11 +27,6 @@
 }
 
 
-.imagePlaceholder {
-  min-width: 576px;
-  background-color: rgb(119, 119, 119);
-  height: 576px;
-}
 
 .chatBubbleUser {
   width: fit-content;
