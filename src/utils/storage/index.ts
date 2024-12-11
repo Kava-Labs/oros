@@ -10,9 +10,9 @@ export class LocalStorage<T> implements IStorage<T> {
     this.defaultState = defaultState;
   }
 
-  async write(message: T) {
+  async write(state: T) {
     try {
-      localStorage.setItem(this.key, JSON.stringify(message));
+      localStorage.setItem(this.key, JSON.stringify(state));
     } catch (e: unknown) {
       toast.error(JSON.stringify(e));
     }
