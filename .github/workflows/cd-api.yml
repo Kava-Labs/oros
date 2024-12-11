@@ -18,7 +18,7 @@ on:
   workflow_dispatch:
     inputs:
       image:
-        description: "Docker image name to deploy"
+        description: 'Docker image name to deploy'
         required: true
 
 env:
@@ -59,17 +59,15 @@ jobs:
 
       - name: Read full Docker image name from artifacts
         if: ${{ github.event_name == 'workflow_run' }}
-        id: read-docker-image
         run: |
           IMAGE_NAME=$(cat image-name.txt)
-          echo "image_name=$IMAGE_NAME" >> $GITHUB_OUTPUT
+          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
 
       - name: Read full Docker image name from dispatch input
         if: ${{ github.event_name == 'workflow_dispatch' }}
-        id: read-docker-image
         run: |
           IMAGE_NAME=${{ github.event.inputs.image }}
-          echo "image_name=$IMAGE_NAME" >> $GITHUB_OUTPUT
+          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
 
       - name: Download task definition
         run: |
@@ -84,7 +82,7 @@ jobs:
         with:
           task-definition: task-definition.json
           # Only modify the image, nothing else
-          image: ${{ steps.read-docker-image.outputs.image_name }}
+          image: ${{ env.IMAGE_NAME }}
           # Container name matches service name
           container-name: ${{ env.ECS_SERVICE }}
 
