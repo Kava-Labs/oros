@@ -29,6 +29,7 @@ vi.mock('../stores', () => ({
 
 vi.mock('../utils', () => ({
   chat: vi.fn(),
+  deleteImages: vi.fn(),
 }));
 
 describe('AppContextProvider', () => {
@@ -180,5 +181,9 @@ describe('AppContextProvider', () => {
     expect(stores.appStore.dispatch).toHaveBeenCalledWith(
       stores.messageHistoryClear(),
     );
+
+    expect(utils.deleteImages as Mock).toHaveBeenCalled()
+   
+
   });
 });

@@ -30,6 +30,8 @@ import {
   getDelegatedBalance,
 } from '../tools/toolFunctions';
 import { toast } from 'react-toastify';
+import { generateImage } from '../utils/image/image';
+import { deleteImages } from '../utils';
 
 interface AppContext {
   address: string;
@@ -161,6 +163,10 @@ export function AppContextProvider({
               await doToolCall(tc, getDelegatedBalance);
               break;
 
+            case 'generateImage':
+              console.info('generateImage');
+              await doToolCall(tc, generateImage);
+              break;
             default:
               throw new Error(
                 `unknown tool call function: ${tc.function?.name}`,
@@ -246,9 +252,14 @@ export function AppContextProvider({
     }
   }, [store]);
 
-  const clearChatMessages = useCallback(() => {
+  const clearChatMessages = useCallback(async () => {
     store.dispatch(messageHistoryClear());
     markDownCache.current.clear();
+    try {
+      await deleteImages();
+    } catch (err) {
+      console.error(err);
+    }
   }, [store]);
 
   return (

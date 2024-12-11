@@ -97,4 +97,23 @@ export const selectHasToolCallInProgress = createSelector(
   },
 );
 
+export const selectHasImageGenerationInProgress = createSelector(
+  selectMessageStore,
+  (state) => {
+    const lastMsg = state.history[state.history.length - 1];
+    const isToolCall =
+      lastMsg.role === 'assistant' &&
+      lastMsg.content === null &&
+      Array.isArray(lastMsg.tool_calls);
+
+    if (isToolCall) {
+      for (const tc of lastMsg.tool_calls!) {
+        if (tc.function.name === 'generateImage') return true;
+      }
+    }
+
+    return false;
+  },
+);
+
 export const msgStoreReducer = msgStoreSlice.reducer;
