@@ -17,7 +17,12 @@ describe('MemoryStorage', () => {
 
       //  add a new entry
       const updatedState: ChatHistory = {
-        messages: ['testMessage'],
+        messages: [
+          {
+            role: 'user',
+            content: 'Hello there!',
+          },
+        ],
       };
 
       await store.write(updatedState);
@@ -51,7 +56,12 @@ describe('LocalStorage', () => {
       expect(currentState).toStrictEqual(defaultState);
 
       const updatedState: ChatHistory = {
-        messages: ['Hello world'],
+        messages: [
+          {
+            role: 'user',
+            content: 'Hello there!',
+          },
+        ],
       };
 
       await store.write(updatedState);

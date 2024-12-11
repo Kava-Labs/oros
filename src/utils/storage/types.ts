@@ -7,5 +7,5 @@ export interface IStorage<T> {
 }
 
 export type ChatHistory = {
-  messages: string[];
+  messages: Array<{ role: 'user' | 'system' | 'assistant'; content: string }>;
 };
