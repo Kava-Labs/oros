@@ -19,7 +19,6 @@ export class LocalStorage<T> implements IStorage<T> {
     if (data !== null) {
       return JSON.parse(data) as T;
     } else {
-      console.log('in else');
       return this.defaultState as T;
     }
   }
