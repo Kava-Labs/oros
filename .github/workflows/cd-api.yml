@@ -2,7 +2,7 @@ name: Continuous Deployment - API
 
 # Ensure only 1 deployment is running at a time
 concurrency:
-  group: production
+  group: api-production
   # Do NOT cancel in-progress deployments, ensure each deployment completes
   # before starting the next one. This allows for rollbacks to the latest most
   # stable version, instead of potentially skipping over a stable version.
@@ -15,22 +15,29 @@ on:
     branches: [main]
     types:
       - completed
+  workflow_dispatch:
+    inputs:
+      image:
+        description: "Docker image name to deploy"
+        required: true
 
 env:
   AWS_REGION: us-east-1
   ECS_SERVICE: kavachat-api
   ECS_CLUSTER: kavachat
   # This is the family name of the task definition, excluding revision to get
-  # the latest ACTIVE revision.
+  # the latest ACTIVE revision. Fetch the -template task definition which is
+  # managed by terraform.
+  ECS_TASK_DEFINITION_FAMILY_TEMPLATE: kavachat-api-template
   ECS_TASK_DEFINITION_FAMILY: kavachat-api
 
 jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    # Only run this job if the CI job was successful
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    environment: production
+    # Only run this job if the CI job was successful or if manually triggered
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    environment: api-production
 
     steps:
       - name: Checkout
@@ -44,26 +51,41 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Download full Docker image name from artifacts
+        if: ${{ github.event_name == 'workflow_run' }}
         uses: actions/download-artifact@v4
         with:
           name: kavachat-api-docker-image-name
           path: image-name.txt
 
-      - name: Read full Docker image name
+      - name: Read full Docker image name from artifacts
+        if: ${{ github.event_name == 'workflow_run' }}
         id: read-docker-image
         run: |
           IMAGE_NAME=$(cat image-name.txt)
           echo "image_name=$IMAGE_NAME" >> $GITHUB_OUTPUT
 
+      - name: Read full Docker image name from dispatch input
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        id: read-docker-image
+        run: |
+          IMAGE_NAME=${{ github.event.inputs.image }}
+          echo "image_name=$IMAGE_NAME" >> $GITHUB_OUTPUT
+
+      - name: Install awscli
+        run: |
+          sudo apt update
+          sudo apt install -y awscli
+
       - name: Download task definition
         run: |
           aws ecs describe-task-definition \
-            --task-definition ${{ env.ECS_TASK_DEFINITION_FAMILY }} \
+            --task-definition ${{ env.ECS_TASK_DEFINITION_FAMILY_TEMPLATE }} \
             --query taskDefinition > task-definition.json
 
       - name: Update image ID in Amazon ECS task definition
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
+        # Does not support changing task family name
         with:
           task-definition: task-definition.json
           # Only modify the image, nothing else
@@ -71,9 +93,20 @@ jobs:
           # Container name matches service name
           container-name: ${{ env.ECS_SERVICE }}
 
+      - name: Rename task family in task json file
+        # taskDefinitionArn does not need to be changed as it is only from query
+        # and not used for registering new task definitions
+        run: |
+          mv ${{ steps.task-def.outputs.task-definition }} task-definition.json.bak
+          jq '.family = "${{ env.ECS_TASK_DEFINITION_FAMILY }}"' task-definition.json.bak > ${{ steps.task-def.outputs.task-definition }}
+
+      - name: Output updated task definition
+        run: cat ${{ steps.task-def.outputs.task-definition }}
+
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
+          # Registers new task definition
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
