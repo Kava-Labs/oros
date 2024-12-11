@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto';
-import { idbDatabase, saveImage, getImage } from './idb';
+import { idbDatabase, saveImage, getImage, deleteImages } from './idb';
 
 afterAll(() => {
   vi.restoreAllMocks();
@@ -30,6 +30,23 @@ describe('IndexedDB Operations', () => {
     expect(retrieved).toBeDefined();
     expect(retrieved?.id).toBe(savedId);
     expect(retrieved?.data).toBe(base64Img);
+  });
+
+  it('deleteImages should clear out the image store', async () => {
+    const base64Img = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...'; // sample data
+
+    const savedId = await saveImage(base64Img);
+    expect(savedId).toBeDefined();
+    expect(typeof savedId).toBe('string');
+
+    const retrieved = await getImage(savedId);
+    expect(retrieved).toBeDefined();
+    expect(retrieved?.id).toBe(savedId);
+    expect(retrieved?.data).toBe(base64Img);
+
+    await deleteImages();
+
+    expect(await getImage(savedId)).toBeUndefined();
   });
 
   it('should return undefined if the requested image does not exist', async () => {

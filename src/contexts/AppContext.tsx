@@ -31,6 +31,7 @@ import {
 } from '../tools/toolFunctions';
 import { toast } from 'react-toastify';
 import { generateImage } from '../utils/image/image';
+import { deleteImages } from '../utils/idb/idb';
 
 interface AppContext {
   address: string;
@@ -251,9 +252,14 @@ export function AppContextProvider({
     }
   }, [store]);
 
-  const clearChatMessages = useCallback(() => {
+  const clearChatMessages = useCallback(async () => {
     store.dispatch(messageHistoryClear());
     markDownCache.current.clear();
+    try {
+      await deleteImages();
+    } catch (err) {
+      console.error(err);
+    }
   }, [store]);
 
   return (

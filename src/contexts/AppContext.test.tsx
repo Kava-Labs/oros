@@ -4,6 +4,7 @@ import { AppContextProvider } from './AppContext';
 import { useAppContext } from './AppContext';
 import * as stores from '../stores';
 import * as utils from '../utils';
+import 'fake-indexeddb/auto';
 
 vi.mock('../stores', () => ({
   messageHistoryAddMessage: vi

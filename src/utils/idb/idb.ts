@@ -143,3 +143,30 @@ export const getImage = async (
     });
   });
 };
+
+export const deleteImages = async () => {
+  const db = await idbDatabase();
+  if (!db.objectStoreNames.contains(IMAGE_STORE_NAME)) {
+    return;
+  }
+
+  const tx = db.transaction(IMAGE_STORE_NAME, 'readwrite');
+
+  const store = tx.objectStore(IMAGE_STORE_NAME);
+
+  const req = store.clear();
+
+  return new Promise((resolve, reject) => {
+    tx.addEventListener('complete', () => {
+      resolve(req.result);
+    });
+
+    tx.addEventListener('error', () => {
+      reject(new Error(`indexedDB: transaction to delete Images failed`));
+    });
+
+    req.addEventListener('error', () => {
+      reject(new Error(`indexedDB: request to delete images failed`));
+    });
+  });
+};
