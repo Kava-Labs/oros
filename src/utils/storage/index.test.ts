@@ -52,4 +52,27 @@ describe('LocalStorage', () => {
       expect(currentState).toStrictEqual(defaultState);
     }
   });
+  it('write error is handled', async () => {
+    const store = new LocalStorage<ChatHistory>('chat-messages', {
+      messages: [],
+    });
+
+    // Load initial state
+    await store.load();
+
+    // Define a state that exceeds localStorage quota
+    const updatedState: ChatHistory = {
+      messages: [
+        {
+          role: 'user',
+          content: 'x'.repeat(10 * 1024 * 1024), // Large content to exceed quota
+        },
+      ],
+    };
+
+    // Attempt to write and expect an error
+    await expect(store.write(updatedState)).rejects.toThrow(
+      'Error while writing state: "The 5000000-code unit storage quota has been exceeded."',
+    );
+  });
 });

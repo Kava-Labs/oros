@@ -1,5 +1,4 @@
 import { IStorage } from './types';
-import { toast } from 'react-toastify';
 
 export class LocalStorage<T> implements IStorage<T> {
   private key: string;
@@ -13,8 +12,12 @@ export class LocalStorage<T> implements IStorage<T> {
   async write(state: T) {
     try {
       localStorage.setItem(this.key, JSON.stringify(state));
-    } catch (e: unknown) {
-      toast.error(JSON.stringify(e));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e: any) {
+      const errorMessage = e.message ?? e;
+      throw new Error(
+        `Error while writing state: ${JSON.stringify(errorMessage)}`,
+      );
     }
   }
 
