@@ -69,7 +69,7 @@ describe('LocalStorage', () => {
     };
 
     await expect(store.write(updatedState)).rejects.toThrow(
-      'Error while writing state: "The 5000000-code unit storage quota has been exceeded."',
+      'The 5000000-code unit storage quota has been exceeded.',
     );
   });
 });
