@@ -24,11 +24,10 @@ export class LocalStorage<T> implements IStorage<T> {
   async load() {
     const data = localStorage.getItem(this.key);
 
-    if (data !== null) {
-      return JSON.parse(data) as T;
-    } else {
-      return this.defaultState as T;
+    if (data === null) {
+      return this.defaultState;
     }
+    return JSON.parse(data) as T;
   }
 
   async reset() {
