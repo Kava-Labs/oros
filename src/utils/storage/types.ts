@@ -6,6 +6,11 @@ export interface IStorage<T> {
   reset(): Promise<void>;
 }
 
+type ChatHistoryEntry = {
+  role: 'user' | 'system' | 'assistant';
+  content: string;
+};
+
 export type ChatHistory = {
-  messages: Array<{ role: 'user' | 'system' | 'assistant'; content: string }>;
+  messages: Array<ChatHistoryEntry>;
 };
