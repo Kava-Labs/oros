@@ -79,18 +79,27 @@ export const tools: ChatCompletionTool[] = [
   {
     type: 'function',
     function: {
-      name: 'generateImage',
-      description: 'generates an image from the given prompt',
+      name: 'generateCoinMetadata',
+      description:
+        'generates a coin image, along with the symbol and token description',
       parameters: {
         type: 'object',
         properties: {
           prompt: {
             type: 'string',
             description:
-              'A text description of the desired image optimized for dalle-2 use the conversation context to help make the image, maximum 1000 characters',
+              'A text description of the desired coin image optimized for dalle-2 use the conversation context to help make the image, do not exceed 1000 characters',
+          },
+          symbol: {
+            type: 'string',
+            description: 'the token symbol',
+          },
+          about: {
+            type: 'string',
+            description: 'the description of the token',
           },
         },
-        required: ['prompt'],
+        required: ['prompt', 'symbol', 'about'],
         strict: true,
       },
     },

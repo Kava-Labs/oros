@@ -1,7 +1,7 @@
 import { Mock } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { ChatImage } from './ChatImage';
+import { GeneratedToken } from './GeneratedToken';
 import { getImage } from '../../../utils/idb/idb';
 import { toast } from 'react-toastify';
 
@@ -24,7 +24,7 @@ afterAll(() => {
   vi.restoreAllMocks();
 });
 
-describe('ChatImage Component', () => {
+describe('GeneratedToken Component', () => {
   it('calls getImage and sets image data when id is provided', async () => {
     const mockImageData = 'fakeBase64DataHere';
     // Mock getImage to resolve to a defined object
@@ -33,7 +33,7 @@ describe('ChatImage Component', () => {
       data: mockImageData,
     });
 
-    render(<ChatImage id="some-id" />);
+    render(<GeneratedToken id="some-id" about="" symbol="" message="" />);
 
     // Wait for the image to update
     await waitFor(() => {
@@ -50,13 +50,15 @@ describe('ChatImage Component', () => {
     // Mock getImage to resolve to a defined object
     (getImage as Mock).mockRejectedValue(new Error('some error'));
 
-    render(<ChatImage id="some-id" />);
+    render(<GeneratedToken id="some-id" about="" symbol="" message="" />);
 
     await waitFor(() => {
       screen.getByRole('img') as HTMLImageElement;
     });
 
     expect(toast.dismiss).toHaveBeenCalled();
-    expect(toast.error).toHaveBeenCalledWith('Error: failed to load requested image some error');
+    expect(toast.error).toHaveBeenCalledWith(
+      'Error: failed to load requested image some error',
+    );
   });
 });

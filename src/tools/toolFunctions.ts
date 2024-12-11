@@ -3,7 +3,8 @@ import { bech32 } from 'bech32';
 import { erc20ABI } from './erc20ABI';
 import { ASSET_ADDRESSES, kavaEVMProvider } from '../config/evm';
 import { Coin, fetchDelegatedBalance, fetchStakingApy } from './api';
-
+import OpenAI from 'openai';
+import { getToken, saveImage } from '../utils';
 /**
  *
  * @param kavaAddress string
@@ -205,3 +206,49 @@ export async function getDelegatedBalance(arg: {
     return `Error fetching delegated balance for: ${kavaAddress}, ${e}`;
   }
 }
+
+
+
+
+export type GenerateTokenMetadataParams = {
+  prompt: string;
+  about: string;
+  symbol: string;
+};
+
+export type GenerateTokenMetadataResponse = {
+  id: string;
+  message: string;
+  about: string;
+  symbol: string;
+};
+
+export const generateCoinMetadata = async ({
+  prompt,
+  about,
+  symbol,
+}: GenerateTokenMetadataParams): Promise<GenerateTokenMetadataResponse> => {
+  const client = new OpenAI({
+    baseURL: import.meta.env['VITE_OPENAI_BASE_URL'],
+    apiKey: getToken(),
+    dangerouslyAllowBrowser: true,
+  });
+
+  const res = await client.images.generate({
+    model: 'dall-e-2',
+    prompt,
+    size: '512x512',
+    response_format: 'b64_json',
+  });
+
+  const b64ImageData = res.data[0].b64_json!;
+
+  const id = await saveImage(b64ImageData);
+
+  return {
+    id,
+    about,
+    symbol,
+    message: `respond to the user with: your token metadata has been generated`,
+  };
+};

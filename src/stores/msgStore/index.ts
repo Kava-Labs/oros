@@ -97,7 +97,7 @@ export const selectHasToolCallInProgress = createSelector(
   },
 );
 
-export const selectHasImageGenerationInProgress = createSelector(
+export const selectHasTokenGenerationInProgress = createSelector(
   selectMessageStore,
   (state) => {
     const lastMsg = state.history[state.history.length - 1];
@@ -108,7 +108,7 @@ export const selectHasImageGenerationInProgress = createSelector(
 
     if (isToolCall) {
       for (const tc of lastMsg.tool_calls!) {
-        if (tc.function.name === 'generateImage') return true;
+        if (tc.function.name === 'generateCoinMetadata') return true;
       }
     }
 

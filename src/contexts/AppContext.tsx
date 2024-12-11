@@ -30,7 +30,7 @@ import {
   getDelegatedBalance,
 } from '../tools/toolFunctions';
 import { toast } from 'react-toastify';
-import { generateImage } from '../utils/image/image';
+import { generateCoinMetadata } from '../tools/toolFunctions';
 import { deleteImages } from '../utils';
 
 interface AppContext {
@@ -163,9 +163,9 @@ export function AppContextProvider({
               await doToolCall(tc, getDelegatedBalance);
               break;
 
-            case 'generateImage':
-              console.info('generateImage');
-              await doToolCall(tc, generateImage);
+            case 'generateCoinMetadata':
+              console.info('generateCoinMetadata');
+              await doToolCall(tc, generateCoinMetadata);
               break;
             default:
               throw new Error(
