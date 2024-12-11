@@ -1,13 +1,13 @@
 import 'fake-indexeddb/auto';
-import { idbGet, saveImage, getImage } from './idb';
+import { idbDatabase, saveImage, getImage } from './idb';
 
 afterAll(() => {
   vi.restoreAllMocks();
 });
 
 describe('IndexedDB Operations', () => {
-  it('should initialize the database using idbGet', async () => {
-    const db = await idbGet();
+  it('should initialize the database using idbDatabase', async () => {
+    const db = await idbDatabase();
     expect(db).toBeDefined();
     expect(db.name).toBe('kavachat');
     expect(db.version).toBe(1);
