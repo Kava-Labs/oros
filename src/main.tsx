@@ -36,9 +36,7 @@ import { AppContextProvider } from './contexts/AppContext.tsx';
 //
 // Render!
 //
-const root = createRoot(
-  document.getElementById('root')!
-);
+const root = createRoot(document.getElementById('root')!);
 
 root.render(
   <StrictMode>
@@ -47,5 +45,5 @@ root.render(
         <App />
       </AppContextProvider>
     </Provider>
-  </StrictMode>
+  </StrictMode>,
 );
