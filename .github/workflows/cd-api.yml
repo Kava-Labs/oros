@@ -71,11 +71,6 @@ jobs:
           IMAGE_NAME=${{ github.event.inputs.image }}
           echo "image_name=$IMAGE_NAME" >> $GITHUB_OUTPUT
 
-      - name: Install awscli
-        run: |
-          sudo apt update
-          sudo apt install -y awscli
-
       - name: Download task definition
         run: |
           aws ecs describe-task-definition \
