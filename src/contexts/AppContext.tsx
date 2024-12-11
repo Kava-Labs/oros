@@ -67,6 +67,20 @@ const storage = new LocalStorage<ChatHistory>('chat-messages', {
 });
 const chatHistory = await storage.load();
 
+//  stub entries to local storage
+storage.write({
+  messages: [
+    {
+      role: 'user',
+      content: 'Hello',
+    },
+    {
+      role: 'assistant',
+      content: 'Hi how are you',
+    },
+  ],
+});
+
 export function AppContextProvider({
   children,
   store = _appStore,
@@ -81,12 +95,8 @@ export function AppContextProvider({
   useEffect(() => {
     if (!initalized) {
       const messages = chatHistory.messages;
-      store.dispatch(
-        messageHistoryAddMessage({
-          role: 'user',
-          content: messages[0],
-        }),
-      );
+      store.dispatch(messageHistoryAddMessage(messages[0]));
+      store.dispatch(messageHistoryAddMessage(messages[1]));
       setInitialized(true);
     }
   }, []);
@@ -133,7 +143,7 @@ export function AppContextProvider({
       store.dispatch(
         messageHistoryAddMessage({ role: 'user', content: inputContent }),
       );
-      storage.write({ messages: [inputContent] });
+      storage.write({ messages: [{ role: 'user', content: inputContent }] });
       // submit request with updated history
       doChat();
     },
