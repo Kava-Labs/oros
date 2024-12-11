@@ -67,8 +67,11 @@ const storage = new LocalStorage<ChatHistory>('chat-messages', {
   messages: [],
 });
 
-const chatHistory = await storage.load();
-
+//  workaround for no top-level await
+let chatHistory: ChatHistory;
+(async () => {
+  chatHistory = await storage.load();
+})();
 export function AppContextProvider({
   children,
   store = _appStore,
