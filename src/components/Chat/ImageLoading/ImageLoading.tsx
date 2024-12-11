@@ -21,7 +21,7 @@ export const ImageLoading = () => {
   return (
     <>
       <h3 className={styles.title}>generating Image {dots}</h3>
-      <div>
+      <div style={{ paddingLeft: '25%' }}>
         <LoadingSpinner />
       </div>
     </>
