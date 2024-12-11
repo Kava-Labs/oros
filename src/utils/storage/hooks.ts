@@ -18,6 +18,4 @@ export const useSelectMessageHistory = () => {
       messages: msgHistory,
     });
   }, [msgHistory]);
-
-  return msgHistory;
 };
