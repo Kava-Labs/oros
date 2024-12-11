@@ -1,0 +1,6 @@
+services:
+  kavachat-api:
+    image: "${KAVACHAT_IMAGE}"
+    # Reset merge value to null to clear build context in base file
+    # https://docs.docker.com/reference/compose-file/merge/#reset-value
+    build: !reset null

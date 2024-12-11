@@ -1,5 +1,5 @@
 services:
-  openai-proxy:
+  kavachat-api:
     build:
       context: .
       dockerfile: Dockerfile
