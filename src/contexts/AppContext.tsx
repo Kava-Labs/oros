@@ -82,8 +82,7 @@ export function AppContextProvider({
   useSelectMessageHistory();
 
   useEffect(() => {
-    const messages = chatHistory.messages;
-    for (const message of messages) {
+    for (const message of chatHistory.messages) {
       store.dispatch(
         messageHistoryAddMessage({
           role: message.role,
@@ -91,6 +90,18 @@ export function AppContextProvider({
         }),
       );
     }
+
+    //  even with an empty dependency array, this component will render twice
+    //  due to the app being in strict mode
+
+    //  when this component unmounts, clear the messages from redux
+    //  so when the component remounts, local storage will repopulate the
+    //  store and no duplicates will occur
+
+    return () => {
+      // https://react.dev/learn/synchronizing-with-effects#step-3-add-cleanup-if-needed
+      store.dispatch(messageHistoryClear());
+    };
   }, []);
 
   const markDownCache = useRef<Map<string, string>>(mdCache);
