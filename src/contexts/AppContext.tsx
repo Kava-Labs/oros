@@ -67,8 +67,7 @@ const storage = new LocalStorage<ChatHistory>('chat-messages', {
 });
 const chatHistory = await storage.load();
 
-//  stub entries to local storage
-storage.write({
+await storage.write({
   messages: [
     {
       role: 'user',
@@ -90,14 +89,16 @@ export function AppContextProvider({
 }) {
   const [address, setAddress] = useState('');
   const [cancelStream, setCancelStream] = useState<null | (() => void)>(null);
-  const [initalized, setInitialized] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!initalized) {
-      const messages = chatHistory.messages;
-      store.dispatch(messageHistoryAddMessage(messages[0]));
-      store.dispatch(messageHistoryAddMessage(messages[1]));
-      setInitialized(true);
+    const messages = chatHistory.messages;
+    for (const message of messages) {
+      store.dispatch(
+        messageHistoryAddMessage({
+          role: message.role,
+          content: message.content,
+        }),
+      );
     }
   }, []);
 
@@ -173,6 +174,12 @@ export function AppContextProvider({
           messageHistoryAddMessage({ role: 'assistant', content: content }),
         );
         store.dispatch(streamingMessageClear());
+      });
+      storage.write({
+        messages: [
+          ...chatHistory.messages,
+          { role: 'assistant', content: content },
+        ],
       });
     }
   }, [store]);
