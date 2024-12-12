@@ -104,6 +104,8 @@ jobs:
       - name: Push Docker image to Amazon ECR
         uses: docker/build-push-action@v6
         with:
+          # Path context instead of git context so it doesn't build from remote repo
+          context: .
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.image-name.outputs.image }}
@@ -113,6 +115,12 @@ jobs:
     # Limit to only run on main branch pushes
     if: ${{ (github.ref == 'refs/heads/main') && github.event_name == 'push' }}
     uses: ./.github/workflows/deploy-api.yml
+    # This passes **repo secrets** which are actually not set (empty strings).
+    # However, this grants access to the child workflow to read the secrets from
+    # the **environment secrets**
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     with:
       environment: api-production
       image-name: ${{ needs.docker-build-test.outputs.image-name }}
