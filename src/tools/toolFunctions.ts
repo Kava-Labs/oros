@@ -237,7 +237,7 @@ export const generateCoinMetadata = async ({
   const res = await client.images.generate({
     model: 'dall-e-3',
     prompt,
-    quality: 'hd',
+    quality: 'hd', // note(sah): This param is only supported for dall-e-3 https://platform.openai.com/docs/api-reference/images/create
     response_format: 'b64_json',
   });
 
