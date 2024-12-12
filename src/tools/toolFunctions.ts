@@ -214,19 +214,21 @@ export type GenerateTokenMetadataParams = {
   prompt: string;
   about: string;
   symbol: string;
+  name: string;
 };
 
 export type GenerateTokenMetadataResponse = {
   id: string;
-  message: string;
   about: string;
   symbol: string;
+  name: string;
 };
 
 export const generateCoinMetadata = async ({
   prompt,
   about,
   symbol,
+  name,
 }: GenerateTokenMetadataParams): Promise<GenerateTokenMetadataResponse> => {
   const client = new OpenAI({
     baseURL: import.meta.env['VITE_OPENAI_BASE_URL'],
@@ -246,9 +248,9 @@ export const generateCoinMetadata = async ({
   const id = await saveImage(b64ImageData);
 
   return {
+    name,
     id,
     about,
     symbol,
-    message: `respond to the user with: your token metadata has been generated`,
   };
 };
