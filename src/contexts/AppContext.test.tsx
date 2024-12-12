@@ -182,8 +182,6 @@ describe('AppContextProvider', () => {
       stores.messageHistoryClear(),
     );
 
-    expect(utils.deleteImages as Mock).toHaveBeenCalled()
-   
-
+    expect(utils.deleteImages as Mock).toHaveBeenCalled();
   });
 });

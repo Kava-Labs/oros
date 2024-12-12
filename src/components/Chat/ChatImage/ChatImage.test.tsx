@@ -57,6 +57,8 @@ describe('ChatImage Component', () => {
     });
 
     expect(toast.dismiss).toHaveBeenCalled();
-    expect(toast.error).toHaveBeenCalledWith('Error: failed to load requested image some error');
+    expect(toast.error).toHaveBeenCalledWith(
+      'Error: failed to load requested image some error',
+    );
   });
 });
