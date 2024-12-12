@@ -56,12 +56,12 @@ export const NoMessages: Story = {
   parameters: {
     viewport: { defaultViewport: 'reset' },
   },
-  args: {},
+  args: { messages: [] },
 };
 
 export const NoMessagesOnPhoneSmall: Story = {
   parameters: {
     viewport: { defaultViewport: 'mobile1' },
   },
-  args: {},
+  args: { messages: [] },
 };
