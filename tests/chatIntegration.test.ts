@@ -28,8 +28,11 @@ describe('chat function', () => {
     });
 
     //  Wait for the chat completion to finish
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
+    await new Promise((resolve) => {
+      onDone.mockImplementation(() => {
+        resolve(null);
+      });
+    });
     //  'calls' is an array of the arguments passed to the function
     //  so 'chatStream' is an array of arrays
     const chatStream = onData.mock.calls;
