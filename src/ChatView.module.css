@@ -102,12 +102,73 @@
   flex-direction: column;
 }
 
-#input {
-  height: 100px;
-  max-width: 768px;
+#inputContainer {
   width: 100%;
-  background-color: #2d2d2d;
-  border-radius: 16px;
+  max-width: 768px;
+  display: flex;
+  align-items: flex-start; /* Align items at the top to maintain alignment */
+  position: relative;
+
+  #input {
+    min-height: 50px;
+    /* height: 100px; */
+    max-width: 768px;
+    width: 100%;
+    background-color: #2d2d2d;
+    border-radius: 16px;
+    border: none;
+    padding: 16px;
+    color: #ffffff;
+    font-size: 1.6rem;
+    font-family: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    flex: 1;
+    padding: 12px 55px 10px 20px; /* 12px works with line-height to center text veritically  in textarea */
+    overflow-y: auto; /* Enable vertical scrolling */
+    resize: none; /* Disable manual resizing */
+    text-wrap: wrap;
+
+    &:focus {
+      border: none;
+      outline: none;
+      caret-color: white;
+    }
+  }
+
+  #sendChatButton {
+    position: absolute;
+    right: 10px;
+    bottom: 10px; /* Stick the button to the bottom-right of the container */
+    padding: 8px 15px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%; /* Make the button perfectly round */
+    border: none;
+    background-color: #007bff;
+    display: flex; /* Use flex to center the SVG */
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition:
+      background-color 0.3s ease,
+      transform 0.2s ease;
+
+    &:hover {
+      background-color: #0056b3; /* Darken the background color on hover */
+    }
+
+    &:active {
+      transform: scale(0.8); /* make the button strink slightly on click */
+    }
+
+    svg {
+      color: #ffffff; /* SVG color */
+      width: 15px; /* Adjust SVG width */
+      height: 15px; /* Adjust SVG height */
+      flex-shrink: 0; /* prevent SVG from shrinking in flexbox */
+    }
+  }
 }
 
 #controls {

@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react';
 import styles from './ChatView.module.css';
 import chatIcon from './assets/chatIcon.svg';
 
@@ -8,6 +9,26 @@ export interface ChatViewProps {
 }
 
 export const ChatView = ({ messages }: ChatViewProps) => {
+  const [inputValue, setInputValue] = useState('');
+  const inputRef = useRef(null);
+
+  const handleInputChange = (e: any) => {
+    /**
+     * Set the text area height to 'auto' on change so the height is
+     * automatically adjusted as the user types. Set it to the
+     * scrollHeight so as the user types, the textarea content moves
+     * upward keeping the  user on the same line
+     */
+    const textarea = e.target;
+    textarea.style.height = 'auto'; // Reset the height
+    textarea.style.height = `${textarea.scrollHeight}px`; // Adjust to scrollHeight
+    setInputValue(textarea.value);
+  };
+
+  const handleButtonClick = () => {
+    console.log(inputValue);
+  };
+
   const hasMessages = messages && messages.length > 0;
 
   return (
@@ -45,7 +66,44 @@ export const ChatView = ({ messages }: ChatViewProps) => {
       </div>
 
       <div id={styles.controls} data-testid="controls">
-        <div id={styles.input} data-testid="input"></div>
+        <div id={styles.inputContainer}>
+          <textarea
+            id={styles.input}
+            data-testid="input"
+            rows={1}
+            ref={inputRef}
+            value={inputValue}
+            onChange={handleInputChange}
+          ></textarea>
+          <button
+            id={styles.sendChatButton}
+            type="submit"
+            onClick={handleButtonClick}
+            aria-label="Send Chat"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              color={'#FFFFFF'}
+              fill={'none'}
+            >
+              <path
+                d="M12 4V20"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M4 12H20"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
         <span id={styles.importantInfo} data-testid="importantInfo">
           <p>This application may produce errors and incorrect information.</p>
         </span>

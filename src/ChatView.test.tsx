@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { ChatView } from './ChatView';
 import type { ChatCompletionMessageParam } from 'openai';
 
@@ -68,5 +68,15 @@ describe('ChatView', () => {
     expect(importantInfo).toHaveTextContent(
       'This application may produce errors and incorrect information.',
     );
+  });
+
+  it('shows the warning message', () => {
+    render(<ChatView messages={[]} />);
+
+    const sendChatButton = screen.getByLabelText('Send Chat');
+    expect(sendChatButton).toBeInTheDocument();
+
+    fireEvent.click(sendChatButton);
+    // assert some function was called when wired in
   });
 });
