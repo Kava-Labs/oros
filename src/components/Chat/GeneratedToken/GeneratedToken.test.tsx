@@ -33,7 +33,7 @@ describe('GeneratedToken Component', () => {
       data: mockImageData,
     });
 
-    render(<GeneratedToken id="some-id" about="" symbol="" message="" />);
+    render(<GeneratedToken id="some-id" about="" symbol="" name="" />);
 
     // Wait for the image to update
     await waitFor(() => {
@@ -50,7 +50,7 @@ describe('GeneratedToken Component', () => {
     // Mock getImage to resolve to a defined object
     (getImage as Mock).mockRejectedValue(new Error('some error'));
 
-    render(<GeneratedToken id="some-id" about="" symbol="" message="" />);
+    render(<GeneratedToken id="some-id" about="" symbol="" name="" />);
 
     await waitFor(() => {
       screen.getByRole('img') as HTMLImageElement;
