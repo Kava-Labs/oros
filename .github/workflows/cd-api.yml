@@ -55,6 +55,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: kavachat-api-docker-image-name
+          # Run ID of the CI job that triggered workflow_run event
+          run-id: ${{ github.event.workflow_run.id }}
           path: image-name.txt
 
       - name: Read full Docker image name from artifacts
