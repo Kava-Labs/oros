@@ -67,7 +67,7 @@ describe('chat function', () => {
     expect(onError).toHaveBeenCalledWith(Error('Invalid URL'));
   });
 
-  it('tool calls', async () => {
+  it('makes a tool call with the correct parameters', async () => {
     const openAIClient = createOpenApiClient();
 
     chat({
@@ -75,7 +75,29 @@ describe('chat function', () => {
       messages: [
         {
           role: 'user',
-          content: 'What is the staking APY for Kava?',
+          content:
+            'What is the delegated balance of kava1vlpsrmdyuywvaqrv7rx6xga224sqfwz3fyfhwq?',
+        },
+      ],
+      tools: [
+        {
+          type: 'function',
+          function: {
+            name: 'getDelegatedBalance',
+            description:
+              'Gets to total delegated (or total staked) balance for an address',
+            parameters: {
+              type: 'object',
+              properties: {
+                address: {
+                  type: 'string',
+                  description:
+                    'The account address to fetch the delegated balances for',
+                },
+              },
+              required: ['address'],
+            },
+          },
         },
       ],
       onData,
@@ -91,20 +113,14 @@ describe('chat function', () => {
         resolve(null);
       });
     });
-    //  'calls' is an array of the arguments passed to the function
-    //  so 'chatStream' is an array of arrays
-    const chatStream = onData.mock.calls;
 
-    console.log({ chatStream });
+    const toolCallChunk = onToolCallRequest.mock.calls[0][0];
 
-    // let output = '';
-    //
-    // chatStream.forEach((stream) => {
-    //   stream.forEach((chunk) => {
-    //     output = output.concat(chunk);
-    //   });
-    // });
-    //
-    // expect(output).toBe(expectedOutput);
+    expect(toolCallChunk[0].function.name).toBe('getDelegatedBalance');
+    expect(toolCallChunk[0].function.arguments).toBe(
+      JSON.stringify({
+        address: 'kava1vlpsrmdyuywvaqrv7rx6xga224sqfwz3fyfhwq',
+      }),
+    );
   });
 });
