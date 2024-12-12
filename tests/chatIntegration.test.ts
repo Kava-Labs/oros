@@ -1,5 +1,6 @@
 import { chat } from '../src/utils';
 import { createOpenApiClient } from './helpers';
+import OpenAI from 'openai';
 
 describe('chat function', () => {
   const onData = vi.fn();
@@ -46,5 +47,23 @@ describe('chat function', () => {
     });
 
     expect(output).toBe(expectedOutput);
+  });
+
+  it('calls onError', async () => {
+    chat({
+      model: 'gpt-4o-mini',
+      messages: [],
+      onData,
+      onDone,
+      onError,
+      onToolCallRequest,
+      openAI: new OpenAI({
+        baseURL: 'foobar',
+      }),
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    expect(onError).toHaveBeenCalledWith(Error('Invalid URL'));
   });
 });
