@@ -3,7 +3,7 @@
 set -e
 
 # Start the proxy server in the background
-OPENAI_BASE_URL=${OPENAI_BASE_URL} OPENAI_API_KEY=${OPENAI_API_KEY} go run ./cmd/api/main.go &
+OPENAI_BASE_URL=${OPENAI_BASE_URL} OPENAI_API_KEY=${OPENAI_API_KEY} go run ./api/cmd/api/main.go &
 PROXY_SERVER_PID=$! # Store the process ID of the Proxy server
 
 echo "Started Proxy server PID: ${PROXY_SERVER_PID}"
