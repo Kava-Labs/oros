@@ -1,11 +1,11 @@
 import { useAppContext } from '../../../contexts/AppContext';
-import styles from '../../../style.module.css';
+import styles from '../styles.module.css';
 
 export const ConnectWallet = () => {
   const { connectWallet, address } = useAppContext();
   return (
     <button
-      className={styles.active}
+      className={styles.connectWalletButton}
       onClick={(e) => {
         e.preventDefault();
         connectWallet();

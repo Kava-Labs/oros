@@ -1,5 +1,11 @@
-.header {
-  padding: 16px 16px 16px 24px;
+.active {
+  background-color: rgb(160, 181, 255);
+  color: rgb(45, 45, 45);
+}
+
+.active:hover {
+  background-color: rgb(78, 87, 246);
+  color: rgb(238, 238, 238);
 }
 
 .chatControls {
@@ -23,19 +29,14 @@
   cursor: pointer;
 }
 
-.active {
-  background-color: rgb(160, 181, 255);
-  color: rgb(45, 45, 45);
-}
-
 .chatControls .inactive {
   background-color: rgb(75, 75, 75);
   color: rgb(45, 45, 45);
   cursor: unset;
 }
 
-.active:hover {
-  background-color: rgb(78, 87, 246);
-  color: rgb(238, 238, 238);
+.connectWalletButton {
+  background-color: rgb(160, 181, 255);
+  color: rgb(45, 45, 45);
+  width: 175px
 }
-

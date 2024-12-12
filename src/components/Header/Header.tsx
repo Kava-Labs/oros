@@ -1,5 +1,5 @@
 import kavaLogo from '../../assets/kavaLogo.svg';
-import styles from '../../style.module.css';
+import styles from './styles.module.css';
 
 export const Header = () => {
   return (
