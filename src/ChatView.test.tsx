@@ -1,42 +1,72 @@
+import { describe, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/react';
 import { ChatView } from './ChatView';
-import { render, screen, waitFor } from '@testing-library/react';
-
-import { mockChatMessages } from './mockdata';
+import type { ChatCompletionMessageParam } from 'openai';
 
 describe('ChatView', () => {
-  describe('with no messages', () => {
-    it('shows the get started with no props', () => {
-      render(<ChatView />);
+  it('renders the start state when no props are provided', () => {
+    render(<ChatView />);
 
-      const getStartedContainer = screen.getByTestId('start');
+    const startView = screen.getByTestId('start');
 
-      expect(getStartedContainer).toHaveTextContent("Let's get started!");
-    });
-
-    it('shows the get started with empty messages', () => {
-      render(<ChatView messages={[]} />);
-
-      const getStartedContainer = screen.getByTestId('start');
-
-      expect(getStartedContainer).toHaveTextContent("Let's get started!");
-    });
+    expect(startView).toBeInTheDocument();
+    expect(startView).toHaveTextContent("Let's get started!");
   });
 
-  describe('with messages', () => {
-    it('renders all messages in the same order', () => {
-      render(<ChatView messages={mockChatMessages} />);
-    });
+  it('renders the start state when provided messages are empty', () => {
+    render(<ChatView messages={[]} />);
 
-    it('renders assistant messages on the left', () => {
-      render(<ChatView messages={mockChatMessages} />);
-    });
+    const startView = screen.getByTestId('start');
 
-    it('renders user messages on the left', () => {
-      render(<ChatView messages={mockChatMessages} />);
-    });
+    expect(startView).toBeInTheDocument();
+    expect(startView).toHaveTextContent("Let's get started!");
+  });
 
-    it('renders all the messages in the array in order', () => {
-      render(<ChatView messages={mockChatMessages} />);
-    });
+  it('renders messages when they are provided', () => {
+    const messages: ChatCompletionMessageParam[] = [
+      { role: 'assistant', content: 'Hello! How can I help you?' },
+      { role: 'user', content: 'I want to create a new memecoin.' },
+    ];
+
+    render(<ChatView messages={messages} />);
+
+    const conversation = screen.getByTestId('conversation');
+    // Should not show the start state since messages exist
+    expect(screen.queryByTestId('start')).toBeNull();
+
+    // Check that both messages are rendered
+    expect(conversation).toHaveTextContent('Hello! How can I help you?');
+    expect(conversation).toHaveTextContent('I want to create a new memecoin.');
+  });
+
+  it('shows the chat icon for assistant messages', () => {
+    const messages: ChatCompletionMessageParam[] = [
+      { role: 'assistant', content: 'I am here to assist.' },
+      { role: 'user', content: 'Thanks for the help!' },
+    ];
+
+    render(<ChatView messages={messages} />);
+
+    const assistantMessage = screen.getByText('I am here to assist.');
+    // The assistant message container should have the chat icon
+    const assistantContainer = assistantMessage.closest('div');
+    const icon = assistantContainer?.querySelector('img');
+    expect(icon).toBeInTheDocument(); // Icon should be present for assistant
+
+    const userMessage = screen.getByText('Thanks for the help!');
+    const userContainer = userMessage.closest('div');
+    const userIcon = userContainer?.querySelector('img');
+    // Icon should not be present for user messages
+    expect(userIcon).not.toBeInTheDocument();
+  });
+
+  it('shows the important info in the controls section', () => {
+    render(<ChatView messages={[]} />);
+
+    const importantInfo = screen.getByTestId('importantInfo');
+    expect(importantInfo).toBeInTheDocument();
+    expect(importantInfo).toHaveTextContent(
+      'This application may produce errors and incorrect information.',
+    );
   });
 });
