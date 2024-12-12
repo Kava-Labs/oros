@@ -5,7 +5,6 @@ import { ASSET_ADDRESSES, kavaEVMProvider } from '../config/evm';
 import { Coin, fetchDelegatedBalance, fetchStakingApy } from './api';
 import OpenAI from 'openai';
 import { getToken, saveImage } from '../utils';
-
 /**
  *
  * @param kavaAddress string
