@@ -32,6 +32,12 @@ import {
 import { toast } from 'react-toastify';
 import { generateCoinMetadata } from '../tools/toolFunctions';
 import { deleteImages } from '../utils';
+import { LocalStorage } from '../utils/storage';
+import { ChatHistory } from '../utils/storage/types';
+import {
+  useSyncFromStorageOnReload,
+  useSyncToStorage,
+} from '../utils/storage/hooks';
 
 interface AppContext {
   address: string;
@@ -60,6 +66,10 @@ const initValues = {
 
 export const AppContext = createContext<AppContext>(initValues);
 
+const storage = new LocalStorage<ChatHistory>('chat-messages', {
+  messages: [],
+});
+
 export function AppContextProvider({
   children,
   store = _appStore,
@@ -69,6 +79,9 @@ export function AppContextProvider({
 }) {
   const [address, setAddress] = useState('');
   const [cancelStream, setCancelStream] = useState<null | (() => void)>(null);
+
+  useSyncToStorage(storage);
+  useSyncFromStorageOnReload(storage, store);
 
   const markDownCache = useRef<Map<string, string>>(mdCache);
 
@@ -253,6 +266,11 @@ export function AppContextProvider({
   }, [store]);
 
   const clearChatMessages = useCallback(async () => {
+    //  clear storage only when the user manually resets
+    //  if we maintain parity between local storage and redux, we
+    //  can inadvertently overwrite existing data in storage
+    //  with an empty redux store before its repopulated
+    await storage.reset();
     store.dispatch(messageHistoryClear());
     markDownCache.current.clear();
     try {

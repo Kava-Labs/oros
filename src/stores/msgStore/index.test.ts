@@ -11,6 +11,7 @@ import {
   MsgStore,
   selectHasToolCallInProgress,
 } from './index';
+//  todo - refactor to use our own types
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 
 const initialState: MsgStore = {
