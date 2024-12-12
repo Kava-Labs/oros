@@ -22,13 +22,23 @@ export const useSyncToStorage = (storage: LocalStorage<ChatHistory>) => {
     //  and we don't want to rewrite existing local storage with just the system prompt
     //  if the user has started a conversation
     if (msgHistory.length > 1) {
-      storage.write({
-        messages: msgHistory,
-      });
+      try {
+        storage.write({
+          messages: msgHistory,
+        });
+      } catch {
+        //  edge case where a user's message exceeds local storage limit
+        //  https://developer.mozilla.org/en-US/docs/Web/API/Storage_API/Storage_quotas_and_eviction_criteria#web_storage
+        toast.error('A problem occurred - please try again');
+      }
     }
   }, [msgHistory, storage]);
 };
 
+/**
+ * on initial load or refresh, check if there is a conversation history in local storage
+ * if so, set that history in redux, resulting in a persisted UI state (conversation is saved)
+ */
 export const useSyncFromStorageOnReload = (
   storage: LocalStorage<ChatHistory>,
   store: typeof _appStore,
