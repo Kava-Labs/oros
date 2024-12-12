@@ -1,25 +1,39 @@
-name: Continuous Deployment - API
+name: Deploy API
 
-# Ensure only 1 deployment is running at a time
+# Ensure only 1 deployment is running at a time for each environment
 concurrency:
-  group: api-production
+  group: ${{ inputs.environment-name }}
   # Do NOT cancel in-progress deployments, ensure each deployment completes
   # before starting the next one. This allows for rollbacks to the latest most
   # stable version, instead of potentially skipping over a stable version.
   cancel-in-progress: false
 
 on:
-  workflow_run:
-    workflows:
-      - Continuous Integration - API
-    branches: [main]
-    types:
-      - completed
-  workflow_dispatch:
+  # Reusable workflow to be called by other workflows
+  workflow_call:
     inputs:
-      image:
-        description: 'Docker image name to deploy'
+      image-name:
         required: true
+        description: 'Full Docker image name to deploy'
+        type: string
+      environment-name:
+        required: true
+        description: 'Name of environment to deploy to'
+        type: string
+      environment-url:
+        required: true
+        description: 'URL of the environment'
+        type: string
+    # These are set in **environment** settings, not repository-wide secrets.
+    # The values in the parent workflow are replaced with the values environment
+    # settings of this workflow.
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+        description: 'AWS Access Key ID for ECS deployment'
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+        description: 'AWS Secret Access Key for ECS deployment'
 
 env:
   AWS_REGION: us-east-1
@@ -33,43 +47,28 @@ env:
 
 jobs:
   deploy:
-    name: Deploy
+    name: Deploy ${{ inputs.environment-name }}
     runs-on: ubuntu-latest
-    # Only run this job if the CI job was successful or if manually triggered
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
-    environment: api-production
+    environment:
+      name: ${{ inputs.environment-name }}
+      url: ${{ inputs.environment-url }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Output image name
+        run: echo "Deploying Docker image '${{ inputs.image-name }}' to '${{ inputs.environment-name }}'"
+
       - name: Configure AWS credentials for service deployment
         uses: aws-actions/configure-aws-credentials@v1
         with:
+          # These are set in the **environment** settings, not repository-wide
+          # secrets. This allows for different credentials for different
+          # environments.
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-
-      - name: Download full Docker image name from artifacts
-        if: ${{ github.event_name == 'workflow_run' }}
-        uses: actions/download-artifact@v4
-        with:
-          name: kavachat-api-docker-image-name
-          # Run ID of the CI job that triggered workflow_run event
-          run-id: ${{ github.event.workflow_run.id }}
-          path: image-name.txt
-
-      - name: Read full Docker image name from artifacts
-        if: ${{ github.event_name == 'workflow_run' }}
-        run: |
-          IMAGE_NAME=$(cat image-name.txt)
-          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
-
-      - name: Read full Docker image name from dispatch input
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: |
-          IMAGE_NAME=${{ github.event.inputs.image }}
-          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
 
       - name: Download task definition
         run: |
@@ -84,7 +83,7 @@ jobs:
         with:
           task-definition: task-definition.json
           # Only modify the image, nothing else
-          image: ${{ env.IMAGE_NAME }}
+          image: ${{ inputs.image-name }}
           # Container name matches service name
           container-name: ${{ env.ECS_SERVICE }}
 
