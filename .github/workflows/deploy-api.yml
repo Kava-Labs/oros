@@ -9,17 +9,17 @@ concurrency:
   cancel-in-progress: false
 
 on:
-  workflow_run:
-    workflows:
-      - Continuous Integration - API
-    branches: [main]
-    types:
-      - completed
-  workflow_dispatch:
+  # Reusable workflow to be called by other workflows
+  workflow_call:
     inputs:
-      image:
-        description: 'Docker image name to deploy'
+      image-name:
         required: true
+        description: 'Full Docker image name to deploy'
+        type: string
+      environment:
+        required: true
+        description: 'Environment to deploy to'
+        type: string
 
 env:
   AWS_REGION: us-east-1
@@ -35,41 +35,26 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    # Only run this job if the CI job was successful or if manually triggered
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
-    environment: api-production
+    # Ensure the inputs are set
+    if: ${{ inputs.image-name != '' && inputs.environment != '' }}
+    environment: ${{ inputs.environment }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Output image name
+        run: echo "Deploying Docker image '${{ inputs.image-name }}' to '${{ inputs.environment }}'"
+
       - name: Configure AWS credentials for service deployment
         uses: aws-actions/configure-aws-credentials@v1
         with:
+          # These are set in the **environment** settings, not repository-wide
+          # secrets. This allows for different credentials for different
+          # environments.
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-
-      - name: Download full Docker image name from artifacts
-        if: ${{ github.event_name == 'workflow_run' }}
-        uses: actions/download-artifact@v4
-        with:
-          name: kavachat-api-docker-image-name
-          # Run ID of the CI job that triggered workflow_run event
-          run-id: ${{ github.event.workflow_run.id }}
-          path: image-name.txt
-
-      - name: Read full Docker image name from artifacts
-        if: ${{ github.event_name == 'workflow_run' }}
-        run: |
-          IMAGE_NAME=$(cat image-name.txt)
-          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
-
-      - name: Read full Docker image name from dispatch input
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: |
-          IMAGE_NAME=${{ github.event.inputs.image }}
-          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
 
       - name: Download task definition
         run: |

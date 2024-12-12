@@ -1,4 +1,4 @@
-name: Continuous Integration - API
+name: CI / CD
 on:
   push:
     branches:
@@ -13,13 +13,15 @@ env:
   ECR_REPOSITORY: kavachat-api
 
 jobs:
-  e2e-test:
+  docker-build-test:
     runs-on: ubuntu-latest
     env:
       KAVA_TAG: v0.27.0-goleveldb
       KVTOOL_CONFIGTEMPLATE: v0.26
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       OPENAI_BASE_URL: https://api.openai.com/v1
+    outputs:
+      image-name: ${{ steps.image-name.outputs.image }}
     steps:
       - name: Checkout current commit
         uses: actions/checkout@v4
@@ -68,6 +70,7 @@ jobs:
           go-version-file: go.mod
           cache-dependency-path: |
             go.sum
+            ./tests/kvtool/go.mod
 
       - name: Install kvtool
         run: make -C tests/kvtool install
@@ -105,14 +108,11 @@ jobs:
           push: true
           tags: ${{ steps.image-name.outputs.image }}
 
-      - name: Save Docker image name to file
-        run: echo "${{ steps.image-name.outputs.image }}" > image-name.txt
-
-      - name: Upload Docker image name to artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: kavachat-api-docker-image-name
-          path: image-name.txt
-          if-no-files-found: error
-          overwrite: true
-          retention-days: 1
+  deploy-api:
+    needs: docker-build-test
+    # Limit to only run on main branch pushes
+    if: ${{ (github.ref == 'refs/heads/main') && github.event_name == 'push' }}
+    uses: ./.github/workflows/deploy-api.yml
+    with:
+      environment: api-production
+      image-name: ${{ needs.docker-build-test.outputs.image-name }}
