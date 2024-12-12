@@ -13,7 +13,9 @@
     "test": "vitest",
     "test:unit": "vitest src",
     "test:integration": "vitest tests",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@fontsource/inter": "^5.1.0",
@@ -31,8 +33,16 @@
     "uuid": "^11.0.3"
   },
   "devDependencies": {
+    "@chromatic-com/storybook": "^3.2.2",
     "@eslint/js": "^9.15.0",
     "@playwright/test": "^1.49.0",
+    "@storybook/addon-essentials": "^8.4.7",
+    "@storybook/addon-interactions": "^8.4.7",
+    "@storybook/addon-onboarding": "^8.4.7",
+    "@storybook/blocks": "^8.4.7",
+    "@storybook/react": "^8.4.7",
+    "@storybook/react-vite": "^8.4.7",
+    "@storybook/test": "^8.4.7",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.0.1",
     "@testing-library/user-event": "^14.5.2",
@@ -45,15 +55,22 @@
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.14",
+    "eslint-plugin-storybook": "^0.11.1",
     "fake-indexeddb": "^6.0.0",
     "globals": "^15.12.0",
     "jsdom": "^25.0.1",
-    "prettier": "^3.4.2",
     "msw": "^2.6.8",
+    "prettier": "^3.4.2",
+    "storybook": "^8.4.7",
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.15.0",
     "vite": "^6.0.0",
     "vitest": "^2.1.6",
     "vitest-dom": "^0.1.1"
+  },
+  "eslintConfig": {
+    "extends": [
+      "plugin:storybook/recommended"
+    ]
   }
 }
