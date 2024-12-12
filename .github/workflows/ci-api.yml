@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - dl-cd-reusable-workflow
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -113,7 +114,7 @@ jobs:
   deploy-api:
     needs: docker-build-test
     # Limit to only run on main branch pushes
-    if: ${{ (github.ref == 'refs/heads/main') && github.event_name == 'push' }}
+    # if: ${{ (github.ref == 'refs/heads/main') && github.event_name == 'push' }}
     uses: ./.github/workflows/deploy-api.yml
     # This passes **repo secrets** which are actually not set (empty strings).
     # However, this grants access to the child workflow to read the secrets from
