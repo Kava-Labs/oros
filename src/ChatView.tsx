@@ -10,7 +10,6 @@ export interface ChatViewProps {
 
 export const ChatView = ({ messages }: ChatViewProps) => {
   const [inputValue, setInputValue] = useState('');
-  const inputRef = useRef(null);
 
   const handleInputChange = (e: any) => {
     /**
@@ -20,8 +19,8 @@ export const ChatView = ({ messages }: ChatViewProps) => {
      * upward keeping the  user on the same line
      */
     const textarea = e.target;
-    textarea.style.height = 'auto'; // Reset the height
-    textarea.style.height = `${textarea.scrollHeight}px`; // Adjust to scrollHeight
+    textarea.style.height = 'auto';
+    textarea.style.height = `min(${textarea.scrollHeight}px, 60vh)`; // Adjust to scrollHeight
     setInputValue(textarea.value);
   };
 
@@ -71,10 +70,10 @@ export const ChatView = ({ messages }: ChatViewProps) => {
             id={styles.input}
             data-testid="input"
             rows={1}
-            ref={inputRef}
             value={inputValue}
             onChange={handleInputChange}
           ></textarea>
+
           <button
             id={styles.sendChatButton}
             type="submit"
