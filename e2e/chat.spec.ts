@@ -140,7 +140,7 @@ test('messages from the chat populate local storage', async ({ page }) => {
   await page.waitForResponse(async (res) => {
     if (res.url().includes('chat')) {
       expect(res.status()).toBe(200);
-      await res.finished(); // it's important to wait for the stream to finish
+      await res.finished();
       return true;
     }
     return false;

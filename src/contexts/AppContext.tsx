@@ -266,6 +266,10 @@ export function AppContextProvider({
   }, [store]);
 
   const clearChatMessages = useCallback(async () => {
+    //  clear storage only when the user manually resets
+    //  if we maintain parity between local storage and redux, we
+    //  can inadvertently overwrite existing data in storage
+    //  with an empty redux store before its repopulated
     await storage.reset();
     store.dispatch(messageHistoryClear());
     markDownCache.current.clear();
