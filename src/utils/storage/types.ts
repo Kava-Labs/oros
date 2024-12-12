@@ -1,3 +1,5 @@
+import { ChatCompletionMessageParam } from 'openai/resources/index';
+
 export interface IStorage<T> {
   write(state: T): Promise<void>;
 
@@ -6,11 +8,6 @@ export interface IStorage<T> {
   reset(): Promise<void>;
 }
 
-type ChatHistoryEntry = {
-  role: 'user' | 'system' | 'assistant';
-  content: string;
-};
-
 export type ChatHistory = {
-  messages: Array<ChatHistoryEntry>;
+  messages: Array<ChatCompletionMessageParam>;
 };

@@ -32,6 +32,7 @@ vi.mock('../utils', () => ({
   deleteImages: vi.fn(),
 }));
 
+//  todo - unskip when this test is plugged into a redux provider
 describe.skip('AppContextProvider', () => {
   beforeEach(() => {
     vi.clearAllMocks();

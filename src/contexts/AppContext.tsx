@@ -2,7 +2,7 @@
 /**
  * TODO: Remove the eslint-disable and fix linting issues.
  */
-import { createContext, useContext, useEffect, useRef } from 'react';
+import { createContext, useContext, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { useCallback, useState } from 'react';
 import { batch } from 'react-redux';
@@ -34,7 +34,10 @@ import { generateImage } from '../utils/image/image';
 import { deleteImages } from '../utils';
 import { LocalStorage } from '../utils/storage';
 import { ChatHistory } from '../utils/storage/types';
-import { useSelectMessageHistory } from '../utils/storage/hooks';
+import {
+  useSyncFromStorageOnReload,
+  useSyncToStorage,
+} from '../utils/storage/hooks';
 
 interface AppContext {
   address: string;
@@ -67,11 +70,6 @@ const storage = new LocalStorage<ChatHistory>('chat-messages', {
   messages: [],
 });
 
-//  workaround for no top-level await
-let chatHistory: ChatHistory;
-(async () => {
-  chatHistory = await storage.load();
-})();
 export function AppContextProvider({
   children,
   store = _appStore,
@@ -82,30 +80,8 @@ export function AppContextProvider({
   const [address, setAddress] = useState('');
   const [cancelStream, setCancelStream] = useState<null | (() => void)>(null);
 
-  useSelectMessageHistory();
-
-  useEffect(() => {
-    for (const message of chatHistory.messages) {
-      store.dispatch(
-        messageHistoryAddMessage({
-          role: message.role,
-          content: message.content,
-        }),
-      );
-    }
-
-    //  even with an empty dependency array, this component will render twice
-    //  due to the app being in strict mode
-
-    //  when this component unmounts, clear the messages from redux
-    //  so when the component remounts, local storage will repopulate the
-    //  store and no duplicates will occur
-
-    return () => {
-      // https://react.dev/learn/synchronizing-with-effects#step-3-add-cleanup-if-needed
-      store.dispatch(messageHistoryClear());
-    };
-  }, []);
+  useSyncToStorage(storage);
+  useSyncFromStorageOnReload(storage, store);
 
   const markDownCache = useRef<Map<string, string>>(mdCache);
 
@@ -290,6 +266,7 @@ export function AppContextProvider({
   }, [store]);
 
   const clearChatMessages = useCallback(async () => {
+    await storage.reset();
     store.dispatch(messageHistoryClear());
     markDownCache.current.clear();
     try {

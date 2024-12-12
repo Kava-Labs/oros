@@ -42,6 +42,10 @@ export const msgStoreSlice = createSlice({
       }
     },
 
+    messageHistorySet(state: MsgStore, action: PayloadAction<any[]>) {
+      state.history = [...action.payload];
+    },
+
     messageHistoryClear(state: MsgStore, _: PayloadAction<void>) {
       const systemMsg = { ...state.history[0] }; // keep system prompt
       state.history = [systemMsg];
@@ -68,6 +72,7 @@ export const {
   messageHistoryAddMessage,
   messageHistoryClear,
   messageHistoryDropLast,
+  messageHistorySet,
 } = msgStoreSlice.actions;
 
 export type MessageStoreSlice = { [msgStoreSlice.name]: MsgStore };
