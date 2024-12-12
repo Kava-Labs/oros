@@ -12,7 +12,6 @@ export const GeneratedToken = (props: GenerateTokenMetadataResponse) => {
 
   const [imgData, setImageData] = useState('');
 
-  console.info(props);
 
   useEffect(() => {
     if (!id) {
