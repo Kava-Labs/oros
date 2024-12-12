@@ -80,8 +80,8 @@ export function AppContextProvider({
   const [address, setAddress] = useState('');
   const [cancelStream, setCancelStream] = useState<null | (() => void)>(null);
 
-  useSyncToStorage(storage);
-  useSyncFromStorageOnReload(storage, store);
+  useSyncToStorage(store, storage);
+  useSyncFromStorageOnReload(store, storage);
 
   const markDownCache = useRef<Map<string, string>>(mdCache);
 
@@ -270,7 +270,7 @@ export function AppContextProvider({
     //  if we maintain parity between local storage and redux, we
     //  can inadvertently overwrite existing data in storage
     //  with an empty redux store before its repopulated
-    await storage.reset();
+    storage.reset();
     store.dispatch(messageHistoryClear());
     markDownCache.current.clear();
     try {
