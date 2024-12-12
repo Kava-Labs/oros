@@ -79,4 +79,18 @@ describe('ChatView', () => {
     fireEvent.click(sendChatButton);
     // assert some function was called when wired in
   });
+
+  it('resets the chat', () => {
+    const mockResetFn = vi.fn();
+    render(<ChatView messages={[]} />);
+
+    expect(mockResetFn).not.toHaveBeenCalled();
+
+    const resetButton = screen.getByLabelText('Reset Chat');
+    expect(resetButton).toBeInTheDocument();
+
+    fireEvent.click(resetButton);
+    // add me back in when reset chat is wired in
+    // expect(mockResetFn).not.toHaveBeenCalledTimes(1);
+  });
 });
