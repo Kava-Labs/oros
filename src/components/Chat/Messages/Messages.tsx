@@ -63,7 +63,7 @@ export const Messages = () => {
               id={toolResponse.id}
               about={toolResponse.about}
               symbol={toolResponse.symbol}
-              message={toolResponse.message}
+              name={toolResponse.name}
             />
           );
         }

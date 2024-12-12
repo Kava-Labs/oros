@@ -88,7 +88,7 @@ export const tools: ChatCompletionTool[] = [
           prompt: {
             type: 'string',
             description:
-              'A text description of the desired coin image optimized for dalle-2 use the conversation context to help make the image, do not exceed 1000 characters',
+              'A text description of the desired coin image optimized for dalle use the conversation context to help make the image',
           },
           symbol: {
             type: 'string',
@@ -98,8 +98,12 @@ export const tools: ChatCompletionTool[] = [
             type: 'string',
             description: 'the description of the token',
           },
+          name: {
+            type: 'string', 
+            description: 'the name of the token'
+          },
         },
-        required: ['prompt', 'symbol', 'about'],
+        required: ['prompt', 'symbol', 'about', 'name'],
         strict: true,
       },
     },

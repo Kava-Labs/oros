@@ -38,6 +38,7 @@ export const GeneratedToken = (props: GenerateTokenMetadataResponse) => {
   return (
     <div className={styles.chatBubbleAssistant}>
       <div data-chat-role="tool" className={styles.chatBubble}>
+        <h3>Name: {props.name}</h3>
         <h3>Symbol: {props.symbol}</h3>
         <h3>Description</h3>
         <p>{props.about}</p>
