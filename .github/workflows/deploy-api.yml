@@ -43,7 +43,7 @@ env:
 
 jobs:
   deploy:
-    name: Deploy
+    name: Deploy ${{ inputs.environment }}
     runs-on: ubuntu-latest
     # Ensure the inputs are set
     if: ${{ inputs.image-name != '' && inputs.environment != '' }}
