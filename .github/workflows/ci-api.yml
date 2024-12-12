@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'api/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
