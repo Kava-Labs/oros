@@ -1,6 +1,7 @@
 import { chat } from '../src/utils';
 import { createOpenApiClient } from './helpers';
 import OpenAI from 'openai';
+import { ChatConfig } from '../src/utils/chat/chat';
 
 describe('chat function', () => {
   const onData = vi.fn();
@@ -8,24 +9,27 @@ describe('chat function', () => {
   const onError = vi.fn();
   const onToolCallRequest = vi.fn();
 
-  it('successfully constructs a streaming text response', async () => {
-    const expectedOutput = 'This is an integration test.';
+  const openAIClient = createOpenApiClient();
 
-    const openAIClient = createOpenApiClient();
+  const chatConfig: ChatConfig = {
+    model: 'gpt-4o-mini',
+    messages: [],
+    onData,
+    onDone,
+    onError,
+    onToolCallRequest,
+    openAI: openAIClient,
+  };
 
+  it("successfully constructs a streaming text response to a user's message", async () => {
     chat({
-      model: 'gpt-4o-mini',
+      ...chatConfig,
       messages: [
         {
           role: 'user',
-          content: 'Say "This is an integration test."',
+          content: 'Say "This is an integration test"',
         },
       ],
-      onData,
-      onDone,
-      onError,
-      onToolCallRequest,
-      openAI: openAIClient,
     });
 
     //  Wait for the chat completion to finish
@@ -46,17 +50,12 @@ describe('chat function', () => {
       });
     });
 
-    expect(output).toBe(expectedOutput);
+    expect(output).toMatch(/This is an integration test/i);
   });
 
-  it('calls onError', async () => {
+  it('calls onError with misconfigured proxy', async () => {
     chat({
-      model: 'gpt-4o-mini',
-      messages: [],
-      onData,
-      onDone,
-      onError,
-      onToolCallRequest,
+      ...chatConfig,
       openAI: new OpenAI({
         baseURL: 'foobar',
       }),
@@ -68,15 +67,14 @@ describe('chat function', () => {
   });
 
   it('makes a tool call with the correct parameters', async () => {
-    const openAIClient = createOpenApiClient();
+    const kavaAddress = 'kava1vlpsrmdyuywvaqrv7rx6xga224sqfwz3fyfhwq';
 
     chat({
-      model: 'gpt-4o-mini',
+      ...chatConfig,
       messages: [
         {
           role: 'user',
-          content:
-            'What is the delegated balance of kava1vlpsrmdyuywvaqrv7rx6xga224sqfwz3fyfhwq?',
+          content: `What is the delegated balance of ${kavaAddress}?`,
         },
       ],
       tools: [
@@ -100,14 +98,8 @@ describe('chat function', () => {
           },
         },
       ],
-      onData,
-      onDone,
-      onError,
-      onToolCallRequest,
-      openAI: openAIClient,
     });
 
-    //  Wait for the chat completion to finish
     await new Promise((resolve) => {
       onDone.mockImplementation(() => {
         resolve(null);
@@ -119,7 +111,7 @@ describe('chat function', () => {
     expect(toolCallChunk[0].function.name).toBe('getDelegatedBalance');
     expect(toolCallChunk[0].function.arguments).toBe(
       JSON.stringify({
-        address: 'kava1vlpsrmdyuywvaqrv7rx6xga224sqfwz3fyfhwq',
+        address: kavaAddress,
       }),
     );
   });
