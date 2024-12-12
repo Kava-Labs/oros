@@ -110,7 +110,7 @@ jobs:
           push: true
           tags: ${{ steps.image-name.outputs.image }}
 
-  deploy-api:
+  deploy-production-api:
     needs: docker-build-test
     # Limit to only run on main branch pushes
     if: ${{ (github.ref == 'refs/heads/main') && github.event_name == 'push' }}
@@ -122,5 +122,6 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     with:
-      environment: api-production
+      environment-name: api-production
+      environment-url: https://kavachat-api.production.kava.io
       image-name: ${{ needs.docker-build-test.outputs.image-name }}

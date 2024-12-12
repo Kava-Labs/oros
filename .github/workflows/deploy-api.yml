@@ -2,7 +2,7 @@ name: Deploy API
 
 # Ensure only 1 deployment is running at a time for each environment
 concurrency:
-  group: ${{ inputs.environment }}
+  group: ${{ inputs.environment-name }}
   # Do NOT cancel in-progress deployments, ensure each deployment completes
   # before starting the next one. This allows for rollbacks to the latest most
   # stable version, instead of potentially skipping over a stable version.
@@ -16,9 +16,13 @@ on:
         required: true
         description: 'Full Docker image name to deploy'
         type: string
-      environment:
+      environment-name:
         required: true
-        description: 'Environment to deploy to'
+        description: 'Name of environment to deploy to'
+        type: string
+      environment-url:
+        required: true
+        description: 'URL of the environment'
         type: string
     # These are set in **environment** settings, not repository-wide secrets.
     # The values in the parent workflow are replaced with the values environment
@@ -43,18 +47,18 @@ env:
 
 jobs:
   deploy:
-    name: Deploy ${{ inputs.environment }}
+    name: Deploy ${{ inputs.environment-name }}
     runs-on: ubuntu-latest
-    # Ensure the inputs are set
-    if: ${{ inputs.image-name != '' && inputs.environment != '' }}
-    environment: ${{ inputs.environment }}
+    environment:
+      name: ${{ inputs.environment-name }}
+      url: ${{ inputs.environment-url }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Output image name
-        run: echo "Deploying Docker image '${{ inputs.image-name }}' to '${{ inputs.environment }}'"
+        run: echo "Deploying Docker image '${{ inputs.image-name }}' to '${{ inputs.environment-name }}'"
 
       - name: Configure AWS credentials for service deployment
         uses: aws-actions/configure-aws-credentials@v1
