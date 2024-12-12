@@ -42,7 +42,10 @@ export const msgStoreSlice = createSlice({
       }
     },
 
-    messageHistorySet(state: MsgStore, action: PayloadAction<any[]>) {
+    messageHistorySet(
+      state: MsgStore,
+      action: PayloadAction<ChatCompletionMessageParam[]>,
+    ) {
       state.history = [...action.payload];
     },
 
