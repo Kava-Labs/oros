@@ -61,7 +61,11 @@ describe('chat function', () => {
       }),
     });
 
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => {
+      onError.mockImplementation(() => {
+        resolve(null);
+      });
+    });
 
     expect(onError).toHaveBeenCalledWith(Error('Invalid URL'));
   });
