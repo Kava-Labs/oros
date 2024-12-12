@@ -235,9 +235,9 @@ export const generateCoinMetadata = async ({
   });
 
   const res = await client.images.generate({
-    model: 'dall-e-2',
+    model: 'dall-e-3',
     prompt,
-    size: '512x512',
+    quality: 'hd',
     response_format: 'b64_json',
   });
 
