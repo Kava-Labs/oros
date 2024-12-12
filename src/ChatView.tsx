@@ -1,7 +1,5 @@
-import { useEffect, useState } from 'react';
 import styles from './ChatView.module.css';
 import chatIcon from './assets/chatIcon.svg';
-import { getToken } from './utils/token/token';
 
 import type { ChatCompletionMessageParam } from 'openai';
 
@@ -9,7 +7,7 @@ export interface ChatViewProps {
   messages: ChatCompletionMessageParam[];
 }
 
-export const ChatView = ({ messages, ...props }: ChatViewProps) => {
+export const ChatView = ({ messages }: ChatViewProps) => {
   const hasMessages = messages && messages.length > 0;
 
   return (
@@ -24,7 +22,6 @@ export const ChatView = ({ messages, ...props }: ChatViewProps) => {
                   className={
                     message.role == 'assistant' ? styles.left : styles.right
                   }
-                  data-testid
                 >
                   {message.role == 'assistant' && (
                     <img src={chatIcon} className={styles.chatIcon} />
