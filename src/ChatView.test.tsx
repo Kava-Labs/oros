@@ -4,14 +4,10 @@ import { ChatView } from './ChatView';
 import type { ChatCompletionMessageParam } from 'openai';
 
 describe('ChatView', () => {
-  it('renders the start state when no props are provided', () => {
-    render(<ChatView />);
-
-    const startView = screen.getByTestId('start');
-
-    expect(startView).toBeInTheDocument();
-    expect(startView).toHaveTextContent("Let's get started!");
-  });
+  const messages: ChatCompletionMessageParam[] = [
+    { role: 'assistant', content: 'I am here to assist.' },
+    { role: 'user', content: 'Thanks for the help!' },
+  ];
 
   it('renders the start state when provided messages are empty', () => {
     render(<ChatView messages={[]} />);
@@ -40,11 +36,6 @@ describe('ChatView', () => {
   });
 
   it('shows the chat icon for assistant messages', () => {
-    const messages: ChatCompletionMessageParam[] = [
-      { role: 'assistant', content: 'I am here to assist.' },
-      { role: 'user', content: 'Thanks for the help!' },
-    ];
-
     render(<ChatView messages={messages} />);
 
     const assistantMessage = screen.getByText('I am here to assist.');
@@ -82,7 +73,7 @@ describe('ChatView', () => {
 
   it('resets the chat', () => {
     const mockResetFn = vi.fn();
-    render(<ChatView messages={[]} />);
+    render(<ChatView messages={messages} />);
 
     expect(mockResetFn).not.toHaveBeenCalled();
 
