@@ -48,29 +48,31 @@ export const GeneratedToken = (props: GenerateTokenMetadataResponse) => {
           src={`data:image/png;base64,${imgData}`}
         />
 
-        <button
-          className={styles.submitButton}
-          onClick={() => {
-            const isInsideIFrame = window.self !== window.top;
-            if (isInsideIFrame) {
-              console.log('sending message to parent');
-              window.parent.postMessage(
-                {
-                  type: 'GENERATED_TOKEN_METADATA',
-                  payload: {
-                    base64ImageData: imgData,
-                    tokenName: props.name,
-                    tokenSymbol: props.symbol,
-                    tokenDescription: props.about,
+        {window.self !== window.top ? (
+          <button
+            className={styles.submitButton}
+            onClick={() => {
+              const isInsideIFrame = window.self !== window.top;
+              if (isInsideIFrame) {
+                console.log('sending message to parent');
+                window.parent.postMessage(
+                  {
+                    type: 'GENERATED_TOKEN_METADATA',
+                    payload: {
+                      base64ImageData: imgData,
+                      tokenName: props.name,
+                      tokenSymbol: props.symbol,
+                      tokenDescription: props.about,
+                    },
                   },
-                },
-                '*', // target origin is * for now (wherever we are embedded) later we want to restrict this to only work with hard.fun
-              );
-            }
-          }}
-        >
-          launch
-        </button>
+                  '*', // target origin is * for now (wherever we are embedded) later we want to restrict this to only work with hard.fun
+                );
+              }
+            }}
+          >
+            launch
+          </button>
+        ) : null}
       </div>
     </div>
   );
