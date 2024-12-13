@@ -155,6 +155,13 @@ jobs:
         if: failure()
         run: docker compose -f docker-compose.yaml logs
 
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+
       - name: Install node dependencies
         run: npm ci
 
@@ -203,8 +210,14 @@ jobs:
       - build-frontend
       # Requires API deployment to be successful (or skipped due to no changes)
       - deploy-production-api
-    # TODO: Limit to main branch
-    # if: ${{ (github.ref == 'refs/heads/main') && github.event_name == 'push' }}
+    # TODO: Limit to main branch push
+    # Run when:
+    # - New frontend build 'success' and has new changes
+    # - If API deploy was 'success' or 'skipped' (no changes)
+    if: |
+      always() &&
+      needs.build-frontend.result == 'success' && needs.build-frontend.outputs.changed &&
+      (needs.deploy-production-api.result == 'success' || needs.deploy-production-api.result == 'skipped')
     uses: ./.github/workflows/deploy-netlify.yml
     secrets:
       NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
