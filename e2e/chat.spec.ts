@@ -187,3 +187,82 @@ test('messages from the chat populate local storage', async ({ page }) => {
     ],
   });
 });
+
+test('clicking "reset chat" clears "chatMessages" from local storage', async ({
+  page,
+}) => {
+  test.setTimeout(90 * 1000);
+  await page.goto('http://localhost:3000/');
+
+  await page.waitForLoadState();
+
+  const input = page.getByTestId('PromptInput').getByRole('textbox');
+
+  await input.fill(
+    'This is an automated test suite, please respond with the exact text: THIS IS A TEST',
+  );
+
+  await page.getByTestId('PromptInput').getByRole('button').click();
+
+  await page.waitForResponse(async (res) => {
+    if (res.url().includes('chat')) {
+      expect(res.status()).toBe(200);
+      await res.finished();
+      return true;
+    }
+    return false;
+  });
+
+  //  wait for the assistant's reply to complete
+  await page.waitForFunction(
+    () => {
+      const messages = document.querySelectorAll(
+        '[data-testid="ChatContainer"] div div',
+      );
+      const lastMessage = messages[messages.length - 1];
+      return (
+        lastMessage &&
+        lastMessage.getAttribute('data-chat-role') === 'assistant' &&
+        (lastMessage.textContent?.length ?? 0) > 0
+      );
+    },
+    {
+      timeout: 10000,
+      polling: 100,
+    },
+  );
+
+  const storedMessageHistory = await page.evaluate(() =>
+    localStorage.getItem('chat-messages'),
+  );
+
+  expect(JSON.parse(storedMessageHistory)).toStrictEqual({
+    messages: [
+      {
+        role: 'system',
+        content: systemPrompt,
+      },
+      {
+        role: 'user',
+        content:
+          'This is an automated test suite, please respond with the exact text: THIS IS A TEST',
+      },
+      {
+        role: 'assistant',
+        content: 'THIS IS A TEST',
+      },
+    ],
+  });
+
+  await page
+    .getByRole('button', {
+      name: 'Reset Chat',
+    })
+    .click();
+
+  const updatedLocalStorage = await page.evaluate(() =>
+    localStorage.getItem('chat-messages'),
+  );
+
+  expect(updatedLocalStorage).toBeNull();
+});
