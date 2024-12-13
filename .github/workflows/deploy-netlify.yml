@@ -43,12 +43,14 @@ jobs:
 
       - name: Deploy to Netlify
         id: netlify-deploy
-        # Run netlify-cli manually, netlify/actions/cli is unmaintained
+        # Run netlify-cli manually, netlify/actions/cli is unmaintained.
+        # This only deploys to **production** with the --prod flag. No previews.
         run: |
           npx netlify-cli@17 deploy \
             --dir=dist \
             --json \
-            --message 'Github Actions Deploy: ${{ github.head_ref }}.${{ github.sha }}' > deploy-output.json
+            --prod \
+            --message 'Github Actions Deploy: ${{ github.head_ref }} @ ${{ github.sha }}' > deploy-output.json
 
           # Print the JSON output for debugging
           cat deploy-output.json
