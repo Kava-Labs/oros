@@ -24,6 +24,10 @@ import { LocalStorage } from '../utils/storage';
 import { ChatHistory } from '../utils/storage/types';
 import { StateStore } from '../stores';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
+import {
+  useSyncFromStorageOnReload,
+  useSyncToStorage,
+} from '../utils/storage/hooks'
 
 interface AppContext {
   address: string;
@@ -69,6 +73,9 @@ export function AppContextProvider({
   const [cancelStream, setCancelStream] = useState<null | (() => void)>(null);
 
   const markDownCache = useRef<Map<string, string>>(mdCache);
+
+  useSyncToStorage(storage);
+  useSyncFromStorageOnReload(storage);
 
   const doChat = useCallback(() => {
     const cancelFN = chat({

@@ -1,15 +1,6 @@
 import { render, screen } from '@testing-library/react';
-import { Mock } from 'vitest';
 import { INTRO_MESSAGE, Messages } from './Messages';
 
-import {
-  useMessageHistoryStore,
-} from '../../../stores';
-
-vi.mock('../../../stores', () => ({
-  useMessageHistoryStore: vi.fn(),
-  useHasTokenGenerationInProgress: vi.fn(),
-}));
 
 
 describe('Messages Component', () => {
@@ -29,11 +20,8 @@ describe('Messages Component', () => {
       { role: 'assistant', content: 'Hi there!' },
     ];
 
-    (useMessageHistoryStore as Mock).mockImplementation(() => {
-      return [history];
-    });
 
-    render(<Messages />);
+    render(<Messages history={history as any}/>);
 
     // Messages with role 'user' and 'assistant' should be rendered
     expect(screen.getByText('Hello')).toBeInTheDocument();
@@ -44,11 +32,7 @@ describe('Messages Component', () => {
   });
 
   it('renders the INTRO_MESSAGE as a StaticMessage', () => {
-    (useMessageHistoryStore as Mock).mockImplementation(() => {
-      return [[{ role: 'system', content: 'system' }]];
-    });
-
-    render(<Messages />);
+    render(<Messages history={[[{ role: 'system', content: 'system' }] as any]}/>);
 
     // Check that the INTRO_MESSAGE is rendered
     expect(screen.getByText(INTRO_MESSAGE)).toBeInTheDocument();
@@ -86,11 +70,7 @@ describe('Messages Component', () => {
       },
     ];
 
-    (useMessageHistoryStore as Mock).mockImplementation(() => {
-      return [history];
-    });
-
-    render(<Messages />);
+    render(<Messages history={history as any}/>);
 
     expect(
       screen.queryByText('{"kava":"1000","hard":"34142"}'),
