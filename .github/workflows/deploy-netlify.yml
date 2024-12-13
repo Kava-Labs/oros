@@ -1,0 +1,62 @@
+name: Deploy to Netlify
+
+# Ensure only 1 deployment is running at a time for each environment
+concurrency:
+  group: ${{ inputs.environment-name }}
+  # Do NOT cancel in-progress deployments, ensure each deployment completes
+  # before starting the next one. This allows for rollbacks to the latest most
+  # stable version, instead of potentially skipping over a stable version.
+  cancel-in-progress: false
+
+on:
+  # Reusable workflow to be called by other workflows
+  workflow_call:
+    inputs:
+      environment-name:
+        required: true
+        description: 'Name of environment to deploy to'
+        type: string
+
+    secrets:
+      NETLIFY_AUTH_TOKEN:
+        required: true
+        description: 'Netlify auth token'
+
+env:
+  NETLIFY_SITE_ID: b56e4d0e-21ed-44d6-aafa-2e5d63106ece
+
+jobs:
+  deploy-frontend:
+    name: Deploy ${{ inputs.environment-name }}
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment-name }}
+      url: ${{ steps.netlify-deploy.outputs.deploy-url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+
+      - name: Deploy to Netlify
+        id: netlify-deploy
+        # Run netlify-cli manually, netlify/actions/cli is unmaintained
+        run: |
+          DEPLOY_OUTPUT=(npx netlify-cli@17 deploy --dir=dist --json)
+          echo "$DEPLOY_OUTPUT"
+
+          # Extract the Netlify URL from the JSON output
+          # https://github.com/netlify/cli/blob/65dc682d1036893f33bc3be4013f408a1ef2452b/src/commands/deploy/deploy.ts#L671-L679
+          DEPLOY_URL=$(echo "$DEPLOY_OUTPUT" | jq -r '.deploy_url')
+          LOGS_URL=$(echo "$DEPLOY_OUTPUT" | jq -r '.logs')
+
+          # Set step output
+          echo "deploy-url=$DEPLOY_URL" >> $GITHUB_ENV
+          echo "logs-url=$LOGS_URL" >> $GITHUB_ENV
+        env:
+          NETLIFY_SITE_ID: ${{ env.NETLIFY_SITE_ID }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
