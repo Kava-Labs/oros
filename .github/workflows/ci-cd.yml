@@ -4,6 +4,9 @@ on:
     branches:
       - main
       - dl-cd-netlify
+  pull_request:
+    branches:
+      - main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -54,7 +57,8 @@ jobs:
         run: npm run build
 
       - name: Upload build artifact
-        if: env.GIT_DIFF
+        # Only if changes and push on main branch
+        if: env.GIT_DIFF && github.ref == 'refs/heads/main' && github.event_name == 'push'
         uses: actions/upload-artifact@v4
         with:
           name: frontend-dist
@@ -203,14 +207,15 @@ jobs:
       - build-frontend
       # Requires API deployment to be successful (or skipped due to no changes)
       - deploy-production-api
-    # TODO: Limit to main branch push
     # Run when:
     # - New frontend build 'success' and has new changes
     # - If API deploy was 'success' or 'skipped' (no changes)
+    # - Push on main branch
     if: |
       always() &&
       needs.build-frontend.result == 'success' && needs.build-frontend.outputs.changed &&
-      (needs.deploy-production-api.result == 'success' || needs.deploy-production-api.result == 'skipped')
+      (needs.deploy-production-api.result == 'success' || needs.deploy-production-api.result == 'skipped') &&
+      (github.ref == 'refs/heads/main' && github.event_name == 'push')
     uses: ./.github/workflows/deploy-netlify.yml
     secrets:
       NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
