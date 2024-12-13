@@ -10,7 +10,7 @@ import (
 	"os"
 	"strings"
 
-	api "github.com/kava-labs/kavachat/cmd/api"
+	api "github.com/kava-labs/kavachat/api/cmd/api"
 )
 
 const (
