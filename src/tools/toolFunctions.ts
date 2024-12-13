@@ -244,7 +244,6 @@ export const generateCoinMetadata = async ({
 
   const id = await saveImage(b64ImageData);
 
-
   return {
     name,
     id,
