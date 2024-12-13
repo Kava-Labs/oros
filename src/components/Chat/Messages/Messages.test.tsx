@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { INTRO_MESSAGE, Messages } from './Messages';
-
-
+import type { ChatCompletionMessageParam } from 'openai/resources/index';
 
 describe('Messages Component', () => {
   beforeEach(() => {
@@ -14,14 +13,13 @@ describe('Messages Component', () => {
   });
 
   it('renders messages from history', () => {
-    const history = [
+    const history: ChatCompletionMessageParam[] = [
       { role: 'system', content: 'System message' },
       { role: 'user', content: 'Hello' },
       { role: 'assistant', content: 'Hi there!' },
     ];
 
-
-    render(<Messages history={history as any}/>);
+    render(<Messages history={history} />);
 
     // Messages with role 'user' and 'assistant' should be rendered
     expect(screen.getByText('Hello')).toBeInTheDocument();
@@ -32,7 +30,10 @@ describe('Messages Component', () => {
   });
 
   it('renders the INTRO_MESSAGE as a StaticMessage', () => {
-    render(<Messages history={[[{ role: 'system', content: 'system' }] as any]}/>);
+    const history: ChatCompletionMessageParam[] = [
+      { role: 'system', content: 'system' },
+    ];
+    render(<Messages history={history} />);
 
     // Check that the INTRO_MESSAGE is rendered
     expect(screen.getByText(INTRO_MESSAGE)).toBeInTheDocument();
@@ -41,7 +42,7 @@ describe('Messages Component', () => {
   });
 
   it('skips tool call related messages', () => {
-    const history = [
+    const history: ChatCompletionMessageParam[] = [
       { role: 'system', content: 'System message' },
       { role: 'user', content: 'What is my balance?' },
       {
@@ -70,7 +71,7 @@ describe('Messages Component', () => {
       },
     ];
 
-    render(<Messages history={history as any}/>);
+    render(<Messages history={history} />);
 
     expect(
       screen.queryByText('{"kava":"1000","hard":"34142"}'),
