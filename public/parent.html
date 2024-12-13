@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Parent Page</title>
+    <style>
+      body {
+        height: 90vh;
+      }
+      iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Embed the React app served by the dev server -->
+    <div id="iframe-root" style="width: 400px; height: 600px"></div>
+
+    <div>
+      <button id="open_chat">Open Chat</button>
+    </div>
+
+    <div id="GENERATED_TOKEN_METADATA"></div>
+
+    <script>
+      document.getElementById('open_chat').addEventListener('click', () => {
+        console.log(document.getElementById('iframe-root'));
+        if (document.getElementById('iframe-root').innerHTML) {
+          document.getElementById('iframe-root').innerHTML = '';
+          document.getElementById('open_chat').innerText = 'Open Chat';
+          document.getElementById('GENERATED_TOKEN_METADATA').innerHTML = '';
+          return;
+        }
+
+        document.getElementById('iframe-root').innerHTML =
+          `<iframe id="KAVA_CHAT" src="http://localhost:3000"></iframe>`;
+
+        document.getElementById('open_chat').innerText = 'Close Chat';
+      });
+
+      window.addEventListener('message', (event) => {
+        if (event.data.type && event.data.type === 'GENERATED_TOKEN_METADATA') {
+          // render the received data from the iFrame
+          document.getElementById('GENERATED_TOKEN_METADATA').innerHTML = `
+        <h1>Received iFrame message from chat App</h1>
+        <h3>Name: ${event.data.payload.tokenName}</h3>
+        <h3>Symbol: ${event.data.payload.tokenSymbol}</h3>
+        <h3>Description</h3>
+        <p>${event.data.payload.tokenDescription}</p>
+        <h3>Token Image</h3>
+        <img
+          alt="Model Generated Image"
+          src="data:image/png;base64,${event.data.payload.base64ImageData}"
+        />
+          `;
+        }
+      });
+    </script>
+  </body>
+</html>
