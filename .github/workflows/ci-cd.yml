@@ -29,11 +29,11 @@ jobs:
         uses: technote-space/get-diff-action@v6
         with:
           PATTERNS: |
-            **/**
-            .github/workflows/**
-            **/*.ts
+            **/*.(js|ts|tsx|html)
+            **/tsconfig.*
             src/**
             public/**
+            !.github/**
             !api/**
           FILES: |
             package.json
