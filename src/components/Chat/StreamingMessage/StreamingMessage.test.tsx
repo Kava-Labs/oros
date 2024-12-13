@@ -2,11 +2,11 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { Mock } from 'vitest';
 import { StreamingMessage } from './StreamingMessage';
-import { useSelector } from 'react-redux';
-import { selectStreamingMessage } from '../../../stores';
+import { useStreamingMessageStore } from '../../../stores';
 
-vi.mock('react-redux', () => ({
-  useSelector: vi.fn(),
+
+vi.mock('../../../stores', () => ({
+  useStreamingMessageStore: vi.fn(),
 }));
 
 vi.mock('marked', () => ({
@@ -25,10 +25,8 @@ describe('StreamingMessage Component', () => {
   });
 
   it('returns null when content is empty', () => {
-    (useSelector as unknown as Mock).mockImplementation((selector) => {
-      if (selector === selectStreamingMessage) {
-        return '';
-      }
+    (useStreamingMessageStore as Mock).mockImplementation(() => {
+      return ['']
     });
 
     const chatContainerRef = React.createRef<HTMLDivElement>();
@@ -43,10 +41,8 @@ describe('StreamingMessage Component', () => {
   it('renders content with parsed markdown', () => {
     const content = 'Streaming content';
 
-    (useSelector as unknown as Mock).mockImplementation((selector) => {
-      if (selector === selectStreamingMessage) {
-        return content;
-      }
+    (useStreamingMessageStore as Mock).mockImplementation(() => {
+      return [content]
     });
 
     const chatContainerRef = React.createRef<HTMLDivElement>();

@@ -1,19 +1,19 @@
 import { useState } from 'react';
 import styles from '../style.module.css';
-import { useSelector } from 'react-redux';
-import { selectHasToolCallInProgress } from '../../../stores';
+import { useHasToolCallInProgress } from '../../../stores';
 
 type PromptInputProps = {
   submitUserMessage: (content: string) => void;
   cancelStream: null | (() => void);
 };
 
+
 export const PromptInput = ({
   submitUserMessage,
   cancelStream,
 }: PromptInputProps) => {
   const [input, setInput] = useState('');
-  const hasToolCallInProgress = useSelector(selectHasToolCallInProgress);
+  const hasToolCallInProgress = useHasToolCallInProgress();
 
   return (
     <form

@@ -2,38 +2,33 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Mock } from 'vitest';
 import { AppContextProvider } from './AppContext';
 import { useAppContext } from './AppContext';
-import * as stores from '../stores';
+import {
+  createStore,
+} from '../stores';
 import * as utils from '../utils';
+import type { ChatCompletionMessageParam } from 'openai/resources/index';
 
-vi.mock('../stores', () => ({
-  messageHistoryAddMessage: vi
-    .fn()
-    .mockReturnValue({ type: 'messageHistoryAddMessage' }),
-  messageHistoryClear: vi.fn().mockReturnValue({ type: 'messageHistoryClear' }),
-  messageHistoryDropLast: vi
-    .fn()
-    .mockReturnValue({ type: 'messageHistoryDropLast' }),
-  selectMessageHistory: vi.fn().mockReturnValue([]),
-  selectStreamingMessage: vi.fn().mockReturnValue(''),
-  streamingMessageClear: vi
-    .fn()
-    .mockReturnValue({ type: 'streamingMessageClear' }),
-  streamingMessageConcat: vi
-    .fn()
-    .mockReturnValue({ type: 'streamingMessageConcat' }),
-  appStore: {
-    dispatch: vi.fn(),
-    getState: vi.fn(() => ({})),
-  },
-}));
+const systemPromptMessage = { role: 'system', content: 'the system prompt' };
+
+const createTestStores = () => {
+  const streamingMessageStore = createStore('');
+  const messageHistoryStore = createStore<ChatCompletionMessageParam[]>([
+    systemPromptMessage as any,
+  ]);
+
+  return {
+    streamingMessageStore,
+    messageHistoryStore,
+  };
+};
 
 vi.mock('../utils', () => ({
   chat: vi.fn(),
   deleteImages: vi.fn(),
 }));
 
-//  todo - unskip when this test is plugged into a redux provider
-describe.skip('AppContextProvider', () => {
+
+describe('AppContextProvider', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Mock window.ethereum
@@ -45,6 +40,7 @@ describe.skip('AppContextProvider', () => {
   it('connects wallet and updates address', async () => {
     const mockAccounts = ['0x1234567890abcdef'];
     window.ethereum.request = vi.fn().mockResolvedValue(mockAccounts);
+    const { streamingMessageStore, messageHistoryStore } = createTestStores();
 
     const TestComponent = () => {
       const { address, connectWallet } = useAppContext();
@@ -58,7 +54,10 @@ describe.skip('AppContextProvider', () => {
     };
 
     render(
-      <AppContextProvider>
+      <AppContextProvider
+        streamingMessageStore={streamingMessageStore}
+        messageHistoryStore={messageHistoryStore}
+      >
         <TestComponent />
       </AppContextProvider>,
     );
@@ -75,16 +74,19 @@ describe.skip('AppContextProvider', () => {
     expect(screen.getByTestId('address').textContent).toBe(mockAccounts[0]);
 
     // Verify that messageHistoryAddMessage was dispatched
-    expect(stores.appStore.dispatch).toHaveBeenCalledWith(
-      stores.messageHistoryAddMessage({
+
+    expect(messageHistoryStore.getCurrent()).toEqual([
+      systemPromptMessage,
+      {
         role: 'system',
         content: `user's current wallet address: ${mockAccounts[0]}`,
-      }),
-    );
+      },
+    ]);
   });
 
   it('handles submitUserChatMessage correctly', () => {
     const mockChatCancel = vi.fn();
+    const { streamingMessageStore, messageHistoryStore } = createTestStores();
     (utils.chat as Mock).mockReturnValue(mockChatCancel);
 
     const TestComponent = () => {
@@ -98,7 +100,10 @@ describe.skip('AppContextProvider', () => {
     };
 
     render(
-      <AppContextProvider>
+      <AppContextProvider
+        streamingMessageStore={streamingMessageStore}
+        messageHistoryStore={messageHistoryStore}
+      >
         <TestComponent />
       </AppContextProvider>,
     );
@@ -106,10 +111,12 @@ describe.skip('AppContextProvider', () => {
     const button = screen.getByText('Submit Chat Message');
     fireEvent.click(button);
 
-    // Verify that messageHistoryAddMessage was dispatched
-    expect(stores.appStore.dispatch).toHaveBeenCalledWith(
-      stores.messageHistoryAddMessage({ role: 'user', content: 'Hello' }),
-    );
+    expect(messageHistoryStore.getCurrent().length).toBe(2);
+
+    expect(messageHistoryStore.getCurrent()).toEqual([
+      systemPromptMessage,
+      { role: 'user', content: 'Hello' },
+    ]);
 
     // Verify that chat was called
     expect(utils.chat).toHaveBeenCalled();
@@ -118,6 +125,7 @@ describe.skip('AppContextProvider', () => {
   it('handles cancelStream correctly', () => {
     const mockChatCancel = vi.fn();
     (utils.chat as Mock).mockReturnValue(mockChatCancel);
+    const { streamingMessageStore, messageHistoryStore } = createTestStores();
 
     const TestComponent = () => {
       const { submitUserChatMessage, cancelStream } = useAppContext();
@@ -135,7 +143,10 @@ describe.skip('AppContextProvider', () => {
     };
 
     render(
-      <AppContextProvider>
+      <AppContextProvider
+        streamingMessageStore={streamingMessageStore}
+        messageHistoryStore={messageHistoryStore}
+      >
         <TestComponent />
       </AppContextProvider>,
     );
@@ -149,16 +160,12 @@ describe.skip('AppContextProvider', () => {
     // Verify that mockChatCancel was called
     expect(mockChatCancel).toHaveBeenCalled();
 
-    // Verify that streamingMessageClear and messageHistoryDropLast were dispatched
-    expect(stores.appStore.dispatch).toHaveBeenCalledWith(
-      stores.streamingMessageClear(),
-    );
-    expect(stores.appStore.dispatch).toHaveBeenCalledWith(
-      stores.messageHistoryDropLast(),
-    );
+    expect(messageHistoryStore.getCurrent()).toEqual([systemPromptMessage]);
   });
 
-  it('clears chat messages correctly', () => {
+  it('clears chat messages correctly', async () => {
+    const { streamingMessageStore, messageHistoryStore } = createTestStores();
+
     const TestComponent = () => {
       const { clearChatMessages } = useAppContext();
 
@@ -170,7 +177,10 @@ describe.skip('AppContextProvider', () => {
     };
 
     render(
-      <AppContextProvider>
+      <AppContextProvider
+        streamingMessageStore={streamingMessageStore}
+        messageHistoryStore={messageHistoryStore}
+      >
         <TestComponent />
       </AppContextProvider>,
     );
@@ -178,11 +188,10 @@ describe.skip('AppContextProvider', () => {
     // Click the clearChatMessages button
     fireEvent.click(screen.getByText('Clear Chat Messages'));
 
-    // Verify that messageHistoryClear was dispatched
-    expect(stores.appStore.dispatch).toHaveBeenCalledWith(
-      stores.messageHistoryClear(),
-    );
+    expect(messageHistoryStore.getCurrent()).toEqual([systemPromptMessage]);
 
-    expect(utils.deleteImages as Mock).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(utils.deleteImages as Mock).toHaveBeenCalledTimes(1);
+    });
   });
 });

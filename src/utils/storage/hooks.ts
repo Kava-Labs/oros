@@ -1,20 +1,15 @@
-import {
-  appStore as _appStore,
-  messageHistorySet,
-  selectMessageHistory,
-} from '../../stores';
-import { useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { LocalStorage } from './index';
 import { ChatHistory } from './types';
 import { toast } from 'react-toastify';
+import { messageHistoryStore, useMessageHistoryStore } from '../../stores';
 
 /**
  * when messages are added to msgHistory in redux (beyond just the initial system message), sync those messages
  * to local storage
  */
 export const useSyncToStorage = (storage: LocalStorage<ChatHistory>) => {
-  const msgHistory = useSelector(selectMessageHistory);
+  const [msgHistory] = useMessageHistoryStore();
 
   useEffect(() => {
     //  only write to storage if there's something more than system prompt in redux msgHistory
@@ -41,7 +36,6 @@ export const useSyncToStorage = (storage: LocalStorage<ChatHistory>) => {
  */
 export const useSyncFromStorageOnReload = (
   storage: LocalStorage<ChatHistory>,
-  store: typeof _appStore,
 ) => {
   useEffect(() => {
     const syncFromLocalStorage = async () => {
@@ -50,7 +44,7 @@ export const useSyncFromStorageOnReload = (
         const { messages } = chatHistory;
         const hasUserMessagesInLocalStorage = messages && messages.length > 0;
         if (hasUserMessagesInLocalStorage) {
-          store.dispatch(messageHistorySet(messages));
+          messageHistoryStore.setValue(messages);
         }
       } catch {
         toast.error('There was a problem retrieving your chat messages');
@@ -58,5 +52,5 @@ export const useSyncFromStorageOnReload = (
     };
 
     syncFromLocalStorage();
-  }, [storage, store]);
+  }, [storage]);
 };

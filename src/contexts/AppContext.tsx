@@ -5,18 +5,6 @@
 import { createContext, useContext, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { useCallback, useState } from 'react';
-import { batch } from 'react-redux';
-import {
-  appStore as _appStore,
-  messageHistoryAddMessage,
-  messageHistoryClear,
-  messageHistoryDropLast,
-  selectMessageHistory,
-  selectMessageStore,
-  selectStreamingMessage,
-  streamingMessageClear,
-  streamingMessageConcat,
-} from '../stores';
 import { chat } from '../utils';
 import { tools } from '../config';
 import type {
@@ -34,10 +22,8 @@ import { generateCoinMetadata } from '../tools/toolFunctions';
 import { deleteImages } from '../utils';
 import { LocalStorage } from '../utils/storage';
 import { ChatHistory } from '../utils/storage/types';
-import {
-  useSyncFromStorageOnReload,
-  useSyncToStorage,
-} from '../utils/storage/hooks';
+import { StateStore } from '../stores';
+import type { ChatCompletionMessageParam } from 'openai/resources/index';
 
 interface AppContext {
   address: string;
@@ -72,16 +58,15 @@ const storage = new LocalStorage<ChatHistory>('chat-messages', {
 
 export function AppContextProvider({
   children,
-  store = _appStore,
+  messageHistoryStore,
+  streamingMessageStore,
 }: {
   children: ReactNode | ReactNode[];
-  store?: typeof _appStore;
+  messageHistoryStore: StateStore<ChatCompletionMessageParam[]>;
+  streamingMessageStore: StateStore<string>;
 }) {
   const [address, setAddress] = useState('');
   const [cancelStream, setCancelStream] = useState<null | (() => void)>(null);
-
-  useSyncToStorage(storage);
-  useSyncFromStorageOnReload(storage, store);
 
   const markDownCache = useRef<Map<string, string>>(mdCache);
 
@@ -89,7 +74,7 @@ export function AppContextProvider({
     const cancelFN = chat({
       tools,
       model: 'gpt-4',
-      messages: selectMessageHistory(store.getState()),
+      messages: messageHistoryStore.getCurrent(),
       onData: onChatStreamData,
       onDone: () => {
         onChatStreamDone();
@@ -108,50 +93,55 @@ export function AppContextProvider({
       return () => {
         cancelFN();
 
-        batch(() => {
-          store.dispatch(streamingMessageClear());
-          store.dispatch(messageHistoryDropLast());
-        });
+        streamingMessageStore.setValue('');
+        const history = messageHistoryStore.getCurrent();
+
+        let i = history.length - 1;
+
+        while (i > 1) {
+          if (history[i].role === 'user') {
+            break;
+          }
+          i--;
+        }
+        if (i) messageHistoryStore.setValue(history.slice(0, i));
 
         setCancelStream(null);
       };
     });
-  }, [store]);
+  }, []);
 
-  const submitUserChatMessage = useCallback(
-    (inputContent: string) => {
-      if (!inputContent.length) return;
-      // add to history
-      store.dispatch(
-        messageHistoryAddMessage({ role: 'user', content: inputContent }),
-      );
-      // submit request with updated history
-      doChat();
-    },
-    [store],
-  );
+  const submitUserChatMessage = useCallback((inputContent: string) => {
+    if (!inputContent.length) return;
+    messageHistoryStore.setValue([
+      ...messageHistoryStore.getCurrent(),
+      {
+        role: 'user',
+        content: inputContent,
+      },
+    ]);
+
+    // submit request with updated history
+    doChat();
+  }, []);
 
   // handlers
-  const onChatStreamData = useCallback(
-    (chunk: string) => {
-      store.dispatch(streamingMessageConcat(chunk));
-    },
-    [store],
-  );
+  const onChatStreamData = useCallback((chunk: string) => {
+    streamingMessageStore.setValue(streamingMessageStore.getCurrent() + chunk);
+  }, []);
 
   const onChatStreamDone = useCallback(() => {
-    const content = selectStreamingMessage(store.getState());
+    const content = streamingMessageStore.getCurrent();
     if (content) {
-      batch(() => {
-        // add the new message we received from the model to history
-        // clear streamingMessage since the request is done
-        store.dispatch(
-          messageHistoryAddMessage({ role: 'assistant', content: content }),
-        );
-        store.dispatch(streamingMessageClear());
-      });
+      // add the new message we received from the model to history
+      // clear streamingMessage since the request is done
+      messageHistoryStore.setValue([
+        ...messageHistoryStore.getCurrent(),
+        { role: 'assistant', content },
+      ]);
+      streamingMessageStore.setValue('');
     }
-  }, [store]);
+  }, []);
 
   const onChatStreamToolCallRequest = useCallback(
     (toolCalls: ChatCompletionChunk.Choice.Delta.ToolCall[]) => {
@@ -197,8 +187,10 @@ export function AppContextProvider({
       tcFunction: (arg: any) => Promise<any>,
     ) => {
       const args = tc.function?.arguments;
-      store.dispatch(
-        messageHistoryAddMessage({
+
+      messageHistoryStore.setValue([
+        ...messageHistoryStore.getCurrent(),
+        {
           role: 'assistant',
           function_call: null,
           content: null,
@@ -209,8 +201,8 @@ export function AppContextProvider({
               type: 'function',
             } as ChatCompletionMessageToolCall,
           ],
-        }),
-      );
+        },
+      ]);
 
       let results: any;
 
@@ -221,7 +213,7 @@ export function AppContextProvider({
       }
 
       const commitToolCall =
-        selectMessageStore(store.getState()).history.find((msg) => {
+        messageHistoryStore.getCurrent().find((msg) => {
           return (
             msg.role === 'assistant' &&
             msg.content === null &&
@@ -232,18 +224,19 @@ export function AppContextProvider({
         }) !== undefined;
 
       if (commitToolCall) {
-        store.dispatch(
-          messageHistoryAddMessage({
+        messageHistoryStore.setValue([
+          ...messageHistoryStore.getCurrent(),
+          {
             role: 'tool',
             content: JSON.stringify(results),
             tool_call_id: tc.id!,
-          }),
-        );
+          },
+        ]);
 
         doChat();
       }
     },
-    [store],
+    [],
   );
 
   const connectWallet = useCallback(async () => {
@@ -256,14 +249,16 @@ export function AppContextProvider({
     });
     if (accounts && accounts[0]) {
       setAddress(() => accounts[0]);
-      store.dispatch(
-        messageHistoryAddMessage({
+
+      messageHistoryStore.setValue([
+        ...messageHistoryStore.getCurrent(),
+        {
           role: 'system',
           content: `user's current wallet address: ${accounts[0]}`,
-        }),
-      );
+        },
+      ]);
     }
-  }, [store]);
+  }, []);
 
   const clearChatMessages = useCallback(async () => {
     //  clear storage only when the user manually resets
@@ -271,14 +266,16 @@ export function AppContextProvider({
     //  can inadvertently overwrite existing data in storage
     //  with an empty redux store before its repopulated
     await storage.reset();
-    store.dispatch(messageHistoryClear());
+
+    messageHistoryStore.setValue([messageHistoryStore.getCurrent()[0]]);
+
     markDownCache.current.clear();
     try {
       await deleteImages();
     } catch (err) {
       console.error(err);
     }
-  }, [store]);
+  }, []);
 
   return (
     <AppContext.Provider

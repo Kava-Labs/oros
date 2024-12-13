@@ -1,15 +1,14 @@
-import { useSelector } from 'react-redux';
-import { selectStreamingMessage } from '../../../stores';
 import styles from '../style.module.css';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
+import { useStreamingMessageStore } from '../../../stores';
 
 export const StreamingMessage = ({
   chatContainerRef,
 }: {
   chatContainerRef: React.RefObject<HTMLDivElement>;
 }) => {
-  const content = useSelector(selectStreamingMessage);
+  const [content] = useStreamingMessageStore();
   if (!content) {
     return null;
   }

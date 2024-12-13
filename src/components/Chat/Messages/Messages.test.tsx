@@ -1,13 +1,16 @@
 import { render, screen } from '@testing-library/react';
 import { Mock } from 'vitest';
 import { INTRO_MESSAGE, Messages } from './Messages';
-import { useSelector } from 'react-redux';
-import { selectMessageHistory } from '../../../stores';
 
-// Mock react-redux useSelector
-vi.mock('react-redux', () => ({
-  useSelector: vi.fn(),
+import {
+  useMessageHistoryStore,
+} from '../../../stores';
+
+vi.mock('../../../stores', () => ({
+  useMessageHistoryStore: vi.fn(),
+  useHasTokenGenerationInProgress: vi.fn(),
 }));
+
 
 describe('Messages Component', () => {
   beforeEach(() => {
@@ -26,10 +29,8 @@ describe('Messages Component', () => {
       { role: 'assistant', content: 'Hi there!' },
     ];
 
-    (useSelector as unknown as Mock).mockImplementation((selector) => {
-      if (selector === selectMessageHistory) {
-        return history;
-      }
+    (useMessageHistoryStore as Mock).mockImplementation(() => {
+      return [history];
     });
 
     render(<Messages />);
@@ -43,10 +44,8 @@ describe('Messages Component', () => {
   });
 
   it('renders the INTRO_MESSAGE as a StaticMessage', () => {
-    (useSelector as unknown as Mock).mockImplementation((selector) => {
-      if (selector === selectMessageHistory) {
-        return [{ role: 'system', content: 'system' }];
-      }
+    (useMessageHistoryStore as Mock).mockImplementation(() => {
+      return [[{ role: 'system', content: 'system' }]];
     });
 
     render(<Messages />);
@@ -87,10 +86,8 @@ describe('Messages Component', () => {
       },
     ];
 
-    (useSelector as unknown as Mock).mockImplementation((selector) => {
-      if (selector === selectMessageHistory) {
-        return history;
-      }
+    (useMessageHistoryStore as Mock).mockImplementation(() => {
+      return [history];
     });
 
     render(<Messages />);

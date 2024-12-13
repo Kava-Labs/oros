@@ -1,11 +1,11 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Mock } from 'vitest';
 import { PromptInput } from './PromptInput';
-import { useSelector } from 'react-redux';
-import { selectHasToolCallInProgress } from '../../../stores';
+import { useHasToolCallInProgress } from '../../../stores';
 
-vi.mock('react-redux', () => ({
-  useSelector: vi.fn(),
+
+vi.mock('../../../stores', () => ({
+  useHasToolCallInProgress: vi.fn(),
 }));
 
 describe('PromptInput Component', () => {
@@ -143,11 +143,9 @@ describe('PromptInput Component', () => {
   });
 
   it('disables the Submit button when there is a tool_call in progress', () => {
-    (useSelector as unknown as Mock).mockImplementation((selector) => {
-      if (selector === selectHasToolCallInProgress) {
-        return true;
-      }
-    });
+    (useHasToolCallInProgress as unknown as Mock).mockImplementationOnce(
+      () => true,
+    );
 
     render(
       <PromptInput
