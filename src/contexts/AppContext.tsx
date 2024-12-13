@@ -81,7 +81,7 @@ export function AppContextProvider({
     const cancelFN = chat({
       tools,
       model: 'gpt-4',
-      messages: messageHistoryStore.getCurrent(),
+      messages: messageHistoryStore.getState(),
       onData: onChatStreamData,
       onDone: () => {
         onChatStreamDone();
@@ -100,8 +100,8 @@ export function AppContextProvider({
       return () => {
         cancelFN();
 
-        streamingMessageStore.setValue('');
-        const history = messageHistoryStore.getCurrent();
+        streamingMessageStore.setState('');
+        const history = messageHistoryStore.getState();
 
         let i = history.length - 1;
 
@@ -111,7 +111,7 @@ export function AppContextProvider({
           }
           i--;
         }
-        if (i) messageHistoryStore.setValue(history.slice(0, i));
+        if (i) messageHistoryStore.setState(history.slice(0, i));
 
         setCancelStream(null);
       };
@@ -120,8 +120,8 @@ export function AppContextProvider({
 
   const submitUserChatMessage = useCallback((inputContent: string) => {
     if (!inputContent.length) return;
-    messageHistoryStore.setValue([
-      ...messageHistoryStore.getCurrent(),
+    messageHistoryStore.setState([
+      ...messageHistoryStore.getState(),
       {
         role: 'user',
         content: inputContent,
@@ -134,19 +134,19 @@ export function AppContextProvider({
 
   // handlers
   const onChatStreamData = useCallback((chunk: string) => {
-    streamingMessageStore.setValue(streamingMessageStore.getCurrent() + chunk);
+    streamingMessageStore.setState(streamingMessageStore.getState() + chunk);
   }, []);
 
   const onChatStreamDone = useCallback(() => {
-    const content = streamingMessageStore.getCurrent();
+    const content = streamingMessageStore.getState();
     if (content) {
       // add the new message we received from the model to history
       // clear streamingMessage since the request is done
-      messageHistoryStore.setValue([
-        ...messageHistoryStore.getCurrent(),
+      messageHistoryStore.setState([
+        ...messageHistoryStore.getState(),
         { role: 'assistant', content },
       ]);
-      streamingMessageStore.setValue('');
+      streamingMessageStore.setState('');
     }
   }, []);
 
@@ -195,8 +195,8 @@ export function AppContextProvider({
     ) => {
       const args = tc.function?.arguments;
 
-      messageHistoryStore.setValue([
-        ...messageHistoryStore.getCurrent(),
+      messageHistoryStore.setState([
+        ...messageHistoryStore.getState(),
         {
           role: 'assistant',
           function_call: null,
@@ -220,7 +220,7 @@ export function AppContextProvider({
       }
 
       const commitToolCall =
-        messageHistoryStore.getCurrent().find((msg) => {
+        messageHistoryStore.getState().find((msg) => {
           return (
             msg.role === 'assistant' &&
             msg.content === null &&
@@ -231,8 +231,8 @@ export function AppContextProvider({
         }) !== undefined;
 
       if (commitToolCall) {
-        messageHistoryStore.setValue([
-          ...messageHistoryStore.getCurrent(),
+        messageHistoryStore.setState([
+          ...messageHistoryStore.getState(),
           {
             role: 'tool',
             content: JSON.stringify(results),
@@ -257,8 +257,8 @@ export function AppContextProvider({
     if (accounts && accounts[0]) {
       setAddress(() => accounts[0]);
 
-      messageHistoryStore.setValue([
-        ...messageHistoryStore.getCurrent(),
+      messageHistoryStore.setState([
+        ...messageHistoryStore.getState(),
         {
           role: 'system',
           content: `user's current wallet address: ${accounts[0]}`,
@@ -274,7 +274,7 @@ export function AppContextProvider({
     //  with an empty redux store before its repopulated
     await storage.reset();
 
-    messageHistoryStore.setValue([messageHistoryStore.getCurrent()[0]]);
+    messageHistoryStore.setState([messageHistoryStore.getState()[0]]);
 
     markDownCache.current.clear();
     try {

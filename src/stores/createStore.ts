@@ -1,6 +1,6 @@
 export interface StateStore<T> {
-  getCurrent: () => T;
-  setValue: (newValue: T) => void;
+  getState: () => T;
+  setState: (newValue: T) => void;
 
   subscribe: (listener: () => void) => () => void;
   getSubscriberCount: () => number;
@@ -18,7 +18,7 @@ export const createStore = <T>(initialValue: T): StateStore<T> => {
       set(target, prop, newValue) {
         if (prop === 'current' && target.current !== newValue) {
           target.current = structuredClone(newValue);
-          for (const listener of subscribers) listener();
+          for (const fn of subscribers) fn();
         }
         return true;
       },
@@ -30,9 +30,9 @@ export const createStore = <T>(initialValue: T): StateStore<T> => {
     return () => subscribers.delete(listener);
   };
 
-  const getCurrent = () => stateProxy.current;
+  const getState = () => stateProxy.current;
 
-  const setValue = (newValue: T) => {
+  const setState = (newValue: T) => {
     stateProxy.current = newValue;
   };
 
@@ -43,7 +43,7 @@ export const createStore = <T>(initialValue: T): StateStore<T> => {
   return {
     subscribe,
     getSubscriberCount,
-    getCurrent,
-    setValue,
+    getState,
+    setState,
   };
 };

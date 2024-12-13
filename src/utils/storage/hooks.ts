@@ -44,7 +44,7 @@ export const useSyncFromStorageOnReload = (
         const { messages } = chatHistory;
         const hasUserMessagesInLocalStorage = messages && messages.length > 0;
         if (hasUserMessagesInLocalStorage) {
-          messageHistoryStore.setValue(messages);
+          messageHistoryStore.setState(messages);
         }
       } catch {
         toast.error('There was a problem retrieving your chat messages');

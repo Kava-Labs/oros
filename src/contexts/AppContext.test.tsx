@@ -72,7 +72,7 @@ describe('AppContextProvider', () => {
 
     // Verify that messageHistoryAddMessage was dispatched
 
-    expect(messageHistoryStore.getCurrent()).toEqual([
+    expect(messageHistoryStore.getState()).toEqual([
       systemPromptMessage,
       {
         role: 'system',
@@ -108,9 +108,9 @@ describe('AppContextProvider', () => {
     const button = screen.getByText('Submit Chat Message');
     fireEvent.click(button);
 
-    expect(messageHistoryStore.getCurrent().length).toBe(2);
+    expect(messageHistoryStore.getState().length).toBe(2);
 
-    expect(messageHistoryStore.getCurrent()).toEqual([
+    expect(messageHistoryStore.getState()).toEqual([
       systemPromptMessage,
       { role: 'user', content: 'Hello' },
     ]);
@@ -157,7 +157,7 @@ describe('AppContextProvider', () => {
     // Verify that mockChatCancel was called
     expect(mockChatCancel).toHaveBeenCalled();
 
-    expect(messageHistoryStore.getCurrent()).toEqual([systemPromptMessage]);
+    expect(messageHistoryStore.getState()).toEqual([systemPromptMessage]);
   });
 
   it('clears chat messages correctly', async () => {
@@ -185,7 +185,7 @@ describe('AppContextProvider', () => {
     // Click the clearChatMessages button
     fireEvent.click(screen.getByText('Clear Chat Messages'));
 
-    expect(messageHistoryStore.getCurrent()).toEqual([systemPromptMessage]);
+    expect(messageHistoryStore.getState()).toEqual([systemPromptMessage]);
 
     await waitFor(() => {
       expect(utils.deleteImages as Mock).toHaveBeenCalledTimes(1);

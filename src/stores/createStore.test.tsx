@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
 import { createStore, StateStore } from './createStore';
-/// <reference types="vitest" />
 import React, { FC } from 'react';
 import { render, screen, act } from '@testing-library/react';
 import { useSyncExternalStore } from 'react';
@@ -8,7 +7,7 @@ import { useSyncExternalStore } from 'react';
 describe('createStore', () => {
   it('should initialize with the given initial value', () => {
     const counterStore = createStore<number>(1);
-    expect(counterStore.getCurrent()).toEqual(1);
+    expect(counterStore.getState()).toEqual(1);
   });
 
   it('should update the state and notify subscribers', () => {
@@ -16,9 +15,9 @@ describe('createStore', () => {
     const subscriber = vi.fn();
     counterStore.subscribe(subscriber);
 
-    counterStore.setValue(2);
+    counterStore.setState(2);
 
-    expect(counterStore.getCurrent()).toEqual(2);
+    expect(counterStore.getState()).toEqual(2);
     expect(subscriber).toHaveBeenCalledTimes(1);
   });
 
@@ -27,9 +26,9 @@ describe('createStore', () => {
     const subscriber = vi.fn();
     counterStore.subscribe(subscriber);
 
-    counterStore.setValue(1);
+    counterStore.setState(1);
 
-    expect(counterStore.getCurrent()).toEqual(1);
+    expect(counterStore.getState()).toEqual(1);
     expect(subscriber).not.toHaveBeenCalled();
   });
 
@@ -39,7 +38,7 @@ describe('createStore', () => {
     const unsubscribe = counterStore.subscribe(subscriber);
 
     unsubscribe();
-    counterStore.setValue(2);
+    counterStore.setState(2);
 
     expect(subscriber).not.toHaveBeenCalled();
   });
@@ -49,12 +48,12 @@ describe('createStore', () => {
     const subscriber = vi.fn();
     numberStore.subscribe(subscriber);
 
-    numberStore.setValue([1, 2, 3]);
+    numberStore.setState([1, 2, 3]);
 
-    expect(numberStore.getCurrent()).toEqual([1, 2, 3]);
+    expect(numberStore.getState()).toEqual([1, 2, 3]);
     expect(subscriber).toHaveBeenCalledTimes(1);
 
-    numberStore.setValue([1, 2, 3]);
+    numberStore.setState([1, 2, 3]);
 
     // this demonstrates that the store works by reference
     // for non primitive types even though the array contents are the same
@@ -63,8 +62,8 @@ describe('createStore', () => {
 });
 
 const useStoreValue = <T,>(store: StateStore<T>) => {
-  const value = useSyncExternalStore(store.subscribe, store.getCurrent);
-  return [value, store.setValue] as const;
+  const value = useSyncExternalStore(store.subscribe, store.getState);
+  return [value, store.setState] as const;
 };
 
 // A test component that uses our store
@@ -92,7 +91,7 @@ describe('createStore integration with useSyncExternalStore', () => {
     expect(el.textContent).toBe('"initial"');
 
     act(() => {
-      store.setValue('updated');
+      store.setState('updated');
     });
 
     expect(el.textContent).toBe('"updated"');
@@ -111,7 +110,7 @@ describe('createStore integration with useSyncExternalStore', () => {
     expect(renderSpy).toHaveBeenCalledTimes(1);
 
     act(() => {
-      store.setValue('fixed');
+      store.setState('fixed');
     });
     // should still be one
     expect(renderSpy).toHaveBeenCalledTimes(1);
@@ -127,7 +126,7 @@ describe('createStore integration with useSyncExternalStore', () => {
 
     const newObj = { a: 4, b: { c: { d: { f: { x: 'y' } } } } };
     act(() => {
-      store.setValue(newObj);
+      store.setState(newObj);
     });
     expect(el.textContent).toBe(JSON.stringify(newObj));
   });
@@ -171,7 +170,7 @@ describe('createStore integration with useSyncExternalStore', () => {
     expect(c2.textContent).toBe('0');
 
     act(() => {
-      store.setValue(42);
+      store.setState(42);
     });
 
     expect(c1.textContent).toBe('42');
@@ -194,12 +193,12 @@ describe('createStore integration with useSyncExternalStore', () => {
     expect(renderCount).toBe(1);
 
     act(() => {
-      store.setValue('one');
+      store.setState('one');
     });
     expect(renderCount).toBe(2);
 
     act(() => {
-      store.setValue('two');
+      store.setState('two');
     });
     expect(renderCount).toBe(3);
 

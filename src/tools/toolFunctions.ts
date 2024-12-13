@@ -244,22 +244,6 @@ export const generateCoinMetadata = async ({
 
   const id = await saveImage(b64ImageData);
 
-  const isInsideIFrame = window.self !== window.top;
-  if (isInsideIFrame) {
-    console.log('sending message to parent');
-    window.parent.postMessage(
-      {
-        type: 'GENERATED_TOKEN_METADATA',
-        payload: {
-          base64ImageData: b64ImageData,
-          tokenName: name,
-          tokenSymbol: symbol,
-          tokenDescription: about,
-        },
-      },
-      '*', // target origin is * for now (wherever we are embedded) later we want to restrict this to only work with hard.fun
-    );
-  }
 
   return {
     name,

@@ -5,8 +5,8 @@ import { messageHistoryStore } from './messageHistoryStore';
 export const useMessageHistoryStore = (store = messageHistoryStore) => {
   const state: ChatCompletionMessageParam[] = useSyncExternalStore(
     store.subscribe,
-    store.getCurrent,
+    store.getState,
   );
 
-  return [state, store.setValue] as const;
+  return [state, store.setState] as const;
 };
