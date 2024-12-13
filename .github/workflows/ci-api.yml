@@ -99,8 +99,14 @@ jobs:
         if: failure()
         run: docker compose -f docker-compose.yaml logs
 
-      - name: Run E2E tests
-        run: echo "Run E2E tests here!"
+      - name: Install node dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright tests
+        run: DEBUG=pw:webserver npx playwright test
 
       - name: Shutdown proxy and kava node
         if: always()
