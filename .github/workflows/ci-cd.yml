@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - main
-      - dl-cd-netlify
   pull_request:
     branches:
       - main
