@@ -224,9 +224,7 @@ describe('createStore integration with useSyncExternalStore', () => {
   });
 });
 
-
 describe('deepCopy', () => {
-  
   test('should create a deep copy of a simple object', () => {
     const obj = { a: 1, b: { c: 2 } };
     const copy = deepCopy(obj);
@@ -247,15 +245,17 @@ describe('deepCopy', () => {
 
   test('should handle primitive values', () => {
     expect(deepCopy(42)).toBe(42);
-    expect(deepCopy("string")).toBe("string");
+    expect(deepCopy('string')).toBe('string');
     expect(deepCopy(null)).toBeNull();
     expect(deepCopy(undefined)).toBeUndefined();
   });
 
   test('should throw an error for non-serializable values', () => {
-    const fn = function() {};
+    const fn = function () {};
 
-    expect(() => deepCopy(fn)).toThrow(`provided data must be serializable: ${fn}`);
+    expect(() => deepCopy(fn)).toThrow(
+      `provided data must be serializable: ${fn}`,
+    );
   });
 
   test('should create a deep copy when structuredClone is available', () => {
