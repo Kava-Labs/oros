@@ -61,8 +61,8 @@ jobs:
           LOGS_URL=$(jq -r '.logs' deploy-output.json)
 
           # Set step output
-          echo "deploy-url=$DEPLOY_URL" >> $GITHUB_ENV
-          echo "logs-url=$LOGS_URL" >> $GITHUB_ENV
+          echo "deploy-url=$DEPLOY_URL" >> $GITHUB_OUTPUT
+          echo "logs-url=$LOGS_URL" >> $GITHUB_OUTPUT
         env:
           NETLIFY_SITE_ID: ${{ env.NETLIFY_SITE_ID }}
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
