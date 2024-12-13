@@ -3,5 +3,5 @@ import { streamingMessageStore as streamingMessageStore } from './streamingMessa
 
 export const useStreamingMessageStore = (store = streamingMessageStore) => {
   const state: string = useSyncExternalStore(store.subscribe, store.getCurrent);
-  return [state, store.setValue, store.getCurrent] as const;
+  return [state, store.setValue] as const;
 };

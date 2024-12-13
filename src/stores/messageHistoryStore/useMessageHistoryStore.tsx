@@ -8,5 +8,5 @@ export const useMessageHistoryStore = (store = messageHistoryStore) => {
     store.getCurrent,
   );
 
-  return [state, store.setValue, store.getCurrent] as const;
+  return [state, store.setValue] as const;
 };
