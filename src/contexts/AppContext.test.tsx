@@ -33,7 +33,7 @@ vi.mock('../utils', () => ({
 }));
 
 //  todo - unskip when this test is plugged into a redux provider
-describe.skip('AppContextProvider', () => {
+describe('AppContextProvider', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Mock window.ethereum
