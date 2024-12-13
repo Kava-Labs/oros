@@ -264,5 +264,5 @@ test('clicking "reset chat" clears "chatMessages" from local storage', async ({
     localStorage.getItem('chat-messages'),
   );
 
-  expect(JSON.parse(updatedLocalStorage)).toBeNull();
+  expect(updatedLocalStorage).toBeNull();
 });
