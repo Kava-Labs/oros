@@ -1,7 +1,7 @@
 services:
   kavachat-api:
     build:
-      context: .
+      context: ./api
       dockerfile: Dockerfile
     ports:
       - "5555:5555"

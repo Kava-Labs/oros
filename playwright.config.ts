@@ -48,7 +48,7 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: `OPENAI_BASE_URL=${process.env.OPENAI_BASE_URL} OPENAI_API_KEY=${process.env.OPENAI_API_KEY} bash ./playwrightInit.bash`,
+    command: `bash ./playwrightInit.bash`,
     url: 'http://localhost:3000',
   },
 });

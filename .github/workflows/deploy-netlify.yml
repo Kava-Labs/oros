@@ -1,0 +1,68 @@
+name: Deploy to Netlify
+
+# Ensure only 1 deployment is running at a time for each environment
+concurrency:
+  group: ${{ inputs.environment-name }}
+  # Do NOT cancel in-progress deployments, ensure each deployment completes
+  # before starting the next one. This allows for rollbacks to the latest most
+  # stable version, instead of potentially skipping over a stable version.
+  cancel-in-progress: false
+
+on:
+  # Reusable workflow to be called by other workflows
+  workflow_call:
+    inputs:
+      environment-name:
+        required: true
+        description: 'Name of environment to deploy to'
+        type: string
+
+    secrets:
+      NETLIFY_AUTH_TOKEN:
+        required: true
+        description: 'Netlify auth token'
+
+env:
+  NETLIFY_SITE_ID: b56e4d0e-21ed-44d6-aafa-2e5d63106ece
+
+jobs:
+  deploy-frontend:
+    name: Deploy ${{ inputs.environment-name }}
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment-name }}
+      url: ${{ steps.netlify-deploy.outputs.deploy-url }}
+
+    steps:
+      # Does not require checkout
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: dist/
+
+      - name: Deploy to Netlify
+        id: netlify-deploy
+        # Run netlify-cli manually, netlify/actions/cli is unmaintained.
+        # This only deploys to **production** with the --prod flag. No previews.
+        run: |
+          npx netlify-cli@17 deploy \
+            --dir=dist \
+            --json \
+            --prod \
+            --message 'Github Actions Deploy: ${{ github.head_ref }} @ ${{ github.sha }}' > deploy-output.json
+
+          # Print the JSON output for debugging
+          cat deploy-output.json
+
+          # Extract the Netlify URL from the JSON output
+          # https://github.com/netlify/cli/blob/65dc682d1036893f33bc3be4013f408a1ef2452b/src/commands/deploy/deploy.ts#L671-L679
+          DEPLOY_URL=$(jq -r '.deploy_url' deploy-output.json)
+          LOGS_URL=$(jq -r '.logs' deploy-output.json)
+
+          # Set step output
+          echo "deploy-url=$DEPLOY_URL" >> $GITHUB_OUTPUT
+          echo "logs-url=$LOGS_URL" >> $GITHUB_OUTPUT
+        env:
+          NETLIFY_SITE_ID: ${{ env.NETLIFY_SITE_ID }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
