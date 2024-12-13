@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { createStore, StateStore } from './createStore';
+import { createStore, deepCopy, StateStore } from './createStore';
 import React, { FC } from 'react';
 import { render, screen, act } from '@testing-library/react';
 import { useSyncExternalStore } from 'react';
@@ -221,5 +221,68 @@ describe('createStore integration with useSyncExternalStore', () => {
     expect(renderCount).toBe(3);
 
     expect(store.getSubscriberCount()).toBe(1);
+  });
+});
+
+
+describe('deepCopy', () => {
+  
+  test('should create a deep copy of a simple object', () => {
+    const obj = { a: 1, b: { c: 2 } };
+    const copy = deepCopy(obj);
+
+    expect(copy).toEqual(obj);
+    expect(copy).not.toBe(obj);
+    expect(copy.b).not.toBe(obj.b);
+  });
+
+  test('should create a deep copy of an array', () => {
+    const arr = [1, 2, { a: 3 }];
+    const copy = deepCopy(arr);
+
+    expect(copy).toEqual(arr);
+    expect(copy).not.toBe(arr);
+    expect(copy[2]).not.toBe(arr[2]);
+  });
+
+  test('should handle primitive values', () => {
+    expect(deepCopy(42)).toBe(42);
+    expect(deepCopy("string")).toBe("string");
+    expect(deepCopy(null)).toBeNull();
+    expect(deepCopy(undefined)).toBeUndefined();
+  });
+
+  test('should throw an error for non-serializable values', () => {
+    const fn = function() {};
+
+    expect(() => deepCopy(fn)).toThrow(`provided data must be serializable: ${fn}`);
+  });
+
+  test('should create a deep copy when structuredClone is available', () => {
+    const originalStructuredClone = window.structuredClone;
+    const mockStructuredClone = vi.fn((val) => val);
+    window.structuredClone = mockStructuredClone;
+
+    const obj = { a: 1 };
+    const copy = deepCopy(obj);
+
+    expect(mockStructuredClone).toHaveBeenCalledWith(obj);
+    expect(copy).toBe(obj);
+
+    window.structuredClone = originalStructuredClone; // Restore original structuredClone
+  });
+
+  test('should fallback to JSON methods if structuredClone is not available', () => {
+    const originalStructuredClone = window.structuredClone;
+    // @ts-expect-error
+    window.structuredClone = undefined;
+
+    const obj = { a: 1, b: { c: 2 } };
+    const copy = deepCopy(obj);
+
+    expect(copy).toEqual(obj);
+    expect(copy).not.toBe(obj);
+
+    window.structuredClone = originalStructuredClone; // Restore original structuredClone
   });
 });

@@ -10,7 +10,7 @@ export const createStore = <T>(initialValue: T): StateStore<T> => {
   const subscribers = new Set<() => void>();
 
   const state = {
-    current: structuredClone(initialValue),
+    current: deepCopy(initialValue),
   };
 
   const subscribe = (listener: () => void) => {
@@ -29,7 +29,7 @@ export const createStore = <T>(initialValue: T): StateStore<T> => {
     }
 
     if (newVal !== state.current) {
-      state.current = structuredClone(newVal);
+      state.current = deepCopy(newVal);
       for (const fn of subscribers) fn();
     }
   };
@@ -44,4 +44,21 @@ export const createStore = <T>(initialValue: T): StateStore<T> => {
     getState,
     setState,
   };
+};
+
+export const deepCopy = (val: unknown) => {
+  // spread operator doesn't do a deep copy
+  // it also doesn't work with primitive types
+  try {
+    // some older browsers may not have structuredClone
+    // It's been available across browsers since early 2022 but just
+    // in case this function is not available we fallback to JSON stringify then parse
+    if (window.structuredClone) {
+      return window.structuredClone(val);
+    }
+    return JSON.parse(JSON.stringify(val));
+  } catch (err) {
+    // rethrow the error with a different message
+    throw new Error(`provided data must be serializable: ${val}`);
+  }
 };
