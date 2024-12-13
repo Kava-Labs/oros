@@ -267,8 +267,8 @@ export function AppContextProvider({
     if (accounts && accounts[0]) {
       setAddress(() => accounts[0]);
 
-      messageHistoryStore.setState([
-        ...messageHistoryStore.getState(),
+      messageHistoryStore.setState((prev) => [
+        ...prev,
         {
           role: 'system',
           content: `user's current wallet address: ${accounts[0]}`,
