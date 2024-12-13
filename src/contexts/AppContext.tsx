@@ -130,8 +130,8 @@ export function AppContextProvider({
 
   const submitUserChatMessage = useCallback((inputContent: string) => {
     if (!inputContent.length) return;
-    messageHistoryStore.setState([
-      ...messageHistoryStore.getState(),
+    messageHistoryStore.setState((prev) => [
+      ...prev,
       {
         role: 'user',
         content: inputContent,
@@ -144,7 +144,7 @@ export function AppContextProvider({
 
   // handlers
   const onChatStreamData = useCallback((chunk: string) => {
-    streamingMessageStore.setState(streamingMessageStore.getState() + chunk);
+    streamingMessageStore.setState((prev) => prev + chunk);
   }, []);
 
   const onChatStreamDone = useCallback(() => {
@@ -152,8 +152,8 @@ export function AppContextProvider({
     if (content) {
       // add the new message we received from the model to history
       // clear streamingMessage since the request is done
-      messageHistoryStore.setState([
-        ...messageHistoryStore.getState(),
+      messageHistoryStore.setState((prev) => [
+        ...prev,
         { role: 'assistant', content },
       ]);
       streamingMessageStore.setState('');
@@ -205,8 +205,8 @@ export function AppContextProvider({
     ) => {
       const args = tc.function?.arguments;
 
-      messageHistoryStore.setState([
-        ...messageHistoryStore.getState(),
+      messageHistoryStore.setState((prev) => [
+        ...prev,
         {
           role: 'assistant',
           function_call: null,
@@ -241,8 +241,8 @@ export function AppContextProvider({
         }) !== undefined;
 
       if (commitToolCall) {
-        messageHistoryStore.setState([
-          ...messageHistoryStore.getState(),
+        messageHistoryStore.setState((prev) => [
+          ...prev,
           {
             role: 'tool',
             content: JSON.stringify(results),
