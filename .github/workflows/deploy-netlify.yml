@@ -48,7 +48,7 @@ jobs:
           npx netlify-cli@17 deploy \
             --dir=dist \
             --json \
-            --message '${{ github.head_ref }}.${{ github.sha }}' > deploy-output.json
+            --message 'Github Actions Deploy: ${{ github.head_ref }}.${{ github.sha }}' > deploy-output.json
 
           # Print the JSON output for debugging
           cat deploy-output.json
