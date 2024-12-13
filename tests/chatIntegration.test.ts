@@ -7,6 +7,7 @@ describe('chat function', () => {
   const onData = vi.fn();
   const onDone = vi.fn();
   const onError = vi.fn();
+  const onCancel = vi.fn();
   const onToolCallRequest = vi.fn();
 
   const openAIClient = createOpenApiClient();
@@ -18,6 +19,7 @@ describe('chat function', () => {
     onDone,
     onError,
     onToolCallRequest,
+    onCancel,
     openAI: openAIClient,
   };
 
@@ -118,5 +120,27 @@ describe('chat function', () => {
         address: kavaAddress,
       }),
     );
+  });
+
+  it('handles cancelling the stream', async () => {
+    const cancelFunction = chat({
+      ...chatConfig,
+      messages: [
+        {
+          role: 'user',
+          content: 'Say "This is an integration test"',
+        },
+      ],
+    });
+
+    cancelFunction();
+
+    await new Promise((resolve) => {
+      onCancel.mockImplementation(() => {
+        resolve(null);
+      });
+    });
+
+    expect(onCancel).toHaveBeenCalled();
   });
 });
