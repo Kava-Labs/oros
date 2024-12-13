@@ -5,6 +5,9 @@ on:
       - main
     paths:
       - 'api/**'
+  pull_request:
+    paths:
+      - 'api/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -59,7 +62,7 @@ jobs:
       - name: Build Docker image
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ./api
           # Do not push before running E2E tests
           push: false
           load: true
@@ -69,9 +72,9 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version-file: go.mod
+          go-version-file: ./api/go.mod
           cache-dependency-path: |
-            go.sum
+            ./api/go.sum
             ./tests/kvtool/go.mod
 
       - name: Install kvtool
@@ -107,7 +110,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           # Path context instead of git context so it doesn't build from remote repo
-          context: .
+          context: ./api
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.image-name.outputs.image }}
