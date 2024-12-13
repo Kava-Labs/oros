@@ -1,67 +1,35 @@
 import { test, expect } from '@playwright/test';
 import { systemPrompt } from '../src/config';
+import { Chat } from './Chat';
 
 test('renders intro message', async ({ page }) => {
-  await page.goto('http://localhost:3000/');
+  const chat = new Chat(page);
+  await chat.goto();
 
-  await page.waitForLoadState();
+  expect(chat.messageContainer).not.toBeNull();
 
-  const messageContainer = await page.$(
-    `[data-testid="ChatContainer"] div div`,
-  );
-  expect(messageContainer).not.toBeNull();
-
-  const role = await messageContainer!.getAttribute('data-chat-role');
+  const role = await chat.messageContainer.getAttribute('data-chat-role');
   expect(role).toBe('assistant');
 
-  await expect(page.getByTestId('ChatContainer')).toHaveText(
-    /Hey I'm Kava AI/,
-    { useInnerText: true },
-  );
+  await expect(chat.messageContainer).toHaveText(/Hey I'm Kava AI/, {
+    useInnerText: true,
+  });
 });
 
 test('receiving a response from the model', async ({ page }) => {
   test.setTimeout(90 * 1000);
-  await page.goto('http://localhost:3000/');
 
-  await page.waitForLoadState();
+  const chat = new Chat(page);
+  await chat.goto();
 
-  const input = page.getByTestId('PromptInput').getByRole('textbox');
-
-  await input.fill(
+  await chat.submitMessage(
     'This is an automated test suite, please respond with the exact text: THIS IS A TEST',
   );
 
-  await page.getByTestId('PromptInput').getByRole('button').click();
+  await chat.waitForStreamToFinish();
+  await chat.waitForAssistantResponse();
 
-  await page.waitForResponse(async (res) => {
-    if (res.url().includes('chat')) {
-      expect(res.status()).toBe(200);
-      await res.finished(); // it's important to wait for the stream to finish
-      return true;
-    }
-    return false;
-  });
-
-  await page.waitForFunction(
-    () => {
-      const messages = document.querySelectorAll(
-        '[data-testid="ChatContainer"] div div',
-      );
-      const lastMessage = messages[messages.length - 1];
-      return (
-        lastMessage &&
-        lastMessage.getAttribute('data-chat-role') === 'assistant' &&
-        (lastMessage.textContent?.length ?? 0) > 0
-      );
-    },
-    {
-      timeout: 10000,
-      polling: 100,
-    },
-  );
-
-  const messages = await page.$$(`[data-testid="ChatContainer"] div div`);
+  const messages = await chat.messageContainer.all();
   expect(messages.length).toBeGreaterThan(0);
 
   const attr =
@@ -75,32 +43,25 @@ test('receiving a response from the model', async ({ page }) => {
 test('fills in messages from local storage', async ({ page }) => {
   test.setTimeout(90 * 1000);
 
-  await page.addInitScript(() => {
-    localStorage.setItem(
-      'chat-messages',
-      JSON.stringify({
-        messages: [
-          {
-            role: 'user',
-            content: 'This message was loaded from  local storage',
-          },
-          {
-            role: 'assistant',
-            content: 'That is terrific!',
-          },
-        ],
-      }),
-    );
-  });
+  const chat = new Chat(page);
+  await chat.goto();
 
-  await page.goto('http://localhost:3000/');
+  await chat.setMessagesInStorage([
+    {
+      role: 'user',
+      content: 'This message was loaded from local storage',
+    },
+    {
+      role: 'assistant',
+      content: 'That is terrific!',
+    },
+  ]);
 
-  await page.waitForLoadState();
+  await chat.goto();
 
-  const messages = await page.$$(`[data-testid="ChatContainer"] div div`);
-
-  const userMessage = await messages[messages.length - 2].innerText();
-  const responseMessage = await messages[messages.length - 1].innerText();
+  const messages = await chat.messageContainer.all();
+  const userMessage = await messages[messages.length - 2].textContent();
+  const responseMessage = await messages[messages.length - 1].textContent();
 
   expect(userMessage).toMatch(/This message was loaded from local storage/i);
   expect(responseMessage).toMatch(/That is terrific!/i);
@@ -108,10 +69,7 @@ test('fills in messages from local storage', async ({ page }) => {
   //  reload the page and verify the same messages are still present
   await page.reload();
 
-  const messagesOnReload = await page.$$(
-    `[data-testid="ChatContainer"] div div`,
-  );
-
+  const messagesOnReload = await chat.messageContainer.all();
   const userMessageOnReload =
     await messagesOnReload[messagesOnReload.length - 2].innerText();
   const responseMessageOnReload =
@@ -125,51 +83,19 @@ test('fills in messages from local storage', async ({ page }) => {
 
 test('messages from the chat populate local storage', async ({ page }) => {
   test.setTimeout(90 * 1000);
-  await page.goto('http://localhost:3000/');
 
-  await page.waitForLoadState();
+  const chat = new Chat(page);
+  await chat.goto();
 
-  const input = page.getByTestId('PromptInput').getByRole('textbox');
-
-  await input.fill(
+  await chat.submitMessage(
     'This is an automated test suite, please respond with the exact text: THIS IS A TEST',
   );
 
-  await page.getByTestId('PromptInput').getByRole('button').click();
+  await chat.waitForStreamToFinish();
+  await chat.waitForAssistantResponse();
 
-  await page.waitForResponse(async (res) => {
-    if (res.url().includes('chat')) {
-      expect(res.status()).toBe(200);
-      await res.finished();
-      return true;
-    }
-    return false;
-  });
-
-  //  wait for the assistant's reply to complete
-  await page.waitForFunction(
-    () => {
-      const messages = document.querySelectorAll(
-        '[data-testid="ChatContainer"] div div',
-      );
-      const lastMessage = messages[messages.length - 1];
-      return (
-        lastMessage &&
-        lastMessage.getAttribute('data-chat-role') === 'assistant' &&
-        (lastMessage.textContent?.length ?? 0) > 0
-      );
-    },
-    {
-      timeout: 10000,
-      polling: 100,
-    },
-  );
-
-  const storedMessageHistory = await page.evaluate(() =>
-    localStorage.getItem('chat-messages'),
-  );
-
-  expect(JSON.parse(storedMessageHistory)).toStrictEqual({
+  const messageHistory = await chat.getMessageHistoryFromStorage();
+  expect(JSON.parse(messageHistory)).toStrictEqual({
     messages: [
       {
         role: 'system',
@@ -188,55 +114,23 @@ test('messages from the chat populate local storage', async ({ page }) => {
   });
 });
 
-test('clicking "reset chat" clears "chatMessages" from local storage', async ({
+test.only('clicking "reset chat" clears "chatMessages" from local storage', async ({
   page,
 }) => {
   test.setTimeout(90 * 1000);
-  await page.goto('http://localhost:3000/');
 
-  await page.waitForLoadState();
+  const chat = new Chat(page);
+  await chat.goto();
 
-  const input = page.getByTestId('PromptInput').getByRole('textbox');
-
-  await input.fill(
+  await chat.submitMessage(
     'This is an automated test suite, please respond with the exact text: THIS IS A TEST',
   );
 
-  await page.getByTestId('PromptInput').getByRole('button').click();
+  await chat.waitForStreamToFinish();
+  await chat.waitForAssistantResponse();
 
-  await page.waitForResponse(async (res) => {
-    if (res.url().includes('chat')) {
-      expect(res.status()).toBe(200);
-      await res.finished();
-      return true;
-    }
-    return false;
-  });
-
-  //  wait for the assistant's reply to complete
-  await page.waitForFunction(
-    () => {
-      const messages = document.querySelectorAll(
-        '[data-testid="ChatContainer"] div div',
-      );
-      const lastMessage = messages[messages.length - 1];
-      return (
-        lastMessage &&
-        lastMessage.getAttribute('data-chat-role') === 'assistant' &&
-        (lastMessage.textContent?.length ?? 0) > 0
-      );
-    },
-    {
-      timeout: 10000,
-      polling: 100,
-    },
-  );
-
-  const storedMessageHistory = await page.evaluate(() =>
-    localStorage.getItem('chat-messages'),
-  );
-
-  expect(JSON.parse(storedMessageHistory)).toStrictEqual({
+  const messageHistory = await chat.getMessageHistoryFromStorage();
+  expect(JSON.parse(messageHistory)).toStrictEqual({
     messages: [
       {
         role: 'system',
@@ -260,9 +154,103 @@ test('clicking "reset chat" clears "chatMessages" from local storage', async ({
     })
     .click();
 
-  const updatedLocalStorage = await page.evaluate(() =>
-    localStorage.getItem('chat-messages'),
+  const updatedLocalStorage = await chat.getMessageHistoryFromStorage();
+  expect(updatedLocalStorage).toBeNull();
+});
+
+test('image generation', async ({ page }) => {
+  test.setTimeout(90 * 1000);
+
+  const chat = new Chat(page);
+  await chat.goto();
+
+  await chat.submitMessage('Make me a giraffe-themed meme coin');
+
+  await chat.waitForStreamToFinish();
+
+  //  loading state begins
+  await expect(
+    page.locator('h3', { hasText: 'Generating Token Metadata' }),
+  ).toBeVisible();
+
+  await chat.waitForAssistantResponse();
+
+  //  loading state is finished
+  await expect(
+    page.locator('h3', { hasText: 'Generating Token Metadata' }),
+  ).not.toBeVisible();
+
+  const initialTokenName = page.locator('h3', { hasText: 'Name:' }).first();
+  const initialTokenSymbol = page.locator('h3', { hasText: 'Symbol:' }).first();
+  const initialTokenDescription = page
+    .locator('h3', { hasText: 'Description' })
+    .locator('+ p')
+    .first();
+  const initialTokenImage = page
+    .locator('img[alt="Model Generated Image"]')
+    .first();
+  const initialTokenImageSrc = await initialTokenImage.getAttribute('src');
+
+  await expect(initialTokenName).toBeVisible();
+  await expect(initialTokenSymbol).toBeVisible();
+  await expect(initialTokenDescription).toBeVisible();
+  await expect(initialTokenImage).toBeVisible();
+
+  //  edit some of the token metadata
+  await chat.submitMessage(
+    'Keep all metadata the same, but generate a new image',
   );
 
-  expect(updatedLocalStorage).toBeNull();
+  await chat.waitForAssistantResponse();
+
+  const updatedTokenName = page.locator('h3', { hasText: 'Name:' }).nth(1);
+  const updatedTokenSymbol = page.locator('h3', { hasText: 'Symbol:' }).nth(1);
+  const updatedTokenDescription = page
+    .locator('h3', { hasText: 'Description' })
+    .locator('+ p')
+    .nth(1);
+  const updatedTokenImage = page
+    .locator('img[alt="Model Generated Image"]')
+    .nth(1);
+  const updatedTokenImageSrc = await updatedTokenImage.getAttribute('src');
+
+  expect(await updatedTokenName.textContent()).toBe(
+    await initialTokenName.textContent(),
+  );
+  expect(await updatedTokenSymbol.textContent()).toBe(
+    await initialTokenSymbol.textContent(),
+  );
+  expect(await updatedTokenDescription.textContent()).toBe(
+    await initialTokenDescription.textContent(),
+  );
+  expect(updatedTokenImageSrc).not.toBe(initialTokenImageSrc);
+
+  // //  edit all the token metadata
+  await chat.submitMessage(
+    'Generate an entirely new, non-giraffe themed meme coin',
+  );
+
+  await chat.waitForAssistantResponse();
+
+  const anotherTokenName = page.locator('h3', { hasText: 'Name:' }).nth(2);
+  const anotherTokenSymbol = page.locator('h3', { hasText: 'Symbol:' }).nth(2);
+  const anotherTokenDescription = page
+    .locator('h3', { hasText: 'Description' })
+    .locator('+ p')
+    .nth(2);
+  const anotherTokenImage = page
+    .locator('img[alt="Model Generated Image"]')
+    .nth(2);
+  const anotherTokenImageSrc = await anotherTokenImage.getAttribute('src');
+
+  expect(await anotherTokenName.textContent()).not.toBe(
+    await updatedTokenName.textContent(),
+  );
+  expect(await anotherTokenSymbol.textContent()).not.toBe(
+    await updatedTokenSymbol.textContent(),
+  );
+  expect(await anotherTokenDescription.textContent()).not.toBe(
+    await updatedTokenDescription.textContent(),
+  );
+  expect(anotherTokenImageSrc).not.toBe(updatedTokenImageSrc);
 });
