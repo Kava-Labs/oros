@@ -59,6 +59,24 @@ describe('createStore', () => {
     // for non primitive types even though the array contents are the same
     expect(subscriber).toHaveBeenCalledTimes(2);
   });
+
+  it('set state with callback should pass the current state value', () => {
+    const store = createStore<string[]>(['hello']);
+
+    expect(store.getState()).toStrictEqual(['hello']);
+    expect(store.getSubscriberCount()).toBe(0);
+    const subscribe = vi.fn();
+    store.subscribe(subscribe);
+    expect(store.getSubscriberCount()).toBe(1);
+
+    store.setState((prev) => {
+      expect(prev).toStrictEqual(['hello']);
+      return [...prev, 'world'];
+    });
+
+    expect(subscribe).toHaveBeenCalledOnce();
+    expect(store.getState()).toStrictEqual(['hello', 'world']);
+  });
 });
 
 const useStoreValue = <T,>(store: StateStore<T>) => {
