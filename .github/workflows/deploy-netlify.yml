@@ -51,12 +51,12 @@ jobs:
 
           # Extract the Netlify URL from the JSON output
           # https://github.com/netlify/cli/blob/65dc682d1036893f33bc3be4013f408a1ef2452b/src/commands/deploy/deploy.ts#L671-L679
-          DEPLOY_URL=$(echo "$DEPLOY_OUTPUT" | jq -r '.deploy_url')
-          LOGS_URL=$(echo "$DEPLOY_OUTPUT" | jq -r '.logs')
+          ### DEPLOY_URL=$(echo "$DEPLOY_OUTPUT" | jq -r '.deploy_url')
+          ### LOGS_URL=$(echo "$DEPLOY_OUTPUT" | jq -r '.logs')
 
           # Set step output
-          echo "deploy-url=$DEPLOY_URL" >> $GITHUB_ENV
-          echo "logs-url=$LOGS_URL" >> $GITHUB_ENV
+          ### echo "deploy-url=$DEPLOY_URL" >> $GITHUB_ENV
+          ### echo "logs-url=$LOGS_URL" >> $GITHUB_ENV
         env:
           NETLIFY_SITE_ID: ${{ env.NETLIFY_SITE_ID }}
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}

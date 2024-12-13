@@ -3,11 +3,7 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'api/**'
-  pull_request:
-    paths:
-      - 'api/**'
+      - dl-cd-netlify
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -18,13 +14,71 @@ env:
   ECR_REPOSITORY: kavachat-api
 
 jobs:
+  build-frontend:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.diff.outputs.diff != '' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for changes
+        id: diff
+        uses: technote-space/get-diff-action@v6
+        with:
+          PATTERNS: |
+            **/**
+            .github/workflows/**
+            **/*.ts
+            src/**
+            public/**
+            !api/**
+          FILES: |
+            package.json
+            package-lock.json
+            .github/workflows/deploy-netlify.yml
+
+      - name: Output changed files
+        run: |
+          echo "env.diff ${{ env.GIT_DIFF }}"
+          echo "diff ${{ steps.diff.outputs.diff }}"
+          echo "diff != '' ${{ steps.diff.outputs.diff != '' }}"
+
+      - name: Install Node.js
+        if: env.GIT_DIFF
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+
+      - name: Install dependencies
+        if: env.GIT_DIFF
+        run: npm ci
+
+      - name: Build app
+        if: env.GIT_DIFF
+        run: npm run build
+
+      - name: Upload build artifact
+        if: env.GIT_DIFF
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: dist/
+          if-no-files-found: error
+          retention-days: 1
+
   docker-build-test:
     runs-on: ubuntu-latest
     env:
       KAVA_TAG: v0.27.0-goleveldb
       KVTOOL_CONFIGTEMPLATE: v0.26
+      # kavachat API
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       OPENAI_BASE_URL: https://api.openai.com/v1
+      # Frontend playwrite tests
+      VITE_OPENAI_BASE_URL: http://localhost:5555/openai/v1
     outputs:
       image-name: ${{ steps.image-name.outputs.image }}
     steps:
@@ -67,6 +121,8 @@ jobs:
           push: false
           load: true
           tags: ${{ steps.image-name.outputs.image }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       # Setup kvtool build environment
       - name: Set up Go
@@ -113,6 +169,8 @@ jobs:
         run: docker compose -f docker-compose.yaml down
 
       - name: Push Docker image to Amazon ECR
+        # Only push images on main branch pushes
+        if: ${{ (github.ref == 'refs/heads/main') && github.event_name == 'push' }}
         uses: docker/build-push-action@v6
         with:
           # Path context instead of git context so it doesn't build from remote repo
@@ -120,6 +178,8 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.image-name.outputs.image }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   deploy-production-api:
     needs: docker-build-test
@@ -136,3 +196,17 @@ jobs:
       environment-name: api-production
       environment-url: https://kavachat-api.production.kava.io
       image-name: ${{ needs.docker-build-test.outputs.image-name }}
+
+  deploy-frontend:
+    needs:
+      # Requires built artifact
+      - build-frontend
+      # Requires API deployment to be successful (or skipped due to no changes)
+      - deploy-production-api
+    # TODO: Limit to main branch
+    # if: ${{ (github.ref == 'refs/heads/main') && github.event_name == 'push' }}
+    uses: ./.github/workflows/deploy-netlify.yml
+    secrets:
+      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+    with:
+      environment-name: frontend-production
