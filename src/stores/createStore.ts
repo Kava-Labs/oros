@@ -7,11 +7,10 @@ export interface StateStore<T> {
 }
 
 export const createStore = <T>(initialValue: T): StateStore<T> => {
-  let currentValue = initialValue;
   const subscribers = new Set<() => void>();
 
   const state = {
-    current: currentValue,
+    current: structuredClone(initialValue),
   };
 
   const subscribe = (listener: () => void) => {
