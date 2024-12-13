@@ -1,12 +1,9 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { Mock } from 'vitest';
 import { StreamingMessage } from './StreamingMessage';
-import { useStreamingMessageStore } from '../../../stores';
-
-vi.mock('../../../stores', () => ({
-  useStreamingMessageStore: vi.fn(),
-}));
+import { createStore } from '../../../stores';
+import { AppContextProvider } from '../../../contexts/AppContext';
+import { ChatCompletionMessageParam } from 'openai/resources/index.mjs';
 
 vi.mock('marked', () => ({
   marked: {
@@ -24,14 +21,17 @@ describe('StreamingMessage Component', () => {
   });
 
   it('returns null when content is empty', () => {
-    (useStreamingMessageStore as Mock).mockImplementation(() => {
-      return [''];
-    });
-
     const chatContainerRef = React.createRef<HTMLDivElement>();
 
     const { container } = render(
-      <StreamingMessage chatContainerRef={chatContainerRef} />,
+      <AppContextProvider
+        streamingMessageStore={createStore<string>('')}
+        messageHistoryStore={createStore<ChatCompletionMessageParam[]>([
+          { role: 'system', content: 'the system prompt' },
+        ])}
+      >
+        <StreamingMessage chatContainerRef={chatContainerRef} />
+      </AppContextProvider>,
     );
 
     expect(container.firstChild).toBeNull();
@@ -40,12 +40,17 @@ describe('StreamingMessage Component', () => {
   it('renders content with parsed markdown', () => {
     const content = 'Streaming content';
 
-    (useStreamingMessageStore as Mock).mockImplementation(() => {
-      return [content];
-    });
-
     const chatContainerRef = React.createRef<HTMLDivElement>();
-    render(<StreamingMessage chatContainerRef={chatContainerRef} />);
+    render(
+      <AppContextProvider
+        streamingMessageStore={createStore<string>(content)}
+        messageHistoryStore={createStore<ChatCompletionMessageParam[]>([
+          { role: 'system', content: 'the system prompt' },
+        ])}
+      >
+        <StreamingMessage chatContainerRef={chatContainerRef} />
+      </AppContextProvider>,
+    );
 
     // Verify that the content is rendered parsed
     expect(screen.getByText(`parsed: ${content}`)).toBeInTheDocument();

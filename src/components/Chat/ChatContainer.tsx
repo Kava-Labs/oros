@@ -7,9 +7,9 @@ import { useAppContext } from '../../contexts/AppContext';
 import { useMessageHistoryStore } from '../../stores';
 
 export const ChatContainer = () => {
-  const { submitUserChatMessage, cancelStream } = useAppContext();
+  const { submitUserChatMessage, cancelStream, messageHistoryStore } = useAppContext();
   const chatContainerRef = useRef<HTMLDivElement>(null);
-  const [history] = useMessageHistoryStore();
+  const [history] = useMessageHistoryStore(messageHistoryStore);
 
   return (
     <div data-testid="Chat">

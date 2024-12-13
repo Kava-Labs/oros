@@ -1,3 +1,6 @@
-import { createStore } from '../createStore';
+import { createStore, StateStore } from '../createStore';
 
-export const streamingMessageStore = createStore<string>('');
+export type StreamingMessageStore = StateStore<string>;
+
+export const streamingMessageStore : StreamingMessageStore = createStore<string>('');
+

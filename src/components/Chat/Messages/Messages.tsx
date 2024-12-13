@@ -5,6 +5,7 @@ import { GeneratedToken } from '../GeneratedToken';
 import { LoadingSpinner } from '../../LoadingSpinner';
 import { useHasTokenGenerationInProgress } from '../../../stores';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
+import { useAppContext } from '../../../contexts/AppContext';
 
 export const INTRO_MESSAGE = `Hey I'm Kava AI. You can ask me any question. If you're here for the #KavaAI Launch Competition, try asking a question like "I want to deploy a memecoin on Kava with cool tokenomics".`;
 
@@ -13,7 +14,10 @@ export const Messages = ({
 }: {
   history: ChatCompletionMessageParam[];
 }) => {
-  const isGeneratingToken = useHasTokenGenerationInProgress();
+  const { messageHistoryStore } = useAppContext();
+
+  const isGeneratingToken =
+    useHasTokenGenerationInProgress(messageHistoryStore);
 
   return (
     <>

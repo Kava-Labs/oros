@@ -2,13 +2,15 @@ import styles from '../style.module.css';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import { useStreamingMessageStore } from '../../../stores';
+import { useAppContext } from '../../../contexts/AppContext';
 
 export const StreamingMessage = ({
   chatContainerRef,
 }: {
   chatContainerRef: React.RefObject<HTMLDivElement>;
 }) => {
-  const [content] = useStreamingMessageStore();
+  const { streamingMessageStore } = useAppContext();
+  const [content] = useStreamingMessageStore(streamingMessageStore);
   if (!content) {
     return null;
   }

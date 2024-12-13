@@ -22,7 +22,13 @@ import { generateCoinMetadata } from '../tools/toolFunctions';
 import { deleteImages } from '../utils';
 import { LocalStorage } from '../utils/storage';
 import { ChatHistory } from '../utils/storage/types';
-import { StateStore } from '../stores';
+import {
+  messageHistoryStore,
+  MessageHistoryStore,
+  StateStore,
+  streamingMessageStore,
+  StreamingMessageStore,
+} from '../stores';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import {
   useSyncFromStorageOnReload,
@@ -35,11 +41,13 @@ interface AppContext {
   submitUserChatMessage: (msg: string) => void;
   cancelStream: (() => void) | null;
   clearChatMessages: () => void;
+  streamingMessageStore: StreamingMessageStore;
+  messageHistoryStore: MessageHistoryStore;
   markDownCache: React.MutableRefObject<Map<string, string>>;
 }
 
 const mdCache = new Map<string, string>();
-const initValues = {
+const initValues: AppContext = {
   address: '',
   connectWallet: async () => {
     throw new Error('Uninitialized');
@@ -51,6 +59,8 @@ const initValues = {
     throw new Error('Uninitialized');
   },
   cancelStream: null,
+  streamingMessageStore: streamingMessageStore,
+  messageHistoryStore: messageHistoryStore,
   markDownCache: { current: mdCache },
 };
 
@@ -287,6 +297,8 @@ export function AppContextProvider({
   return (
     <AppContext.Provider
       value={{
+        streamingMessageStore,
+        messageHistoryStore,
         submitUserChatMessage,
         cancelStream,
         connectWallet,

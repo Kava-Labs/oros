@@ -1,9 +1,7 @@
 import { useMessageHistoryStore } from '.';
-import { messageHistoryStore } from './messageHistoryStore';
+import { MessageHistoryStore } from './messageHistoryStore';
 
-export const useHasTokenGenerationInProgress = (
-  store = messageHistoryStore,
-) => {
+export const useHasTokenGenerationInProgress = (store: MessageHistoryStore) => {
   const [history] = useMessageHistoryStore(store);
 
   const lastMsg = history[history.length - 1];

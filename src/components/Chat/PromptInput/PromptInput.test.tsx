@@ -1,11 +1,8 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { Mock } from 'vitest';
 import { PromptInput } from './PromptInput';
-import { useHasToolCallInProgress } from '../../../stores';
-
-vi.mock('../../../stores', () => ({
-  useHasToolCallInProgress: vi.fn(),
-}));
+import { createStore } from '../../../stores';
+import { AppContextProvider } from '../../../contexts/AppContext';
+import { ChatCompletionMessageParam } from 'openai/resources/index.mjs';
 
 describe('PromptInput Component', () => {
   const mockSubmitUserMessage = vi.fn();
@@ -21,10 +18,17 @@ describe('PromptInput Component', () => {
 
   it('renders input field and submit button', () => {
     render(
-      <PromptInput
-        submitUserMessage={mockSubmitUserMessage}
-        cancelStream={null}
-      />,
+      <AppContextProvider
+        streamingMessageStore={createStore<string>('')}
+        messageHistoryStore={createStore<ChatCompletionMessageParam[]>([
+          { role: 'system', content: 'the system prompt' },
+        ])}
+      >
+        <PromptInput
+          submitUserMessage={mockSubmitUserMessage}
+          cancelStream={null}
+        />
+      </AppContextProvider>,
     );
 
     expect(
@@ -35,10 +39,17 @@ describe('PromptInput Component', () => {
 
   it('updates input value on change', () => {
     render(
-      <PromptInput
-        submitUserMessage={mockSubmitUserMessage}
-        cancelStream={null}
-      />,
+      <AppContextProvider
+        streamingMessageStore={createStore<string>('')}
+        messageHistoryStore={createStore<ChatCompletionMessageParam[]>([
+          { role: 'system', content: 'the system prompt' },
+        ])}
+      >
+        <PromptInput
+          submitUserMessage={mockSubmitUserMessage}
+          cancelStream={null}
+        />
+      </AppContextProvider>,
     );
 
     const inputElement = screen.getByPlaceholderText(
@@ -51,10 +62,17 @@ describe('PromptInput Component', () => {
 
   it('calls submitUserMessage on form submit and clears input', () => {
     render(
-      <PromptInput
-        submitUserMessage={mockSubmitUserMessage}
-        cancelStream={null}
-      />,
+      <AppContextProvider
+        streamingMessageStore={createStore<string>('')}
+        messageHistoryStore={createStore<ChatCompletionMessageParam[]>([
+          { role: 'system', content: 'the system prompt' },
+        ])}
+      >
+        <PromptInput
+          submitUserMessage={mockSubmitUserMessage}
+          cancelStream={null}
+        />
+      </AppContextProvider>,
     );
 
     const inputElement = screen.getByPlaceholderText(
@@ -71,10 +89,17 @@ describe('PromptInput Component', () => {
 
   it('calls cancelStream when cancel button is clicked', () => {
     render(
-      <PromptInput
-        submitUserMessage={mockSubmitUserMessage}
-        cancelStream={mockCancelStream}
-      />,
+      <AppContextProvider
+        streamingMessageStore={createStore<string>('')}
+        messageHistoryStore={createStore<ChatCompletionMessageParam[]>([
+          { role: 'system', content: 'the system prompt' },
+        ])}
+      >
+        <PromptInput
+          submitUserMessage={mockSubmitUserMessage}
+          cancelStream={mockCancelStream}
+        />
+      </AppContextProvider>,
     );
 
     const buttonElement = screen.getByText('Cancel');
@@ -86,10 +111,17 @@ describe('PromptInput Component', () => {
 
   it('calls submitUserMessage when submit button is clicked and input is not empty', () => {
     render(
-      <PromptInput
-        submitUserMessage={mockSubmitUserMessage}
-        cancelStream={null}
-      />,
+      <AppContextProvider
+        streamingMessageStore={createStore<string>('')}
+        messageHistoryStore={createStore<ChatCompletionMessageParam[]>([
+          { role: 'system', content: 'the system prompt' },
+        ])}
+      >
+        <PromptInput
+          submitUserMessage={mockSubmitUserMessage}
+          cancelStream={null}
+        />
+      </AppContextProvider>,
     );
 
     const inputElement = screen.getByPlaceholderText(
@@ -106,10 +138,17 @@ describe('PromptInput Component', () => {
 
   it('does not call submitUserMessage when input is empty', () => {
     render(
-      <PromptInput
-        submitUserMessage={mockSubmitUserMessage}
-        cancelStream={null}
-      />,
+      <AppContextProvider
+        streamingMessageStore={createStore<string>('')}
+        messageHistoryStore={createStore<ChatCompletionMessageParam[]>([
+          { role: 'system', content: 'the system prompt' },
+        ])}
+      >
+        <PromptInput
+          submitUserMessage={mockSubmitUserMessage}
+          cancelStream={null}
+        />
+      </AppContextProvider>,
     );
 
     const buttonElement = screen.getByText('Submit');
@@ -121,10 +160,17 @@ describe('PromptInput Component', () => {
 
   it('renders Cancel button when cancelStream is provided', () => {
     render(
-      <PromptInput
-        submitUserMessage={mockSubmitUserMessage}
-        cancelStream={mockCancelStream}
-      />,
+      <AppContextProvider
+        streamingMessageStore={createStore<string>('')}
+        messageHistoryStore={createStore<ChatCompletionMessageParam[]>([
+          { role: 'system', content: 'the system prompt' },
+        ])}
+      >
+        <PromptInput
+          submitUserMessage={mockSubmitUserMessage}
+          cancelStream={() => {}}
+        />
+      </AppContextProvider>,
     );
 
     expect(screen.getByText('Cancel')).toBeInTheDocument();
@@ -132,25 +178,47 @@ describe('PromptInput Component', () => {
 
   it('renders Submit button when cancelStream is null', () => {
     render(
-      <PromptInput
-        submitUserMessage={mockSubmitUserMessage}
-        cancelStream={null}
-      />,
+      <AppContextProvider
+        streamingMessageStore={createStore<string>('')}
+        messageHistoryStore={createStore<ChatCompletionMessageParam[]>([
+          { role: 'system', content: 'the system prompt' },
+        ])}
+      >
+        <PromptInput
+          submitUserMessage={mockSubmitUserMessage}
+          cancelStream={null}
+        />
+      </AppContextProvider>,
     );
 
     expect(screen.getByText('Submit')).toBeInTheDocument();
   });
 
   it('disables the Submit button when there is a tool_call in progress', () => {
-    (useHasToolCallInProgress as unknown as Mock).mockImplementationOnce(
-      () => true,
-    );
-
     render(
-      <PromptInput
-        submitUserMessage={mockSubmitUserMessage}
-        cancelStream={null}
-      />,
+      <AppContextProvider
+        streamingMessageStore={createStore<string>('')}
+        messageHistoryStore={createStore<ChatCompletionMessageParam[]>([
+          { role: 'system', content: 'the system prompt' },
+          { role: 'user', content: 'tool_call' },
+          {
+            role: 'assistant',
+            content: null,
+            tool_calls: [
+              {
+                type: 'function',
+                function: { name: '', arguments: '' },
+                id: '',
+              },
+            ],
+          },
+        ])}
+      >
+        <PromptInput
+          submitUserMessage={mockSubmitUserMessage}
+          cancelStream={null}
+        />
+      </AppContextProvider>,
     );
 
     expect(screen.getByRole('button')).toBeInTheDocument();

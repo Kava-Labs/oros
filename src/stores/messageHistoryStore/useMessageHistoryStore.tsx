@@ -1,8 +1,8 @@
 import { useSyncExternalStore } from 'react';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
-import { messageHistoryStore } from './messageHistoryStore';
+import { MessageHistoryStore } from './messageHistoryStore';
 
-export const useMessageHistoryStore = (store = messageHistoryStore) => {
+export const useMessageHistoryStore = (store: MessageHistoryStore) => {
   const state: ChatCompletionMessageParam[] = useSyncExternalStore(
     store.subscribe,
     store.getState,

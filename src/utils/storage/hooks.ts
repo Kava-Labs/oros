@@ -3,13 +3,16 @@ import { LocalStorage } from './index';
 import { ChatHistory } from './types';
 import { toast } from 'react-toastify';
 import { messageHistoryStore, useMessageHistoryStore } from '../../stores';
+import { useAppContext } from '../../contexts/AppContext';
 
 /**
  * when messages are added to msgHistory in redux (beyond just the initial system message), sync those messages
  * to local storage
  */
 export const useSyncToStorage = (storage: LocalStorage<ChatHistory>) => {
-  const [msgHistory] = useMessageHistoryStore();
+  const { messageHistoryStore } = useAppContext();
+
+  const [msgHistory] = useMessageHistoryStore(messageHistoryStore);
 
   useEffect(() => {
     //  only write to storage if there's something more than system prompt in redux msgHistory

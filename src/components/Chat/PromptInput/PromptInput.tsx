@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import styles from '../style.module.css';
 import { useHasToolCallInProgress } from '../../../stores';
+import { useAppContext } from '../../../contexts/AppContext';
 
 type PromptInputProps = {
   submitUserMessage: (content: string) => void;
@@ -11,8 +12,10 @@ export const PromptInput = ({
   submitUserMessage,
   cancelStream,
 }: PromptInputProps) => {
+  const { messageHistoryStore } = useAppContext();
+
   const [input, setInput] = useState('');
-  const hasToolCallInProgress = useHasToolCallInProgress();
+  const hasToolCallInProgress = useHasToolCallInProgress(messageHistoryStore);
 
   return (
     <form

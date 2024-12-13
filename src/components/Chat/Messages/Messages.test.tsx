@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { INTRO_MESSAGE, Messages } from './Messages';
-import type { ChatCompletionMessageParam } from 'openai/resources/index';
+import { AppContextProvider } from '../../../contexts/AppContext';
+import { ChatCompletionMessageParam } from 'openai/resources/index.mjs';
+import { createStore } from '../../../stores';
 
 describe('Messages Component', () => {
   beforeEach(() => {
@@ -19,7 +21,14 @@ describe('Messages Component', () => {
       { role: 'assistant', content: 'Hi there!' },
     ];
 
-    render(<Messages history={history} />);
+    render(
+      <AppContextProvider
+        streamingMessageStore={createStore<string>('')}
+        messageHistoryStore={createStore<ChatCompletionMessageParam[]>(history)}
+      >
+        <Messages history={history} />
+      </AppContextProvider>,
+    );
 
     // Messages with role 'user' and 'assistant' should be rendered
     expect(screen.getByText('Hello')).toBeInTheDocument();
@@ -33,7 +42,14 @@ describe('Messages Component', () => {
     const history: ChatCompletionMessageParam[] = [
       { role: 'system', content: 'system' },
     ];
-    render(<Messages history={history} />);
+    render(
+      <AppContextProvider
+        streamingMessageStore={createStore<string>('')}
+        messageHistoryStore={createStore<ChatCompletionMessageParam[]>(history)}
+      >
+        <Messages history={history} />
+      </AppContextProvider>,
+    );
 
     // Check that the INTRO_MESSAGE is rendered
     expect(screen.getByText(INTRO_MESSAGE)).toBeInTheDocument();
@@ -71,7 +87,14 @@ describe('Messages Component', () => {
       },
     ];
 
-    render(<Messages history={history} />);
+    render(
+      <AppContextProvider
+        streamingMessageStore={createStore<string>('')}
+        messageHistoryStore={createStore<ChatCompletionMessageParam[]>(history)}
+      >
+        <Messages history={history} />
+      </AppContextProvider>,
+    );
 
     expect(
       screen.queryByText('{"kava":"1000","hard":"34142"}'),
