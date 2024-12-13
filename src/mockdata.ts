@@ -1,4 +1,4 @@
-import type { ChatCompletionMessageParam } from 'openai';
+import type { ChatCompletionMessageParam } from 'openai/resources/index';
 
 export const mockChatMessages: ChatCompletionMessageParam[] = [
   {
