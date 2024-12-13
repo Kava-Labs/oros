@@ -95,6 +95,7 @@
   max-width: 768px;
   width: 100%;
   padding: 0px 10px 0px 10px;
+  margin-top: -10px;
 
   height: 100%;
 
@@ -196,16 +197,22 @@
 }
 
 #stickyHeader {
-  position: fixed;
+  position: sticky;
   top: 0;
   width: 100%;
-  max-width: 786px;
+  max-width: 768px;
   margin: 0 auto;
   background: #121212;
-  padding: 10px 20px;
+  padding: 10px 10px;
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  margin: 0px;
+
+  @media (max-width: 640px) {
+    padding: 5px 10px;
+
+  }
 
   #resetButton {
     background-color: rgb(60, 60, 60);
@@ -223,6 +230,20 @@
 
     &:active {
       transform: scale(0.8);
+    }
+
+    svg {
+      height: 24px;
+      width: 24px;
+    }
+
+    @media (max-width: 640px) {
+      padding: 3px 4px;
+
+      svg {
+        height: 20px;
+        width: 20x;
+      }
     }
   }
 }
