@@ -2,9 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Mock } from 'vitest';
 import { AppContextProvider } from './AppContext';
 import { useAppContext } from './AppContext';
-import {
-  createStore,
-} from '../stores';
+import { createStore } from '../stores';
 import * as utils from '../utils';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 
@@ -26,7 +24,6 @@ vi.mock('../utils', () => ({
   chat: vi.fn(),
   deleteImages: vi.fn(),
 }));
-
 
 describe('AppContextProvider', () => {
   beforeEach(() => {

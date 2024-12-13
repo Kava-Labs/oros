@@ -8,5 +8,3 @@ export const messageHistoryStore = createStore<ChatCompletionMessageParam[]>([
     content: systemPrompt,
   },
 ]);
-
-

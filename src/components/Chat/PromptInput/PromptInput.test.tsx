@@ -3,7 +3,6 @@ import { Mock } from 'vitest';
 import { PromptInput } from './PromptInput';
 import { useHasToolCallInProgress } from '../../../stores';
 
-
 vi.mock('../../../stores', () => ({
   useHasToolCallInProgress: vi.fn(),
 }));

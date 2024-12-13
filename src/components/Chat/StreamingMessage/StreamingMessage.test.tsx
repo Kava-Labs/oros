@@ -4,7 +4,6 @@ import { Mock } from 'vitest';
 import { StreamingMessage } from './StreamingMessage';
 import { useStreamingMessageStore } from '../../../stores';
 
-
 vi.mock('../../../stores', () => ({
   useStreamingMessageStore: vi.fn(),
 }));
@@ -26,7 +25,7 @@ describe('StreamingMessage Component', () => {
 
   it('returns null when content is empty', () => {
     (useStreamingMessageStore as Mock).mockImplementation(() => {
-      return ['']
+      return [''];
     });
 
     const chatContainerRef = React.createRef<HTMLDivElement>();
@@ -42,7 +41,7 @@ describe('StreamingMessage Component', () => {
     const content = 'Streaming content';
 
     (useStreamingMessageStore as Mock).mockImplementation(() => {
-      return [content]
+      return [content];
     });
 
     const chatContainerRef = React.createRef<HTMLDivElement>();

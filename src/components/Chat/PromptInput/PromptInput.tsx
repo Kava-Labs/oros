@@ -7,7 +7,6 @@ type PromptInputProps = {
   cancelStream: null | (() => void);
 };
 
-
 export const PromptInput = ({
   submitUserMessage,
   cancelStream,

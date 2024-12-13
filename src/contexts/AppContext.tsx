@@ -27,7 +27,7 @@ import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import {
   useSyncFromStorageOnReload,
   useSyncToStorage,
-} from '../utils/storage/hooks'
+} from '../utils/storage/hooks';
 
 interface AppContext {
   address: string;
