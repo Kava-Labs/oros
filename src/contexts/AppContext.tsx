@@ -114,13 +114,14 @@ export function AppContextProvider({
         const history = messageHistoryStore.getState();
 
         let i = history.length - 1;
-
+        // start from the last message and stop when you get to the first user message
         while (i > 1) {
           if (history[i].role === 'user') {
             break;
           }
           i--;
         }
+        // remove those messages
         if (i) messageHistoryStore.setState(history.slice(0, i));
 
         setCancelStream(null);
