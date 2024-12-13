@@ -40,7 +40,9 @@ test('receiving a response from the model', async ({ page }) => {
   expect(responseText).toMatch(/THIS IS A TEST/i);
 });
 
-test('fills in messages from local storage', async ({ page }) => {
+test('fills in messages from local storage to the UI, which persist on browser refresh', async ({
+  page,
+}) => {
   test.setTimeout(90 * 1000);
 
   const chat = new Chat(page);
@@ -81,7 +83,7 @@ test('fills in messages from local storage', async ({ page }) => {
   expect(responseMessageOnReload).toMatch(/That is terrific!/i);
 });
 
-test('messages from the chat populate local storage', async ({ page }) => {
+test('messages from the UI populate local storage', async ({ page }) => {
   test.setTimeout(90 * 1000);
 
   const chat = new Chat(page);
@@ -114,7 +116,7 @@ test('messages from the chat populate local storage', async ({ page }) => {
   });
 });
 
-test.only('clicking "reset chat" clears "chatMessages" from local storage', async ({
+test('clicking reset chat button clears chatMessages from local storage', async ({
   page,
 }) => {
   test.setTimeout(90 * 1000);
@@ -158,7 +160,7 @@ test.only('clicking "reset chat" clears "chatMessages" from local storage', asyn
   expect(updatedLocalStorage).toBeNull();
 });
 
-test('image generation', async ({ page }) => {
+test('image generation and editing', async ({ page }) => {
   test.setTimeout(90 * 1000);
 
   const chat = new Chat(page);
