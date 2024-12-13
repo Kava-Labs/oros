@@ -53,8 +53,8 @@ export const deepCopy = (val: unknown) => {
     // some older browsers may not have structuredClone
     // It's been available across browsers since early 2022 but just
     // in case this function is not available we fallback to JSON stringify then parse
-    if (window.structuredClone) {
-      return window.structuredClone(val);
+    if (structuredClone) {
+      return structuredClone(val);
     }
     return JSON.parse(JSON.stringify(val));
   } catch (err) {
