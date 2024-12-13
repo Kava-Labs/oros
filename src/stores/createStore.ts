@@ -1,7 +1,9 @@
 export interface StateStore<T> {
-  subscribe: (listener: () => void) => () => void;
   getCurrent: () => T;
   setValue: (newValue: T) => void;
+
+  subscribe: (listener: () => void) => () => void;
+  getSubscriberCount: () => number;
 }
 
 export const createStore = <T>(initialValue: T): StateStore<T> => {
@@ -34,8 +36,13 @@ export const createStore = <T>(initialValue: T): StateStore<T> => {
     stateProxy.current = newValue;
   };
 
+  const getSubscriberCount = () => {
+    return subscribers.size;
+  };
+
   return {
     subscribe,
+    getSubscriberCount,
     getCurrent,
     setValue,
   };
