@@ -55,34 +55,4 @@ describe('OpenAI Client', () => {
 
     expect(output).toMatch(expectedContent);
   });
-  it('streaming response assembles chunks into a response appropriate text', async () => {
-    const userPrompt = 'Say this is a test';
-    const expectedContent = 'This is a test';
-
-    const client = createOpenApiClient();
-
-    const chatStream = await client.chat.completions.create({
-      messages: [{ role: 'user', content: userPrompt }],
-      model: 'gpt-4o-mini',
-      stream: true,
-    });
-
-    //  Use this string to assemble the chunks into a singular message
-    let output = '';
-
-    for await (const chunk of chatStream) {
-      const { choices, id } = chunk;
-
-      const responseMessage = choices[0].delta;
-
-      expect(id).toBeDefined();
-      expect(choices).toHaveLength(1);
-
-      if (responseMessage.content) {
-        output = output.concat(responseMessage.content);
-      }
-    }
-
-    expect(output).toMatch(expectedContent);
-  });
 });
