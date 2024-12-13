@@ -211,7 +211,6 @@
 
   @media (max-width: 640px) {
     padding: 5px 10px;
-
   }
 
   #resetButton {
@@ -242,7 +241,7 @@
 
       svg {
         height: 20px;
-        width: 20x;
+        width: 20px;
       }
     }
   }

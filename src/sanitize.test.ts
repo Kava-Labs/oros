@@ -46,7 +46,9 @@ function hello() {
     `;
     const output = await sanitizeContent(input);
 
-    expect(output).toContain('<blockquote>\n<p>A blockquote\nspanning multiple lines.</p>\n</blockquote>');
+    expect(output).toContain(
+      '<blockquote>\n<p>A blockquote\nspanning multiple lines.</p>\n</blockquote>',
+    );
     expect(output).toContain('<pre><code class="language-javascript">');
     expect(output).toContain('console.log("Hello, world!");');
     expect(output).toContain('<table>');
@@ -94,7 +96,10 @@ This should render anyway
 
   it('should handle large input strings without error', async () => {
     // Generate a large markdown string
-    const largeInput = Array.from({ length: 1000 }, (_, i) => `- Item ${i}`).join('\n');
+    const largeInput = Array.from(
+      { length: 1000 },
+      (_, i) => `- Item ${i}`,
+    ).join('\n');
     const output = await sanitizeContent(largeInput);
     expect(output).toContain('<ul>');
     expect((output.match(/<li>/g) || []).length).toBe(1000);
