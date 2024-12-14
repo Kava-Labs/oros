@@ -233,7 +233,7 @@ jobs:
       # Requires API deployment to be successful (or skipped due to no changes)
       - deploy-production-api
     # Run when all are true:
-    # - New frontend build 'success' AND has changes
+    # - New frontend build 'success' AND has changes (needs explicit == 'true' check)
     # - If API deploy was 'success' OR 'skipped' (no changes)
     # - Push on main branch
     if: |
@@ -247,33 +247,3 @@ jobs:
       NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
     with:
       environment-name: frontend-production
-
-  frontend-result-test-1:
-    runs-on: ubuntu-latest
-    needs:
-      # Requires built files artifact
-      - build-frontend
-    if: |
-      always() &&
-      needs.build-frontend.result == 'success' &&
-      needs.build-frontend.outputs.changed == 'true'
-    steps:
-      - name: output
-        run: |
-          echo "${{ needs.build-frontend.outputs.changed }}"
-          echo "${{ toJson(needs.build-frontend.outputs) }}"
-
-  frontend-result-test-2:
-    runs-on: ubuntu-latest
-    needs:
-      # Requires built files artifact
-      - build-frontend
-    if: |
-      always() &&
-      needs.build-frontend.result == 'success' &&
-      needs.build-frontend.outputs.changed
-    steps:
-      - name: output
-        run: |
-          echo "${{ needs.build-frontend.outputs.changed }}"
-          echo "${{ toJson(needs.build-frontend.outputs) }}"
