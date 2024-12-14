@@ -20,6 +20,8 @@ jobs:
   build-frontend:
     name: Build frontend
     runs-on: ubuntu-latest
+    env:
+      VITE_OPENAI_BASE_URL: https://kavachat-api.production.kava.io/openai/v1
     outputs:
       changed: ${{ steps.diff.outputs.diff != '' }}
     steps:
