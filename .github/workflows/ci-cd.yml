@@ -9,7 +9,8 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  # Only cancel in-progress jobs on non-main branches
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 env:
   AWS_REGION: us-east-1
@@ -17,6 +18,7 @@ env:
 
 jobs:
   build-frontend:
+    name: Build frontend
     runs-on: ubuntu-latest
     outputs:
       changed: ${{ steps.diff.outputs.diff != '' }}
@@ -27,6 +29,8 @@ jobs:
       - name: Check for changes
         id: diff
         uses: technote-space/get-diff-action@v6
+        # Only files that are relevant to new frontend build.
+        # Excludes API and tests
         with:
           PATTERNS: |
             **/*.(js|ts|tsx|html)
@@ -184,10 +188,31 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+  check-api-files-changed:
+    name: Check if API files changed
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.diff.outputs.diff != '' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for changes
+        id: diff
+        uses: technote-space/get-diff-action@v6
+        with:
+          PATTERNS: |
+            ./api/**
+
   deploy-production-api:
-    needs: docker-build-test
-    # Limit to only run on main branch pushes
-    if: ${{ (github.ref == 'refs/heads/main') && github.event_name == 'push' }}
+    name: Deploy API to production
+    needs:
+      - docker-build-test
+      - check-api-files-changed
+    # Only run on main branch pushes and if API files changed
+    if: |
+      needs.check-api-files-changed.outputs.changed == 'true' &&
+      (github.ref == 'refs/heads/main') && github.event_name == 'push'
     uses: ./.github/workflows/deploy-api.yml
     # This passes **repo secrets** which are actually not set (empty strings).
     # However, this grants access to the child workflow to read the secrets from
@@ -201,18 +226,20 @@ jobs:
       image-name: ${{ needs.docker-build-test.outputs.image-name }}
 
   deploy-frontend:
+    name: Deploy frontend to production
     needs:
-      # Requires built artifact
+      # Requires built files artifact
       - build-frontend
       # Requires API deployment to be successful (or skipped due to no changes)
       - deploy-production-api
-    # Run when:
-    # - New frontend build 'success' and has new changes
-    # - If API deploy was 'success' or 'skipped' (no changes)
+    # Run when all are true:
+    # - New frontend build 'success' AND has changes (needs explicit == 'true' check)
+    # - If API deploy was 'success' OR 'skipped' (no changes)
     # - Push on main branch
     if: |
       always() &&
-      needs.build-frontend.result == 'success' && needs.build-frontend.outputs.changed &&
+      needs.build-frontend.result == 'success' &&
+      needs.build-frontend.outputs.changed == 'true' &&
       (needs.deploy-production-api.result == 'success' || needs.deploy-production-api.result == 'skipped') &&
       (github.ref == 'refs/heads/main' && github.event_name == 'push')
     uses: ./.github/workflows/deploy-netlify.yml
