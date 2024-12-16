@@ -1,5 +1,5 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { ChatCompletionMessageParam } from 'openai/resources';
+import type { ChatCompletionMessageParam } from 'openai/resources/index';
 
 export class Chat {
   public page: Page;
@@ -9,9 +9,9 @@ export class Chat {
   constructor(page: Page) {
     this.page = page;
     this.messageContainer = this.page.locator(
-      `[data-testid="ChatContainer"] div div`,
+      `[data-testid="conversation"] div div`,
     );
-    this.chatContainer = this.page.getByTestId('ChatContainer');
+    this.chatContainer = this.page.getByTestId('conversation');
   }
 
   async goto() {
@@ -20,8 +20,8 @@ export class Chat {
   }
 
   async submitMessage(text: string) {
-    await this.page.getByTestId('PromptInput').getByRole('textbox').fill(text);
-    await this.page.getByTestId('PromptInput').getByRole('button').click();
+    await this.page.getByTestId('chat-view-input').fill(text);
+    await this.page.getByTestId('chat-view-button').click();
   }
 
   async waitForStreamToFinish() {
@@ -39,7 +39,7 @@ export class Chat {
     await this.page.waitForFunction(
       () => {
         const messages = document.querySelectorAll(
-          '[data-testid="ChatContainer"] div div',
+          '[data-testid="conversation"] div div',
         );
         const lastMessage = messages[messages.length - 1];
         return (

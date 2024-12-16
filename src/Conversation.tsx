@@ -13,7 +13,8 @@ const ContentMemo = memo(Content, (prevProps, curProps) => {
   // todo: do we need this callback function?
   return (
     prevProps.content === curProps.content &&
-    prevProps.onRendered === curProps.onRendered
+    prevProps.onRendered === curProps.onRendered &&
+    prevProps.role === curProps.role
   );
 });
 
@@ -37,6 +38,7 @@ export const Conversation = ({
           return (
             <div key={index} className={styles.right}>
               <ContentMemo
+                role={message.role}
                 content={message.content as string}
                 onRendered={onRendered}
               />
@@ -49,6 +51,7 @@ export const Conversation = ({
             <div key={index} className={styles.left}>
               <img src={chatIcon} className={styles.chatIcon} />
               <ContentMemo
+                role={message.role}
                 content={message.content as string}
                 onRendered={onRendered}
               />
@@ -103,7 +106,11 @@ export const Conversation = ({
             <div id={styles.progressStream}>
               <StreamingText store={progressStore}>
                 {(message) => (
-                  <ContentMemo content={message} onRendered={onRendered} />
+                  <ContentMemo
+                    role="assistant"
+                    content={message}
+                    onRendered={onRendered}
+                  />
                 )}
               </StreamingText>
             </div>
@@ -111,7 +118,11 @@ export const Conversation = ({
             <div id={styles.assistantStream}>
               <StreamingText store={messageStore}>
                 {(message) => (
-                  <ContentMemo content={message} onRendered={onRendered} />
+                  <ContentMemo
+                    role="assistant"
+                    content={message}
+                    onRendered={onRendered}
+                  />
                 )}
               </StreamingText>
             </div>

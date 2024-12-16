@@ -5,9 +5,10 @@ import styles from './ChatView.module.css';
 export interface ContentProps {
   content: string;
   onRendered(): void;
+  role: string;
 }
 
-export const Content = ({ content, onRendered }: ContentProps) => {
+export const Content = ({ content, onRendered, role }: ContentProps) => {
   const [hasError, setHasError] = useState(false);
   const [sanitizedContent, setSanitizedContent] = useState<string>('');
 
@@ -52,13 +53,13 @@ export const Content = ({ content, onRendered }: ContentProps) => {
   }
 
   return (
-    <>
+    <div data-chat-role={role}>
       {sanitizedContent !== '' && (
         <span
           className={styles.content}
           dangerouslySetInnerHTML={{ __html: sanitizedContent }}
         ></span>
       )}
-    </>
+    </div>
   );
 };
