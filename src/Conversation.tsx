@@ -9,7 +9,12 @@ import { TokenCard } from './TokenCard';
 
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 
-const ContentMemo = memo(Content);
+const ContentMemo = memo(Content, (prevProps, curProps) => {
+  return (
+    prevProps.content === curProps.content &&
+    prevProps.onRendered === curProps.onRendered
+  );
+});
 
 export interface ConversationProps {
   messages: ChatCompletionMessageParam[];
