@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import styles from './TokenCard.module.css';
 import { imagedb } from './imagedb';
-import { LoadingSpinner } from './components/LoadingSpinner';
+import { LoadingSpinner } from './LoadingSpinner';
 
 export interface TokenCardProps {
   id: string;

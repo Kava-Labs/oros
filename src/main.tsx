@@ -5,12 +5,6 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
 //
-// Redux Imports
-//
-import { Provider } from 'react-redux';
-import { appStore } from './stores';
-
-//
 // Global CSS & Fonts
 //
 import './global.css';
@@ -40,7 +34,6 @@ idbDatabase()
 // Components & Context
 //
 import { App } from './App.tsx';
-import { AppContextProvider } from './contexts/AppContext.tsx';
 
 //
 // Render!
@@ -49,10 +42,6 @@ const root = createRoot(document.getElementById('root')!);
 
 root.render(
   <StrictMode>
-    <Provider store={appStore}>
-      <AppContextProvider>
-        <App />
-      </AppContextProvider>
-    </Provider>
+    <App />
   </StrictMode>,
 );
