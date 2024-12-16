@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { ChatView } from './ChatView';
 import { getToken } from './utils/token/token';
 import OpenAI from 'openai';
-import { messageStore, progressStore } from './store';
+import { messageStore, progressStore, errorStore } from './store';
 import type {
   ChatCompletionMessageParam,
   ChatCompletionChunk,
@@ -49,6 +49,8 @@ export const App = () => {
   // use is sending request to signify to the chat view that
   // a request is in progress so it can disable inputs
   const [isRequesting, setIsRequesting] = useState(false);
+
+  const errorText = errorStore.getSnapshot();
   // abort controller for cancelling openai request
   const controllerRef = useRef<AbortController | null>(null);
 
@@ -95,13 +97,13 @@ export const App = () => {
         tools,
         progressStore,
         messageStore,
+        errorStore,
         publishMessage,
       );
     } catch (error) {
       if (error instanceof DOMException && error.name !== 'AbortError') {
         console.error(error);
       }
-      // TODO: Add error message rendering to page
     } finally {
       setIsRequesting(false);
       controllerRef.current = null;
@@ -129,6 +131,7 @@ export const App = () => {
           onReset={handleReset}
           onCancel={handleCancel}
           isRequesting={isRequesting}
+          errorText={errorText}
         />
       )}
     </>
@@ -142,6 +145,7 @@ async function doChat(
   tools: ChatCompletionTool[],
   progressStore: TextStreamStore,
   messageStore: TextStreamStore,
+  errorStore: TextStreamStore,
   publishMessage: (
     messages: ChatCompletionMessageParam[],
     message: ChatCompletionMessageParam,
@@ -149,6 +153,9 @@ async function doChat(
 ) {
   progressStore.setText('Thinking');
   try {
+    //  clear any existing error
+    errorStore.setText('');
+
     const toolCallsState: ChatCompletionChunk.Choice.Delta.ToolCall[] = [];
 
     const stream = await client.chat.completions.create(
@@ -201,10 +208,17 @@ async function doChat(
         tools,
         progressStore,
         messageStore,
+        errorStore,
         publishMessage,
       );
     }
+    //  todo - cleanup
   } catch (e) {
+    const errorMessage =
+      typeof e === 'object' && e !== null && 'message' in e
+        ? (e as { message: string }).message
+        : 'An error occurred - please try again';
+    errorStore.setText(errorMessage);
     console.error(e);
   } finally {
     // Clear progress text if not cleared already

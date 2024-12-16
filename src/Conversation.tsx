@@ -22,6 +22,7 @@ export interface ConversationProps {
   messages: ChatCompletionMessageParam[];
 
   isRequesting: boolean;
+  errorText: string;
 
   onRendered(): void;
 }
@@ -29,6 +30,7 @@ export interface ConversationProps {
 export const Conversation = ({
   messages,
   isRequesting,
+  errorText,
   onRendered,
 }: ConversationProps) => {
   return (
@@ -127,6 +129,12 @@ export const Conversation = ({
               </StreamingText>
             </div>
           </div>
+        </div>
+      )}
+      {errorText !== '' && (
+        <div className={styles.left}>
+          <img src={chatIcon} className={styles.chatIcon} />
+          <ContentMemo content={errorText} onRendered={onRendered} />
         </div>
       )}
     </div>
