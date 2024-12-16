@@ -82,6 +82,7 @@ jobs:
       # Frontend playwrite tests
       VITE_OPENAI_BASE_URL: http://localhost:5555/openai/v1
     outputs:
+      changed: ${{ steps.diff.outputs.diff != '' }}
       image-name: ${{ steps.image-name.outputs.image }}
     steps:
       - name: Checkout current commit
@@ -89,6 +90,13 @@ jobs:
         with:
           # Also clone kvtool submodule
           submodules: true
+
+      - name: Check for API server changes
+        id: diff
+        uses: technote-space/get-diff-action@v6
+        with:
+          PATTERNS: |
+            ./api/**
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -178,8 +186,8 @@ jobs:
         run: docker compose -f docker-compose.yaml down
 
       - name: Push Docker image to Amazon ECR
-        # Only push images on main branch pushes
-        if: ${{ (github.ref == 'refs/heads/main') && github.event_name == 'push' }}
+        # Only push images on main branch pushes AND if API files were changed.
+        if: ${{ (github.ref == 'refs/heads/main') && github.event_name == 'push' && steps.diff.outputs.diff != '' }}
         uses: docker/build-push-action@v6
         with:
           # Path context instead of git context so it doesn't build from remote repo
@@ -190,30 +198,13 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  check-api-files-changed:
-    name: Check if API files changed
-    runs-on: ubuntu-latest
-    outputs:
-      changed: ${{ steps.diff.outputs.diff != '' }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Check for changes
-        id: diff
-        uses: technote-space/get-diff-action@v6
-        with:
-          PATTERNS: |
-            ./api/**
-
   deploy-production-api:
     name: Deploy API to production
     needs:
       - docker-build-test
-      - check-api-files-changed
     # Only run on main branch pushes and if API files changed
     if: |
-      needs.check-api-files-changed.outputs.changed == 'true' &&
+      needs.docker-build-test.outputs.changed == 'true' &&
       (github.ref == 'refs/heads/main') && github.event_name == 'push'
     uses: ./.github/workflows/deploy-api.yml
     # This passes **repo secrets** which are actually not set (empty strings).
@@ -235,7 +226,7 @@ jobs:
       # Requires API deployment to be successful (or skipped due to no changes)
       - deploy-production-api
     # Run when all are true:
-    # - New frontend build 'success' AND has changes (needs explicit == 'true' check)
+    # - New frontend build 'success' AND has changes (needs explicit == 'true' check as its a string, 'false' is still truthy)
     # - If API deploy was 'success' OR 'skipped' (no changes)
     # - Push on main branch
     if: |
