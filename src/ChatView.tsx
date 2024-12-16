@@ -126,7 +126,7 @@ export const ChatView = ({
         <div id={styles.inputContainer}>
           <textarea
             id={styles.input}
-            data-testid="input"
+            data-testid="chat-view-input"
             rows={1}
             value={inputValue}
             onChange={handleInputChange}
@@ -134,6 +134,7 @@ export const ChatView = ({
           ></textarea>
 
           <button
+            data-testid='chat-view-button'
             ref={buttonRef}
             id={styles.sendChatButton}
             type="submit"
