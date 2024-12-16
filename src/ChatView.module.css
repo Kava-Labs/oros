@@ -1,0 +1,287 @@
+#chatview {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  justify-content: center;
+  background: #121212;
+}
+
+::-webkit-scrollbar {
+  background-color: #121212;
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #2d2d2d;
+  border-radius: 16px;
+}
+
+#startContainer {
+  max-width: 768px;
+  width: 100%;
+  padding: 0px 10px 0px 10px;
+  margin-top: -10px;
+
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+}
+
+#start {
+  color: #ffffff;
+  margin: auto;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.6rem;
+
+  max-width: 60%;
+  @media (max-width: 640px) {
+    max-width: 80%;
+  }
+
+  img {
+    height: 72px;
+    width: 72px;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 0;
+    margin-top: 10px;
+    font-size: 2.2rem;
+  }
+
+  p {
+    text-align: center;
+    margin-top: 10px;
+  }
+}
+
+.right {
+  flex-shrink: 0;
+  border-radius: 16px;
+  background: #2d2d2d;
+  color: #ffffff;
+  padding: 16px;
+  font-size: 1.6rem;
+  margin-left: auto;
+  margin-top: 10px;
+}
+
+.left {
+  flex-shrink: 0;
+  margin-top: 10px;
+  font-size: 1.6rem;
+  padding: 16px 16px 16px 0px;
+  color: #ffffff;
+
+  display: flex;
+  flex-direction: row;
+}
+
+#progressStream{
+  .content {
+    color: #BBBBBB;
+
+    p::after {
+      content: '.';
+      animation: dots 1.5s steps(5, end) infinite;
+    }
+  }
+}
+
+@keyframes dots {
+  0%, 20% {
+    content: '.';
+  }
+  40% {
+    content: '..';
+  }
+  60% {
+    content: '...';
+  }
+  80%, 100% {
+    content: '';
+  }
+}
+
+.chatIcon {
+  height: 48px;
+  width: 48px;
+  margin-right: 5px;
+  margin-top: -10px;
+}
+
+#scrollContent {
+  flex-grow: 1;
+  width: 100%;
+
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+
+  scrollbar-color: #2d2d2d #121212;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+}
+
+#conversation {
+  max-width: 768px;
+  width: 100%;
+  padding: 0px 10px 0px 10px;
+  margin-top: -10px;
+
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+}
+
+#inputContainer {
+  width: 100%;
+  max-width: 768px;
+  display: flex;
+  align-items: flex-start; /* Align items at the top to maintain alignment */
+  position: relative;
+
+  #input {
+    min-height: 50px;
+    /* height: 100px; */
+    max-width: 768px;
+    width: 100%;
+    background-color: #2d2d2d;
+    border-radius: 16px;
+    border: none;
+    padding: 16px;
+    color: #ffffff;
+    font-size: 1.6rem;
+    font-family: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    flex: 1;
+    padding: 12px 55px 10px 20px; /* 12px works with line-height to center text veritically  in textarea */
+    overflow-y: auto; /* Enable vertical scrolling */
+    resize: none; /* Disable manual resizing */
+    text-wrap: wrap;
+
+    &:focus {
+      border: none;
+      outline: none;
+      caret-color: white;
+    }
+  }
+
+  #sendChatButton {
+    position: absolute;
+    right: 10px;
+    bottom: 10px; /* Stick the button to the bottom-right of the container */
+    padding: 8px 15px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%; /* Make the button perfectly round */
+    border: none;
+    background-color: #007bff;
+    display: flex; /* Use flex to center the SVG */
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition:
+      background-color 0.3s ease,
+      transform 0.2s ease;
+
+    &:hover {
+      background-color: #0056b3; /* Darken the background color on hover */
+    }
+
+    &:active {
+      transform: scale(0.8); /* make the button strink slightly on click */
+    }
+
+    svg {
+      color: #ffffff; /* SVG color */
+      width: 15px; /* Adjust SVG width */
+      height: 15px; /* Adjust SVG height */
+      flex-shrink: 0; /* prevent SVG from shrinking in flexbox */
+    }
+  }
+}
+
+#controls {
+  width: 100%;
+  flex-shrink: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  scrollbar-color: #2d2d2d #121212;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+  padding: 0px 4px 4px 4px;
+
+  @media (max-width: 768px) {
+    overflow-y: hidden;
+  }
+}
+
+#importantInfo {
+  margin-top: 4px;
+  font-size: 1rem;
+  text-align: center;
+  color: rgb(150, 150, 150);
+}
+
+#stickyHeader {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  max-width: 768px;
+  margin: 0 auto;
+  background: #121212;
+  padding: 10px 10px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin: 0px;
+
+  @media (max-width: 640px) {
+    padding: 5px 10px;
+  }
+
+  #resetButton {
+    background-color: rgb(60, 60, 60);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 6px 9px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: rgb(75, 75, 75);
+    }
+
+    &:active {
+      transform: scale(0.8);
+    }
+
+    svg {
+      height: 24px;
+      width: 24px;
+    }
+
+    @media (max-width: 640px) {
+      padding: 3px 4px;
+
+      svg {
+        height: 20px;
+        width: 20px;
+      }
+    }
+  }
+}

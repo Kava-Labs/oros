@@ -35,3 +35,5 @@ __pycache__
 kavachat-api
 
 .env
+
+*storybook.log

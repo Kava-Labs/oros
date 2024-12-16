@@ -99,8 +99,8 @@ export const tools: ChatCompletionTool[] = [
             description: 'the description of the token',
           },
           name: {
-            type: 'string', 
-            description: 'the name of the token'
+            type: 'string',
+            description: 'the name of the token',
           },
         },
         required: ['prompt', 'symbol', 'about', 'name'],

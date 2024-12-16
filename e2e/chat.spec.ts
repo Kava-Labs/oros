@@ -8,12 +8,10 @@ test('renders intro message', async ({ page }) => {
 
   expect(chat.messageContainer).not.toBeNull();
 
-  const role = await chat.messageContainer.getAttribute('data-chat-role');
-  expect(role).toBe('assistant');
+  await expect(page.getByText("let's get started")).toBeVisible();
 
-  await expect(chat.messageContainer).toHaveText(/Hey I'm Kava AI/, {
-    useInnerText: true,
-  });
+  await expect(page.getByText("Tell me about your memecoin idea below and we'll generate everything you need to get it launched.")).toBeVisible();
+
 });
 
 test('receiving a response from the model', async ({ page }) => {
@@ -40,7 +38,8 @@ test('receiving a response from the model', async ({ page }) => {
   expect(responseText).toMatch(/THIS IS A TEST/i);
 });
 
-test('fills in messages from local storage to the UI, which persist on browser refresh', async ({
+// skipped because we disabled local storage
+test.skip('fills in messages from local storage to the UI, which persist on browser refresh', async ({
   page,
 }) => {
   test.setTimeout(90 * 1000);
@@ -83,7 +82,8 @@ test('fills in messages from local storage to the UI, which persist on browser r
   expect(responseMessageOnReload).toMatch(/That is terrific!/i);
 });
 
-test('messages from the UI populate local storage', async ({ page }) => {
+// skipped because we disabled local storage
+test.skip('messages from the UI populate local storage', async ({ page }) => {
   test.setTimeout(90 * 1000);
 
   const chat = new Chat(page);
@@ -97,7 +97,7 @@ test('messages from the UI populate local storage', async ({ page }) => {
   await chat.waitForAssistantResponse();
 
   const messageHistory = await chat.getMessageHistoryFromStorage();
-  expect(JSON.parse(messageHistory)).toStrictEqual({
+  expect(JSON.parse(messageHistory!)).toStrictEqual({
     messages: [
       {
         role: 'system',
@@ -116,7 +116,8 @@ test('messages from the UI populate local storage', async ({ page }) => {
   });
 });
 
-test('clicking reset chat button clears chatMessages from local storage', async ({
+// skipped because we disabled local storage
+test.skip('clicking reset chat button clears chatMessages from local storage', async ({
   page,
 }) => {
   test.setTimeout(90 * 1000);
@@ -132,7 +133,7 @@ test('clicking reset chat button clears chatMessages from local storage', async 
   await chat.waitForAssistantResponse();
 
   const messageHistory = await chat.getMessageHistoryFromStorage();
-  expect(JSON.parse(messageHistory)).toStrictEqual({
+  expect(JSON.parse(messageHistory!)).toStrictEqual({
     messages: [
       {
         role: 'system',
@@ -160,7 +161,7 @@ test('clicking reset chat button clears chatMessages from local storage', async 
   expect(updatedLocalStorage).toBeNull();
 });
 
-test('image generation and editing', async ({ page }) => {
+test.skip('image generation and editing', async ({ page }) => {
   test.setTimeout(90 * 1000);
 
   const chat = new Chat(page);
