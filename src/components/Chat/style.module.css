@@ -49,11 +49,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  max-width: 1010px;
 }
 
 /* Input field styles */
 .inputField {
-  max-width: 910px;
   height: 50px;
   width: 100%;
   color: #eeeeee;
