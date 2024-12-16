@@ -289,7 +289,7 @@ async function callTools(
         break;
       }
       default:
-        throw new Error(`unkown tool call: ${name}`);
+        throw new Error(`unknown tool call: ${name}`);
     }
   }
 }
