@@ -12,7 +12,7 @@ export interface ChatViewProps {
   messages: ChatCompletionMessageParam[];
 
   isRequesting: boolean;
-
+  errorText: string;
   onSubmit(value: string): void;
   onReset(): void;
   onCancel(): void;
@@ -21,6 +21,7 @@ export interface ChatViewProps {
 export const ChatView = ({
   messages,
   isRequesting,
+  errorText,
   onSubmit,
   onReset,
   onCancel,
@@ -103,6 +104,7 @@ export const ChatView = ({
             <Conversation
               messages={messages}
               isRequesting={isRequesting}
+              errorText={errorText}
               onRendered={handleContentRendered}
             />
           </>
