@@ -32,6 +32,7 @@ jobs:
         id: diff
         uses: technote-space/get-diff-action@v6
         # Only files that are relevant to new frontend build.
+        # Also includes workflow files in case build process changes.
         # Excludes API and tests
         with:
           PATTERNS: |
@@ -41,6 +42,7 @@ jobs:
             public/**
             !.github/**
             !api/**
+            .github/workflows/**
           FILES: |
             package.json
             package-lock.json
