@@ -78,4 +78,4 @@ The user's request maybe vague, but you should always use it as context to provi
 
 ### Final Note
 Use the provided tool to produce the final token metadata when appropriate. After using the tool, do not repeat or display the token’s metadata. Instead, inform the user that the metadata has been generated and is available for them to view, and ask if they have any feedback or further requests.
-`
+`;

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
 
 import { ChatView } from '../ChatView';
 import { mockChatMessages } from '../mockdata';
@@ -31,6 +32,10 @@ export const Primary: Story = {
   },
   args: {
     messages: mockChatMessages,
+    isRequesting: false,
+    onSubmit: fn(),
+    onReset: fn(),
+    onCancel: fn(),
   },
 };
 
@@ -40,6 +45,10 @@ export const OnPhoneSmall: Story = {
   },
   args: {
     messages: mockChatMessages,
+    isRequesting: false,
+    onSubmit: fn(),
+    onReset: fn(),
+    onCancel: fn(),
   },
 };
 
@@ -49,6 +58,10 @@ export const OnPhoneLarge: Story = {
   },
   args: {
     messages: mockChatMessages,
+    isRequesting: false,
+    onSubmit: fn(),
+    onReset: fn(),
+    onCancel: fn(),
   },
 };
 
@@ -56,12 +69,37 @@ export const NoMessages: Story = {
   parameters: {
     viewport: { defaultViewport: 'reset' },
   },
-  args: { messages: [] },
+  args: {
+    messages: [],
+    isRequesting: false,
+    onSubmit: fn(),
+    onReset: fn(),
+    onCancel: fn(),
+  },
 };
 
 export const NoMessagesOnPhoneSmall: Story = {
   parameters: {
     viewport: { defaultViewport: 'mobile1' },
   },
-  args: { messages: [] },
+  args: {
+    messages: [],
+    isRequesting: false,
+    onSubmit: fn(),
+    onReset: fn(),
+    onCancel: fn(),
+  },
+};
+
+export const RequestInProgress: Story = {
+  parameters: {
+    viewport: { defaultViewport: 'reset' },
+  },
+  args: {
+    messages: [],
+    isRequesting: true,
+    onSubmit: fn(),
+    onCancel: fn(),
+    onReset: fn(),
+  },
 };

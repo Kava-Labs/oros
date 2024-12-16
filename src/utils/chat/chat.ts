@@ -44,7 +44,7 @@ export interface ChatConfig {
  * @param result - The ChatCompletionChunk to check.
  * @returns True if the chunk contains content, false otherwise.
  */
-const isContentChunk = (result: ChatCompletionChunk): boolean => {
+export const isContentChunk = (result: ChatCompletionChunk): boolean => {
   const delta = result.choices[0].delta;
   // Sometimes content is an empty string, so we check if content is a string property.
   if (delta && 'content' in delta && typeof delta.content === 'string') {
@@ -58,7 +58,7 @@ const isContentChunk = (result: ChatCompletionChunk): boolean => {
  * @param result - The ChatCompletionChunk to check.
  * @returns True if the chunk contains tool calls, false otherwise.
  */
-const isToolCallChunk = (result: ChatCompletionChunk): boolean => {
+export const isToolCallChunk = (result: ChatCompletionChunk): boolean => {
   if (result.choices[0]?.delta && result.choices[0].delta.tool_calls) {
     return true;
   }
@@ -70,7 +70,7 @@ const isToolCallChunk = (result: ChatCompletionChunk): boolean => {
  * @param result - The ChatCompletionChunk containing tool call data.
  * @param toolCallsState - The state array to assemble tool calls into.
  */
-const assembleToolCallsFromStream = (
+export const assembleToolCallsFromStream = (
   result: ChatCompletionChunk,
   toolCallsState: ChatCompletionChunk.Choice.Delta.ToolCall[],
 ): void => {
