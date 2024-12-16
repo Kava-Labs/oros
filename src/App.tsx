@@ -49,8 +49,8 @@ export const App = () => {
   // use is sending request to signify to the chat view that
   // a request is in progress so it can disable inputs
   const [isRequesting, setIsRequesting] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
-  const errorText = errorStore.getSnapshot();
   // abort controller for cancelling openai request
   const controllerRef = useRef<AbortController | null>(null);
 
@@ -101,8 +101,13 @@ export const App = () => {
         publishMessage,
       );
     } catch (error) {
+      setHasError(true);
       if (error instanceof DOMException && error.name !== 'AbortError') {
-        console.error(error);
+        const errorMessage =
+          typeof error === 'object' && error !== null && 'message' in error
+            ? (error as { message: string }).message
+            : 'An error occurred - please try again';
+        errorStore.setText(errorMessage);
       }
     } finally {
       setIsRequesting(false);
@@ -131,7 +136,7 @@ export const App = () => {
           onReset={handleReset}
           onCancel={handleCancel}
           isRequesting={isRequesting}
-          errorText={errorText}
+          hasError={hasError}
         />
       )}
     </>
@@ -152,10 +157,9 @@ async function doChat(
   ) => void,
 ) {
   progressStore.setText('Thinking');
+  //  clear any existing error
+  errorStore.setText('');
   try {
-    //  clear any existing error
-    errorStore.setText('');
-
     const toolCallsState: ChatCompletionChunk.Choice.Delta.ToolCall[] = [];
 
     const stream = await client.chat.completions.create(
@@ -214,12 +218,18 @@ async function doChat(
     }
     //  todo - cleanup
   } catch (e) {
-    const errorMessage =
+    let errorMessage =
       typeof e === 'object' && e !== null && 'message' in e
         ? (e as { message: string }).message
         : 'An error occurred - please try again';
+
+    //  This error occurs during an in-progress cancelled recursive call
+    if (errorMessage.startsWith('Unterminated string in JSON at position')) {
+      errorMessage = 'You clicked cancel - please try again';
+    }
+
     errorStore.setText(errorMessage);
-    console.error(e);
+    throw e;
   } finally {
     // Clear progress text if not cleared already
     if (progressStore.getSnapshot() !== '') {
