@@ -21,9 +21,9 @@ on:
       NETLIFY_AUTH_TOKEN:
         required: true
         description: 'Netlify auth token'
-
-env:
-  NETLIFY_SITE_ID: b56e4d0e-21ed-44d6-aafa-2e5d63106ece
+      NETLIFY_SITE_ID:
+        required: true
+        description: 'Netlify site ID'
 
 jobs:
   deploy-frontend:
@@ -64,5 +64,5 @@ jobs:
           echo "deploy-url=$DEPLOY_URL" >> $GITHUB_OUTPUT
           echo "logs-url=$LOGS_URL" >> $GITHUB_OUTPUT
         env:
-          NETLIFY_SITE_ID: ${{ env.NETLIFY_SITE_ID }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
