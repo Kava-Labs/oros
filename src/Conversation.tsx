@@ -3,7 +3,7 @@ import styles from './ChatView.module.css';
 import chatIcon from './assets/chatIcon.svg';
 import { Content } from './Content';
 import { StreamingText } from './StreamingText';
-import { messageStore, progressStore } from './store';
+import { messageStore, progressStore, errorStore } from './store';
 import type { GenerateTokenMetadataResponse } from './tools/toolFunctions';
 import { TokenCard } from './TokenCard';
 
@@ -20,17 +20,16 @@ const ContentMemo = memo(Content, (prevProps, curProps) => {
 
 export interface ConversationProps {
   messages: ChatCompletionMessageParam[];
-
+  hasError: boolean;
   isRequesting: boolean;
-  errorText: string;
 
   onRendered(): void;
 }
 
 export const Conversation = ({
   messages,
+  hasError,
   isRequesting,
-  errorText,
   onRendered,
 }: ConversationProps) => {
   return (
@@ -99,11 +98,9 @@ export const Conversation = ({
 
         return null;
       })}
-
       {isRequesting && (
         <div className={styles.left}>
           <img src={chatIcon} className={styles.chatIcon} />
-
           <div id={styles.streamContainer}>
             <div id={styles.progressStream}>
               <StreamingText store={progressStore}>
@@ -116,7 +113,6 @@ export const Conversation = ({
                 )}
               </StreamingText>
             </div>
-
             <div id={styles.assistantStream}>
               <StreamingText store={messageStore}>
                 {(message) => (
@@ -131,10 +127,12 @@ export const Conversation = ({
           </div>
         </div>
       )}
-      {errorText !== '' && (
+      {hasError && !isRequesting && (
         <div className={styles.left}>
           <img src={chatIcon} className={styles.chatIcon} />
-          <ContentMemo content={errorText} onRendered={onRendered} />
+          <StreamingText store={errorStore}>
+            {(error) => <ContentMemo content={error} onRendered={onRendered} />}
+          </StreamingText>
         </div>
       )}
     </div>
