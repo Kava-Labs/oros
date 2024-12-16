@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Chat Demo</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css"
+    />
+    <link rel="stylesheet" href="./chatdemo.css" />
+    <!-- <style>
+      body {
+        height: 100vh;
+        margin: 0;
+        background: radial-gradient(
+            circle at -10% 70%,
+            #3c1a11ff 3%,
+            #3c1a1188 10%,
+            #1a0d0b66 25%,
+            #1a0d0b44 40%,
+            #1a0d0b22 60%,
+            #00000000 80%
+          ),
+          radial-gradient(
+            circle at 110% 20%,
+            #3c1a11ff 3%,
+            #3c1a1188 10%,
+            #1a0d0b66 25%,
+            #1a0d0b44 40%,
+            #1a0d0b22 60%,
+            #00000000 80%
+          );
+        background-size:
+          120% 120%,
+          120% 120%;
+        background-repeat: no-repeat;
+        background-position:
+          -10% 70%,
+          110% 20%;
+        background-clip: padding-box;
+      }
+
+      #open_chat {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 70px;
+        height: 70px;
+        background: white;
+        border: none;
+        border-radius: 50%;
+        padding: 1px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      #open_chat svg {
+        width: 100%;
+        height: 100%;
+      }
+
+      #iframe-root {
+        position: fixed;
+        bottom: 100px;
+        right: 20px;
+        width: 400px;
+        height: 600px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        display: none;
+        visibility: hidden;
+      }
+
+      #iframe-root.open {
+        z-index: 1000;
+        display: block;
+        visibility: visible;
+      }
+
+      .form-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        letter-spacing: 0.02rem;
+
+        #avatar-image {
+          padding: 5px;
+          border-radius: 50%;
+          margin-bottom: 100px;
+          color: white;
+        }
+
+        .field {
+          margin-top: 20px;
+          margin-bottom: 20px;
+        }
+
+        #form-header {
+          color: white;
+          font-size: 18px;
+          line-height: 28px;
+          font-weight: 450;
+          letter-spacing: normal;
+        }
+
+        .form-card {
+          max-width: 550px;
+          width: 100%;
+
+          input,
+          textarea {
+            border: 0.5px solid #9e9c9b;
+            color: #9e9c9b;
+            background: transparent !important;
+            border-radius: 10px;
+            font-size: 1.2rem;
+          }
+
+          textarea {
+            max-height: 50px;
+          }
+
+          input::placeholder,
+          textarea::placeholder {
+            color: #9e9c9b;
+          }
+
+          input:hover,
+          textarea:hover {
+            border-color: #bfbdba;
+            color: #bfbdba;
+          }
+
+          input:focus,
+          textarea:focus {
+            border-color: #19b6e9;
+            color: white !important;
+            outline: none;
+          }
+
+          input:active,
+          textarea:ative {
+            border-color: #19b6e9;
+            color: white !important;
+            outline: none;
+          }
+
+          .button-connect {
+            width: 100%;
+            border-radius: 30px;
+            background: linear-gradient(45deg, #ff564f, #ff873e);
+            color: white;
+            border: none;
+            font-weight: 800;
+          }
+
+          .button-connect:hover {
+            background: linear-gradient(45deg, #ff873e, #ff564f);
+            color: white;
+          }
+        }
+      }
+    </style> -->
+  </head>
+  <body>
+    <div id="chat-container">
+      <div id="iframe-root"></div>
+
+      <button id="open_chat" aria-label="Open Chat">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+          <circle cx="100" cy="100" r="90" fill="#1a1a1a" />
+          <circle cx="100" cy="100" r="20" fill="#4a90e2" />
+          <circle cx="65" cy="65" r="12" fill="#4a90e2" opacity="0.9" />
+          <circle cx="135" cy="65" r="12" fill="#4a90e2" opacity="0.9" />
+          <circle cx="135" cy="135" r="12" fill="#4a90e2" opacity="0.9" />
+          <circle cx="65" cy="135" r="12" fill="#4a90e2" opacity="0.9" />
+          <line
+            x1="75"
+            y1="75"
+            x2="90"
+            y2="90"
+            stroke="#4a90e2"
+            stroke-width="3"
+          />
+          <line
+            x1="125"
+            y1="75"
+            x2="110"
+            y2="90"
+            stroke="#4a90e2"
+            stroke-width="3"
+          />
+          <line
+            x1="125"
+            y1="125"
+            x2="110"
+            y2="110"
+            stroke="#4a90e2"
+            stroke-width="3"
+          />
+          <line
+            x1="75"
+            y1="125"
+            x2="90"
+            y2="110"
+            stroke="#4a90e2"
+            stroke-width="3"
+          />
+          <path
+            d="M65,65 Q100,40 135,65"
+            fill="none"
+            stroke="#4a90e2"
+            stroke-width="2.5"
+            opacity="0.7"
+          />
+          <path
+            d="M135,65 Q160,100 135,135"
+            fill="none"
+            stroke="#4a90e2"
+            stroke-width="2.5"
+            opacity="0.7"
+          />
+          <path
+            d="M135,135 Q100,160 65,135"
+            fill="none"
+            stroke="#4a90e2"
+            stroke-width="2.5"
+            opacity="0.7"
+          />
+          <path
+            d="M65,135 Q40,100 65,65"
+            fill="none"
+            stroke="#4a90e2"
+            stroke-width="2.5"
+            opacity="0.7"
+          />
+          <circle cx="82" cy="82" r="3" fill="#4a90e2" opacity="0.8" />
+          <circle cx="118" cy="82" r="3" fill="#4a90e2" opacity="0.8" />
+          <circle cx="118" cy="118" r="3" fill="#4a90e2" opacity="0.8" />
+          <circle cx="82" cy="118" r="3" fill="#4a90e2" opacity="0.8" />
+        </svg>
+      </button>
+
+      <div id="GENERATED_TOKEN_METADATA"></div>
+    </div>
+
+    <div class="form-container">
+      <figure class="image is-128x128 avatar-container">
+        <div class="is-rounded avatar-circle" id="token-avatar">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="40"
+            height="40"
+            color="#9e9c9b"
+            fill="none"
+          >
+            <path
+              d="M17.4776 9.01106C17.485 9.01102 17.4925 9.01101 17.5 9.01101C19.9853 9.01101 22 11.0294 22 13.5193C22 15.8398 20.25 17.7508 18 18M17.4776 9.01106C17.4924 8.84606 17.5 8.67896 17.5 8.51009C17.5 5.46695 15.0376 3 12 3C9.12324 3 6.76233 5.21267 6.52042 8.03192M17.4776 9.01106C17.3753 10.1476 16.9286 11.1846 16.2428 12.0165M6.52042 8.03192C3.98398 8.27373 2 10.4139 2 13.0183C2 15.4417 3.71776 17.4632 6 17.9273M6.52042 8.03192C6.67826 8.01687 6.83823 8.00917 7 8.00917C8.12582 8.00917 9.16474 8.38194 10.0005 9.01101"
+              stroke="currentColor"
+              stroke-width="1"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M12 13L12 21M12 13C11.2998 13 9.99153 14.9943 9.5 15.5M12 13C12.7002 13 14.0085 14.9943 14.5 15.5"
+              stroke="currentColor"
+              stroke-width="1"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+      </figure>
+      <div class="form-card">
+        <h2 id="form-header">Basic Token Info</h2>
+        <form>
+          <div class="field">
+            <div class="control">
+              <input
+                class="input transparent-input"
+                type="text"
+                placeholder="Token Name"
+                id="token-name-input"
+              />
+            </div>
+          </div>
+          <div class="field">
+            <div class="control">
+              <input
+                class="input transparent-input"
+                type="text"
+                placeholder="Token Symbol"
+                id="token-symbol-input"
+              />
+            </div>
+          </div>
+          <div class="field">
+            <div class="control">
+              <textarea
+                class="textarea transparent-input"
+                placeholder="Description (Optional)"
+                id="token-description-input"
+              ></textarea>
+            </div>
+          </div>
+          <div class="field full-width">
+            <div class="control">
+              <button
+                class="button button-connect"
+                type="button"
+                onclick="() => {}"
+              >
+                Connect Wallet
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="./chatdemo.js"></script>
+  </body>
+</html>

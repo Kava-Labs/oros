@@ -1,0 +1,174 @@
+body {
+  height: 100vh;
+  margin: 0;
+  background: radial-gradient(
+      circle at -10% 70%,
+      #3c1a11ff 3%,
+      #3c1a1188 10%,
+      #1a0d0b66 25%,
+      #1a0d0b44 40%,
+      #1a0d0b22 60%,
+      #00000000 80%
+    ),
+    radial-gradient(
+      circle at 110% 20%,
+      #3c1a11ff 3%,
+      #3c1a1188 10%,
+      #1a0d0b66 25%,
+      #1a0d0b44 40%,
+      #1a0d0b22 60%,
+      #00000000 80%
+    );
+  background-size:
+    120% 120%,
+    120% 120%;
+  background-repeat: no-repeat;
+  background-position:
+    -10% 70%,
+    110% 20%;
+  background-clip: padding-box;
+}
+
+#open_chat {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 70px;
+  height: 70px;
+  background: white;
+  border: none;
+  border-radius: 50%;
+  padding: 1px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#open_chat svg {
+  width: 100%;
+  height: 100%;
+}
+
+#iframe-root {
+  position: fixed;
+  bottom: 100px;
+  right: 20px;
+  width: 400px;
+  height: 600px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  display: none;
+  visibility: hidden;
+}
+
+#iframe-root.open {
+  z-index: 1000;
+  display: block;
+  visibility: visible;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100vh;
+  letter-spacing: 0.02rem;
+  padding-top: 12.5%;
+
+  .field {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  #form-header {
+    color: white;
+    font-size: 18px;
+    line-height: 28px;
+    font-weight: 450;
+    letter-spacing: normal;
+  }
+
+  .form-card {
+    max-width: 550px;
+    width: 100%;
+
+    input,
+    textarea {
+      border: 0.5px solid #9e9c9b;
+      color: #9e9c9b;
+      background: transparent !important;
+      border-radius: 10px;
+      font-size: 1.2rem;
+    }
+
+    textarea {
+      max-height: 50px;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #9e9c9b;
+    }
+
+    input:hover,
+    textarea:hover {
+      border-color: #bfbdba;
+      color: #bfbdba;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: #19b6e9;
+      color: white !important;
+      outline: none;
+    }
+
+    input:active,
+    textarea:ative {
+      border-color: #19b6e9;
+      color: white !important;
+      outline: none;
+    }
+
+    .button-connect {
+      width: 100%;
+      border-radius: 30px;
+      background: linear-gradient(45deg, #ff564f, #ff873e);
+      color: white;
+      border: none;
+      font-weight: 800;
+    }
+
+    .button-connect:hover {
+      background: linear-gradient(45deg, #ff873e, #ff564f);
+      color: white;
+    }
+  }
+}
+
+.avatar-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 100px;
+}
+
+.avatar-circle {
+  width: 100px;
+  height: 100px;
+  padding: 20px; /* Padding between the border and the SVG */
+  border-radius: 50%; /* Creates the circular shape */
+  border: 1px solid #9e9c9b; /* Customize the border color and width */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Optional shadow */
+}
+
+.avatar-circle svg {
+  width: 40px;
+  height: 40px; /* Adjust size to fit well within the circle */
+}
