@@ -297,17 +297,5 @@
 #chatIconContainer {
   width: 80px;
   height: 80px;
-  border-radius: 50%;
-  background-color: #1a1a1a;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-
-  img {
-    width: 64px; /* SVG width */
-    height: 64px; /* SVG height */
-    object-fit: contain; /* Ensures the image fits within the size */
-  }
+  object-fit: contain; /* Ensures the image fits within the size */
 }
