@@ -158,17 +158,25 @@ body {
 .avatar-circle {
   width: 100px;
   height: 100px;
-  padding: 20px; /* Padding between the border and the SVG */
-  border-radius: 50%; /* Creates the circular shape */
-  border: 1px solid #9e9c9b; /* Customize the border color and width */
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid #9e9c9b;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: transparent;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Optional shadow */
-}
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
 
-.avatar-circle svg {
-  width: 40px;
-  height: 40px; /* Adjust size to fit well within the circle */
+  img {
+    width: 100%; /* Force full width */
+    height: 100%; /* Force full height */
+    object-fit: cover; /* Maintain aspect ratio and crop excess */
+    display: block; /* Remove inline spacing */
+  }
+
+  svg {
+    width: 40px;
+    height: 40px;
+  }
 }

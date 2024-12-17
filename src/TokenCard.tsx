@@ -22,6 +22,21 @@ export const TokenCard = ({
 }: TokenCardProps) => {
   const [imageUri, setImageUri] = useState<string | undefined>(undefined);
 
+  const handleLaunchClick = () => {
+    const tokenMetadata = {
+      base64ImageData: imageUri,
+      tokenName: name,
+      tokenSymbol: symbol,
+      tokenDescription: about,
+    };
+
+    // Send message to the parent window from the iframe
+    window.parent.postMessage(
+      { type: 'GENERATED_TOKEN_METADATA', payload: tokenMetadata },
+      '*',
+    );
+  };
+
   useEffect(() => {
     let cancel = false;
     const getImageUri = async () => {
@@ -83,7 +98,7 @@ export const TokenCard = ({
           <button
             id={styles.launchButton}
             aria-label="Launch Token"
-            onClick={() => {}}
+            onClick={handleLaunchClick}
           >
             <LaunchIcon />
 
