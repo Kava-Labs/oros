@@ -3,8 +3,6 @@ import { bech32 } from 'bech32';
 import { erc20ABI } from './erc20ABI';
 import { ASSET_ADDRESSES, kavaEVMProvider } from '../config/evm';
 import { Coin, fetchDelegatedBalance, fetchStakingApy } from './api';
-import OpenAI from 'openai';
-import { getToken, saveImage } from '../utils';
 /**
  *
  * @param kavaAddress string
@@ -221,33 +219,3 @@ export type GenerateTokenMetadataResponse = {
   name: string;
 };
 
-export const generateCoinMetadata = async ({
-  prompt,
-  about,
-  symbol,
-  name,
-}: GenerateTokenMetadataParams): Promise<GenerateTokenMetadataResponse> => {
-  const client = new OpenAI({
-    baseURL: import.meta.env['VITE_OPENAI_BASE_URL'],
-    apiKey: getToken(),
-    dangerouslyAllowBrowser: true,
-  });
-
-  const res = await client.images.generate({
-    model: 'dall-e-3',
-    prompt,
-    quality: 'hd', // note(sah): This param is only supported for dall-e-3 https://platform.openai.com/docs/api-reference/images/create
-    response_format: 'b64_json',
-  });
-
-  const b64ImageData = res.data[0].b64_json!;
-
-  const id = await saveImage(b64ImageData);
-
-  return {
-    name,
-    id,
-    about,
-    symbol,
-  };
-};
