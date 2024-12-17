@@ -4,14 +4,16 @@ import type { ChatCompletionMessageParam } from 'openai/resources/index';
 export class Chat {
   public page: Page;
   public messageContainer: Locator;
-  public chatContainer: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.messageContainer = this.page.locator(
       `[data-testid="conversation"] div div`,
     );
-    this.chatContainer = this.page.getByTestId('conversation');
+  }
+
+  async getMessageElements() {
+    return await this.page.$$('[data-testid="conversation-message"]');
   }
 
   async goto() {

@@ -1,6 +1,22 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, ElementHandle } from '@playwright/test';
 import { systemPrompt } from '../src/config';
 import { Chat } from './Chat';
+
+/**
+ * Blank locators are added to the chat container during the loading text animation
+ * This function removes those and only leaves elements that have text content
+ * This is useful because the response should be the last element after cleanup
+ */
+const removeEmptyMessageElements = async (messageElements: ElementHandle[]) => {
+  const trimmedMessages: string[] = [];
+  for await (const element of messageElements) {
+    if ((await element.textContent()) !== '') {
+      trimmedMessages.push(await element.textContent());
+    }
+  }
+
+  return trimmedMessages;
+};
 
 test('renders intro message', async ({ page }) => {
   const chat = new Chat(page);
@@ -30,7 +46,7 @@ test('receiving a response from the model', async ({ page }) => {
   await chat.waitForStreamToFinish();
   await chat.waitForAssistantResponse();
 
-  const messages = await chat.messageContainer.all();
+  const messages = await chat.getMessageElements();
   expect(messages.length).toBeGreaterThan(0);
 
   const attr =
@@ -271,32 +287,33 @@ test('handles cancelling an in progress token metadata request', async ({
 
   await chat.submitMessage('Make me a giraffe-themed meme coin');
 
-  const messages = await page.$$('[data-testid="conversation"]');
+  const messages = await removeEmptyMessageElements(
+    await chat.getMessageElements(),
+  );
 
   //  Streaming begins
-  expect(await messages[messages.length - 1].textContent()).toMatch(
-    /Thinking/i,
-  );
+  expect(await messages[messages.length - 1]).toMatch(/Thinking/i);
 
   //  allow everything but the image to be set
   await chat.waitForStreamToFinish();
 
-  const messagesDuringImageGeneration = await page.$$(
-    '[data-testid="conversation"]',
+  const messagesDuringImageGeneration = await removeEmptyMessageElements(
+    await chat.getMessageElements(),
   );
 
   expect(
     await messagesDuringImageGeneration[
       messagesDuringImageGeneration.length - 1
-    ].textContent(),
+    ],
   ).toMatch(/Generating image/i);
 
   //  click cancel icon
   await page.getByTestId('chat-view-button').click();
 
-  const messagesAfterCancel = await page.$$('[data-testid="conversation"]');
-
-  expect(
-    await messagesAfterCancel[messagesAfterCancel.length - 1].textContent(),
-  ).toMatch(/Request was aborted/i);
+  const messagesAfterCancel = await removeEmptyMessageElements(
+    await chat.getMessageElements(),
+  );
+  expect(await messagesAfterCancel[messagesAfterCancel.length - 1]).toMatch(
+    /Request was aborted/i,
+  );
 });

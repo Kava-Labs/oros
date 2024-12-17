@@ -53,7 +53,7 @@ export const Content = ({ content, onRendered, role }: ContentProps) => {
   }
 
   return (
-    <div data-chat-role={role}>
+    <div data-testid="conversation-message" data-chat-role={role}>
       {sanitizedContent !== '' && (
         <span
           className={styles.content}
