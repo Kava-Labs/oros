@@ -84,9 +84,9 @@
   flex-direction: row;
 }
 
-#progressStream{
+#progressStream {
   .content {
-    color: #BBBBBB;
+    color: #bbbbbb;
 
     p::after {
       content: '.';
@@ -96,7 +96,8 @@
 }
 
 @keyframes dots {
-  0%, 20% {
+  0%,
+  20% {
     content: '.';
   }
   40% {
@@ -105,7 +106,8 @@
   60% {
     content: '...';
   }
-  80%, 100% {
+  80%,
+  100% {
     content: '';
   }
 }
@@ -175,39 +177,39 @@
       caret-color: white;
     }
   }
+}
 
-  #sendChatButton {
-    position: absolute;
-    right: 10px;
-    bottom: 10px; /* Stick the button to the bottom-right of the container */
-    padding: 8px 15px;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%; /* Make the button perfectly round */
-    border: none;
-    background-color: #007bff;
-    display: flex; /* Use flex to center the SVG */
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition:
-      background-color 0.3s ease,
-      transform 0.2s ease;
+#sendChatButton {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 8px 15px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background-color: #ff564f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    opacity 0.2s ease;
 
-    &:hover {
-      background-color: #0056b3; /* Darken the background color on hover */
-    }
+  &:hover {
+    background-color: #e04a45;
+  }
 
-    &:active {
-      transform: scale(0.8); /* make the button strink slightly on click */
-    }
+  &:active {
+    opacity: 0.6;
+  }
 
-    svg {
-      color: #ffffff; /* SVG color */
-      width: 15px; /* Adjust SVG width */
-      height: 15px; /* Adjust SVG height */
-      flex-shrink: 0; /* prevent SVG from shrinking in flexbox */
-    }
+  svg {
+    color: #ffffff;
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
   }
 }
 
