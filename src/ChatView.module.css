@@ -187,14 +187,9 @@
   height: 30px;
   padding: 0;
   border-radius: 50%;
-<<<<<<< HEAD
   box-sizing: border-box;
   background: #070303;
   border: 1px solid rgb(247, 73, 40);
-=======
-  background: #070303;
-  border: 1.5px solid rgb(247, 73, 40);
->>>>>>> beaa8d4 (feat: add launch btn and update action btn styling)
   display: flex;
   align-items: center;
   justify-content: center;
