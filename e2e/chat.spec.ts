@@ -2,22 +2,6 @@ import { test, expect, Locator } from '@playwright/test';
 import { systemPrompt } from '../src/config';
 import { Chat } from './Chat';
 
-/**
- * Blank locators are added to the chat container during the loading text animation
- * This function removes those and only leaves elements that have text content
- * This is useful because the response should be the last element
- */
-const removeEmptyMessageElements = async (messages: Locator[]) => {
-  const trimmedMessages: string[] = [];
-  for await (const message of messages) {
-    if ((await message.textContent()) !== '') {
-      trimmedMessages.push(await message.textContent());
-    }
-  }
-
-  return trimmedMessages;
-};
-
 test('renders intro message', async ({ page }) => {
   const chat = new Chat(page);
   await chat.goto();
@@ -287,33 +271,32 @@ test('handles cancelling an in progress token metadata request', async ({
 
   await chat.submitMessage('Make me a giraffe-themed meme coin');
 
-  //  remove empty messages caused by animation
-  const messages = await removeEmptyMessageElements(
-    await chat.messageContainer.all(),
-  );
+  const messages = await page.$$('[data-testid="conversation"]');
 
   //  Streaming begins
-  expect(messages[messages.length - 1]).toMatch(/Thinking/i);
+  expect(await messages[messages.length - 1].textContent()).toMatch(
+    /Thinking/i,
+  );
 
   //  allow everything but the image to be set
   await chat.waitForStreamToFinish();
 
-  const messagesDuringImageGeneration = await removeEmptyMessageElements(
-    await chat.messageContainer.all(),
+  const messagesDuringImageGeneration = await page.$$(
+    '[data-testid="conversation"]',
   );
 
   expect(
-    messagesDuringImageGeneration[messagesDuringImageGeneration.length - 1],
+    await messagesDuringImageGeneration[
+      messagesDuringImageGeneration.length - 1
+    ].textContent(),
   ).toMatch(/Generating image/i);
 
   //  click cancel icon
   await page.getByTestId('chat-view-button').click();
 
-  const messagesAfterCancel = await removeEmptyMessageElements(
-    await chat.messageContainer.all(),
-  );
+  const messagesAfterCancel = await page.$$('[data-testid="conversation"]');
 
-  expect(messagesAfterCancel[messagesAfterCancel.length - 1]).toMatch(
-    /Request was aborted/i,
-  );
+  expect(
+    await messagesAfterCancel[messagesAfterCancel.length - 1].textContent(),
+  ).toMatch(/Request was aborted/i);
 });
