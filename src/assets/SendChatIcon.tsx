@@ -11,14 +11,14 @@ export const SendChatIcon = memo(
       >
         <path
           d="M12 4V20"
-          stroke="#ff564f"
+          stroke="rgb(247, 73, 40, 0.75)"
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
         <path
           d="M4 12H20"
-          stroke="#ff564f"
+          stroke="rgb(247, 73, 40, 0.75)"
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"

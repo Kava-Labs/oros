@@ -8,7 +8,7 @@ export const LaunchIcon = memo(
         viewBox="0 0 24 24"
         width="20"
         height="20"
-        color="#f74928"
+        color="rgb(247, 73, 40, 0.75)"
         fill="none"
       >
         <path
@@ -35,7 +35,7 @@ export const LaunchIcon = memo(
           d="M4 12L3 13"
           stroke="currentColor"
           strokeWidth="1.5"
-          stroke-linecap="round"
+          strokeLinecap="round"
           strokeLinejoin="round"
         />
         <path
