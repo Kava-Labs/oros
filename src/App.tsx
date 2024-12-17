@@ -91,24 +91,29 @@ export const App = () => {
     // This is recursive and completes when all tools calls have been made
     // and all follow ups have been completed.
     try {
-      await doChat(
-        controller,
-        client,
-        newMessages,
-        tools,
-        progressStore,
-        messageStore,
-        setErrorText,
-        publishMessage,
-      );
+      setErrorText(''),
+        await doChat(
+          controller,
+          client,
+          newMessages,
+          tools,
+          progressStore,
+          messageStore,
+          publishMessage,
+        );
     } catch (error) {
-      if (error instanceof DOMException && error.name !== 'AbortError') {
-        const errorMessage =
-          typeof error === 'object' && error !== null && 'message' in error
-            ? (error as { message: string }).message
-            : 'An error occurred - please try again';
-        setErrorText(errorMessage);
+      // if (error instanceof DOMException && error.name !== 'AbortError') {
+      let errorMessage =
+        typeof error === 'object' && error !== null && 'message' in error
+          ? (error as { message: string }).message
+          : 'An error occurred - please try again';
+
+      if (errorMessage.startsWith('Unterminated string in JSON at position')) {
+        errorMessage = 'You clicked cancel - please try again';
       }
+
+      setErrorText(errorMessage);
+      // }
     } finally {
       setIsRequesting(false);
       controllerRef.current = null;
@@ -150,7 +155,6 @@ async function doChat(
   tools: ChatCompletionTool[],
   progressStore: TextStreamStore,
   messageStore: TextStreamStore,
-  setErrorText: (e: string) => void,
   publishMessage: (
     messages: ChatCompletionMessageParam[],
     message: ChatCompletionMessageParam,
@@ -158,7 +162,6 @@ async function doChat(
 ) {
   progressStore.setText('Thinking');
   //  clear any existing error
-  setErrorText('');
   try {
     const toolCallsState: ChatCompletionChunk.Choice.Delta.ToolCall[] = [];
 
@@ -212,23 +215,10 @@ async function doChat(
         tools,
         progressStore,
         messageStore,
-        setErrorText,
         publishMessage,
       );
     }
-    //  todo - cleanup
   } catch (e) {
-    let errorMessage =
-      typeof e === 'object' && e !== null && 'message' in e
-        ? (e as { message: string }).message
-        : 'An error occurred - please try again';
-
-    //  This error occurs during an in-progress cancelled recursive call
-    if (errorMessage.startsWith('Unterminated string in JSON at position')) {
-      errorMessage = 'You clicked cancel - please try again';
-    }
-
-    setErrorText(errorMessage);
     throw e;
   } finally {
     // Clear progress text if not cleared already
