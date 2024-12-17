@@ -1,7 +1,7 @@
 import { chat } from '../src/utils';
 import { createOpenApiClient } from './helpers';
 import OpenAI from 'openai';
-import { ChatConfig } from '../src/utils/chat/chat';
+import { ChatConfig } from '../src/streamUtils';
 
 describe('chat function', () => {
   const onData = vi.fn();
