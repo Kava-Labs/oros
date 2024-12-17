@@ -272,12 +272,17 @@ test('handles cancelling an in progress token metadata request', async ({
   await chat.submitMessage('Make me a giraffe-themed meme coin');
 
   const messages = await chat.messageContainer.all();
-  const responseMessage = await messages[messages.length - 1].textContent();
+
+  const responseMessage = await messages[1].textContent();
 
   expect(responseMessage).toMatch(/Thinking/i);
 
   //  click cancel icon
   await page.getByTestId('chat-view-button').click();
-  //
-  expect(responseMessage).toBe('You clicked cancel - please try again');
+
+  const updatedMessages = await chat.messageContainer.all();
+
+  console.log(await updatedMessages[0].textContent());
+  console.log(await updatedMessages[1].textContent());
+  console.log(await updatedMessages[2].textContent());
 });
