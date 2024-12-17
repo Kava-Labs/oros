@@ -10,8 +10,11 @@ test('renders intro message', async ({ page }) => {
 
   await expect(page.getByText("let's get started")).toBeVisible();
 
-  await expect(page.getByText("Tell me about your memecoin idea below and we'll generate everything you need to get it launched.")).toBeVisible();
-
+  await expect(
+    page.getByText(
+      "Tell me about your memecoin idea below and we'll generate everything you need to get it launched.",
+    ),
+  ).toBeVisible();
 });
 
 test('receiving a response from the model', async ({ page }) => {
@@ -256,4 +259,25 @@ test.skip('image generation and editing', async ({ page }) => {
     await updatedTokenDescription.textContent(),
   );
   expect(anotherTokenImageSrc).not.toBe(updatedTokenImageSrc);
+});
+
+test('handles cancelling an in progress token metadata request', async ({
+  page,
+}) => {
+  test.setTimeout(90 * 1000);
+
+  const chat = new Chat(page);
+  await chat.goto();
+
+  await chat.submitMessage('Make me a giraffe-themed meme coin');
+
+  const messages = await chat.messageContainer.all();
+  const responseMessage = await messages[messages.length - 1].textContent();
+
+  expect(responseMessage).toMatch(/Thinking/i);
+
+  //  click cancel icon
+  await page.getByTestId('chat-view-button').click();
+  //
+  expect(responseMessage).toBe('You clicked cancel - please try again');
 });
