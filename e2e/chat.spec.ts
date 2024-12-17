@@ -201,7 +201,7 @@ test('image generation and editing', async ({ page }) => {
     .locator('img[alt="Model Generated Image"]')
     .nth(1);
   const updatedTokenImageSrc = await updatedTokenImage.getAttribute('src');
-  //
+
   expect(updatedTokenImageSrc).not.toBe(initialTokenImageSrc);
 
   //  todo - edit all token metadata
