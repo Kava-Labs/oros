@@ -36,6 +36,7 @@ export const Primary: Story = {
     onSubmit: fn(),
     onReset: fn(),
     onCancel: fn(),
+    errorText: '',
   },
 };
 
@@ -49,6 +50,7 @@ export const OnPhoneSmall: Story = {
     onSubmit: fn(),
     onReset: fn(),
     onCancel: fn(),
+    errorText: '',
   },
 };
 
@@ -62,6 +64,7 @@ export const OnPhoneLarge: Story = {
     onSubmit: fn(),
     onReset: fn(),
     onCancel: fn(),
+    errorText: '',
   },
 };
 
@@ -75,6 +78,7 @@ export const NoMessages: Story = {
     onSubmit: fn(),
     onReset: fn(),
     onCancel: fn(),
+    errorText: '',
   },
 };
 
@@ -88,6 +92,7 @@ export const NoMessagesOnPhoneSmall: Story = {
     onSubmit: fn(),
     onReset: fn(),
     onCancel: fn(),
+    errorText: '',
   },
 };
 
@@ -101,5 +106,6 @@ export const RequestInProgress: Story = {
     onSubmit: fn(),
     onCancel: fn(),
     onReset: fn(),
+    errorText: '',
   },
 };

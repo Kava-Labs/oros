@@ -25,7 +25,6 @@ let client: OpenAI | null = null;
 export const App = () => {
   // Do not load UI/UX until openAI client is ready
   const [isReady, setIsReady] = useState(false);
-  // TODO: add error component if this fails
   const [errorText, setErrorText] = useState('');
 
   // TODO: check healthcheck and set error if backend is not availiable
@@ -218,7 +217,8 @@ async function doChat(
       );
     }
   } catch (e) {
-    console.error(e);
+    console.error(`An error occurred: ${e} `);
+    throw e;
   } finally {
     // Clear progress text if not cleared already
     if (progressStore.getSnapshot() !== '') {
