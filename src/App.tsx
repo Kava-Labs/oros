@@ -13,7 +13,7 @@ import {
   isContentChunk,
   isToolCallChunk,
   assembleToolCallsFromStream,
-} from './utils/chat/chat';
+} from './streamUtils';
 import { TextStreamStore } from './textStreamStore';
 import { systemPrompt } from './config/systemPrompt';
 import { tools } from './config/tools';
