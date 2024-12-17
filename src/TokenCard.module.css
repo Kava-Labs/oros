@@ -41,9 +41,9 @@
   gap: 8px;
   width: 100px;
   border-radius: 30px;
-  color: rgb(247, 73, 40);
+  color: rgb(247, 73, 40, 0.75);
   background: #070303;
-  border: 1px solid rgb(247, 73, 40);
+  border: 1px solid rgb(247, 73, 40, 0.75);
   font-weight: 800;
   padding: 6px;
   transition:
