@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import styles from './TokenCard.module.css';
 import { imagedb } from './imagedb';
 import { LoadingSpinner } from './LoadingSpinner';
+import { LaunchIcon } from './assets/LaunchIcon';
 
 export interface TokenCardProps {
   id: string;
@@ -48,6 +49,8 @@ export const TokenCard = ({
     requestAnimationFrame(onRendered);
   }, [name, symbol, about, imageUri, onRendered]);
 
+  const isLoading = imageUri === undefined;
+
   return (
     <div className={styles.wrapper}>
       <div>
@@ -57,7 +60,7 @@ export const TokenCard = ({
           </strong>
         </h6>
       </div>
-      {imageUri === undefined && (
+      {isLoading && (
         <div>
           <LoadingSpinner />
         </div>
@@ -75,6 +78,19 @@ export const TokenCard = ({
       <div>
         <p>{about}</p>
       </div>
+      {!isLoading && (
+        <div id={styles.launchButtonContainer}>
+          <button
+            id={styles.launchButton}
+            aria-label="Launch Token"
+            onClick={() => {}}
+          >
+            <LaunchIcon />
+
+            <span>Launch</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 };
