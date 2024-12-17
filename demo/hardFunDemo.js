@@ -40,6 +40,8 @@ window.addEventListener('message', (event) => {
   if (event.data.type && event.data.type === 'GENERATED_TOKEN_METADATA') {
     // render the received data from the iFrame
 
+    console.log('event.data.payload', event.data.payload);
+
     document.getElementById('token-avatar').innerHTML = `
       <img
         alt="Model Generated Image"
@@ -53,18 +55,5 @@ window.addEventListener('message', (event) => {
       event.data.payload.tokenSymbol;
     document.getElementById('token-description-input').innerHTML =
       event.data.payload.tokenDescription;
-
-    //   document.getElementById('GENERATED_TOKEN_METADATA').innerHTML = `
-    // <h1>Received iFrame message from chat App</h1>
-    // <h3>Name: ${event.data.payload.tokenName}</h3>
-    // <h3>Symbol: ${event.data.payload.tokenSymbol}</h3>
-    // <h3>Description</h3>
-    // <p>${event.data.payload.tokenDescription}</p>
-    // <h3>Token Image</h3>
-    // <img
-    //   alt="Model Generated Image"
-    //   src="data:image/png;base64,${event.data.payload.base64ImageData}"
-    // />
-    //   `;
   }
 });
