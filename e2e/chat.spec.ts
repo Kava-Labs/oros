@@ -292,7 +292,7 @@ test('handles cancelling an in progress token metadata request', async ({
   );
 
   //  Streaming begins
-  expect(await messages[messages.length - 1]).toMatch(/Thinking/i);
+  expect(messages[messages.length - 1]).toMatch(/Thinking/i);
 
   //  allow everything but the image to be set
   await chat.waitForStreamToFinish();
@@ -302,9 +302,7 @@ test('handles cancelling an in progress token metadata request', async ({
   );
 
   expect(
-    await messagesDuringImageGeneration[
-      messagesDuringImageGeneration.length - 1
-    ],
+    messagesDuringImageGeneration[messagesDuringImageGeneration.length - 1],
   ).toMatch(/Generating image/i);
 
   //  click cancel icon
@@ -313,7 +311,7 @@ test('handles cancelling an in progress token metadata request', async ({
   const messagesAfterCancel = await removeEmptyMessageElements(
     await chat.getMessageElements(),
   );
-  expect(await messagesAfterCancel[messagesAfterCancel.length - 1]).toMatch(
+  expect(messagesAfterCancel[messagesAfterCancel.length - 1]).toMatch(
     /Request was aborted/i,
   );
 });

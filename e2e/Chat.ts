@@ -41,7 +41,7 @@ export class Chat {
     await this.page.waitForFunction(
       () => {
         const messages = document.querySelectorAll(
-          '[data-testid="conversation"] div div',
+          '[data-testid="conversation-message"]',
         );
         const lastMessage = messages[messages.length - 1];
         return (
