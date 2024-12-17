@@ -186,7 +186,6 @@ test('image generation and editing', async ({ page }) => {
   const initialTokenImageSrc = await initialTokenImage.getAttribute('src');
 
   await expect(initialTokenImage).toBeVisible();
-  await page.waitForTimeout(10000);
 
   await chat.waitForAssistantResponse();
 
