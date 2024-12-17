@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { ChatView } from './ChatView';
 import { getToken } from './utils/token/token';
 import OpenAI from 'openai';
-import { messageStore, progressStore, errorStore } from './store';
+import { messageStore, progressStore } from './store';
 import type {
   ChatCompletionMessageParam,
   ChatCompletionChunk,
@@ -26,6 +26,8 @@ export const App = () => {
   // Do not load UI/UX until openAI client is ready
   const [isReady, setIsReady] = useState(false);
   // TODO: add error component if this fails
+  const [errorText, setErrorText] = useState('');
+
   // TODO: check healthcheck and set error if backend is not availiable
   useEffect(() => {
     try {
@@ -49,7 +51,6 @@ export const App = () => {
   // use is sending request to signify to the chat view that
   // a request is in progress so it can disable inputs
   const [isRequesting, setIsRequesting] = useState(false);
-  const [hasError, setHasError] = useState(false);
 
   // abort controller for cancelling openai request
   const controllerRef = useRef<AbortController | null>(null);
@@ -97,17 +98,16 @@ export const App = () => {
         tools,
         progressStore,
         messageStore,
-        errorStore,
+        setErrorText,
         publishMessage,
       );
     } catch (error) {
-      setHasError(true);
       if (error instanceof DOMException && error.name !== 'AbortError') {
         const errorMessage =
           typeof error === 'object' && error !== null && 'message' in error
             ? (error as { message: string }).message
             : 'An error occurred - please try again';
-        errorStore.setText(errorMessage);
+        setErrorText(errorMessage);
       }
     } finally {
       setIsRequesting(false);
@@ -136,7 +136,7 @@ export const App = () => {
           onReset={handleReset}
           onCancel={handleCancel}
           isRequesting={isRequesting}
-          hasError={hasError}
+          errorText={errorText}
         />
       )}
     </>
@@ -150,7 +150,7 @@ async function doChat(
   tools: ChatCompletionTool[],
   progressStore: TextStreamStore,
   messageStore: TextStreamStore,
-  errorStore: TextStreamStore,
+  setErrorText: (e: string) => void,
   publishMessage: (
     messages: ChatCompletionMessageParam[],
     message: ChatCompletionMessageParam,
@@ -158,7 +158,7 @@ async function doChat(
 ) {
   progressStore.setText('Thinking');
   //  clear any existing error
-  errorStore.setText('');
+  setErrorText('');
   try {
     const toolCallsState: ChatCompletionChunk.Choice.Delta.ToolCall[] = [];
 
@@ -212,7 +212,7 @@ async function doChat(
         tools,
         progressStore,
         messageStore,
-        errorStore,
+        setErrorText,
         publishMessage,
       );
     }
@@ -228,7 +228,7 @@ async function doChat(
       errorMessage = 'You clicked cancel - please try again';
     }
 
-    errorStore.setText(errorMessage);
+    setErrorText(errorMessage);
     throw e;
   } finally {
     // Clear progress text if not cleared already

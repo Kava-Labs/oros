@@ -10,7 +10,7 @@ import type { ChatCompletionMessageParam } from 'openai/resources/index';
 
 export interface ChatViewProps {
   messages: ChatCompletionMessageParam[];
-  hasError: boolean;
+  errorText: string;
   isRequesting: boolean;
   onSubmit(value: string): void;
   onReset(): void;
@@ -19,7 +19,7 @@ export interface ChatViewProps {
 
 export const ChatView = ({
   messages,
-  hasError,
+  errorText,
   isRequesting,
   onSubmit,
   onReset,
@@ -102,7 +102,7 @@ export const ChatView = ({
 
             <Conversation
               messages={messages}
-              hasError={hasError}
+              errorText={errorText}
               isRequesting={isRequesting}
               onRendered={handleContentRendered}
             />

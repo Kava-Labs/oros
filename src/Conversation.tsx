@@ -3,7 +3,7 @@ import styles from './ChatView.module.css';
 import hardDotFunDiamond from './assets/hardDotFunDiamond.svg';
 import { Content } from './Content';
 import { StreamingText } from './StreamingText';
-import { messageStore, progressStore, errorStore } from './store';
+import { messageStore, progressStore } from './store';
 import type { GenerateTokenMetadataResponse } from './tools/toolFunctions';
 import { TokenCard } from './TokenCard';
 
@@ -20,7 +20,7 @@ const ContentMemo = memo(Content, (prevProps, curProps) => {
 
 export interface ConversationProps {
   messages: ChatCompletionMessageParam[];
-  hasError: boolean;
+  errorText: string;
   isRequesting: boolean;
 
   onRendered(): void;
@@ -28,7 +28,7 @@ export interface ConversationProps {
 
 export const Conversation = ({
   messages,
-  hasError,
+  errorText,
   isRequesting,
   onRendered,
 }: ConversationProps) => {
@@ -136,18 +136,14 @@ export const Conversation = ({
           </div>
         </div>
       )}
-      {hasError && !isRequesting && (
+      {errorText.length > 0 && (
         <div className={styles.left}>
           <img src={hardDotFunDiamond} className={styles.chatIcon} />
-          <StreamingText store={errorStore}>
-            {(error) => (
-              <ContentMemo
-                content={error}
-                onRendered={onRendered}
-                role="assistant"
-              />
-            )}
-          </StreamingText>
+          <Content
+            content={errorText}
+            onRendered={onRendered}
+            role="assistant"
+          />
         </div>
       )}
     </div>
