@@ -22,3 +22,39 @@
   margin-bottom: 35px;
   margin-top: 20px;
 }
+
+#launchButtonContainer {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#launchButton {
+  line-height: 1.2;
+  font-weight: 700;
+  font-family: 'Inter';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 20%;
+  border-radius: 30px;
+  color: rgb(247, 73, 40);
+  background: #070303;
+  border: 1px solid rgb(247, 73, 40);
+  font-weight: 800;
+  padding: 6px;
+  transition:
+    background 0.3s,
+    transform 0.2s;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+}

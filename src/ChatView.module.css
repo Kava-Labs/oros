@@ -187,8 +187,8 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  border: none;
-  background-color: #ff564f;
+  background: #070303;
+  border: 1.5px solid rgb(247, 73, 40);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -196,10 +196,6 @@
   transition:
     background-color 0.3s ease,
     opacity 0.2s ease;
-
-  &:hover {
-    background-color: #e04a45;
-  }
 
   &:active {
     opacity: 0.6;
@@ -255,9 +251,9 @@
   }
 
   #resetButton {
-    background-color: rgb(60, 60, 60);
+    background: #070303;
+    border: 1.5px solid rgb(247, 73, 40);
     color: #fff;
-    border: none;
     border-radius: 10px;
     padding: 6px 9px;
     font-size: 14px;
