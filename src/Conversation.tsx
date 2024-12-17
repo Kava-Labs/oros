@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import styles from './ChatView.module.css';
-import chatIcon from './assets/chatIcon.svg';
+import hardDotFunDiamond from './assets/hardDotFunDiamond.svg';
 import { Content } from './Content';
 import { StreamingText } from './StreamingText';
 import { messageStore, progressStore } from './store';
@@ -49,12 +49,17 @@ export const Conversation = ({
         if (message.role === 'assistant' && message.content) {
           return (
             <div key={index} className={styles.left}>
-              <img src={chatIcon} className={styles.chatIcon} />
-              <ContentMemo
-                role={message.role}
-                content={message.content as string}
-                onRendered={onRendered}
+              <img
+                src={hardDotFunDiamond}
+                className={styles.conversationChatIcon}
               />
+              <div className={styles.assistantContainer}>
+                <ContentMemo
+                  role={message.role}
+                  content={message.content as string}
+                  onRendered={onRendered}
+                />
+              </div>
             </div>
           );
         }
@@ -100,9 +105,12 @@ export const Conversation = ({
 
       {isRequesting && (
         <div className={styles.left}>
-          <img src={chatIcon} className={styles.chatIcon} />
+          <img
+            src={hardDotFunDiamond}
+            className={styles.conversationChatIcon}
+          />
 
-          <div id={styles.streamContainer}>
+          <div className={styles.assistantContainer}>
             <div id={styles.progressStream}>
               <StreamingText store={progressStore}>
                 {(message) => (

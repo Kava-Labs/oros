@@ -75,13 +75,18 @@
 
 .left {
   flex-shrink: 0;
-  margin-top: 10px;
+  margin-top: 20px;
   font-size: 1.6rem;
   padding: 16px 16px 16px 0px;
   color: #ffffff;
 
   display: flex;
   flex-direction: row;
+  align-items: start;
+}
+
+.assistantContainer {
+  margin-top: 15px;
 }
 
 #progressStream {
@@ -112,11 +117,15 @@
   }
 }
 
-.chatIcon {
-  height: 48px;
-  width: 48px;
-  margin-right: 5px;
-  margin-top: -10px;
+.conversationChatIcon {
+  height: 60px;
+  width: 60px;
+  margin-right: 10px;
+  /* margin-top: -10px; */
+  object-fit: contain;
+  aspect-ratio: 1 / 1;
+  transform: scale(0.75);
+  transform-origin: center;
 }
 
 #scrollContent {
@@ -188,8 +197,8 @@
   padding: 0;
   border-radius: 50%;
   box-sizing: border-box;
-  background: #070303;
-  border: 1px solid rgb(247, 73, 40);
+  background: #1a1a1a;
+  border: 1px solid rgb(247, 73, 40, 0.75);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -248,12 +257,12 @@
   margin: 0px;
 
   @media (max-width: 640px) {
-    padding: 5px 10px;
+    padding: 10px 10px;
   }
 
   #resetButton {
-    background: #070303;
-    border: 1.5px solid rgb(247, 73, 40);
+    background: #1a1a1a;
+    border: 1.5px solid rgb(247, 73, 40, 0.75);
     color: #fff;
     border-radius: 10px;
     padding: 6px 9px;
@@ -283,4 +292,10 @@
       }
     }
   }
+}
+
+#chatIconContainer {
+  width: 80px;
+  height: 80px;
+  object-fit: contain; /* Ensures the image fits within the size */
 }

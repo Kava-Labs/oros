@@ -3,7 +3,7 @@ import styles from './ChatView.module.css';
 import { ResetChatIcon } from './assets/ResetChatIcon';
 import { SendChatIcon } from './assets/SendChatIcon';
 import { CancelChatIcon } from './assets/CancelChatIcon';
-import chatIcon from './assets/chatIcon.svg';
+import hardDotFunDiamond from './assets/hardDotFunDiamond.svg';
 import { Conversation } from './Conversation';
 
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
@@ -111,7 +111,7 @@ export const ChatView = ({
         {!hasMessages && (
           <div id={styles.startContainer}>
             <div id={styles.start} data-testid="start">
-              <img src={chatIcon} />
+              <img src={hardDotFunDiamond} id={styles.chatIconContainer} />
               <h1>Let's get started!</h1>
               <p>
                 Tell me about your memecoin idea below and we'll generate
@@ -134,7 +134,7 @@ export const ChatView = ({
           ></textarea>
 
           <button
-            data-testid='chat-view-button'
+            data-testid="chat-view-button"
             ref={buttonRef}
             id={styles.sendChatButton}
             type="submit"

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Chat Demo</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css"
+    />
+    <link rel="stylesheet" href="./hardFunDemo.css" />
+  </head>
+  <body>
+    <div id="chat-container">
+      <div id="iframe-root"></div>
+
+      <button id="open_chat" aria-label="Open Chat">
+        <img src="./hardDotFunDiamond.svg" />
+      </button>
+    </div>
+
+    <div class="form-container">
+      <figure class="image is-128x128 avatar-container">
+        <div class="is-rounded avatar-circle" id="token-avatar">
+          <img src="./defaultAvatar.svg" />
+        </div>
+      </figure>
+      <div class="form-card">
+        <h2 id="form-header">Basic Token Info</h2>
+        <form>
+          <div class="field">
+            <div class="control">
+              <input
+                class="input transparent-input"
+                type="text"
+                placeholder="Token Name"
+                id="token-name-input"
+              />
+            </div>
+          </div>
+          <div class="field">
+            <div class="control">
+              <input
+                class="input transparent-input"
+                type="text"
+                placeholder="Token Symbol"
+                id="token-symbol-input"
+              />
+            </div>
+          </div>
+          <div class="field">
+            <div class="control">
+              <textarea
+                class="textarea transparent-input"
+                placeholder="Description (Optional)"
+                id="token-description-input"
+              ></textarea>
+            </div>
+          </div>
+          <div class="field full-width">
+            <div class="control">
+              <button
+                class="button button-connect"
+                type="button"
+                onClick="() => {}"
+              >
+                Connect Wallet
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script type="module" src="./hardFunDemo.js"></script>
+  </body>
+</html>
