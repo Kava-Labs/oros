@@ -226,8 +226,8 @@ test.skip('image generation and editing', async ({ page }) => {
 });
 
 test('handles cancelling an in progress token metadata request', async ({
-  page,
-}) => {
+                                                                          page,
+                                                                        }) => {
   test.setTimeout(90 * 1000);
 
   const chat = new Chat(page);
