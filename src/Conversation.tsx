@@ -138,12 +138,19 @@ export const Conversation = ({
       )}
       {errorText.length > 0 && (
         <div className={styles.left}>
-          <img src={hardDotFunDiamond} className={styles.chatIcon} />
-          <Content
-            content={errorText}
-            onRendered={onRendered}
-            role="assistant"
+          <img
+            src={hardDotFunDiamond}
+            className={styles.conversationChatIcon}
           />
+          <div className={styles.assistantContainer}>
+            <div id={styles.progressStream}>
+              <Content
+                content={errorText}
+                onRendered={onRendered}
+                role="assistant"
+              />
+            </div>
+          </div>
         </div>
       )}
     </div>
