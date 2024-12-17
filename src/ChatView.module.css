@@ -189,7 +189,7 @@
   border-radius: 50%;
   box-sizing: border-box;
   background: #070303;
-  border: 1px solid rgb(247, 73, 40);
+  border: 1px solid rgb(247, 73, 40, 0.75);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -253,7 +253,7 @@
 
   #resetButton {
     background: #070303;
-    border: 1.5px solid rgb(247, 73, 40);
+    border: 1.5px solid rgb(247, 73, 40, 0.75);
     color: #fff;
     border-radius: 10px;
     padding: 6px 9px;
