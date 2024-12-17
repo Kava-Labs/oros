@@ -1,4 +1,4 @@
-import { expect, Locator, Page } from '@playwright/test';
+import { ElementHandle, expect, Locator, Page } from '@playwright/test';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 
 export class Chat {
@@ -12,8 +12,31 @@ export class Chat {
     );
   }
 
-  async getMessageElements() {
+  private async getAllMessageElements(): Promise<ElementHandle<Node>[]> {
     return await this.page.$$('[data-testid="conversation-message"]');
+  }
+
+  /**
+   * Blank locators can be added to the chat container during the loading text animation
+   * This function removes those and only leaves elements that have text content
+   * This is useful because the response should be the last element after cleanup
+   */
+  private async removeEmptyMessageElements(
+    messageElements: ElementHandle<Node>[],
+  ) {
+    const trimmedMessages: ElementHandle<Node>[] = [];
+    for (const element of messageElements) {
+      const textContent = await element.textContent();
+      if (textContent && textContent.trim() !== '') {
+        trimmedMessages.push(element);
+      }
+    }
+    return trimmedMessages;
+  }
+
+  async getMessageElementsWithContent() {
+    const messageElements = await this.getAllMessageElements();
+    return await this.removeEmptyMessageElements(messageElements);
   }
 
   async goto() {
