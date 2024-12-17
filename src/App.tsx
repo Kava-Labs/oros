@@ -90,6 +90,7 @@ export const App = () => {
     // This is recursive and completes when all tools calls have been made
     // and all follow ups have been completed.
     try {
+      //  clear any existing error
       setErrorText('');
 
       await doChat(
@@ -160,7 +161,6 @@ async function doChat(
   ) => void,
 ) {
   progressStore.setText('Thinking');
-  //  clear any existing error
   try {
     const toolCallsState: ChatCompletionChunk.Choice.Delta.ToolCall[] = [];
 
