@@ -1,22 +1,6 @@
-import { test, expect, ElementHandle } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { systemPrompt } from '../src/config';
 import { Chat } from './Chat';
-
-/**
- * Blank locators are added to the chat container during the loading text animation
- * This function removes those and only leaves elements that have text content
- * This is useful because the response should be the last element after cleanup
- */
-const removeEmptyMessageElements = async (messageElements: ElementHandle[]) => {
-  const trimmedMessages: string[] = [];
-  for await (const element of messageElements) {
-    if ((await element.textContent()) !== '') {
-      trimmedMessages.push(await element.textContent());
-    }
-  }
-
-  return trimmedMessages;
-};
 
 test('renders intro message', async ({ page }) => {
   const chat = new Chat(page);
@@ -47,7 +31,6 @@ test('receiving a response from the model', async ({ page }) => {
   await chat.waitForAssistantResponse();
 
   const messages = await chat.getMessageElementsWithContent();
-
   expect(messages.length).toBeGreaterThan(0);
 
   const attr =
@@ -226,8 +209,8 @@ test.skip('image generation and editing', async ({ page }) => {
 });
 
 test('handles cancelling an in progress token metadata request', async ({
-                                                                          page,
-                                                                        }) => {
+  page,
+}) => {
   test.setTimeout(90 * 1000);
 
   const chat = new Chat(page);
