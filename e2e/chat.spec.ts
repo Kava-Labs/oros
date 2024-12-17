@@ -164,8 +164,7 @@ test.skip('clicking reset chat button clears chatMessages from local storage', a
   expect(updatedLocalStorage).toBeNull();
 });
 
-//  todo - address timeout issue occurring in build, but not locally
-test.skip('image generation and editing', async ({ page }) => {
+test('image generation and editing', async ({ page }) => {
   test.setTimeout(90 * 1000);
 
   const chat = new Chat(page);
@@ -187,6 +186,9 @@ test.skip('image generation and editing', async ({ page }) => {
   const initialTokenImageSrc = await initialTokenImage.getAttribute('src');
 
   await expect(initialTokenImage).toBeVisible();
+  await page.waitForTimeout(10000);
+
+  await chat.waitForAssistantResponse();
 
   await chat.waitForAssistantResponse();
 
@@ -202,7 +204,6 @@ test.skip('image generation and editing', async ({ page }) => {
     .locator('img[alt="Model Generated Image"]')
     .nth(1);
   const updatedTokenImageSrc = await updatedTokenImage.getAttribute('src');
-
   expect(updatedTokenImageSrc).not.toBe(initialTokenImageSrc);
 
   //  todo - edit all token metadata
