@@ -220,7 +220,7 @@ test('handles cancelling an in progress token metadata request', async ({
 
   let messageElements = await chat.getMessageElementsWithContent();
 
-  //  Streaming begins
+  //  Streaming beginsg
   expect(
     await messageElements[messageElements.length - 1].textContent(),
   ).toMatch(/Thinking/i);
