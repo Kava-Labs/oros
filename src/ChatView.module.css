@@ -75,13 +75,18 @@
 
 .left {
   flex-shrink: 0;
-  margin-top: 10px;
+  margin-top: 20px;
   font-size: 1.6rem;
   padding: 16px 16px 16px 0px;
   color: #ffffff;
 
   display: flex;
   flex-direction: row;
+  align-items: start;
+}
+
+.assistantContainer {
+  margin-top: 15px;
 }
 
 #progressStream {
@@ -112,11 +117,15 @@
   }
 }
 
-.chatIcon {
-  height: 48px;
-  width: 48px;
-  margin-right: 5px;
-  margin-top: -10px;
+.conversationChatIcon {
+  height: 60px;
+  width: 60px;
+  margin-right: 10px;
+  /* margin-top: -10px; */
+  object-fit: contain;
+  aspect-ratio: 1 / 1;
+  transform: scale(0.75);
+  transform-origin: center;
 }
 
 #scrollContent {

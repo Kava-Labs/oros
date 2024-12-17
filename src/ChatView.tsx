@@ -3,7 +3,6 @@ import styles from './ChatView.module.css';
 import { ResetChatIcon } from './assets/ResetChatIcon';
 import { SendChatIcon } from './assets/SendChatIcon';
 import { CancelChatIcon } from './assets/CancelChatIcon';
-import chatIcon from './assets/chatIcon.svg';
 import hardDotFunDiamond from './assets/hardDotFunDiamond.svg';
 import { Conversation } from './Conversation';
 
