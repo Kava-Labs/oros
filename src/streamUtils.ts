@@ -1,4 +1,5 @@
 import type { ChatCompletionChunk } from 'openai/resources/index';
+import { ToolCallStore } from './toolCallStore';
 
 /**
  * Checks if the given ChatCompletionChunk is a content chunk.
@@ -33,29 +34,31 @@ export const isToolCallChunk = (result: ChatCompletionChunk): boolean => {
  */
 export const assembleToolCallsFromStream = (
   result: ChatCompletionChunk,
-  toolCallsState: ChatCompletionChunk.Choice.Delta.ToolCall[],
+  toolCallsState: ToolCallStore,
 ): void => {
   if (!result.choices[0].delta?.tool_calls) {
     return;
   }
 
-  // Assemble chunks of the tool call.
-  // Iterate over all tool calls (more than one may be present).
   for (const tcChunk of result.choices[0].delta.tool_calls) {
-    if (toolCallsState.length <= tcChunk.index) {
+    if (toolCallsState.getSnapshot().length <= tcChunk.index) {
       // Push a new tool call request.
-      toolCallsState.push({
+
+      toolCallsState.pushToolCall({
         index: tcChunk.index,
         id: '',
         function: { name: '', arguments: '' },
       });
     }
     // Fill in info as we get it streamed for the corresponding tool call index.
-    const partialTC = toolCallsState[tcChunk.index];
+    const partialTC = toolCallsState.getSnapshot()[tcChunk.index];
     if (tcChunk.id) partialTC.id += tcChunk.id;
     if (tcChunk.function?.name)
       partialTC.function!.name += tcChunk.function.name;
     if (tcChunk.function?.arguments)
       partialTC.function!.arguments += tcChunk.function.arguments;
+
+    // use structured clone to copy the objects inside the state also (a nasty bug awaits if we don't do this)
+    toolCallsState.setToolCalls(structuredClone(toolCallsState.getSnapshot()));
   }
 };

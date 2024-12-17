@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { ChatView } from './ChatView';
 import { getToken } from './utils/token/token';
 import OpenAI from 'openai';
-import { messageStore, progressStore } from './store';
+import { messageStore, progressStore, toolCallStore } from './store';
 import type {
   ChatCompletionMessageParam,
   ChatCompletionChunk,
@@ -19,10 +19,16 @@ import { systemPrompt } from './config/systemPrompt';
 import { tools } from './config/tools';
 import { imagedb } from './imagedb';
 import { v4 as uuidv4 } from 'uuid';
+import { ToolCallStore } from './toolCallStore';
+import { useToolCallStream } from './useToolCallStream';
 
 let client: OpenAI | null = null;
 
 export const App = () => {
+  // putting it here for demoing (check console for outputs)
+  // this should ideally be called in a deeper component to avoid App wide re-renders
+  useToolCallStream(toolCallStore);
+
   // Do not load UI/UX until openAI client is ready
   const [isReady, setIsReady] = useState(false);
   // TODO: add error component if this fails
@@ -95,6 +101,7 @@ export const App = () => {
         tools,
         progressStore,
         messageStore,
+        toolCallStore,
         publishMessage,
       );
     } catch (error) {
@@ -142,6 +149,7 @@ async function doChat(
   tools: ChatCompletionTool[],
   progressStore: TextStreamStore,
   messageStore: TextStreamStore,
+  toolCallStore: ToolCallStore,
   publishMessage: (
     messages: ChatCompletionMessageParam[],
     message: ChatCompletionMessageParam,
@@ -149,8 +157,6 @@ async function doChat(
 ) {
   progressStore.setText('Thinking');
   try {
-    const toolCallsState: ChatCompletionChunk.Choice.Delta.ToolCall[] = [];
-
     const stream = await client.chat.completions.create(
       {
         model: 'gpt-4',
@@ -171,7 +177,7 @@ async function doChat(
 
         messageStore.appendText(chunk.choices[0].delta.content as string);
       } else if (isToolCallChunk(chunk)) {
-        assembleToolCallsFromStream(chunk, toolCallsState);
+        assembleToolCallsFromStream(chunk, toolCallStore);
       }
     }
 
@@ -184,15 +190,18 @@ async function doChat(
       messageStore.setText('');
     }
 
-    if (toolCallsState.length > 0) {
+    if (toolCallStore.getSnapshot().length > 0) {
       await callTools(
         controller,
         client,
         messages,
-        toolCallsState,
+        toolCallStore.getSnapshot(),
         progressStore,
         publishMessage,
       );
+
+      console.log('resetting tool call state');
+      toolCallStore.setToolCalls([]); // reset tool call store after calling tool calls
 
       await doChat(
         controller,
@@ -201,6 +210,7 @@ async function doChat(
         tools,
         progressStore,
         messageStore,
+        toolCallStore,
         publishMessage,
       );
     }
