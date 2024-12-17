@@ -91,18 +91,18 @@ export const App = () => {
     // This is recursive and completes when all tools calls have been made
     // and all follow ups have been completed.
     try {
-      setErrorText(''),
-        await doChat(
-          controller,
-          client,
-          newMessages,
-          tools,
-          progressStore,
-          messageStore,
-          publishMessage,
-        );
+      setErrorText('');
+
+      await doChat(
+        controller,
+        client,
+        newMessages,
+        tools,
+        progressStore,
+        messageStore,
+        publishMessage,
+      );
     } catch (error) {
-      // if (error instanceof DOMException && error.name !== 'AbortError') {
       let errorMessage =
         typeof error === 'object' && error !== null && 'message' in error
           ? (error as { message: string }).message
@@ -113,7 +113,6 @@ export const App = () => {
       }
 
       setErrorText(errorMessage);
-      // }
     } finally {
       setIsRequesting(false);
       controllerRef.current = null;
@@ -219,7 +218,7 @@ async function doChat(
       );
     }
   } catch (e) {
-    throw e;
+    console.error(e);
   } finally {
     // Clear progress text if not cleared already
     if (progressStore.getSnapshot() !== '') {
