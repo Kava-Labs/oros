@@ -20,15 +20,15 @@ import '@fontsource/inter/500-italic.css';
 
 import '@fontsource/inter/700.css';
 import '@fontsource/inter/700-italic.css';
-import { idbDatabase } from './utils';
+// import { idbDatabase } from './utils';
 
-idbDatabase()
-  .then(() => {
-    console.debug('indexedDB initialized');
-  })
-  .catch((err) => {
-    console.error('failed to open indexedDB', err);
-  });
+// idbDatabase()
+//   .then(() => {
+//     console.debug('indexedDB initialized');
+//   })
+//   .catch((err) => {
+//     console.error('failed to open indexedDB', err);
+//   });
 
 //
 // Components & Context

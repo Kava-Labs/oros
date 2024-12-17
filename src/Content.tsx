@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { sanitizeContent } from './sanitize';
 import styles from './ChatView.module.css';
 
@@ -8,7 +8,11 @@ export interface ContentProps {
   role: string;
 }
 
-export const Content = ({ content, onRendered, role }: ContentProps) => {
+export const ContentComponent = ({
+  content,
+  onRendered,
+  role,
+}: ContentProps) => {
   const [hasError, setHasError] = useState(false);
   const [sanitizedContent, setSanitizedContent] = useState<string>('');
 
@@ -63,3 +67,12 @@ export const Content = ({ content, onRendered, role }: ContentProps) => {
     </div>
   );
 };
+
+export const Content = memo(ContentComponent, (prevProps, curProps) => {
+  // todo: do we need this callback function?
+  return (
+    prevProps.content === curProps.content &&
+    prevProps.onRendered === curProps.onRendered &&
+    prevProps.role === curProps.role
+  );
+});
