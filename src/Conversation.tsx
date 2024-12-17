@@ -143,13 +143,11 @@ export const Conversation = ({
             className={styles.conversationChatIcon}
           />
           <div className={styles.assistantContainer}>
-            <div id={styles.progressStream}>
-              <Content
-                content={errorText}
-                onRendered={onRendered}
-                role="assistant"
-              />
-            </div>
+            <Content
+              content={errorText}
+              onRendered={onRendered}
+              role="assistant"
+            />
           </div>
         </div>
       )}
