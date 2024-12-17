@@ -107,8 +107,11 @@ export const App = () => {
           ? (error as { message: string }).message
           : 'An error occurred - please try again';
 
-      //  This error is thrown when recursive call is cancelled
-      if (errorMessage.startsWith('Unterminated string in JSON at position')) {
+      //  These errors can be thrown when recursive call is cancelled
+      if (
+        errorMessage.startsWith('Unterminated string in JSON at position') ||
+        errorMessage.startsWith('Unexpected end of JSON input')
+      ) {
         errorMessage = 'You clicked cancel - please try again';
       }
 
