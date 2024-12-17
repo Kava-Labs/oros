@@ -271,7 +271,7 @@ test('handles cancelling an in progress token metadata request', async ({
 
   await chat.submitMessage('Make me a giraffe-themed meme coin');
 
-  const messageElements = await chat.getMessageElementsWithContent();
+  let messageElements = await chat.getMessageElementsWithContent();
 
   //  Streaming begins
   expect(
@@ -281,20 +281,19 @@ test('handles cancelling an in progress token metadata request', async ({
   //  allow everything but the image to be set
   await chat.waitForStreamToFinish();
 
-  const messagesDuringImageGeneration =
-    await chat.getMessageElementsWithContent();
+  //  get the updated messages
+  messageElements = await chat.getMessageElementsWithContent();
 
   expect(
-    await messagesDuringImageGeneration[
-      messagesDuringImageGeneration.length - 1
-    ].textContent(),
+    await messageElements[messageElements.length - 1].textContent(),
   ).toMatch(/Generating image/i);
 
   //  click cancel icon
   await page.getByTestId('chat-view-button').click();
 
-  const messagesAfterCancel = await chat.getMessageElementsWithContent();
+  messageElements = await chat.getMessageElementsWithContent();
+
   expect(
-    await messagesAfterCancel[messagesAfterCancel.length - 1].textContent(),
+    await messageElements[messageElements.length - 1].textContent(),
   ).toMatch(/Request was aborted/i);
 });
