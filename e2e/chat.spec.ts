@@ -1,4 +1,4 @@
-import { test, expect, Locator } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { systemPrompt } from '../src/config';
 import { Chat } from './Chat';
 
