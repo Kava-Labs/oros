@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import styles from './ChatView.module.css';
 import hardDotFunDiamond from './assets/hardDotFunDiamond.svg';
 import { Content } from './Content';
@@ -8,15 +7,6 @@ import type { GenerateTokenMetadataResponse } from './tools/toolFunctions';
 import { TokenCard } from './TokenCard';
 
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
-
-const ContentMemo = memo(Content, (prevProps, curProps) => {
-  // todo: do we need this callback function?
-  return (
-    prevProps.content === curProps.content &&
-    prevProps.onRendered === curProps.onRendered &&
-    prevProps.role === curProps.role
-  );
-});
 
 export interface ConversationProps {
   messages: ChatCompletionMessageParam[];
@@ -37,7 +27,7 @@ export const Conversation = ({
         if (message.role === 'user') {
           return (
             <div key={index} className={styles.right}>
-              <ContentMemo
+              <Content
                 role={message.role}
                 content={message.content as string}
                 onRendered={onRendered}
@@ -54,7 +44,7 @@ export const Conversation = ({
                 className={styles.conversationChatIcon}
               />
               <div className={styles.assistantContainer}>
-                <ContentMemo
+                <Content
                   role={message.role}
                   content={message.content as string}
                   onRendered={onRendered}
@@ -114,7 +104,7 @@ export const Conversation = ({
             <div id={styles.progressStream}>
               <StreamingText store={progressStore}>
                 {(message) => (
-                  <ContentMemo
+                  <Content
                     role="assistant"
                     content={message}
                     onRendered={onRendered}
@@ -126,7 +116,7 @@ export const Conversation = ({
             <div id={styles.assistantStream}>
               <StreamingText store={messageStore}>
                 {(message) => (
-                  <ContentMemo
+                  <Content
                     role="assistant"
                     content={message}
                     onRendered={onRendered}
