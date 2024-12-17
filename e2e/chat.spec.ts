@@ -1,6 +1,22 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Locator } from '@playwright/test';
 import { systemPrompt } from '../src/config';
 import { Chat } from './Chat';
+
+/**
+ * Blank locators are added to the chat container during the loading text animation
+ * This function removes those and only leaves elements that have text content
+ * This is useful because the response should be the last element
+ */
+const removeEmptyMessageElements = async (messages: Locator[]) => {
+  const trimmedMessages: string[] = [];
+  for await (const message of messages) {
+    if ((await message.textContent()) !== '') {
+      trimmedMessages.push(await message.textContent());
+    }
+  }
+
+  return trimmedMessages;
+};
 
 test('renders intro message', async ({ page }) => {
   const chat = new Chat(page);
@@ -271,18 +287,33 @@ test('handles cancelling an in progress token metadata request', async ({
 
   await chat.submitMessage('Make me a giraffe-themed meme coin');
 
-  const messages = await chat.messageContainer.all();
+  //  remove empty messages caused by animation
+  const messages = await removeEmptyMessageElements(
+    await chat.messageContainer.all(),
+  );
 
-  const responseMessage = await messages[1].textContent();
+  //  Streaming begins
+  expect(messages[messages.length - 1]).toMatch(/Thinking/i);
 
-  expect(responseMessage).toMatch(/Thinking/i);
+  //  allow everything but the image to be set
+  await chat.waitForStreamToFinish();
+
+  const messagesDuringImageGeneration = await removeEmptyMessageElements(
+    await chat.messageContainer.all(),
+  );
+
+  expect(
+    messagesDuringImageGeneration[messagesDuringImageGeneration.length - 1],
+  ).toMatch(/Generating image/i);
 
   //  click cancel icon
   await page.getByTestId('chat-view-button').click();
 
-  const updatedMessages = await chat.messageContainer.all();
+  const messagesAfterCancel = await removeEmptyMessageElements(
+    await chat.messageContainer.all(),
+  );
 
-  console.log(await updatedMessages[0].textContent());
-  console.log(await updatedMessages[1].textContent());
-  console.log(await updatedMessages[2].textContent());
+  expect(messagesAfterCancel[messagesAfterCancel.length - 1]).toMatch(
+    /Request was aborted/i,
+  );
 });
