@@ -49,9 +49,10 @@ export const TokenCard = ({
     requestAnimationFrame(onRendered);
   }, [name, symbol, about, imageUri, onRendered]);
 
+  const isInIframe = window === window.parent;
   const isLoading = imageUri === undefined;
-
   const isImageError = imageUri === '';
+
   let imageWrapperStyles = styles.imageWrapper;
   if (isImageError) {
     imageWrapperStyles += ` ${styles.imageError}`;
@@ -89,7 +90,7 @@ export const TokenCard = ({
           <div className={styles.descriptionContainer}>
             <h3 className={styles.infoTitle}>Token Info</h3>
             <p className={styles.description}>{about}</p>
-            {!isLoading && !isImageError && (
+            {!isLoading && !isImageError && !isInIframe && (
               <button className={styles.tokenButton}>
                 <LaunchIcon />
                 Launch
