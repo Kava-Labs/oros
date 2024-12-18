@@ -156,15 +156,12 @@ describe('useToolCallStream', () => {
     });
   });
 
-  it.skip('should handle escaped quotes in values', () => {
+  it('should handle escaped quotes in values', () => {
     const { result } = renderHook(() => useToolCallStream(toolCallStore));
 
-    const data = {
-      prompt: 'Test \"escaped\"',
-      symbol: 'BTC',
-      name: 'Bitcoin',
-      about: 'A decentralized currency',
-    };
+    const dataStr =
+      '{"prompt":"Test \\"prompt\\"","symbol":"BTC","name":"Bitcoin","about":"A decentralized currency"}';
+    const data = JSON.parse(dataStr);
 
     act(() => {
       toolCallStore.pushToolCall({
@@ -172,11 +169,10 @@ describe('useToolCallStream', () => {
         index: 0,
         function: {
           name: 'generateCoinMetadata',
-          arguments: JSON.stringify(data),
+          arguments: dataStr,
         },
       });
     });
-
 
     expect(result.current).toEqual(data);
   });

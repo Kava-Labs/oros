@@ -111,10 +111,10 @@ export const useToolCallStream = (toolCallStore: ToolCallStore) => {
             );
 
             const key = parser.current.key!.replace(/"/g, '');
-            const val = tc.function.arguments.slice(
+            const val = unescapeString(tc.function.arguments.slice(
               parser.current.idx + 1,
               valueEndIndex,
-            );
+            ));
             // console.log(`${key}: ${val}`);
 
             setState((prev) => ({
@@ -224,4 +224,30 @@ const extractStringValue = (str: string, idx = 0): [number, boolean] => {
   }
 
   return [idx, reachedEnd];
+};
+
+
+const unescapeString = (str: string): string => {
+  let result = '';
+  let i = 0;
+
+  while (i < str.length) {
+    if (str[i] === '\\' && i + 1 < str.length) {
+      // Handle escaped characters
+      const nextChar = str[i + 1];
+      if (nextChar === '"' || nextChar === '\\') {
+        result += nextChar; // Add the unescaped character
+        i += 2; // Skip the escape character and the next character
+      } else {
+        // Add the backslash as-is (uncommon but valid for unknown escapes)
+        result += str[i];
+        i++;
+      }
+    } else {
+      result += str[i]; // Add non-escaped characters directly
+      i++;
+    }
+  }
+
+  return result;
 };
