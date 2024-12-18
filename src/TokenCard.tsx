@@ -22,21 +22,6 @@ export const TokenCard = ({
 }: TokenCardProps) => {
   const [imageUri, setImageUri] = useState<string | undefined>(undefined);
 
-  const handleLaunchClick = () => {
-    const tokenMetadata = {
-      base64ImageData: imageUri,
-      tokenName: name,
-      tokenSymbol: symbol,
-      tokenDescription: about,
-    };
-
-    // Send message to the parent window from the iframe
-    window.parent.postMessage(
-      { type: 'GENERATED_TOKEN_METADATA', payload: tokenMetadata },
-      '*',
-    );
-  };
-
   useEffect(() => {
     let cancel = false;
     const getImageUri = async () => {
@@ -66,46 +51,50 @@ export const TokenCard = ({
 
   const isLoading = imageUri === undefined;
 
-  return (
-    <div className={styles.wrapper}>
-      <div>
-        <h6>
-          <strong>
-            {name} ({symbol})
-          </strong>
-        </h6>
-      </div>
-      {isLoading && (
-        <div>
-          <LoadingSpinner />
-        </div>
-      )}
-      {imageUri === '' && (
-        <div className={styles.imageError}>
-          <p>Error: Failed to create image</p>
-        </div>
-      )}
-      {imageUri !== undefined && imageUri !== '' && (
-        <div>
-          <img alt="Model Generated Image" src={imageUri} />
-        </div>
-      )}
-      <div>
-        <p>{about}</p>
-      </div>
-      {!isLoading && (
-        <div id={styles.launchButtonContainer}>
-          <button
-            id={styles.launchButton}
-            aria-label="Launch Token"
-            onClick={handleLaunchClick}
-          >
-            <LaunchIcon />
+  const isImageError = imageUri === '';
+  let imageWrapperStyles = styles.imageWrapper;
+  if (isImageError) {
+    imageWrapperStyles += ` ${styles.imageError}`;
+  }
 
-            <span>Launch</span>
-          </button>
+  return (
+    <div className={styles.tokenCardWrapper}>
+      <div className={styles.tokenCard}>
+        <div className={styles.header}>
+          <div className={styles.headerContent}>
+            <h2 className={styles.tokenName}>{name}</h2>
+            <div className={styles.tokenSymbol}>{symbol}</div>
+          </div>
         </div>
-      )}
+        <div className={styles.content}>
+          <div className={imageWrapperStyles}>
+            <div className={styles.tokenImage}>
+              {isLoading && <LoadingSpinner />}
+
+              {isImageError && (
+                <div className={styles.imageErrorText}>
+                  <p>Error: Failed to create image</p>
+                </div>
+              )}
+
+              {!isLoading && !isImageError && (
+                <img
+                  alt="Model Generated Image"
+                  src={imageUri}
+                  className={styles.tokenImage}
+                />
+              )}
+            </div>
+          </div>
+          <div className={styles.descriptionContainer}>
+            <h3 className={styles.infoTitle}>Token Info</h3>
+            <p className={styles.description}>{about}</p>
+            {!isLoading && !isImageError && (
+              <button className={styles.tokenButton}>Launch</button>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
