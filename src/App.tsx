@@ -25,7 +25,8 @@ let client: OpenAI | null = null;
 export const App = () => {
   // Do not load UI/UX until openAI client is ready
   const [isReady, setIsReady] = useState(false);
-  // TODO: add error component if this fails
+  const [errorText, setErrorText] = useState('');
+
   // TODO: check healthcheck and set error if backend is not availiable
   useEffect(() => {
     try {
@@ -49,6 +50,7 @@ export const App = () => {
   // use is sending request to signify to the chat view that
   // a request is in progress so it can disable inputs
   const [isRequesting, setIsRequesting] = useState(false);
+
   // abort controller for cancelling openai request
   const controllerRef = useRef<AbortController | null>(null);
 
@@ -88,6 +90,9 @@ export const App = () => {
     // This is recursive and completes when all tools calls have been made
     // and all follow ups have been completed.
     try {
+      //  clear any existing error
+      setErrorText('');
+
       await doChat(
         controller,
         client,
@@ -98,10 +103,17 @@ export const App = () => {
         publishMessage,
       );
     } catch (error) {
-      if (error instanceof DOMException && error.name !== 'AbortError') {
-        console.error(error);
+      let errorMessage =
+        typeof error === 'object' && error !== null && 'message' in error
+          ? (error as { message: string }).message
+          : 'An error occurred - please try again';
+
+      //  Errors can be thrown when recursive call is cancelled
+      if (errorMessage.includes('JSON')) {
+        errorMessage = 'You clicked cancel - please try again';
       }
-      // TODO: Add error message rendering to page
+
+      setErrorText(errorMessage);
     } finally {
       setIsRequesting(false);
       controllerRef.current = null;
@@ -129,6 +141,7 @@ export const App = () => {
           onReset={handleReset}
           onCancel={handleCancel}
           isRequesting={isRequesting}
+          errorText={errorText}
         />
       )}
     </>
@@ -205,7 +218,8 @@ async function doChat(
       );
     }
   } catch (e) {
-    console.error(e);
+    console.error(`An error occurred: ${e} `);
+    throw e;
   } finally {
     // Clear progress text if not cleared already
     if (progressStore.getSnapshot() !== '') {
@@ -289,7 +303,7 @@ async function callTools(
         break;
       }
       default:
-        throw new Error(`unkown tool call: ${name}`);
+        throw new Error(`unknown tool call: ${name}`);
     }
   }
 }

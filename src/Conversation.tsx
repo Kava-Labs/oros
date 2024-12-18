@@ -10,7 +10,7 @@ import type { ChatCompletionMessageParam } from 'openai/resources/index';
 
 export interface ConversationProps {
   messages: ChatCompletionMessageParam[];
-
+  errorText: string;
   isRequesting: boolean;
 
   onRendered(): void;
@@ -18,6 +18,7 @@ export interface ConversationProps {
 
 export const Conversation = ({
   messages,
+  errorText,
   isRequesting,
   onRendered,
 }: ConversationProps) => {
@@ -92,7 +93,6 @@ export const Conversation = ({
 
         return null;
       })}
-
       {isRequesting && (
         <div className={styles.left}>
           <img
@@ -112,7 +112,6 @@ export const Conversation = ({
                 )}
               </StreamingText>
             </div>
-
             <div id={styles.assistantStream}>
               <StreamingText store={messageStore}>
                 {(message) => (
@@ -124,6 +123,21 @@ export const Conversation = ({
                 )}
               </StreamingText>
             </div>
+          </div>
+        </div>
+      )}
+      {errorText.length > 0 && (
+        <div className={styles.left}>
+          <img
+            src={hardDotFunDiamond}
+            className={styles.conversationChatIcon}
+          />
+          <div className={styles.assistantContainer}>
+            <Content
+              content={errorText}
+              onRendered={onRendered}
+              role="assistant"
+            />
           </div>
         </div>
       )}
