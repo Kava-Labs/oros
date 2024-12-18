@@ -105,6 +105,7 @@ export const tools: ChatCompletionTool[] = [
         },
         required: ['prompt', 'symbol', 'name', 'about'],
         strict: true,
+        additionalProperties: false, // https://platform.openai.com/docs/guides/structured-outputs 
       },
     },
   },
