@@ -164,8 +164,15 @@ test.skip('clicking reset chat button clears chatMessages from local storage', a
   expect(updatedLocalStorage).toBeNull();
 });
 
+// const map = {
+//   address_one: '0xaddr1',
+//   address_one: '0xaddr1',
+//   address_one: '0xaddr1',
+//   address_one: '0xaddr1'
+// }
+
 //  todo - address timeout issue occurring in build, but not locally
-test.skip('image generation and editing', async ({ page }) => {
+test('image generation and editing', async ({ page }) => {
   test.setTimeout(90 * 1000);
 
   const chat = new Chat(page);
@@ -179,8 +186,12 @@ test.skip('image generation and editing', async ({ page }) => {
   const loadingSpinner = await page.locator('div[role="status"]');
   await expect(loadingSpinner).toBeVisible();
 
-  await chat.waitForAssistantResponse();
+  await chat.waitForImageGenerationToFinish();
 
+  const initialTokenCardTitle = await page
+    .locator('h6 strong')
+    .first()
+    .textContent();
   const initialTokenImage = page
     .locator('img[alt="Model Generated Image"]')
     .first();
@@ -188,7 +199,7 @@ test.skip('image generation and editing', async ({ page }) => {
 
   await expect(initialTokenImage).toBeVisible();
 
-  await chat.waitForAssistantResponse();
+  await chat.waitForStreamToFinish();
 
   await chat.waitForAssistantResponse();
 
@@ -197,15 +208,34 @@ test.skip('image generation and editing', async ({ page }) => {
     'Keep all metadata the same, but generate a new image',
   );
 
-  await chat.waitForAssistantResponse();
+  await chat.waitForStreamToFinish();
+  await chat.waitForImageGenerationToFinish();
 
-  //  todo - assertions symbol and description?
+  const updatedTokenCardTitle = await page
+    .locator('h6 strong')
+    .nth(1)
+    .textContent();
   const updatedTokenImage = page
     .locator('img[alt="Model Generated Image"]')
     .nth(1);
   const updatedTokenImageSrc = await updatedTokenImage.getAttribute('src');
+
+  expect(initialTokenCardTitle).toBe(updatedTokenCardTitle);
   expect(updatedTokenImageSrc).not.toBe(initialTokenImageSrc);
 
+  // await chat.submitMessage('Make me an entirely-new memecoin');
+  //
+  // await chat.waitForStreamToFinish();
+  // await chat.waitForImageGenerationToFinish();
+  // await chat.waitForStreamToFinish();
+  //
+  // const third = await page.locator('h6 strong').nth(2).textContent();
+  //
+  // const thirdimg = page.locator('img[alt="Model Generated Image"]').nth(2);
+  // const thirdsrc = await thirdimg.getAttribute('src');
+  //
+  // expect(third).not.toBe(updatedTokenCardTitle);
+  // expect(thirdsrc).not.toBe(updatedTokenImageSrc);
   //  todo - edit all token metadata
 });
 
