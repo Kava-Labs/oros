@@ -101,20 +101,19 @@ export const useToolCallStream = (toolCallStore: ToolCallStore) => {
       }
       case ParseState.EXTRACTING_VALUE:
         {
-          if (
-            notReachedEnd(parser.current.idx, tc.function.arguments) &&
-            parser.current.idx + 1 <= tc.function.arguments.length
-          ) {
+          if (notReachedEnd(parser.current.idx + 1, tc.function.arguments)) {
             const [valueEndIndex, done] = extractStringValue(
               tc.function.arguments,
               parser.current.idx,
             );
 
             const key = parser.current.key!.replace(/"/g, '');
-            const val = unescapeString(tc.function.arguments.slice(
-              parser.current.idx + 1,
-              valueEndIndex,
-            ));
+            const val = unescapeString(
+              tc.function.arguments.slice(
+                parser.current.idx + 1,
+                valueEndIndex,
+              ),
+            );
             // console.log(`${key}: ${val}`);
 
             setState((prev) => ({
@@ -225,7 +224,6 @@ const extractStringValue = (str: string, idx = 0): [number, boolean] => {
 
   return [idx, reachedEnd];
 };
-
 
 const unescapeString = (str: string): string => {
   let result = '';
