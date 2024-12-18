@@ -177,6 +177,36 @@ describe('useToolCallStream', () => {
     expect(result.current).toEqual(data);
   });
 
+  it('should handle multi escaped quotes in values with stream', () => {
+    const { result } = renderHook(() => useToolCallStream(toolCallStore));
+
+    const dataStr =
+      '{"prompt":"Test \\"prompt\\"","symbol":"\\"BTC\\"","name":"\\"Bitcoin\\"","about":"\\"A decentralized currency\\""}';
+
+    const data = JSON.parse(dataStr);
+
+    act(() => {
+      toolCallStore.pushToolCall({
+        id: '',
+        index: 0,
+        function: {
+          name: 'generateCoinMetadata',
+          arguments: dataStr[0],
+        },
+      });
+    });
+
+    for (let i = 1; i < dataStr.length; i++) {
+      act(() => {
+        const newData = { ...toolCallStore.getSnapshot()[0] };
+        newData.function!.arguments += dataStr[i];
+        toolCallStore.setToolCalls([newData]);
+      });
+    }
+
+    expect(result.current).toEqual(data);
+  });
+
   it('should skip unrelated tool calls', () => {
     const { result } = renderHook(() => useToolCallStream(toolCallStore));
 
