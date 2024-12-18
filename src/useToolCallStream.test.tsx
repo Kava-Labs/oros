@@ -23,7 +23,7 @@ describe('useToolCallStream', () => {
 
     act(() => {
       toolCallStore.pushToolCall({
-        id: '',
+        id: 'dsafdas',
         index: 0,
         function: {
           name: 'generateCoinMetadata',
@@ -49,7 +49,7 @@ describe('useToolCallStream', () => {
 
     act(() => {
       toolCallStore.pushToolCall({
-        id: '',
+        id: 'sacdsfgregv',
         index: 0,
         function: {
           name: 'generateCoinMetadata',
@@ -83,7 +83,7 @@ describe('useToolCallStream', () => {
 
     act(() => {
       toolCallStore.pushToolCall({
-        id: '',
+        id: 'er23fdfdf',
         index: 0,
         function: {
           name: 'generateCoinMetadata',
@@ -100,7 +100,7 @@ describe('useToolCallStream', () => {
 
     act(() => {
       toolCallStore.pushToolCall({
-        id: '',
+        id: 'qe32r3f',
         index: 0,
         function: {
           name: 'generateCoinMetadata',
@@ -131,7 +131,7 @@ describe('useToolCallStream', () => {
 
     act(() => {
       toolCallStore.pushToolCall({
-        id: '',
+        id: 'x3g4f',
         index: 0,
         function: {
           name: 'generateCoinMetadata',
@@ -165,7 +165,7 @@ describe('useToolCallStream', () => {
 
     act(() => {
       toolCallStore.pushToolCall({
-        id: '',
+        id: '321edfedfdfvf',
         index: 0,
         function: {
           name: 'generateCoinMetadata',
@@ -187,7 +187,7 @@ describe('useToolCallStream', () => {
 
     act(() => {
       toolCallStore.pushToolCall({
-        id: '',
+        id: '22141ccsa',
         index: 0,
         function: {
           name: 'generateCoinMetadata',
@@ -219,7 +219,7 @@ describe('useToolCallStream', () => {
 
     act(() => {
       toolCallStore.pushToolCall({
-        id: '',
+        id: '432cvfdvrb',
         index: 0,
         function: {
           name: 'unrelatedFunction',
@@ -228,7 +228,7 @@ describe('useToolCallStream', () => {
       });
 
       toolCallStore.pushToolCall({
-        id: '',
+        id: '321fwsd',
         index: 0,
         function: {
           name: 'generateCoinMetadata',
@@ -245,7 +245,7 @@ describe('useToolCallStream', () => {
 
     act(() => {
       toolCallStore.pushToolCall({
-        id: '',
+        id: 'e122dcsd',
         index: 0,
         function: {
           name: 'generateCoinMetadata',
@@ -263,7 +263,7 @@ describe('useToolCallStream', () => {
 
     act(() => {
       toolCallStore.pushToolCall({
-        id: '',
+        id: 'fsdvcxvdfvdf',
         index: 0,
         function: {
           name: 'generateCoinMetadata',
