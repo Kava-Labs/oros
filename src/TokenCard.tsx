@@ -90,7 +90,10 @@ export const TokenCard = ({
             <h3 className={styles.infoTitle}>Token Info</h3>
             <p className={styles.description}>{about}</p>
             {!isLoading && !isImageError && (
-              <button className={styles.tokenButton}>Launch</button>
+              <button className={styles.tokenButton}>
+                <LaunchIcon />
+                Launch
+              </button>
             )}
           </div>
         </div>
