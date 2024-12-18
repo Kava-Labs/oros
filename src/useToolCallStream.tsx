@@ -46,7 +46,7 @@ export const useToolCallStream = (toolCallStore: ToolCallStore) => {
       }
 
       const tcParser = parsers.current.get(tc.id);
-      if (tc.function && tcParser && isString(tc.function.arguments)) {
+      if (tcParser && isString(tc.function.arguments)) {
         tcParser.streamParser.write(
           (tc.function.arguments as string).slice(tcParser.indexReached),
         );
