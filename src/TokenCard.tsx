@@ -121,7 +121,6 @@ export const TokenCardStreamingPlaceholder = ({
   );
   if (!generateCoinMetadataStream) return null;
 
-
   const nameStream =
     (generateCoinMetadataStream.arguments.name as string) ?? '';
   const symbolStream =
@@ -130,23 +129,23 @@ export const TokenCardStreamingPlaceholder = ({
     (generateCoinMetadataStream.arguments.about as string) ?? '';
 
   return (
-    <div className={styles.wrapper}>
-      <div>
-        <h6>
-          <strong>
-            {nameStream.length > 0 || symbolStream.length > 0
-              ? `${nameStream} (${symbolStream})`
-              : null}
-          </strong>
-        </h6>
-      </div>
-
-      <div>
-        <LoadingSpinner />
-      </div>
-
-      <div>
-        <p>{aboutStream}</p>
+    <div className={styles.tokenCardWrapper}>
+      <div className={styles.tokenCard}>
+        <div className={styles.header}>
+          <div className={styles.headerContent}>
+            <h2 className={styles.tokenName}>{nameStream}</h2>
+            <div className={styles.tokenSymbol}>{symbolStream}</div>
+          </div>
+        </div>
+        <div className={styles.content}>
+          <div className={styles.imageWrapper}>
+            <div className={styles.tokenImage}>{<LoadingSpinner />}</div>
+          </div>
+          <div className={styles.descriptionContainer}>
+            <h3 className={styles.infoTitle}>Token Info</h3>
+            <p className={styles.description}>{aboutStream}</p>
+          </div>
+        </div>
       </div>
     </div>
   );
