@@ -3,15 +3,25 @@ import { failureTestCases, happyPathCases } from './tokenAddressMaskingCases';
 import { expect } from '@playwright/test';
 
 describe('maskAddresses', () => {
-  test('replaces present addresses', () => {
-    happyPathCases.forEach((testCase) => {
+  test('replaces single address', () => {
+    happyPathCases['singleAddress'].forEach((testCase) => {
       const { output, maskedValueMap } = maskAddresses(testCase);
 
       //  no more 0x addresses exist
       expect(/0x[a-fA-F0-9]{40}(?!0)/g.test(output)).toBe(false);
 
-      //  we may have more than one address, but at least one should be present
       expect(maskedValueMap).toHaveProperty('<address_1>');
+    });
+  });
+
+  test('replaces multiple address', () => {
+    happyPathCases['multipleAddresses'].forEach((testCase) => {
+      const { output, maskedValueMap } = maskAddresses(testCase);
+
+      expect(/0x[a-fA-F0-9]{40}(?!0)/g.test(output)).toBe(false);
+
+      expect(maskedValueMap).toHaveProperty('<address_1>');
+      expect(maskedValueMap).toHaveProperty('<address_2>');
     });
   });
 
