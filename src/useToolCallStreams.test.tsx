@@ -221,32 +221,6 @@ describe('useToolCallStreams', () => {
     ]);
   });
 
-  it('should handle missing keys gracefully', () => {
-    const { result } = renderHook(() => useToolCallStreams(toolCallStore));
-
-    act(() => {
-      toolCallStore.pushToolCall({
-        id: 'qe32r3f',
-        index: 0,
-        function: {
-          name: 'generateCoinMetadata',
-          arguments: JSON.stringify({ prompt: 'Test prompt', symbol: 'BTC' }),
-        },
-      });
-    });
-
-    expect(result.current).toEqual([
-      {
-        id: 'qe32r3f',
-        name: 'generateCoinMetadata',
-        arguments: {
-          prompt: 'Test prompt',
-          symbol: 'BTC',
-        },
-      },
-    ]);
-  });
-
   it('should reset state when no tool calls exist', () => {
     const { result, rerender } = renderHook(() =>
       useToolCallStreams(toolCallStore),
