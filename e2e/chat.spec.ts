@@ -188,8 +188,11 @@ test('image generation and editing', async ({ page }) => {
 
   await chat.waitForImageGenerationToFinish();
 
-  const initialTokenCardTitle = await page
-    .locator('h6 strong')
+  const initialTokenCardTitle = await page.locator('h2').first().textContent();
+  //  get the text content of the p tag after the label
+  const initialTokenInfo = await page
+    .locator('h3', { hasText: 'Token info' })
+    .locator('+ p')
     .first()
     .textContent();
   const initialTokenImage = page
@@ -215,8 +218,10 @@ test('image generation and editing', async ({ page }) => {
   //  follow-up chat completes
   await chat.waitForStreamToFinish();
 
-  const updatedTokenCardTitle = await page
-    .locator('h6 strong')
+  const updatedTokenCardTitle = await page.locator('h2').nth(1).textContent();
+  const updatedTokenInfo = await page
+    .locator('h3', { hasText: 'Token info' })
+    .locator('+ p')
     .nth(1)
     .textContent();
   const updatedTokenImage = page
@@ -225,16 +230,21 @@ test('image generation and editing', async ({ page }) => {
   const updatedTokenImageSrc = await updatedTokenImage.getAttribute('src');
 
   expect(initialTokenCardTitle).toBe(updatedTokenCardTitle);
+  expect(initialTokenInfo).toBe(updatedTokenInfo);
   expect(updatedTokenImageSrc).not.toBe(initialTokenImageSrc);
 
-  await chat.submitMessage('Make me an entirely-new memecoin');
+  //  specify a theme for the coin - occasionally the tool call won't be made
+  //  and it will ask for more info about what the user wants
+  await chat.submitMessage('Make me an entirely-new memecoin about frogs');
 
   await chat.waitForStreamToFinish();
   await chat.waitForImageGenerationToFinish();
   await chat.waitForStreamToFinish();
 
-  const thirdTokenCardTitle = await page
-    .locator('h6 strong')
+  const thirdTokenCardTitle = await page.locator('h2').nth(2).textContent();
+  const thirdTokenInfo = await page
+    .locator('h3', { hasText: 'Token info' })
+    .locator('+ p')
     .nth(2)
     .textContent();
   const thirdTokenImage = page
@@ -242,6 +252,7 @@ test('image generation and editing', async ({ page }) => {
     .nth(2);
   const thirdTokenImgSrc = await thirdTokenImage.getAttribute('src');
 
+  expect(thirdTokenInfo).not.toBe(updatedTokenInfo);
   expect(thirdTokenCardTitle).not.toBe(updatedTokenCardTitle);
   expect(thirdTokenImgSrc).not.toBe(updatedTokenImageSrc);
 });
