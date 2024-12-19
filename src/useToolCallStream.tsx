@@ -12,6 +12,7 @@ type ToolCallParser = {
   streamParser: JSONParser;
   indexReached: number;
   toolCallId: string;
+  toolCallFunctionName: string;
 };
 
 type StreamingToolCall = {
@@ -59,6 +60,8 @@ export const useToolCallStream = (toolCallStore: ToolCallStore) => {
   const registerToolCallParser = (tc: ToolCall) => {
     if (!parsers.current) return;
     if (!tc.id) return;
+    if (!tc.function) return;
+    if (!tc.function.name) return;
 
     const tcParser = {
       streamParser: new JSONParser({
@@ -67,6 +70,7 @@ export const useToolCallStream = (toolCallStore: ToolCallStore) => {
       }),
       indexReached: 0,
       toolCallId: tc.id,
+      toolCallFunctionName: tc.function.name,
     };
     parsers.current.set(tc.id, tcParser);
 
@@ -76,7 +80,8 @@ export const useToolCallStream = (toolCallStore: ToolCallStore) => {
 
       if (isString(key) && val !== undefined) {
         // the prompt part of the json stream is complete and can be used to generate an image
-        // if (key === 'prompt' && !info.partial) {
+        // if (tcParser.toolCallFunctionName === 'generateCoinMetadata' &&  key === 'prompt' && !info.partial) {
+        //   console.log('generateCoinMetadata prompt part is done!');
         // }
 
         // set the arbitrary key value pair into state for the specific
