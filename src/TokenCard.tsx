@@ -107,7 +107,7 @@ export const TokenCard = ({
 
 // hidden component that only renders when a generateCoinMetadata tool call request
 // is being streamed by the model
-// can be implemented inside TokenCard but didn't want to muddy up that implementation 
+// can be implemented inside TokenCard but didn't want to muddy up that implementation
 // as it's already complex enough handling loading states, errors, etc
 // this component also returns null in many cases so for better readability they are separated
 // just be sure the styles always match and classnames are consistent, this drawback is much better
@@ -119,27 +119,25 @@ export const TokenCardStreamingPlaceholder = ({
 }) => {
   const toolCallStreams = useToolCallStreams(toolCallStreamStore);
 
-  if (!toolCallStreams.length) return null;
-
   const generateCoinMetadataStream = toolCallStreams.find(
     (tc) => tc.name === 'generateCoinMetadata',
   );
+
   if (!generateCoinMetadataStream) return null;
 
-  const nameStream =
-    (generateCoinMetadataStream.arguments.name as string) ?? '';
-  const symbolStream =
-    (generateCoinMetadataStream.arguments.symbol as string) ?? '';
-  const aboutStream =
-    (generateCoinMetadataStream.arguments.about as string) ?? '';
+  const { arguments: streamingArgs } = generateCoinMetadataStream;
 
   return (
     <div className={styles.tokenCardWrapper}>
       <div className={styles.tokenCard}>
         <div className={styles.header}>
           <div className={styles.headerContent}>
-            <h2 className={styles.tokenName}>{nameStream}</h2>
-            <div className={styles.tokenSymbol}>{symbolStream}</div>
+            <h2 className={styles.tokenName}>
+              {(streamingArgs.name as string) ?? ''}
+            </h2>
+            <div className={styles.tokenSymbol}>
+              {(streamingArgs.symbol as string) ?? ''}
+            </div>
           </div>
         </div>
         <div className={styles.content}>
@@ -148,7 +146,9 @@ export const TokenCardStreamingPlaceholder = ({
           </div>
           <div className={styles.descriptionContainer}>
             <h3 className={styles.infoTitle}>Token Info</h3>
-            <p className={styles.description}>{aboutStream}</p>
+            <p className={styles.description}>
+              {(streamingArgs.about as string) ?? ''}
+            </p>
           </div>
         </div>
       </div>
