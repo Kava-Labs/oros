@@ -7,10 +7,16 @@ describe('maskAddresses', () => {
     happyPathCases['singleAddress'].forEach((testCase) => {
       const { output, maskedValueMap } = maskAddresses(testCase);
 
-      //  no more 0x addresses exist
-      expect(/0x[a-fA-F0-9]{40}(?!0)/g.test(output)).toBe(false);
+      //  the address from the test case is removed from the output
+      expect(
+        output.includes('0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5'),
+      ).toBe(false);
 
-      expect(maskedValueMap).toHaveProperty('<address_1>');
+      //  and stored in the map
+      expect(maskedValueMap).toHaveProperty(
+        '<address_1>',
+        '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+      );
     });
   });
 
@@ -18,10 +24,22 @@ describe('maskAddresses', () => {
     happyPathCases['multipleAddresses'].forEach((testCase) => {
       const { output, maskedValueMap } = maskAddresses(testCase);
 
-      expect(/0x[a-fA-F0-9]{40}(?!0)/g.test(output)).toBe(false);
+      //  both addresses are removed
+      expect(
+        output.includes('0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5'),
+      ).toBe(false);
+      expect(
+        output.includes('0xC07918E451Ab77023a16Fa7515Dd60433A3c771D'),
+      ).toBe(false);
 
-      expect(maskedValueMap).toHaveProperty('<address_1>');
-      expect(maskedValueMap).toHaveProperty('<address_2>');
+      expect(maskedValueMap).toHaveProperty(
+        '<address_1>',
+        '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+      );
+      expect(maskedValueMap).toHaveProperty(
+        '<address_2>',
+        '0xC07918E451Ab77023a16Fa7515Dd60433A3c771D',
+      );
     });
   });
 
