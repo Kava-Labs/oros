@@ -195,33 +195,29 @@ describe('useToolCallStream', () => {
     ]);
   });
 
-  it('should handle JSON input with extra spaces', () => {
+  it('should work with any arbitrary arguments', () => {
     const { result } = renderHook(() => useToolCallStreams(toolCallStore));
 
     const data = {
-      prompt: 'Test prompt',
-      symbol: 'ETH',
-      name: 'Ethereum',
-      about: 'Smart contract platform',
+      'key': 'val', 
+      'nested': {
+        'key': 'val'
+      }
     };
 
     act(() => {
       toolCallStore.pushToolCall({
-        id: 'er23fdfdf',
+        id: 'dsafdasxr',
         index: 0,
         function: {
-          name: 'generateCoinMetadata',
-          arguments: JSON.stringify(data, null, 2),
+          name: 'someOtherToolCall',
+          arguments: JSON.stringify(data),
         },
       });
     });
 
     expect(result.current).toEqual([
-      {
-        id: 'er23fdfdf',
-        name: 'generateCoinMetadata',
-        arguments: data,
-      },
+      { id: 'dsafdasxr', name: 'someOtherToolCall', arguments: data },
     ]);
   });
 
