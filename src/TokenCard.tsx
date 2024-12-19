@@ -107,6 +107,11 @@ export const TokenCard = ({
 
 // hidden component that only renders when a generateCoinMetadata tool call request
 // is being streamed by the model
+// can be implemented inside TokenCard but didn't want to muddy up that implementation 
+// as it's already complex enough handling loading states, errors, etc
+// this component also returns null in many cases so for better readability they are separated
+// just be sure the styles always match and classnames are consistent, this drawback is much better
+// than trying to DRY and make TokenCard handle everything
 export const TokenCardStreamingPlaceholder = ({
   toolCallStreamStore,
 }: {
