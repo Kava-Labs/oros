@@ -1,11 +1,11 @@
-import { tokenAddressMasking } from './tokenAddressMasking';
+import { maskAddresses } from './maskAddresses';
 import { failureTestCases, happyPathCases } from './tokenAddressMaskingCases';
 import { expect } from '@playwright/test';
 
-describe('addressAmountAbstractionTest', () => {
+describe('maskAddresses', () => {
   test('replaces present addresses', () => {
     happyPathCases.forEach((testCase) => {
-      const { output, maskedValueMap } = tokenAddressMasking(testCase);
+      const { output, maskedValueMap } = maskAddresses(testCase);
 
       //  no more 0x addresses exist
       expect(/0x[a-fA-F0-9]{40}(?!0)/g.test(output)).toBe(false);
@@ -17,7 +17,7 @@ describe('addressAmountAbstractionTest', () => {
 
   test('no processing for failure cases', () => {
     failureTestCases.forEach((testCase) => {
-      const { output, maskedValueMap } = tokenAddressMasking(testCase);
+      const { output, maskedValueMap } = maskAddresses(testCase);
 
       expect(output).toBe(testCase.input);
       expect(maskedValueMap).toStrictEqual({});

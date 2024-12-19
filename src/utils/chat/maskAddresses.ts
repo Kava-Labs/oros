@@ -5,7 +5,7 @@ type AddressAccumulator = {
   maskedValueMap: { [key: string]: string };
 };
 
-export const tokenAddressMasking = (testCase: TestCase) => {
+export const maskAddresses = (testCase: TestCase) => {
   //  find exactly 40 characters after '0x' (inclusive)
   const ethAddressRegex = /0x[a-fA-F0-9]{40}(?!0)/g;
 
