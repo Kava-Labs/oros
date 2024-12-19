@@ -112,6 +112,19 @@ export const happyPathCases: { [key: string]: Array<TestCase> } = {
     },
     {
       input:
+        'Send 100ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2 to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+      result: {
+        output: 'Send <amount_1><token_1> to <address_1>',
+        maskedValueMap: {
+          address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+          amount_1: '100',
+          token_1:
+            'ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2',
+        },
+      },
+    },
+    {
+      input:
         'Send 100 erc20/tether/usdt to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
       result: {
         output: 'Send <amount_1> <token_1> to <address_1>',
