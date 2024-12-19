@@ -58,7 +58,6 @@ export const assembleToolCallsFromStream = (
     if (tcChunk.function?.arguments)
       partialTC.function!.arguments += tcChunk.function.arguments;
 
-    // use structured clone to copy the objects inside the state also (a nasty bug awaits if we don't do this)
     toolCallsState.setToolCalls(structuredClone(toolCallsState.getSnapshot()));
   }
 };

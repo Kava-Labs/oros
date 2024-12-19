@@ -289,9 +289,8 @@ async function callTools(
           ],
         });
         // remove from store and as we placed this into messages
-        toolCallStore.setToolCalls([
-          ...toolCallStore.getSnapshot().filter((v) => v.id !== toolCall.id),
-        ]);
+        toolCallStore.deleteToolCallById(toolCall.id as string);
+
         publishMessage(messages, {
           role: 'tool' as const,
           tool_call_id: toolCall.id!,

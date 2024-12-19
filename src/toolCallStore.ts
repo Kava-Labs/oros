@@ -20,6 +20,16 @@ export class ToolCallStore {
     this.emitChange();
   };
 
+  public deleteToolCallById = (id: string) => {
+    const newState: ToolCall[] = [];
+    for (const tc of this.currentValue) {
+      if (tc.id !== id) {
+        newState.push({ ...tc });
+      }
+    }
+    this.setToolCalls(newState);
+  };
+
   public getSnapshot = (): ToolCall[] => {
     return this.currentValue;
   };
