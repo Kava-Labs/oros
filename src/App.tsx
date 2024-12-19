@@ -125,6 +125,7 @@ export const App = () => {
     if (controllerRef.current) {
       controllerRef.current.abort();
       controllerRef.current = null;
+      toolCallStore.setToolCalls([]);
     }
   };
 
