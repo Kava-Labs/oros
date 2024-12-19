@@ -75,6 +75,10 @@ export const useToolCallStream = (toolCallStore: ToolCallStore) => {
       const val = info.value;
 
       if (isString(key) && val !== undefined) {
+        // the prompt part of the json stream is complete and can be used to generate an image
+        // if (key === 'prompt' && !info.partial) {
+        // }
+
         // set the arbitrary key value pair into state for the specific
         // tool call id
         setState((prev) => {
@@ -140,12 +144,6 @@ export const useToolCallStream = (toolCallStore: ToolCallStore) => {
       extractArgsFromStream(tc);
     }
   }, [toolCalls]);
-
-  if (state.length) {
-    console.log(state[0].arguments);
-  } else {
-    console.log(state);
-  }
 
   return state;
 };
