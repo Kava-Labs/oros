@@ -208,8 +208,12 @@ test('image generation and editing', async ({ page }) => {
     'Keep all metadata the same, but generate a new image',
   );
 
+  //  non-image metadata completes
   await chat.waitForStreamToFinish();
+  //  image generation completes
   await chat.waitForImageGenerationToFinish();
+  //  follow-up chat completes
+  await chat.waitForStreamToFinish();
 
   const updatedTokenCardTitle = await page
     .locator('h6 strong')
@@ -223,20 +227,23 @@ test('image generation and editing', async ({ page }) => {
   expect(initialTokenCardTitle).toBe(updatedTokenCardTitle);
   expect(updatedTokenImageSrc).not.toBe(initialTokenImageSrc);
 
-  // await chat.submitMessage('Make me an entirely-new memecoin');
-  //
-  // await chat.waitForStreamToFinish();
-  // await chat.waitForImageGenerationToFinish();
-  // await chat.waitForStreamToFinish();
-  //
-  // const third = await page.locator('h6 strong').nth(2).textContent();
-  //
-  // const thirdimg = page.locator('img[alt="Model Generated Image"]').nth(2);
-  // const thirdsrc = await thirdimg.getAttribute('src');
-  //
-  // expect(third).not.toBe(updatedTokenCardTitle);
-  // expect(thirdsrc).not.toBe(updatedTokenImageSrc);
-  //  todo - edit all token metadata
+  await chat.submitMessage('Make me an entirely-new memecoin');
+
+  await chat.waitForStreamToFinish();
+  await chat.waitForImageGenerationToFinish();
+  await chat.waitForStreamToFinish();
+
+  const thirdTokenCardTitle = await page
+    .locator('h6 strong')
+    .nth(2)
+    .textContent();
+  const thirdTokenImage = page
+    .locator('img[alt="Model Generated Image"]')
+    .nth(2);
+  const thirdTokenImgSrc = await thirdTokenImage.getAttribute('src');
+
+  expect(thirdTokenCardTitle).not.toBe(updatedTokenCardTitle);
+  expect(thirdTokenImgSrc).not.toBe(updatedTokenImageSrc);
 });
 
 test('handles cancelling an in progress token metadata request', async ({
