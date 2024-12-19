@@ -250,6 +250,32 @@ export const happyPathCases: Array<TestCase> = [
 ];
 
 export const failureTestCases: Array<TestCase> = [
+  {
+    description: 'Cosmos address',
+    input: 'Send 100 KAVA to kava1vlpsrmdyuywvaqrv7rx6xga224sqfwz3fyfhwq',
+    result: {
+      output: 'Send 100 KAVA to kava1vlpsrmdyuywvaqrv7rx6xga224sqfwz3fyfhwq',
+      maskedValueMap: {},
+    },
+  },
+  {
+    description: 'no 0x address',
+    input: 'Send 100 KAVA to Binance',
+    result: {
+      output: 'Send 100 KAVA to Binance',
+      maskedValueMap: {},
+    },
+  },
+  {
+    description: '0x address with additional characters',
+    input:
+      'Send 100 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe500000000000000000000000',
+    result: {
+      output:
+        'Send 100 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe500000000000000000000000',
+      maskedValueMap: {},
+    },
+  },
   //  these will be useful for testing the amount
   // {
   //   description: 'No number present',
@@ -360,30 +386,4 @@ export const failureTestCases: Array<TestCase> = [
   //   input: 'Send 100 KAVA to 0x123',
   //   result: null,
   // },
-  {
-    description: 'Cosmos address',
-    input: 'Send 100 KAVA to kava1vlpsrmdyuywvaqrv7rx6xga224sqfwz3fyfhwq',
-    result: {
-      output: 'Send 100 KAVA to kava1vlpsrmdyuywvaqrv7rx6xga224sqfwz3fyfhwq',
-      maskedValueMap: {},
-    },
-  },
-  {
-    description: 'no 0x address',
-    input: 'Send 100 KAVA to Binance',
-    result: {
-      output: 'Send 100 KAVA to Binance',
-      maskedValueMap: {},
-    },
-  },
-  {
-    description: '0x address with additional characters',
-    input:
-      'Send 100 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe500000000000000000000000',
-    result: {
-      output:
-        'Send 100 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe500000000000000000000000',
-      maskedValueMap: {},
-    },
-  },
 ];
