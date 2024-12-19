@@ -10,7 +10,9 @@ describe('useToolCallStreams', () => {
   });
 
   it('should parse a valid JSON input', () => {
-    const { result } = renderHook(() => useToolCallStreams(toolCallStreamStore));
+    const { result } = renderHook(() =>
+      useToolCallStreams(toolCallStreamStore),
+    );
 
     const data = {
       prompt: 'Test prompt',
@@ -36,7 +38,9 @@ describe('useToolCallStreams', () => {
   });
 
   it('should parse a valid JSON input  streamed one character at a time', () => {
-    const { result } = renderHook(() => useToolCallStreams(toolCallStreamStore));
+    const { result } = renderHook(() =>
+      useToolCallStreams(toolCallStreamStore),
+    );
 
     const data = {
       prompt: 'Test prompt',
@@ -78,7 +82,9 @@ describe('useToolCallStreams', () => {
   });
 
   it('should handle multi tool calls', () => {
-    const { result } = renderHook(() => useToolCallStreams(toolCallStreamStore));
+    const { result } = renderHook(() =>
+      useToolCallStreams(toolCallStreamStore),
+    );
 
     const data = {
       prompt: 'Valid prompt',
@@ -122,7 +128,9 @@ describe('useToolCallStreams', () => {
   });
 
   it('should handle multiple interleaved tool calls being streamed', () => {
-    const { result } = renderHook(() => useToolCallStreams(toolCallStreamStore));
+    const { result } = renderHook(() =>
+      useToolCallStreams(toolCallStreamStore),
+    );
 
     const data1 = {
       prompt: 'Test prompt',
@@ -196,7 +204,9 @@ describe('useToolCallStreams', () => {
   });
 
   it('should work with any arbitrary arguments', () => {
-    const { result } = renderHook(() => useToolCallStreams(toolCallStreamStore));
+    const { result } = renderHook(() =>
+      useToolCallStreams(toolCallStreamStore),
+    );
 
     const data = {
       key: 'val',
@@ -258,7 +268,9 @@ describe('useToolCallStreams', () => {
   });
 
   it('should handle escaped quotes in values', () => {
-    const { result } = renderHook(() => useToolCallStreams(toolCallStreamStore));
+    const { result } = renderHook(() =>
+      useToolCallStreams(toolCallStreamStore),
+    );
 
     const dataStr =
       '{"prompt":"Test \\"prompt\\"","symbol":"BTC","name":"Bitcoin","about":"A decentralized currency"}';
@@ -285,7 +297,9 @@ describe('useToolCallStreams', () => {
   });
 
   it('should handle multi escaped quotes in values with stream', () => {
-    const { result } = renderHook(() => useToolCallStreams(toolCallStreamStore));
+    const { result } = renderHook(() =>
+      useToolCallStreams(toolCallStreamStore),
+    );
 
     const dataStr =
       '{"prompt":"Test \\"prompt\\"","symbol":"\\"BTC\\"","name":"\\"Bitcoin\\"","about":"\\"A decentralized currency\\""}';
@@ -321,7 +335,9 @@ describe('useToolCallStreams', () => {
   });
 
   it('should handle invalid json gracefully', () => {
-    const { result } = renderHook(() => useToolCallStreams(toolCallStreamStore));
+    const { result } = renderHook(() =>
+      useToolCallStreams(toolCallStreamStore),
+    );
 
     act(() => {
       toolCallStreamStore.pushToolCall({
@@ -330,6 +346,65 @@ describe('useToolCallStreams', () => {
         function: {
           name: 'generateCoinMetadata',
           arguments: '{ some bad json ][',
+        },
+      });
+    });
+
+    expect(result.current).toEqual([]);
+  });
+
+  it('should stop parsing and remove deleted tool calls from state', () => {
+    const { result } = renderHook(() =>
+      useToolCallStreams(toolCallStreamStore),
+    );
+
+    const data = {
+      prompt: 'Test prompt',
+      symbol: 'BTC',
+      name: 'Bitcoin',
+      about: 'A decentralized currency',
+    };
+
+    const str = JSON.stringify(data);
+
+    act(() => {
+      toolCallStreamStore.pushToolCall({
+        id: '123',
+        index: 0,
+        function: {
+          name: 'name',
+          arguments: str.slice(0, str.length / 2),
+        },
+      });
+    });
+
+    // expect a part of the tool call to be in state
+    // notice that the token name and about are still missing
+    expect(result.current).toStrictEqual([
+      {
+        argumentsStream: {
+          prompt: 'Test prompt',
+          symbol: 'BTC',
+        },
+        id: '123',
+        name: 'name',
+      },
+    ]);
+
+    act(() => {
+      toolCallStreamStore.deleteToolCallById('123');
+    });
+
+    expect(result.current).toEqual([]);
+
+    // push the second half
+    act(() => {
+      toolCallStreamStore.pushToolCall({
+        id: '123',
+        index: 0,
+        function: {
+          name: 'name',
+          arguments: str.slice(str.length / 2),
         },
       });
     });

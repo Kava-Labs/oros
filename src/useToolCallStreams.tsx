@@ -161,16 +161,10 @@ export const useToolCallStreams = (
       finishedToolCalls.current = new Set<string>();
     }
 
-    if (!toolCalls.length) {
-      setState([]);
-      if (parsers.current) parsers.current.clear(); // remove all parsers
-    }
-
     for (const tc of toolCalls) {
       extractArgsFromStream(tc);
     }
   }, [toolCalls]);
-
 
   // sync the streaming state with the tool call store
   // removing the streaming state when the tool call is no longer
@@ -198,6 +192,7 @@ export const useToolCallStreams = (
       if (parsers.current) {
         for (const id of staleToolCallIds) {
           console.debug(`removing completed tool call id: ${id}`);
+          if (finishedToolCalls.current) finishedToolCalls.current.add(id);
           parsers.current.delete(id);
         }
       }
