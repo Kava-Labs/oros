@@ -164,8 +164,7 @@ test.skip('clicking reset chat button clears chatMessages from local storage', a
   expect(updatedLocalStorage).toBeNull();
 });
 
-//  todo - address timeout issue occurring in build, but not locally
-test.skip('image generation and editing', async ({ page }) => {
+test('image generation and editing', async ({ page }) => {
   test.setTimeout(90 * 1000);
 
   const chat = new Chat(page);
@@ -179,14 +178,23 @@ test.skip('image generation and editing', async ({ page }) => {
   const loadingSpinner = await page.locator('div[role="status"]');
   await expect(loadingSpinner).toBeVisible();
 
-  await chat.waitForAssistantResponse();
+  await chat.waitForImageGenerationToFinish();
 
+  const initialTokenCardTitle = await page.locator('h2').first().textContent();
+  //  get the text content of the p tag after the label
+  const initialTokenInfo = await page
+    .locator('h3', { hasText: 'Token info' })
+    .locator('+ p')
+    .first()
+    .textContent();
   const initialTokenImage = page
     .locator('img[alt="Model Generated Image"]')
     .first();
   const initialTokenImageSrc = await initialTokenImage.getAttribute('src');
 
   await expect(initialTokenImage).toBeVisible();
+
+  await chat.waitForStreamToFinish();
 
   await chat.waitForAssistantResponse();
 
@@ -195,17 +203,50 @@ test.skip('image generation and editing', async ({ page }) => {
     'Keep all metadata the same, but generate a new image',
   );
 
-  await chat.waitForAssistantResponse();
+  //  non-image metadata completes
+  await chat.waitForStreamToFinish();
+  //  image generation completes
+  await chat.waitForImageGenerationToFinish();
+  //  follow-up chat completes
+  await chat.waitForStreamToFinish();
 
-  //  todo - assertions symbol and description?
+  const updatedTokenCardTitle = await page.locator('h2').nth(1).textContent();
+  const updatedTokenInfo = await page
+    .locator('h3', { hasText: 'Token info' })
+    .locator('+ p')
+    .nth(1)
+    .textContent();
   const updatedTokenImage = page
     .locator('img[alt="Model Generated Image"]')
     .nth(1);
   const updatedTokenImageSrc = await updatedTokenImage.getAttribute('src');
 
+  expect(initialTokenCardTitle).toBe(updatedTokenCardTitle);
+  expect(initialTokenInfo).toBe(updatedTokenInfo);
   expect(updatedTokenImageSrc).not.toBe(initialTokenImageSrc);
 
-  //  todo - edit all token metadata
+  //  specify a theme for the coin - occasionally the tool call won't be made
+  //  and it will ask for more info about what the user wants
+  await chat.submitMessage('Make me an entirely-new memecoin about frogs');
+
+  await chat.waitForStreamToFinish();
+  await chat.waitForImageGenerationToFinish();
+  await chat.waitForStreamToFinish();
+
+  const thirdTokenCardTitle = await page.locator('h2').nth(2).textContent();
+  const thirdTokenInfo = await page
+    .locator('h3', { hasText: 'Token info' })
+    .locator('+ p')
+    .nth(2)
+    .textContent();
+  const thirdTokenImage = page
+    .locator('img[alt="Model Generated Image"]')
+    .nth(2);
+  const thirdTokenImgSrc = await thirdTokenImage.getAttribute('src');
+
+  expect(thirdTokenInfo).not.toBe(updatedTokenInfo);
+  expect(thirdTokenCardTitle).not.toBe(updatedTokenCardTitle);
+  expect(thirdTokenImgSrc).not.toBe(updatedTokenImageSrc);
 });
 
 test('handles cancelling an in progress token metadata request', async ({

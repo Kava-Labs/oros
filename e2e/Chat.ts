@@ -51,9 +51,20 @@ export class Chat {
 
   async waitForStreamToFinish() {
     await this.page.waitForResponse(async (res) => {
-      if (res.url().includes('chat')) {
+      if (res.url().includes('completions')) {
         expect(res.status()).toBe(200);
         await res.finished(); // it's important to wait for the stream to finish
+        return true;
+      }
+      return false;
+    });
+  }
+
+  async waitForImageGenerationToFinish() {
+    await this.page.waitForResponse(async (res) => {
+      if (res.url().includes('generations')) {
+        expect(res.status()).toBe(200);
+        await res.finished();
         return true;
       }
       return false;
