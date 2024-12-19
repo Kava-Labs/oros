@@ -9,7 +9,7 @@ describe('useToolCallStreams', () => {
     toolCallStore = new ToolCallStore();
   });
 
-  it('should parse a valid JSON input with all keys', () => {
+  it('should parse a valid JSON input', () => {
     const { result } = renderHook(() => useToolCallStreams(toolCallStore));
 
     const data = {
@@ -35,7 +35,7 @@ describe('useToolCallStreams', () => {
     ]);
   });
 
-  it('should parse a valid JSON input with all keys streamed one character at a time', () => {
+  it('should parse a valid JSON input  streamed one character at a time', () => {
     const { result } = renderHook(() => useToolCallStreams(toolCallStore));
 
     const data = {
