@@ -3,6 +3,7 @@ import { fn } from '@storybook/test';
 
 import { ChatView } from '../ChatView';
 import { mockChatMessages } from '../mockdata';
+import { ToolCallStore } from '../toolCallStore';
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
@@ -31,6 +32,7 @@ export const Primary: Story = {
     viewport: { defaultViewport: 'reset' },
   },
   args: {
+    toolCallStore: new ToolCallStore(),
     messages: mockChatMessages,
     isRequesting: false,
     onSubmit: fn(),
@@ -45,6 +47,7 @@ export const OnPhoneSmall: Story = {
     viewport: { defaultViewport: 'mobile1' },
   },
   args: {
+    toolCallStore: new ToolCallStore(),
     messages: mockChatMessages,
     isRequesting: false,
     onSubmit: fn(),
@@ -59,6 +62,7 @@ export const OnPhoneLarge: Story = {
     viewport: { defaultViewport: 'mobile2' },
   },
   args: {
+    toolCallStore: new ToolCallStore(),
     messages: mockChatMessages,
     isRequesting: false,
     onSubmit: fn(),
@@ -73,6 +77,7 @@ export const NoMessages: Story = {
     viewport: { defaultViewport: 'reset' },
   },
   args: {
+    toolCallStore: new ToolCallStore(),
     messages: [],
     isRequesting: false,
     onSubmit: fn(),
@@ -87,6 +92,7 @@ export const NoMessagesOnPhoneSmall: Story = {
     viewport: { defaultViewport: 'mobile1' },
   },
   args: {
+    toolCallStore: new ToolCallStore(),
     messages: [],
     isRequesting: false,
     onSubmit: fn(),
@@ -101,6 +107,7 @@ export const RequestInProgress: Story = {
     viewport: { defaultViewport: 'reset' },
   },
   args: {
+    toolCallStore: new ToolCallStore(),
     messages: [],
     isRequesting: true,
     onSubmit: fn(),
