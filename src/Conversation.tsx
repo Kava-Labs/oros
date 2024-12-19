@@ -4,7 +4,7 @@ import { Content } from './Content';
 import { StreamingText } from './StreamingText';
 import { messageStore, progressStore } from './store';
 import type { GenerateTokenMetadataResponse } from './tools/toolFunctions';
-import { TokenCardStreamingPlaceholder, TokenCard } from './TokenCard';
+import { TokenCardsStreamingPlaceholder, TokenCard } from './TokenCard';
 
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { ToolCallStreamStore } from './toolCallStreamStore';
@@ -146,9 +146,7 @@ export const Conversation = ({
         </div>
       )}
 
-      <div className={styles.left}>
-        <TokenCardStreamingPlaceholder toolCallStreamStore={toolCallStreamStore} />
-      </div>
+        <TokenCardsStreamingPlaceholder toolCallStreamStore={toolCallStreamStore} />
     </div>
   );
 };

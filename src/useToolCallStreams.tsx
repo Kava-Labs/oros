@@ -33,6 +33,8 @@ export const useToolCallStreams = (
 
   const parsers = useRef<null | Map<string, ToolCallParser>>(null);
 
+  const finishedToolCalls = useRef<null | Set<string>>(null);
+
   const extractArgsFromStream = useCallback(
     (tc: ToolCall) => {
       if (!parsers.current) return;
@@ -49,7 +51,11 @@ export const useToolCallStreams = (
       }
 
       const tcParser = parsers.current.get(tc.id);
-      if (tcParser && isString(tc.function.arguments)) {
+      if (
+        tcParser &&
+        isString(tc.function.arguments) &&
+        tcParser.indexReached < tc.function.arguments!.length
+      ) {
         tcParser.streamParser.write(
           (tc.function.arguments as string).slice(tcParser.indexReached),
         );
@@ -60,10 +66,11 @@ export const useToolCallStreams = (
   );
 
   const registerToolCallParser = (tc: ToolCall) => {
-    if (!parsers.current) return;
+    if (!parsers.current || !finishedToolCalls.current) return;
     if (!tc.id) return;
     if (!tc.function) return;
     if (!tc.function.name) return;
+    if (finishedToolCalls.current.has(tc.id)) return;
 
     const tcParser = {
       streamParser: new JSONParser({
@@ -125,7 +132,8 @@ export const useToolCallStreams = (
 
     // when done parsing remove the tool call parser
     tcParser.streamParser.onEnd = () => {
-      console.info('done');
+      console.info('done', tcParser.toolCallId);
+      finishedToolCalls.current!.add(tcParser.toolCallId);
       tcParser.streamParser.onValue = () => {};
       parsers.current?.delete(tcParser.toolCallId);
     };
@@ -133,6 +141,7 @@ export const useToolCallStreams = (
     // when an error is encounter remove the tool call parser
     tcParser.streamParser.onError = (err) => {
       console.error('steaming JSON Parser Error', err); // todo(sah): handle invalid json error
+      finishedToolCalls.current!.add(tcParser.toolCallId);
       tcParser.streamParser.onValue = () => {};
       parsers.current?.delete(tcParser.toolCallId);
     };
@@ -142,6 +151,11 @@ export const useToolCallStreams = (
     if (!parsers.current) {
       parsers.current = new Map();
     }
+
+    if (!finishedToolCalls.current) {
+      finishedToolCalls.current = new Set<string>();
+    }
+
     if (!toolCalls.length) {
       setState([]);
       if (parsers.current) parsers.current.clear(); // remove all parsers

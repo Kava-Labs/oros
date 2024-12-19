@@ -106,50 +106,45 @@ export const TokenCard = ({
   );
 };
 
-// hidden component that only renders when a generateCoinMetadata tool call request
-// is being streamed by the model
-// can be implemented inside TokenCard but didn't want to muddy up that implementation
-// as it's already complex enough handling loading states, errors, etc
-// this component also returns null in many cases so for better readability they are separated
-// just be sure the styles always match and classnames are consistent, this drawback is much better
-// than trying to DRY and make TokenCard handle everything
-export const TokenCardStreamingPlaceholder = ({
+export const TokenCardsStreamingPlaceholder = ({
   toolCallStreamStore,
 }: {
   toolCallStreamStore: ToolCallStreamStore;
 }) => {
   const toolCallStreams = useToolCallStreams(toolCallStreamStore);
 
-  const generateCoinMetadataStream = toolCallStreams.find(
-    (tc) => tc.name === 'generateCoinMetadata',
-  );
+  return toolCallStreams.map((tcStream) => {
+    if (tcStream.name !== 'generateCoinMetadata') {
+      return null;
+    }
 
-  if (!generateCoinMetadataStream) return null;
+    const argsStream =
+      tcStream.argumentsStream as Partial<GenerateCoinMetadataArgs>;
 
-  const argumentsStream =
-    generateCoinMetadataStream.argumentsStream as Partial<GenerateCoinMetadataArgs>;
-
-  return (
-    <div className={styles.tokenCardWrapper}>
-      <div className={styles.tokenCard}>
-        <div className={styles.header}>
-          <div className={styles.headerContent}>
-            <h2 className={styles.tokenName}>{argumentsStream.name ?? ''}</h2>
-            <div className={styles.tokenSymbol}>
-              {argumentsStream.symbol ?? ''}
+    return (
+      <div key={tcStream.id} className={styles.left}>
+        <div className={styles.tokenCardWrapper}>
+          <div className={styles.tokenCard}>
+            <div className={styles.header}>
+              <div className={styles.headerContent}>
+                <h2 className={styles.tokenName}>{argsStream.name ?? ''}</h2>
+                <div className={styles.tokenSymbol}>
+                  {argsStream.symbol ?? ''}
+                </div>
+              </div>
+            </div>
+            <div className={styles.content}>
+              <div className={styles.imageWrapper}>
+                <div className={styles.tokenImage}>{<LoadingSpinner />}</div>
+              </div>
+              <div className={styles.descriptionContainer}>
+                <h3 className={styles.infoTitle}>Token Info</h3>
+                <p className={styles.description}>{argsStream.about ?? ''}</p>
+              </div>
             </div>
           </div>
         </div>
-        <div className={styles.content}>
-          <div className={styles.imageWrapper}>
-            <div className={styles.tokenImage}>{<LoadingSpinner />}</div>
-          </div>
-          <div className={styles.descriptionContainer}>
-            <h3 className={styles.infoTitle}>Token Info</h3>
-            <p className={styles.description}>{argumentsStream.about ?? ''}</p>
-          </div>
-        </div>
       </div>
-    </div>
-  );
+    );
+  });
 };
