@@ -7,12 +7,12 @@ import type { GenerateTokenMetadataResponse } from './tools/toolFunctions';
 import { TokenCardStreamingPlaceholder, TokenCard } from './TokenCard';
 
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
-import { ToolCallStore } from './toolCallStore';
+import { ToolCallStreamStore } from './toolCallStreamStore';
 
 export interface ConversationProps {
   messages: ChatCompletionMessageParam[];
   errorText: string;
-  toolCallStore: ToolCallStore;
+  toolCallStreamStore: ToolCallStreamStore;
   isRequesting: boolean;
 
   onRendered(): void;
@@ -23,7 +23,7 @@ export const Conversation = ({
   errorText,
   isRequesting,
   onRendered,
-  toolCallStore,
+  toolCallStreamStore,
 }: ConversationProps) => {
   return (
     <div id={styles.conversation} data-testid="conversation">
@@ -147,7 +147,7 @@ export const Conversation = ({
       )}
 
       <div className={styles.left}>
-        <TokenCardStreamingPlaceholder toolCallStore={toolCallStore} />
+        <TokenCardStreamingPlaceholder toolCallStreamStore={toolCallStreamStore} />
       </div>
     </div>
   );

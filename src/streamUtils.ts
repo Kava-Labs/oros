@@ -1,5 +1,5 @@
 import type { ChatCompletionChunk } from 'openai/resources/index';
-import { ToolCallStore } from './toolCallStore';
+import { ToolCallStreamStore } from './toolCallStreamStore';
 
 /**
  * Checks if the given ChatCompletionChunk is a content chunk.
@@ -27,37 +27,34 @@ export const isToolCallChunk = (result: ChatCompletionChunk): boolean => {
   return false;
 };
 
-/**
- * Assembles tool calls from the streamed ChatCompletionChunk.
- * @param result - The ChatCompletionChunk containing tool call data.
- * @param toolCallsState - The state array to assemble tool calls into.
- */
 export const assembleToolCallsFromStream = (
   result: ChatCompletionChunk,
-  toolCallsState: ToolCallStore,
+  toolCallStreamStore: ToolCallStreamStore,
 ): void => {
   if (!result.choices[0].delta?.tool_calls) {
     return;
   }
 
   for (const tcChunk of result.choices[0].delta.tool_calls) {
-    if (toolCallsState.getSnapshot().length <= tcChunk.index) {
+    if (toolCallStreamStore.getSnapshot().length <= tcChunk.index) {
       // Push a new tool call request.
 
-      toolCallsState.pushToolCall({
+      toolCallStreamStore.pushToolCall({
         index: tcChunk.index,
         id: '',
         function: { name: '', arguments: '' },
       });
     }
     // Fill in info as we get it streamed for the corresponding tool call index.
-    const partialTC = toolCallsState.getSnapshot()[tcChunk.index];
+    const partialTC = toolCallStreamStore.getSnapshot()[tcChunk.index];
     if (tcChunk.id) partialTC.id += tcChunk.id;
     if (tcChunk.function?.name)
       partialTC.function!.name += tcChunk.function.name;
     if (tcChunk.function?.arguments)
       partialTC.function!.arguments += tcChunk.function.arguments;
 
-    toolCallsState.setToolCalls(structuredClone(toolCallsState.getSnapshot()));
+    toolCallStreamStore.setToolCalls(
+      structuredClone(toolCallStreamStore.getSnapshot()),
+    );
   }
 };

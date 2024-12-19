@@ -1,16 +1,16 @@
 import { renderHook, act } from '@testing-library/react';
 import { useToolCallStreams } from './useToolCallStreams';
-import { ToolCallStore } from './toolCallStore';
+import { ToolCallStreamStore } from './toolCallStreamStore';
 
 describe('useToolCallStreams', () => {
-  let toolCallStore: ToolCallStore;
+  let toolCallStreamStore: ToolCallStreamStore;
 
   beforeEach(() => {
-    toolCallStore = new ToolCallStore();
+    toolCallStreamStore = new ToolCallStreamStore();
   });
 
   it('should parse a valid JSON input', () => {
-    const { result } = renderHook(() => useToolCallStreams(toolCallStore));
+    const { result } = renderHook(() => useToolCallStreams(toolCallStreamStore));
 
     const data = {
       prompt: 'Test prompt',
@@ -20,7 +20,7 @@ describe('useToolCallStreams', () => {
     };
 
     act(() => {
-      toolCallStore.pushToolCall({
+      toolCallStreamStore.pushToolCall({
         id: 'dsafdas',
         index: 0,
         function: {
@@ -36,7 +36,7 @@ describe('useToolCallStreams', () => {
   });
 
   it('should parse a valid JSON input  streamed one character at a time', () => {
-    const { result } = renderHook(() => useToolCallStreams(toolCallStore));
+    const { result } = renderHook(() => useToolCallStreams(toolCallStreamStore));
 
     const data = {
       prompt: 'Test prompt',
@@ -48,7 +48,7 @@ describe('useToolCallStreams', () => {
     const str = JSON.stringify(data, null, 2);
 
     act(() => {
-      toolCallStore.pushToolCall({
+      toolCallStreamStore.pushToolCall({
         id: 'sacdsfgregv',
         index: 0,
         function: {
@@ -61,10 +61,10 @@ describe('useToolCallStreams', () => {
     for (let i = 1; i < str.length; i++) {
       act(() => {
         const newData = {
-          ...toolCallStore.getSnapshot()[0],
+          ...toolCallStreamStore.getSnapshot()[0],
         };
         newData.function!.arguments += str[i];
-        toolCallStore.setToolCalls([newData]);
+        toolCallStreamStore.setToolCalls([newData]);
       });
     }
 
@@ -78,7 +78,7 @@ describe('useToolCallStreams', () => {
   });
 
   it('should handle multi tool calls', () => {
-    const { result } = renderHook(() => useToolCallStreams(toolCallStore));
+    const { result } = renderHook(() => useToolCallStreams(toolCallStreamStore));
 
     const data = {
       prompt: 'Valid prompt',
@@ -88,7 +88,7 @@ describe('useToolCallStreams', () => {
     };
 
     act(() => {
-      toolCallStore.pushToolCall({
+      toolCallStreamStore.pushToolCall({
         id: '432cvfdvrb',
         index: 0,
         function: {
@@ -97,7 +97,7 @@ describe('useToolCallStreams', () => {
         },
       });
 
-      toolCallStore.pushToolCall({
+      toolCallStreamStore.pushToolCall({
         id: '321fwsd',
         index: 1,
         function: {
@@ -122,7 +122,7 @@ describe('useToolCallStreams', () => {
   });
 
   it('should handle multiple interleaved tool calls being streamed', () => {
-    const { result } = renderHook(() => useToolCallStreams(toolCallStore));
+    const { result } = renderHook(() => useToolCallStreams(toolCallStreamStore));
 
     const data1 = {
       prompt: 'Test prompt',
@@ -142,7 +142,7 @@ describe('useToolCallStreams', () => {
     const str2 = JSON.stringify(data2, null, 2);
 
     act(() => {
-      toolCallStore.pushToolCall({
+      toolCallStreamStore.pushToolCall({
         id: 'sacdsfgregv',
         index: 0,
         function: {
@@ -153,7 +153,7 @@ describe('useToolCallStreams', () => {
     });
 
     act(() => {
-      toolCallStore.pushToolCall({
+      toolCallStreamStore.pushToolCall({
         id: 'sacdsfgregx',
         index: 1,
         function: {
@@ -162,22 +162,22 @@ describe('useToolCallStreams', () => {
         },
       });
     });
-    expect(toolCallStore.getSnapshot()).toHaveLength(2);
+    expect(toolCallStreamStore.getSnapshot()).toHaveLength(2);
     const len = Math.max(str1.length, str2.length);
     for (let i = 1; i < len; i++) {
       act(() => {
         const newData = [
           {
-            ...toolCallStore.getSnapshot()[0],
+            ...toolCallStreamStore.getSnapshot()[0],
           },
           {
-            ...toolCallStore.getSnapshot()[1],
+            ...toolCallStreamStore.getSnapshot()[1],
           },
         ];
 
         if (i < str1.length) newData[0].function!.arguments += str1[i];
         if (i < str2.length) newData[1].function!.arguments += str2[i];
-        toolCallStore.setToolCalls(newData);
+        toolCallStreamStore.setToolCalls(newData);
       });
     }
 
@@ -196,17 +196,17 @@ describe('useToolCallStreams', () => {
   });
 
   it('should work with any arbitrary arguments', () => {
-    const { result } = renderHook(() => useToolCallStreams(toolCallStore));
+    const { result } = renderHook(() => useToolCallStreams(toolCallStreamStore));
 
     const data = {
-      'key': 'val', 
-      'nested': {
-        'key': 'val'
-      }
+      key: 'val',
+      nested: {
+        key: 'val',
+      },
     };
 
     act(() => {
-      toolCallStore.pushToolCall({
+      toolCallStreamStore.pushToolCall({
         id: 'dsafdasxr',
         index: 0,
         function: {
@@ -223,7 +223,7 @@ describe('useToolCallStreams', () => {
 
   it('should reset state when no tool calls exist', () => {
     const { result, rerender } = renderHook(() =>
-      useToolCallStreams(toolCallStore),
+      useToolCallStreams(toolCallStreamStore),
     );
 
     const data = {
@@ -234,7 +234,7 @@ describe('useToolCallStreams', () => {
     };
 
     act(() => {
-      toolCallStore.pushToolCall({
+      toolCallStreamStore.pushToolCall({
         id: 'x3g4f',
         index: 0,
         function: {
@@ -249,7 +249,7 @@ describe('useToolCallStreams', () => {
     ]);
 
     act(() => {
-      toolCallStore.setToolCalls([]);
+      toolCallStreamStore.setToolCalls([]);
     });
 
     rerender();
@@ -258,14 +258,14 @@ describe('useToolCallStreams', () => {
   });
 
   it('should handle escaped quotes in values', () => {
-    const { result } = renderHook(() => useToolCallStreams(toolCallStore));
+    const { result } = renderHook(() => useToolCallStreams(toolCallStreamStore));
 
     const dataStr =
       '{"prompt":"Test \\"prompt\\"","symbol":"BTC","name":"Bitcoin","about":"A decentralized currency"}';
     const data = JSON.parse(dataStr);
 
     act(() => {
-      toolCallStore.pushToolCall({
+      toolCallStreamStore.pushToolCall({
         id: '321edfedfdfvf',
         index: 0,
         function: {
@@ -285,7 +285,7 @@ describe('useToolCallStreams', () => {
   });
 
   it('should handle multi escaped quotes in values with stream', () => {
-    const { result } = renderHook(() => useToolCallStreams(toolCallStore));
+    const { result } = renderHook(() => useToolCallStreams(toolCallStreamStore));
 
     const dataStr =
       '{"prompt":"Test \\"prompt\\"","symbol":"\\"BTC\\"","name":"\\"Bitcoin\\"","about":"\\"A decentralized currency\\""}';
@@ -293,7 +293,7 @@ describe('useToolCallStreams', () => {
     const data = JSON.parse(dataStr);
 
     act(() => {
-      toolCallStore.pushToolCall({
+      toolCallStreamStore.pushToolCall({
         id: '22141ccsa',
         index: 0,
         function: {
@@ -305,9 +305,9 @@ describe('useToolCallStreams', () => {
 
     for (let i = 1; i < dataStr.length; i++) {
       act(() => {
-        const newData = { ...toolCallStore.getSnapshot()[0] };
+        const newData = { ...toolCallStreamStore.getSnapshot()[0] };
         newData.function!.arguments += dataStr[i];
-        toolCallStore.setToolCalls([newData]);
+        toolCallStreamStore.setToolCalls([newData]);
       });
     }
 
@@ -321,10 +321,10 @@ describe('useToolCallStreams', () => {
   });
 
   it('should handle invalid json gracefully', () => {
-    const { result } = renderHook(() => useToolCallStreams(toolCallStore));
+    const { result } = renderHook(() => useToolCallStreams(toolCallStreamStore));
 
     act(() => {
-      toolCallStore.pushToolCall({
+      toolCallStreamStore.pushToolCall({
         id: 'edsvdsfvdf2r23r',
         index: 0,
         function: {

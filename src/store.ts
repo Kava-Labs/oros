@@ -1,6 +1,6 @@
 import { TextStreamStore } from './textStreamStore';
-import { ToolCallStore } from './toolCallStore';
+import { ToolCallStreamStore } from './toolCallStreamStore';
 
 export const messageStore = new TextStreamStore();
 export const progressStore = new TextStreamStore();
-export const toolCallStore = new ToolCallStore();
+export const toolCallStreamStore = new ToolCallStreamStore();

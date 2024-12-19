@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { ChatView } from './ChatView';
 import { getToken } from './utils/token/token';
 import OpenAI from 'openai';
-import { messageStore, progressStore, toolCallStore } from './store';
+import { messageStore, progressStore, toolCallStreamStore } from './store';
 import type {
   ChatCompletionMessageParam,
   ChatCompletionTool,
@@ -18,7 +18,7 @@ import { systemPrompt } from './config/systemPrompt';
 import { tools } from './config/tools';
 import { imagedb } from './imagedb';
 import { v4 as uuidv4 } from 'uuid';
-import { ToolCallStore } from './toolCallStore';
+import { ToolCallStreamStore } from './toolCallStreamStore';
 
 let client: OpenAI | null = null;
 
@@ -100,7 +100,7 @@ export const App = () => {
         tools,
         progressStore,
         messageStore,
-        toolCallStore,
+        toolCallStreamStore,
         publishMessage,
       );
     } catch (error) {
@@ -125,7 +125,7 @@ export const App = () => {
     if (controllerRef.current) {
       controllerRef.current.abort();
       controllerRef.current = null;
-      toolCallStore.setToolCalls([]);
+      toolCallStreamStore.setToolCalls([]);
     }
   };
 
@@ -138,7 +138,7 @@ export const App = () => {
     <>
       {isReady && (
         <ChatView
-          toolCallStore={toolCallStore}
+          toolCallStreamStore={toolCallStreamStore}
           messages={messages}
           onSubmit={handleChatCompletion}
           onReset={handleReset}
@@ -158,7 +158,7 @@ async function doChat(
   tools: ChatCompletionTool[],
   progressStore: TextStreamStore,
   messageStore: TextStreamStore,
-  toolCallStore: ToolCallStore,
+  toolCallStreamStore: ToolCallStreamStore,
   publishMessage: (
     messages: ChatCompletionMessageParam[],
     message: ChatCompletionMessageParam,
@@ -186,7 +186,7 @@ async function doChat(
 
         messageStore.appendText(chunk.choices[0].delta.content as string);
       } else if (isToolCallChunk(chunk)) {
-        assembleToolCallsFromStream(chunk, toolCallStore);
+        assembleToolCallsFromStream(chunk, toolCallStreamStore);
       }
     }
 
@@ -199,12 +199,12 @@ async function doChat(
       messageStore.setText('');
     }
 
-    if (toolCallStore.getSnapshot().length > 0) {
+    if (toolCallStreamStore.getSnapshot().length > 0) {
       await callTools(
         controller,
         client,
         messages,
-        toolCallStore,
+        toolCallStreamStore,
         progressStore,
         publishMessage,
       );
@@ -216,7 +216,7 @@ async function doChat(
         tools,
         progressStore,
         messageStore,
-        toolCallStore,
+        toolCallStreamStore,
         publishMessage,
       );
     }
@@ -244,14 +244,14 @@ async function callTools(
   controller: AbortController,
   client: OpenAI,
   messages: ChatCompletionMessageParam[],
-  toolCallsStore: ToolCallStore,
+  toolCallStreamStore: ToolCallStreamStore,
   progressStore: TextStreamStore,
   publishMessage: (
     messages: ChatCompletionMessageParam[],
     message: ChatCompletionMessageParam,
   ) => void,
 ): Promise<void> {
-  for (const toolCall of toolCallsStore.getSnapshot()) {
+  for (const toolCall of toolCallStreamStore.getSnapshot()) {
     const name = toolCall.function?.name;
     switch (name) {
       case 'generateCoinMetadata': {
@@ -290,7 +290,7 @@ async function callTools(
           ],
         });
         // remove from store and as we placed this into messages
-        toolCallStore.deleteToolCallById(toolCall.id as string);
+        toolCallStreamStore.deleteToolCallById(toolCall.id as string);
 
         publishMessage(messages, {
           role: 'tool' as const,

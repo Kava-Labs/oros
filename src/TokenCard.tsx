@@ -4,7 +4,7 @@ import { imagedb } from './imagedb';
 import { LoadingSpinner } from './LoadingSpinner';
 import { LaunchIcon } from './assets/LaunchIcon';
 import { useToolCallStreams } from './useToolCallStreams';
-import { ToolCallStore } from './toolCallStore';
+import { ToolCallStreamStore } from './toolCallStreamStore';
 
 export interface TokenCardProps {
   id: string;
@@ -108,11 +108,11 @@ export const TokenCard = ({
 // hidden component that only renders when a generateCoinMetadata tool call request
 // is being streamed by the model
 export const TokenCardStreamingPlaceholder = ({
-  toolCallStore,
+  toolCallStreamStore,
 }: {
-  toolCallStore: ToolCallStore;
+  toolCallStreamStore: ToolCallStreamStore;
 }) => {
-  const toolCallStreams = useToolCallStreams(toolCallStore);
+  const toolCallStreams = useToolCallStreams(toolCallStreamStore);
 
   if (!toolCallStreams.length) return null;
 

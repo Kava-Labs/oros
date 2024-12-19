@@ -5,7 +5,7 @@ import {
   useState,
   useSyncExternalStore,
 } from 'react';
-import { ToolCall, ToolCallStore } from './toolCallStore';
+import { ToolCall, ToolCallStreamStore } from './toolCallStreamStore';
 import { JSONParser } from '@streamparser/json';
 
 type ToolCallParser = {
@@ -21,10 +21,10 @@ type StreamingToolCall = {
   arguments: Record<string, unknown>;
 };
 
-export const useToolCallStreams = (toolCallStore: ToolCallStore) => {
+export const useToolCallStreams = (toolCallStreamStore: ToolCallStreamStore) => {
   const toolCalls = useSyncExternalStore(
-    toolCallStore.subscribe,
-    toolCallStore.getSnapshot,
+    toolCallStreamStore.subscribe,
+    toolCallStreamStore.getSnapshot,
   );
 
   const [state, setState] = useState<StreamingToolCall[]>([]);

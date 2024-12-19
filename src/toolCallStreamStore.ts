@@ -4,7 +4,7 @@ type Listener = () => void;
 
 export type ToolCall = ChatCompletionChunk.Choice.Delta.ToolCall;
 
-export class ToolCallStore {
+export class ToolCallStreamStore {
   private currentValue: ToolCall[] = [];
   private listeners: Set<Listener> = new Set();
 
