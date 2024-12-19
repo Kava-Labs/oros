@@ -164,14 +164,6 @@ test.skip('clicking reset chat button clears chatMessages from local storage', a
   expect(updatedLocalStorage).toBeNull();
 });
 
-// const map = {
-//   address_one: '0xaddr1',
-//   address_one: '0xaddr1',
-//   address_one: '0xaddr1',
-//   address_one: '0xaddr1'
-// }
-
-//  todo - address timeout issue occurring in build, but not locally
 test('image generation and editing', async ({ page }) => {
   test.setTimeout(90 * 1000);
 
