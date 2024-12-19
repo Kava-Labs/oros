@@ -3,7 +3,7 @@ import styles from './TokenCard.module.css';
 import { imagedb } from './imagedb';
 import { LoadingSpinner } from './LoadingSpinner';
 import { LaunchIcon } from './assets/LaunchIcon';
-import { useToolCallStream } from './useToolCallStream';
+import { useToolCallStreams } from './useToolCallStreams';
 import { ToolCallStore } from './toolCallStore';
 
 export interface TokenCardProps {
@@ -112,7 +112,7 @@ export const TokenCardStreamingPlaceholder = ({
 }: {
   toolCallStore: ToolCallStore;
 }) => {
-  const toolCallStreams = useToolCallStream(toolCallStore);
+  const toolCallStreams = useToolCallStreams(toolCallStore);
 
   if (!toolCallStreams.length) return null;
 

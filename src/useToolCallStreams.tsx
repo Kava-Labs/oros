@@ -21,7 +21,7 @@ type StreamingToolCall = {
   arguments: Record<string, unknown>;
 };
 
-export const useToolCallStream = (toolCallStore: ToolCallStore) => {
+export const useToolCallStreams = (toolCallStore: ToolCallStore) => {
   const toolCalls = useSyncExternalStore(
     toolCallStore.subscribe,
     toolCallStore.getSnapshot,
