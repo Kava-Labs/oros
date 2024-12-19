@@ -72,6 +72,8 @@ export const useToolCallStreams = (
     if (!tc.function.name) return;
     if (finishedToolCalls.current.has(tc.id)) return;
 
+    console.debug(`setting up JSON parser for tool call id: ${tc.id}`);
+
     const tcParser = {
       streamParser: new JSONParser({
         emitPartialTokens: true,
@@ -132,7 +134,9 @@ export const useToolCallStreams = (
 
     // when done parsing remove the tool call parser
     tcParser.streamParser.onEnd = () => {
-      console.info('done', tcParser.toolCallId);
+      console.debug(
+        `finished parsing json stream for tool call id: ${tcParser.toolCallId}`,
+      );
       finishedToolCalls.current!.add(tcParser.toolCallId);
       tcParser.streamParser.onValue = () => {};
       parsers.current?.delete(tcParser.toolCallId);
@@ -147,6 +151,7 @@ export const useToolCallStreams = (
     };
   };
 
+  // sets up tool call streaming
   useEffect(() => {
     if (!parsers.current) {
       parsers.current = new Map();
@@ -165,6 +170,39 @@ export const useToolCallStreams = (
       extractArgsFromStream(tc);
     }
   }, [toolCalls]);
+
+
+  // sync the streaming state with the tool call store
+  // removing the streaming state when the tool call is no longer
+  // in the toolCallStreamStore
+  useEffect(() => {
+    const staleToolCallIds: Set<string> = new Set();
+    for (const streamingTc of state) {
+      if (!toolCalls.find((tc) => tc.id === streamingTc.id)) {
+        staleToolCallIds.add(streamingTc.id);
+      }
+    }
+
+    if (staleToolCallIds.size) {
+      setState((prev) => {
+        const newState: StreamingToolCall[] = [];
+
+        for (const tc of prev) {
+          if (!staleToolCallIds.has(tc.id)) {
+            newState.push(structuredClone(tc));
+          }
+        }
+        return newState;
+      });
+
+      if (parsers.current) {
+        for (const id of staleToolCallIds) {
+          console.debug(`removing completed tool call id: ${id}`);
+          parsers.current.delete(id);
+        }
+      }
+    }
+  }, [state, toolCalls]);
 
   return state;
 };
