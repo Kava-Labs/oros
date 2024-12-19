@@ -31,7 +31,7 @@ describe('useToolCallStreams', () => {
     });
 
     expect(result.current).toEqual([
-      { id: 'dsafdas', name: 'generateCoinMetadata', arguments: data },
+      { id: 'dsafdas', name: 'generateCoinMetadata', argumentsStream: data },
     ]);
   });
 
@@ -72,7 +72,7 @@ describe('useToolCallStreams', () => {
       {
         id: 'sacdsfgregv',
         name: 'generateCoinMetadata',
-        arguments: data,
+        argumentsStream: data,
       },
     ]);
   });
@@ -111,12 +111,12 @@ describe('useToolCallStreams', () => {
       {
         id: '432cvfdvrb',
         name: 'unrelatedFunction',
-        arguments: { hi: 'there' },
+        argumentsStream: { hi: 'there' },
       },
       {
         id: '321fwsd',
         name: 'generateCoinMetadata',
-        arguments: data,
+        argumentsStream: data,
       },
     ]);
   });
@@ -185,12 +185,12 @@ describe('useToolCallStreams', () => {
       {
         id: 'sacdsfgregv',
         name: 'generateCoinMetadata',
-        arguments: data1,
+        argumentsStream: data1,
       },
       {
         id: 'sacdsfgregx',
         name: 'generateCoinMetadata',
-        arguments: data2,
+        argumentsStream: data2,
       },
     ]);
   });
@@ -217,7 +217,7 @@ describe('useToolCallStreams', () => {
     });
 
     expect(result.current).toEqual([
-      { id: 'dsafdasxr', name: 'someOtherToolCall', arguments: data },
+      { id: 'dsafdasxr', name: 'someOtherToolCall', argumentsStream: data },
     ]);
   });
 
@@ -245,7 +245,7 @@ describe('useToolCallStreams', () => {
     });
 
     expect(result.current).toEqual([
-      { id: 'x3g4f', name: 'generateCoinMetadata', arguments: data },
+      { id: 'x3g4f', name: 'generateCoinMetadata', argumentsStream: data },
     ]);
 
     act(() => {
@@ -279,7 +279,7 @@ describe('useToolCallStreams', () => {
       {
         id: '321edfedfdfvf',
         name: 'generateCoinMetadata',
-        arguments: data,
+        argumentsStream: data,
       },
     ]);
   });
@@ -315,7 +315,7 @@ describe('useToolCallStreams', () => {
       {
         id: '22141ccsa',
         name: 'generateCoinMetadata',
-        arguments: data,
+        argumentsStream: data,
       },
     ]);
   });

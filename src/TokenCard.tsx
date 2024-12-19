@@ -125,7 +125,7 @@ export const TokenCardStreamingPlaceholder = ({
 
   if (!generateCoinMetadataStream) return null;
 
-  const { arguments: streamingArgs } = generateCoinMetadataStream;
+  const { argumentsStream } = generateCoinMetadataStream;
 
   return (
     <div className={styles.tokenCardWrapper}>
@@ -133,10 +133,10 @@ export const TokenCardStreamingPlaceholder = ({
         <div className={styles.header}>
           <div className={styles.headerContent}>
             <h2 className={styles.tokenName}>
-              {(streamingArgs.name as string) ?? ''}
+              {(argumentsStream.name as string) ?? ''}
             </h2>
             <div className={styles.tokenSymbol}>
-              {(streamingArgs.symbol as string) ?? ''}
+              {(argumentsStream.symbol as string) ?? ''}
             </div>
           </div>
         </div>
@@ -147,7 +147,7 @@ export const TokenCardStreamingPlaceholder = ({
           <div className={styles.descriptionContainer}>
             <h3 className={styles.infoTitle}>Token Info</h3>
             <p className={styles.description}>
-              {(streamingArgs.about as string) ?? ''}
+              {(argumentsStream.about as string) ?? ''}
             </p>
           </div>
         </div>

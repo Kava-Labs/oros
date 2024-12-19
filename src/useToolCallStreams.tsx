@@ -18,10 +18,12 @@ type ToolCallParser = {
 type StreamingToolCall = {
   id: string;
   name: string;
-  arguments: Record<string, unknown>;
+  argumentsStream: Record<string, unknown>;
 };
 
-export const useToolCallStreams = (toolCallStreamStore: ToolCallStreamStore) => {
+export const useToolCallStreams = (
+  toolCallStreamStore: ToolCallStreamStore,
+) => {
   const toolCalls = useSyncExternalStore(
     toolCallStreamStore.subscribe,
     toolCallStreamStore.getSnapshot,
@@ -94,8 +96,8 @@ export const useToolCallStreams = (toolCallStreamStore: ToolCallStreamStore) => 
               found = true;
               newState.push({
                 ...v,
-                arguments: {
-                  ...v.arguments,
+                argumentsStream: {
+                  ...v.argumentsStream,
                   [key as string]: val,
                 },
               });
@@ -110,7 +112,7 @@ export const useToolCallStreams = (toolCallStreamStore: ToolCallStreamStore) => 
             newState.push({
               id: tc.id as string,
               name: tc.function?.name as string,
-              arguments: {
+              argumentsStream: {
                 [key as string]: val,
               },
             });
