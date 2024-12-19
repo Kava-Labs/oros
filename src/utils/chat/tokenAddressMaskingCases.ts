@@ -20,13 +20,79 @@ export const happyPathCases: Array<TestCase> = [
     },
   },
   {
-    input: 'Send 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5 100 KAVA ',
+    input: 'Send 100KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+    result: {
+      output: 'Send <amount_1><token_1> to <address_1>',
+      addressMaskingMap: {
+        address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+        amount_1: '100',
+        token_1: 'KAVA',
+      },
+    },
+  },
+  {
+    input: 'Send 100kava to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+    result: {
+      output: 'Send <amount_1><token_1> to <address_1>',
+      addressMaskingMap: {
+        address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+        amount_1: '100',
+        token_1: 'kava',
+      },
+    },
+  },
+  {
+    input: 'Send 100 ukava to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+    result: {
+      output: 'Send <amount_1><token_1> to <address_1>',
+      addressMaskingMap: {
+        address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+        amount_1: '100',
+        token_1: 'ukava',
+      },
+    },
+  },
+  {
+    input: 'Send 100ukava to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+    result: {
+      output: 'Send <amount_1><token_1> to <address_1>',
+      addressMaskingMap: {
+        address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+        amount_1: '100',
+        token_1: 'ukava',
+      },
+    },
+  },
+  {
+    input: 'Send 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5 100KAVA ',
     result: {
       output: 'Send <address_1> <amount_1> <token_1>',
       addressMaskingMap: {
         address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         amount_1: '100',
         token_1: 'KAVA',
+      },
+    },
+  },
+  {
+    input: 'Send 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5 100kava ',
+    result: {
+      output: 'Send <address_1> <amount_1> <token_1>',
+      addressMaskingMap: {
+        address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+        amount_1: '100',
+        token_1: 'KAVA',
+      },
+    },
+  },
+  {
+    input: 'Send 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5 100ukava ',
+    result: {
+      output: 'Send <address_1> <amount_1> <token_1>',
+      addressMaskingMap: {
+        address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+        amount_1: '100',
+        token_1: 'ukava',
       },
     },
   },
@@ -295,10 +361,18 @@ export const failureTestCases: Array<TestCase> = [
   //   result: null,
   // },
   {
-    description: 'non-0x address',
+    description: 'Cosmos address',
     input: 'Send 100 KAVA to kava1vlpsrmdyuywvaqrv7rx6xga224sqfwz3fyfhwq',
     result: {
       output: 'Send 100 KAVA to kava1vlpsrmdyuywvaqrv7rx6xga224sqfwz3fyfhwq',
+      addressMaskingMap: {},
+    },
+  },
+  {
+    description: 'no 0x address',
+    input: 'Send 100 KAVA to Binance',
+    result: {
+      output: 'Send 100 KAVA to Binance',
       addressMaskingMap: {},
     },
   },
