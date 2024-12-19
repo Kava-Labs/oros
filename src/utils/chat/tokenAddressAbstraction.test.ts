@@ -13,6 +13,7 @@ describe('addressAmountAbstractionTest', () => {
 
       expect(/\d+/.test(result.output)).toBe(false);
 
+      //  we may have more than one instance of each, but at least one should be present
       expect(Object.keys(result.tokenMap)).toEqual(
         expect.arrayContaining(['<address_1>', '<token_1>', '<amount_1>']),
       );
