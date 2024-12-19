@@ -3,7 +3,7 @@ export interface TestCase {
   input: string;
   result: {
     output: string;
-    addressMaskingMap: { [key: string]: string };
+    maskedValueMap: { [key: string]: string };
   };
 }
 
@@ -12,7 +12,7 @@ export const happyPathCases: Array<TestCase> = [
     input: 'Send 100 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
     result: {
       output: 'Send <amount_1> <token_1> to <address_1>',
-      addressMaskingMap: {
+      maskedValueMap: {
         address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         amount_1: '100',
         token_1: 'KAVA',
@@ -23,7 +23,7 @@ export const happyPathCases: Array<TestCase> = [
     input: 'Send 100KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
     result: {
       output: 'Send <amount_1><token_1> to <address_1>',
-      addressMaskingMap: {
+      maskedValueMap: {
         address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         amount_1: '100',
         token_1: 'KAVA',
@@ -34,7 +34,7 @@ export const happyPathCases: Array<TestCase> = [
     input: 'Send 100kava to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
     result: {
       output: 'Send <amount_1><token_1> to <address_1>',
-      addressMaskingMap: {
+      maskedValueMap: {
         address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         amount_1: '100',
         token_1: 'kava',
@@ -45,7 +45,7 @@ export const happyPathCases: Array<TestCase> = [
     input: 'Send 100 ukava to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
     result: {
       output: 'Send <amount_1><token_1> to <address_1>',
-      addressMaskingMap: {
+      maskedValueMap: {
         address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         amount_1: '100',
         token_1: 'ukava',
@@ -56,7 +56,7 @@ export const happyPathCases: Array<TestCase> = [
     input: 'Send 100ukava to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
     result: {
       output: 'Send <amount_1><token_1> to <address_1>',
-      addressMaskingMap: {
+      maskedValueMap: {
         address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         amount_1: '100',
         token_1: 'ukava',
@@ -67,7 +67,7 @@ export const happyPathCases: Array<TestCase> = [
     input: 'Send 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5 100KAVA ',
     result: {
       output: 'Send <address_1> <amount_1> <token_1>',
-      addressMaskingMap: {
+      maskedValueMap: {
         address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         amount_1: '100',
         token_1: 'KAVA',
@@ -78,7 +78,7 @@ export const happyPathCases: Array<TestCase> = [
     input: 'Send 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5 100kava ',
     result: {
       output: 'Send <address_1> <amount_1> <token_1>',
-      addressMaskingMap: {
+      maskedValueMap: {
         address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         amount_1: '100',
         token_1: 'KAVA',
@@ -89,7 +89,7 @@ export const happyPathCases: Array<TestCase> = [
     input: 'Send 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5 100ukava ',
     result: {
       output: 'Send <address_1> <amount_1> <token_1>',
-      addressMaskingMap: {
+      maskedValueMap: {
         address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         amount_1: '100',
         token_1: 'ukava',
@@ -100,7 +100,7 @@ export const happyPathCases: Array<TestCase> = [
     input: 'Send 100.001 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
     result: {
       output: 'Send <amount_1> <token_1> to <address_1>',
-      addressMaskingMap: {
+      maskedValueMap: {
         address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         amount_1: '100.001',
         token_1: 'KAVA',
@@ -111,7 +111,7 @@ export const happyPathCases: Array<TestCase> = [
     input: 'Send 0.9 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
     result: {
       output: 'Send <amount_1> <token_1> to <address_1>',
-      addressMaskingMap: {
+      maskedValueMap: {
         address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         amount_1: '0.9',
         token_1: 'KAVA',
@@ -122,7 +122,7 @@ export const happyPathCases: Array<TestCase> = [
     input: 'Send .9 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
     result: {
       output: 'Send <amount_1> <token_1> to <address_1>',
-      addressMaskingMap: {
+      maskedValueMap: {
         address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         amount_1: '.9',
         token_1: 'KAVA',
@@ -134,7 +134,7 @@ export const happyPathCases: Array<TestCase> = [
       'Send 1,000 KAVA tokens to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
     result: {
       output: 'Send <amount_1> <token_1> to <address_1>',
-      addressMaskingMap: {
+      maskedValueMap: {
         address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         amount_1: '1,000',
         token_1: 'KAVA',
@@ -146,7 +146,7 @@ export const happyPathCases: Array<TestCase> = [
       'Send 1,000.00 KAVA tokens to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
     result: {
       output: 'Send <amount_1> <token_1> to <address_1>',
-      addressMaskingMap: {
+      maskedValueMap: {
         address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         amount_1: '1,000.00',
         token_1: 'KAVA',
@@ -158,7 +158,7 @@ export const happyPathCases: Array<TestCase> = [
       'Send 1,000.123456 KAVA tokens to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
     result: {
       output: 'Send <amount_1> <token_1> to <address_1>',
-      addressMaskingMap: {
+      maskedValueMap: {
         address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         amount_1: '1,000.123456',
         token_1: 'KAVA',
@@ -172,7 +172,7 @@ export const happyPathCases: Array<TestCase> = [
     result: {
       output:
         'Send <amount_1> <token_1> and <amount_2> <token_2> to <address_1>',
-      addressMaskingMap: {
+      maskedValueMap: {
         address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         amount_1: '100',
         token_1: 'KAVA',
@@ -187,7 +187,7 @@ export const happyPathCases: Array<TestCase> = [
       'Send 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5 100 KAVA and 0.01 wBTC',
     result: {
       output: 'Send <address_1> <amount_1> <token_1> and <amount_2> <token_2>',
-      addressMaskingMap: {
+      maskedValueMap: {
         address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         amount_1: '100',
         token_1: 'KAVA',
@@ -203,7 +203,7 @@ export const happyPathCases: Array<TestCase> = [
     result: {
       output:
         'Send <amount_1> <token_1> to <address_1> and <amount_2> <token_2> to <address_2>',
-      addressMaskingMap: {
+      maskedValueMap: {
         address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         amount_1: '100',
         token_1: 'KAVA',
@@ -220,7 +220,7 @@ export const happyPathCases: Array<TestCase> = [
     result: {
       output:
         'Send <address_1> <amount_1> <token_1> and <address_2> <amount_2> <token_2>',
-      addressMaskingMap: {
+      maskedValueMap: {
         address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         amount_1: '100',
         token_1: 'KAVA',
@@ -237,7 +237,7 @@ export const happyPathCases: Array<TestCase> = [
     result: {
       output:
         'Send <address_1> <amount_1> <token_1> and <address_2> <amount_2> <token_2>',
-      addressMaskingMap: {
+      maskedValueMap: {
         address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         amount_1: '100',
         token_1: 'KAVA',
@@ -365,7 +365,7 @@ export const failureTestCases: Array<TestCase> = [
     input: 'Send 100 KAVA to kava1vlpsrmdyuywvaqrv7rx6xga224sqfwz3fyfhwq',
     result: {
       output: 'Send 100 KAVA to kava1vlpsrmdyuywvaqrv7rx6xga224sqfwz3fyfhwq',
-      addressMaskingMap: {},
+      maskedValueMap: {},
     },
   },
   {
@@ -373,7 +373,7 @@ export const failureTestCases: Array<TestCase> = [
     input: 'Send 100 KAVA to Binance',
     result: {
       output: 'Send 100 KAVA to Binance',
-      addressMaskingMap: {},
+      maskedValueMap: {},
     },
   },
   {
@@ -383,7 +383,7 @@ export const failureTestCases: Array<TestCase> = [
     result: {
       output:
         'Send 100 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe500000000000000000000000',
-      addressMaskingMap: {},
+      maskedValueMap: {},
     },
   },
 ];
