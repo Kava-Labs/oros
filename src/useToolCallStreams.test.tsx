@@ -2,7 +2,7 @@ import { renderHook, act } from '@testing-library/react';
 import { useToolCallStreams } from './useToolCallStreams';
 import { ToolCallStore } from './toolCallStore';
 
-describe('useToolCallStream', () => {
+describe('useToolCallStreams', () => {
   let toolCallStore: ToolCallStore;
 
   beforeEach(() => {
