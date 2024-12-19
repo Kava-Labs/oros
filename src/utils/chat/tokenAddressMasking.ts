@@ -2,7 +2,7 @@ import { TestCase } from './tokenAddressMaskingCases';
 
 type AddressAccumulator = {
   updatedResult: string;
-  addressMap: { [key: string]: string };
+  maskedValueMap: { [key: string]: string };
 };
 
 export const tokenAddressMasking = (testCase: TestCase) => {
@@ -13,7 +13,7 @@ export const tokenAddressMasking = (testCase: TestCase) => {
     testCase.input.matchAll(ethAddressRegex),
   );
 
-  const { updatedResult, addressMap } =
+  const { updatedResult, maskedValueMap } =
     addressesToReplace.reduce<AddressAccumulator>(
       (accumulator, addressMatch, i) => {
         const address = addressMatch[0]; // The first element in the array is the match
@@ -26,18 +26,18 @@ export const tokenAddressMasking = (testCase: TestCase) => {
         );
 
         //  build the map of replacements to values
-        accumulator.addressMap[replacement] = address;
+        accumulator.maskedValueMap[replacement] = address;
 
         return accumulator;
       },
       {
         updatedResult: testCase.input,
-        addressMap: {},
+        maskedValueMap: {},
       },
     );
 
   return {
     output: updatedResult,
-    tokenMap: addressMap,
+    maskedValueMap,
   };
 };
