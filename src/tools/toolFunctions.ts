@@ -205,7 +205,7 @@ export async function getDelegatedBalance(arg: {
   }
 }
 
-export type GenerateTokenMetadataParams = {
+export type GenerateCoinMetadataArgs = {
   prompt: string;
   about: string;
   symbol: string;

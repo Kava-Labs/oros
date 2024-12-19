@@ -5,6 +5,7 @@ import { LoadingSpinner } from './LoadingSpinner';
 import { LaunchIcon } from './assets/LaunchIcon';
 import { useToolCallStreams } from './useToolCallStreams';
 import { ToolCallStreamStore } from './toolCallStreamStore';
+import { GenerateCoinMetadataArgs } from './tools/toolFunctions';
 
 export interface TokenCardProps {
   id: string;
@@ -125,18 +126,17 @@ export const TokenCardStreamingPlaceholder = ({
 
   if (!generateCoinMetadataStream) return null;
 
-  const { argumentsStream } = generateCoinMetadataStream;
+  const argumentsStream =
+    generateCoinMetadataStream.argumentsStream as Partial<GenerateCoinMetadataArgs>;
 
   return (
     <div className={styles.tokenCardWrapper}>
       <div className={styles.tokenCard}>
         <div className={styles.header}>
           <div className={styles.headerContent}>
-            <h2 className={styles.tokenName}>
-              {(argumentsStream.name as string) ?? ''}
-            </h2>
+            <h2 className={styles.tokenName}>{argumentsStream.name ?? ''}</h2>
             <div className={styles.tokenSymbol}>
-              {(argumentsStream.symbol as string) ?? ''}
+              {argumentsStream.symbol ?? ''}
             </div>
           </div>
         </div>
@@ -146,9 +146,7 @@ export const TokenCardStreamingPlaceholder = ({
           </div>
           <div className={styles.descriptionContainer}>
             <h3 className={styles.infoTitle}>Token Info</h3>
-            <p className={styles.description}>
-              {(argumentsStream.about as string) ?? ''}
-            </p>
+            <p className={styles.description}>{argumentsStream.about ?? ''}</p>
           </div>
         </div>
       </div>
