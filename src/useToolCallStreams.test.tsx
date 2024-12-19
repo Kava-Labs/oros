@@ -99,7 +99,7 @@ describe('useToolCallStreams', () => {
 
       toolCallStore.pushToolCall({
         id: '321fwsd',
-        index: 0,
+        index: 1,
         function: {
           name: 'generateCoinMetadata',
           arguments: JSON.stringify(data),
