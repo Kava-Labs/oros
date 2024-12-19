@@ -3,6 +3,8 @@ import styles from './TokenCard.module.css';
 import { imagedb } from './imagedb';
 import { LoadingSpinner } from './LoadingSpinner';
 import { LaunchIcon } from './assets/LaunchIcon';
+import { useToolCallStream } from './useToolCallStream';
+import { ToolCallStore } from './toolCallStore';
 
 export interface TokenCardProps {
   id: string;
@@ -98,6 +100,53 @@ export const TokenCard = ({
             )}
           </div>
         </div>
+      </div>
+    </div>
+  );
+};
+
+// hidden component that only renders when a generateCoinMetadata tool call request
+// is being streamed by the model
+export const TokenCardStreamingPlaceholder = ({
+  toolCallStore,
+}: {
+  toolCallStore: ToolCallStore;
+}) => {
+  const toolCallStreams = useToolCallStream(toolCallStore);
+
+  if (!toolCallStreams.length) return null;
+
+  const generateCoinMetadataStream = toolCallStreams.find(
+    (tc) => tc.name === 'generateCoinMetadata',
+  );
+  if (!generateCoinMetadataStream) return null;
+
+
+  const nameStream =
+    (generateCoinMetadataStream.arguments.name as string) ?? '';
+  const symbolStream =
+    (generateCoinMetadataStream.arguments.symbol as string) ?? '';
+  const aboutStream =
+    (generateCoinMetadataStream.arguments.about as string) ?? '';
+
+  return (
+    <div className={styles.wrapper}>
+      <div>
+        <h6>
+          <strong>
+            {nameStream.length > 0 || symbolStream.length > 0
+              ? `${nameStream} (${symbolStream})`
+              : null}
+          </strong>
+        </h6>
+      </div>
+
+      <div>
+        <LoadingSpinner />
+      </div>
+
+      <div>
+        <p>{aboutStream}</p>
       </div>
     </div>
   );

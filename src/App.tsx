@@ -5,7 +5,6 @@ import OpenAI from 'openai';
 import { messageStore, progressStore, toolCallStore } from './store';
 import type {
   ChatCompletionMessageParam,
-  ChatCompletionChunk,
   ChatCompletionTool,
   ChatCompletionMessageToolCall,
 } from 'openai/resources/index';
@@ -20,15 +19,10 @@ import { tools } from './config/tools';
 import { imagedb } from './imagedb';
 import { v4 as uuidv4 } from 'uuid';
 import { ToolCallStore } from './toolCallStore';
-import { useToolCallStream } from './useToolCallStream';
 
 let client: OpenAI | null = null;
 
 export const App = () => {
-  // putting it here for demoing (check console for outputs)
-  // this should ideally be called in a deeper component to avoid App wide re-renders
-  useToolCallStream(toolCallStore);
-
   // Do not load UI/UX until openAI client is ready
   const [isReady, setIsReady] = useState(false);
   const [errorText, setErrorText] = useState('');
@@ -143,6 +137,7 @@ export const App = () => {
     <>
       {isReady && (
         <ChatView
+          toolCallStore={toolCallStore}
           messages={messages}
           onSubmit={handleChatCompletion}
           onReset={handleReset}
@@ -208,13 +203,10 @@ async function doChat(
         controller,
         client,
         messages,
-        toolCallStore.getSnapshot(),
+        toolCallStore,
         progressStore,
         publishMessage,
       );
-
-      console.log('resetting tool call state');
-      toolCallStore.setToolCalls([]); // reset tool call store after calling tool calls
 
       await doChat(
         controller,
@@ -251,14 +243,14 @@ async function callTools(
   controller: AbortController,
   client: OpenAI,
   messages: ChatCompletionMessageParam[],
-  toolCalls: ChatCompletionChunk.Choice.Delta.ToolCall[],
+  toolCallsStore: ToolCallStore,
   progressStore: TextStreamStore,
   publishMessage: (
     messages: ChatCompletionMessageParam[],
     message: ChatCompletionMessageParam,
   ) => void,
 ): Promise<void> {
-  for (const toolCall of toolCalls) {
+  for (const toolCall of toolCallsStore.getSnapshot()) {
     const name = toolCall.function?.name;
     switch (name) {
       case 'generateCoinMetadata': {
@@ -296,6 +288,10 @@ async function callTools(
             } as ChatCompletionMessageToolCall,
           ],
         });
+        // remove from store and as we placed this into messages
+        toolCallStore.setToolCalls([
+          ...toolCallStore.getSnapshot().filter((v) => v.id !== toolCall.id),
+        ]);
         publishMessage(messages, {
           role: 'tool' as const,
           tool_call_id: toolCall.id!,

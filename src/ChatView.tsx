@@ -7,10 +7,12 @@ import hardDotFunDiamond from './assets/hardDotFunDiamond.svg';
 import { Conversation } from './Conversation';
 
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
+import { ToolCallStore } from './toolCallStore';
 
 export interface ChatViewProps {
   messages: ChatCompletionMessageParam[];
   errorText: string;
+  toolCallStore: ToolCallStore;
   isRequesting: boolean;
   onSubmit(value: string): void;
   onReset(): void;
@@ -22,6 +24,7 @@ export const ChatView = ({
   errorText,
   isRequesting,
   onSubmit,
+  toolCallStore,
   onReset,
   onCancel,
 }: ChatViewProps) => {
@@ -101,6 +104,7 @@ export const ChatView = ({
             </div>
 
             <Conversation
+              toolCallStore={toolCallStore}
               messages={messages}
               errorText={errorText}
               isRequesting={isRequesting}
