@@ -180,10 +180,10 @@ test('image generation and editing', async ({ page }) => {
 
   await chat.waitForImageGenerationToFinish();
 
-  const initialTokenCardTitle = await page.locator('h2').first().textContent();
+  const initialTokenCardTitle = await page.locator('h4').first().textContent();
   //  get the text content of the p tag after the label
   const initialTokenInfo = await page
-    .locator('h3', { hasText: 'Token info' })
+    .locator('h6', { hasText: 'Token info' })
     .locator('+ p')
     .first()
     .textContent();
@@ -210,9 +210,9 @@ test('image generation and editing', async ({ page }) => {
   //  follow-up chat completes
   await chat.waitForStreamToFinish();
 
-  const updatedTokenCardTitle = await page.locator('h2').nth(1).textContent();
+  const updatedTokenCardTitle = await page.locator('h4').nth(1).textContent();
   const updatedTokenInfo = await page
-    .locator('h3', { hasText: 'Token info' })
+    .locator('h6', { hasText: 'Token info' })
     .locator('+ p')
     .nth(1)
     .textContent();
@@ -233,9 +233,9 @@ test('image generation and editing', async ({ page }) => {
   await chat.waitForImageGenerationToFinish();
   await chat.waitForStreamToFinish();
 
-  const thirdTokenCardTitle = await page.locator('h2').nth(2).textContent();
+  const thirdTokenCardTitle = await page.locator('h4').nth(2).textContent();
   const thirdTokenInfo = await page
-    .locator('h3', { hasText: 'Token info' })
+    .locator('h6', { hasText: 'Token info' })
     .locator('+ p')
     .nth(2)
     .textContent();
