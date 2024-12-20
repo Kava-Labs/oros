@@ -21,6 +21,25 @@ describe('maskAddresses', () => {
         },
       },
       {
+        input: 'Send 100 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5!',
+        output: {
+          result: 'Send 100 KAVA to <address_1>!',
+          maskedValueMap: {
+            address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+          },
+        },
+      },
+      {
+        input: 'Send 100 KAVA to0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+        output: {
+          result: 'Send 100 KAVA to<address_1>',
+          maskedValueMap: {
+            address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+          },
+        },
+      },
+
+      {
         input:
           'Send 100 KAVA and 0.01 wBTC to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         output: {
