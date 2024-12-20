@@ -20,26 +20,30 @@ export const maskAddresses = (message: string) => {
   const { updatedResult, maskedValueMap } =
     addressesToReplace.reduce<AddressAccumulator>(
       (accumulator, addressMatch) => {
-        const address = addressMatch[0]; // The first element in the array is the match
+        // Convert the matched address to lowercase
+        const address = addressMatch[0].toLowerCase();
 
+        // Retrieve existing keys from the maskedValueMap
         const existingEntries = Object.keys(accumulator.maskedValueMap);
 
-        // Check if this value has already been added to the map
+        // Check if the address is already in the map
         let key = existingEntries.find(
           (existingKey) => accumulator.maskedValueMap[existingKey] === address,
         );
 
-        // If it hasn't, create a new key
+        // If not, create a new key for this address
         if (!key) {
           key = `address_${existingEntries.length + 1}`;
-          accumulator.maskedValueMap[key] = address;
+          accumulator.maskedValueMap[key] = address; // Add lowercased address
         }
 
-        // Use put '<>' around the value when we replace it in the text
-        // but not in the map
+        // Create a replacement string with the key
         const replacement = `<${key}>`;
+
+        // Replace all occurrences of the (lowercase) address in the result
+        const regex = new RegExp(address, 'gi');
         accumulator.updatedResult = accumulator.updatedResult.replace(
-          address,
+          regex,
           replacement,
         );
 
