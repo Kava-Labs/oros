@@ -40,24 +40,7 @@ export const assembleToolCallsFromStream = (
     return;
   }
 
-  // Assemble chunks of the tool call.
-  // Iterate over all tool calls (more than one may be present).
   for (const tcChunk of result.choices[0].delta.tool_calls) {
     toolCallsStreamStore.setToolCall(tcChunk);
-    // if (toolCallsState.length <= tcChunk.index) {
-    //   // Push a new tool call request.
-    //   toolCallsState.push({
-    //     index: tcChunk.index,
-    //     id: '',
-    //     function: { name: '', arguments: '' },
-    //   });
-    // }
-    // // Fill in info as we get it streamed for the corresponding tool call index.
-    // const partialTC = toolCallsState[tcChunk.index];
-    // if (tcChunk.id) partialTC.id += tcChunk.id;
-    // if (tcChunk.function?.name)
-    //   partialTC.function!.name += tcChunk.function.name;
-    // if (tcChunk.function?.arguments)
-    //   partialTC.function!.arguments += tcChunk.function.arguments;
   }
 };

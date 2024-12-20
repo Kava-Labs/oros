@@ -25,32 +25,28 @@ export class ToolCallStreamStore {
   // parsers is a map of json stream parsers with
   // key as the index of the tool call
   // each tool call gets it's own stateful parser
-  // parsers for the duration of the tool call stream
+  // parsers live for the duration of the tool call stream
   private parsers: Map<number, JSONParser> = new Map();
 
   // "buffer" for holding streaming tool calls from a model response
-  // this gets updated as the data is transformed from json to javascript object
+  // this gets updated as the data is transformed from json to javascript objects
   private toolCallStreams: Readonly<ToolCallStream>[] = [];
 
   public setToolCall(tc: ChatCompletionChunk.Choice.Delta.ToolCall) {
-    for (let i = 0; i < this.toolCallStreams.length; i++) {
-      if (tc.index === this.toolCallStreams[i].index) {
-        // this is an update
-        const streamParser = this.parsers.get(tc.index);
-        if (!streamParser) {
-          // we should ALWAYS have a streamParser
-          // if we end up here there's a bug and it's better to just throw
-          throw new Error(`ToolCallStreamStore corrupted`); // todo(sah): better error
-        }
-
-        // this throws on bad json
-        // allow caller to catch the error
-        streamParser.write(tc.function?.arguments ?? '');
-
-        return; // update done
-      }
+    const streamingTc = this.toolCallStreams.find((v) => v.index === tc.index);
+    if (streamingTc) {
+      // update existing tool call
+      const streamParser = this.parsers.get(tc.index);
+      // this throws on bad json
+      // allow caller to catch the error
+      streamParser!.write(tc.function?.arguments ?? '');
+    } else {
+      // add new tool call
+      this.addToolCall(tc);
     }
+  }
 
+  private addToolCall(tc: ChatCompletionChunk.Choice.Delta.ToolCall) {
     // this is a new tool call
     // first chunk ALWAYS should have the tool call id and the function name
     // following chunks MAY choose to remove that and only keep the arguments part
@@ -83,6 +79,7 @@ export class ToolCallStreamStore {
     // wait for the json parser to emit meaningful values to be consumed by UI
     this.toolCallStreams = [...this.toolCallStreams, newToolCallStream];
 
+    // set up stateful json streaming parser
     this.registerToolCallJSONStreamParser(newToolCallStream.index);
 
     if (tc.function.arguments) {
