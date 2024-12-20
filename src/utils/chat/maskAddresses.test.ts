@@ -51,6 +51,20 @@ describe('maskAddresses', () => {
           },
         },
       },
+      {
+        input:
+          'Send 10 KAVA to the following addresses: 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5, 0xC07918E451Ab77023a16Fa7515Dd60433A3c771D, 0x7Bbf300890857b8c241b219C6a489431669b3aFA, 0x1874C3e9D6E5f7e4F3F22C3E260C8b25Ed1433f2',
+        result: {
+          output:
+            'Send 10 KAVA to the following addresses: <address_1>, <address_2>, <address_3>, <address_4>',
+          maskedValueMap: {
+            address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+            address_2: '0xC07918E451Ab77023a16Fa7515Dd60433A3c771D',
+            address_3: '0x7Bbf300890857b8c241b219C6a489431669b3aFA',
+            address_4: '0x1874C3e9D6E5f7e4F3F22C3E260C8b25Ed1433f2',
+          },
+        },
+      },
     ];
 
     testCases.forEach((testCase) => {
