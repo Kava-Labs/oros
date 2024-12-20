@@ -1,38 +1,94 @@
 import { maskAddresses } from './maskAddresses';
-import { failureTestCases, happyPathCases } from './tokenAddressMaskingCases';
-import { expect } from '@playwright/test';
+
+interface MaskedAddressTestCase {
+  input: string;
+  result: {
+    output: string;
+    maskedValueMap: Record<string, string>;
+  };
+}
 
 describe('maskAddresses', () => {
-  const address1 = '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5';
-  const address2 = '0xC07918E451Ab77023a16Fa7515Dd60433A3c771D';
+  test('replaces address(es)', () => {
+    const testCases: Array<MaskedAddressTestCase> = [
+      {
+        input: 'Send 100 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+        result: {
+          output: 'Send 100 KAVA to <address_1>',
+          maskedValueMap: {
+            address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+          },
+        },
+      },
+      {
+        input:
+          'Send 100 KAVA and 0.01 wBTC to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+        result: {
+          output: 'Send 100 KAVA and 0.01 wBTC to <address_1>',
+          maskedValueMap: {
+            address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+          },
+        },
+      },
+      {
+        input:
+          'Send 100 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5 and 0.01 wBTC to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+        result: {
+          output: 'Send 100 KAVA to <address_1> and 0.01 wBTC to <address_1>',
+          maskedValueMap: {
+            address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+          },
+        },
+      },
+      {
+        input:
+          'Send 100 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5 and 0.01 wBTC to 0xC07918E451Ab77023a16Fa7515Dd60433A3c771D',
+        result: {
+          output: 'Send 100 KAVA to <address_1> and 0.01 wBTC to <address_2>',
+          maskedValueMap: {
+            address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+            address_2: '0xC07918E451Ab77023a16Fa7515Dd60433A3c771D',
+          },
+        },
+      },
+    ];
 
-  test('replaces single address', () => {
-    happyPathCases['singleAddress'].forEach((testCase) => {
+    testCases.forEach((testCase) => {
       const { output, maskedValueMap } = maskAddresses(testCase);
 
-      //  the address from the test case is removed from the output
-      expect(output.includes(address1)).toBe(false);
-
-      //  and stored in the map
-      expect(maskedValueMap).toHaveProperty('<address_1>', address1);
-    });
-  });
-
-  test('replaces multiple address', () => {
-    happyPathCases['multipleAddresses'].forEach((testCase) => {
-      const { output, maskedValueMap } = maskAddresses(testCase);
-
-      //  both addresses are removed
-      expect(output.includes(address1)).toBe(false);
-      expect(output.includes(address2)).toBe(false);
-
-      expect(maskedValueMap).toHaveProperty('<address_1>', address1);
-      expect(maskedValueMap).toHaveProperty('<address_2>', address2);
+      expect(output).toBe(testCase.result.output);
+      expect(maskedValueMap).toStrictEqual(testCase.result.maskedValueMap);
     });
   });
 
   test('no processing for failure cases', () => {
-    failureTestCases.forEach((testCase) => {
+    const testCases = [
+      {
+        input: 'Send 100 KAVA to kava1vlpsrmdyuywvaqrv7rx6xga224sqfwz3fyfhwq',
+        result: {
+          output:
+            'Send 100 KAVA to kava1vlpsrmdyuywvaqrv7rx6xga224sqfwz3fyfhwq',
+          maskedValueMap: {},
+        },
+      },
+      {
+        input: 'Send 100 KAVA to Binance',
+        result: {
+          output: 'Send 100 KAVA to Binance',
+          maskedValueMap: {},
+        },
+      },
+      {
+        input:
+          'Send 100 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe500000000000000000000000',
+        result: {
+          output:
+            'Send 100 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe500000000000000000000000',
+          maskedValueMap: {},
+        },
+      },
+    ];
+    testCases.forEach((testCase) => {
       const { output, maskedValueMap } = maskAddresses(testCase);
 
       expect(output).toBe(testCase.input);

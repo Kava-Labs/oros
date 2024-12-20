@@ -20,26 +20,24 @@ export const maskAddresses = (testCase: TestCase) => {
 
         const existingEntries = Object.keys(accumulator.maskedValueMap);
 
-        //  check if this value has already been added to the map
-        //  if it has, we will use the same masked value
-        let replacement = existingEntries.find(
-          (key) => accumulator.maskedValueMap[key] === address,
+        // Check if this value has already been added to the map
+        let key = existingEntries.find(
+          (existingKey) => accumulator.maskedValueMap[existingKey] === address,
         );
 
-        // If it hasn't create a new one
-        if (!replacement) {
-          replacement = `<address_${existingEntries.length + 1}>`;
-          accumulator.maskedValueMap[replacement] = address;
+        // If it hasn't, create a new key
+        if (!key) {
+          key = `address_${existingEntries.length + 1}`;
+          accumulator.maskedValueMap[key] = address;
         }
 
-        //  rebuild the user message with the replacements
+        // Use put '<>' around the value when we replace it in the text
+        //  but not in the map
+        const replacement = `<${key}>`;
         accumulator.updatedResult = accumulator.updatedResult.replace(
           address,
           replacement,
         );
-
-        //  build the map of replacements to values
-        accumulator.maskedValueMap[replacement] = address;
 
         return accumulator;
       },
