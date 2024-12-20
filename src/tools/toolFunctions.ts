@@ -76,7 +76,6 @@ export async function getAccountBalances(arg: {
   );
 }
 
-
 export async function transferAsset(args: TransferParams) {
   const addressTo = args.receiverAddress.startsWith('kava')
     ? kavaToEthAddress(args.receiverAddress)

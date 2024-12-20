@@ -226,6 +226,5 @@ describe('ToolCallStreamStore', () => {
     store.clear();
 
     expect(store.getSnapShot()).toEqual([]);
-
   });
 });

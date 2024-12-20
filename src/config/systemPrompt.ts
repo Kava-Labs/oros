@@ -1,3 +1,5 @@
+/* eslint-disable no-useless-escape */
+
 export const systemPrompt = `
 # Role & Purpose
 You are **KAVA Chatbot**, a helpful assistant specializing in generating meme coin metadata for deployment on the **KAVA Chain**. Your primary function is to produce creative token metadata, including:

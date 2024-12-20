@@ -10,7 +10,7 @@ describe('StreamingText', () => {
     render(
       <StreamingText store={store}>
         {(text) => <span data-testid="output">{text}</span>}
-      </StreamingText>
+      </StreamingText>,
     );
 
     expect(screen.getByTestId('output')).toHaveTextContent('Initial Text');
@@ -23,7 +23,7 @@ describe('StreamingText', () => {
     render(
       <StreamingText store={store}>
         {(text) => <span data-testid="output">{text}</span>}
-      </StreamingText>
+      </StreamingText>,
     );
 
     expect(screen.getByTestId('output')).toHaveTextContent('Initial');
@@ -42,7 +42,7 @@ describe('StreamingText', () => {
     render(
       <StreamingText store={store}>
         {(text) => <span data-testid="output">{text}</span>}
-      </StreamingText>
+      </StreamingText>,
     );
 
     expect(screen.getByTestId('output')).toHaveTextContent('Hello');
@@ -60,7 +60,7 @@ describe('StreamingText', () => {
     render(
       <StreamingText store={store}>
         {(text) => <span data-testid="output">{text}</span>}
-      </StreamingText>
+      </StreamingText>,
     );
 
     expect(screen.getByTestId('output')).toHaveTextContent('');
@@ -73,7 +73,7 @@ describe('StreamingText', () => {
     render(
       <StreamingText store={store}>
         {(text) => <span data-testid="output">{text}</span>}
-      </StreamingText>
+      </StreamingText>,
     );
 
     expect(screen.getByTestId('output')).toHaveTextContent('Initial');
@@ -94,7 +94,7 @@ describe('StreamingText', () => {
     render(
       <StreamingText store={store}>
         {(text) => <strong data-testid="output">**{text}**</strong>}
-      </StreamingText>
+      </StreamingText>,
     );
 
     expect(screen.getByTestId('output')).toHaveTextContent('**Hello**');
@@ -123,7 +123,7 @@ describe('StreamingText', () => {
     const { unmount } = render(
       <StreamingText store={store}>
         {(text) => <span>{text}</span>}
-      </StreamingText>
+      </StreamingText>,
     );
 
     // Unmount the component and ensure unsubscribe was called
@@ -137,9 +137,7 @@ describe('StreamingText', () => {
     const renderFn = vi.fn((text: string) => <span>{text}</span>);
 
     const { unmount } = render(
-      <StreamingText store={store}>
-        {renderFn}
-      </StreamingText>
+      <StreamingText store={store}>{renderFn}</StreamingText>,
     );
 
     expect(renderFn).toHaveBeenCalledTimes(1);
@@ -170,6 +168,7 @@ describe('StreamingText', () => {
           <StreamingText store={store}>
             {(text) => <span data-testid="child">{text}</span>}
           </StreamingText>
+          ,
         </div>
       );
     };
