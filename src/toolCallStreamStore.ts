@@ -13,8 +13,8 @@ export type ToolCallStream = {
     ChatCompletionChunk.Choice.Delta.ToolCall.Function,
     'arguments'
   > & {
-    arguments: Record<string, unknown>;
-    partial?: boolean;
+    arguments: Record<string, unknown>; // overrides the string ChatCompletionChunk.Choice.Delta.ToolCall.function.arguments
+    partial?: boolean; // are we still streaming?
   };
   type?: 'function';
 };
@@ -43,15 +43,17 @@ export class ToolCallStreamStore {
           throw new Error(`ToolCallStreamStore corrupted`); // todo(sah): better error
         }
 
+        // this throws on bad json
+        // allow caller to catch the error
         streamParser.write(tc.function?.arguments ?? '');
 
-        return;
+        return; // update done
       }
     }
 
     // this is a new tool call
     // first chunk ALWAYS should have the tool call id and the function name
-    // following chunks MAY choose to remove that and only the arguments part
+    // following chunks MAY choose to remove that and only keep the arguments part
     // but the index will be available in ALL chunks so we identify the function by it
     if (tc.id === undefined) {
       throw new Error(
@@ -78,11 +80,14 @@ export class ToolCallStreamStore {
     };
 
     // don't call emitChange here
+    // wait for the json parser to emit meaningful values to be consumed by UI
     this.toolCallStreams = [...this.toolCallStreams, newToolCallStream];
 
     this.registerToolCallJSONStreamParser(newToolCallStream.index);
   }
 
+  // sets up parser for a new tool call stream
+  // register parser events and update state as we parse the arguments from the stream
   private registerToolCallJSONStreamParser(tcStreamIndex: number) {
     if (this.parsers.has(tcStreamIndex)) {
       throw new Error(
@@ -96,6 +101,8 @@ export class ToolCallStreamStore {
 
     this.parsers.set(tcStreamIndex, parser);
 
+    // on some new consumable value
+    // update tool call arguments and emitChange
     parser.onValue = (info) => {
       const key = info.key;
       const val = info.value;
@@ -122,6 +129,7 @@ export class ToolCallStreamStore {
       }
     };
 
+    // on done parsing
     parser.onEnd = () => {
       const tcStream = this.toolCallStreams.find(
         (tc) => tc.index === tcStreamIndex,
@@ -134,6 +142,7 @@ export class ToolCallStreamStore {
     };
   }
 
+  // remove the tool call stream from state along with it's parser
   public deleteToolCallById(id: string): boolean {
     const newState: ToolCallStream[] = [];
     let found = false;
@@ -158,6 +167,8 @@ export class ToolCallStreamStore {
     return found;
   }
 
+  // takes our ToolCallStream and converts it to a format
+  // the API can understand (use this when adding a finished tool call stream into message history)
   public toChatCompletionMessageToolCall = (
     tcStream: ToolCallStream,
   ): ChatCompletionMessageToolCall => {
