@@ -30,7 +30,7 @@ export class ToolCallStreamStore {
 
   // "buffer" for holding streaming tool calls from a model response
   // this gets updated as the data is transformed from json to javascript object
-  private toolCallStreams: ToolCallStream[] = [];
+  private toolCallStreams: Readonly<ToolCallStream>[] = [];
 
   public setToolCall(tc: ChatCompletionChunk.Choice.Delta.ToolCall) {
     for (let i = 0; i < this.toolCallStreams.length; i++) {
