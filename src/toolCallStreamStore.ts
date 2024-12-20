@@ -234,7 +234,15 @@ export class ToolCallStreamStore {
     return found;
   }
 
-  
+  /**
+   * Clears all ongoing tool call streams and their corresponding parsers.
+   *
+   * - Terminates all JSON parsers for currently active tool calls.
+   * - Cleans up event handlers associated with these parsers.
+   * - Empties the internal store of tool call streams.
+   * - Notifies subscribers that the state has changed.
+   *
+   */
   public clear() {
     for (const [, parser] of this.parsers) {
       parser.onEnd = () => {};
