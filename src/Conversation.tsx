@@ -80,6 +80,7 @@ export const Conversation = ({
             message.content as string,
           );
 
+          // console.log('the prompt', JSON.parse(prevMsg.tool_calls[0].function.arguments).prompt);
           return (
             <div key={index} className={styles.left}>
               <TokenCard
@@ -88,6 +89,7 @@ export const Conversation = ({
                 about={toolResponse.about}
                 symbol={toolResponse.symbol}
                 name={toolResponse.name}
+                prompt={JSON.parse(prevMsg.tool_calls[0].function.arguments).prompt}
                 onRendered={onRendered}
               />
             </div>
