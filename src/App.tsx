@@ -18,7 +18,7 @@ import { tools } from './config/tools';
 import { imagedb } from './imagedb';
 import { v4 as uuidv4 } from 'uuid';
 import { ToolCallStreamStore } from './toolCallStreamStore';
-import { GenerateTokenMetadataParams } from './tools/toolFunctions';
+import { ToolFunctions, type GenerateCoinMetadataParams } from './tools/types';
 
 let client: OpenAI | null = null;
 
@@ -250,8 +250,8 @@ async function callTools(
   for (const toolCall of toolCallStreamStore.getSnapShot()) {
     const name = toolCall.function?.name;
     switch (name) {
-      case 'generateCoinMetadata': {
-        const args = toolCall.function.arguments as GenerateTokenMetadataParams;
+      case ToolFunctions.GENERATE_COIN_METADATA: {
+        const args = toolCall.function.arguments as GenerateCoinMetadataParams;
         const response = client.images.generate(
           {
             model: 'dall-e-3',

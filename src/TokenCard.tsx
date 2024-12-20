@@ -4,7 +4,7 @@ import { imagedb } from './imagedb';
 import { LoadingSpinner } from './LoadingSpinner';
 import { LaunchIcon } from './assets/LaunchIcon';
 import { ToolCallStreamStore } from './toolCallStreamStore';
-import { GenerateTokenMetadataParams } from './tools/toolFunctions';
+import { ToolFunctions, type GenerateCoinMetadataParams } from './tools/types';
 
 export interface TokenCardProps {
   id: string;
@@ -116,12 +116,12 @@ export const TokenCardsStreamingPlaceholder = ({
   );
 
   return toolCallStreams.map((tcStream) => {
-    if (tcStream.function.name !== 'generateCoinMetadata') {
+    if (tcStream.function.name !== ToolFunctions.GENERATE_COIN_METADATA) {
       return null;
     }
 
     const argsStream = tcStream.function
-      .arguments as Partial<GenerateTokenMetadataParams>;
+      .arguments as Partial<GenerateCoinMetadataParams>;
 
     return (
       <div key={tcStream.id} className={styles.left}>

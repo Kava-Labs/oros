@@ -1,4 +1,5 @@
 import type { ChatCompletionTool } from 'openai/resources/index';
+import { ToolFunctions } from '../tools/types';
 
 export const tools: ChatCompletionTool[] = [
   // {
@@ -79,7 +80,7 @@ export const tools: ChatCompletionTool[] = [
   {
     type: 'function',
     function: {
-      name: 'generateCoinMetadata',
+      name: ToolFunctions.GENERATE_COIN_METADATA,
       description:
         'generates a coin image, along with the symbol and token description',
       parameters: {

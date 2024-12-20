@@ -3,6 +3,7 @@ import { bech32 } from 'bech32';
 import { erc20ABI } from './erc20ABI';
 import { ASSET_ADDRESSES, kavaEVMProvider } from '../config/evm';
 import { Coin, fetchDelegatedBalance, fetchStakingApy } from './api';
+import type { TransferParams } from './types';
 /**
  *
  * @param kavaAddress string
@@ -75,12 +76,6 @@ export async function getAccountBalances(arg: {
   );
 }
 
-type TransferParams = {
-  assetName: string;
-  senderAddress: string;
-  receiverAddress: string;
-  amount: number;
-};
 
 export async function transferAsset(args: TransferParams) {
   const addressTo = args.receiverAddress.startsWith('kava')
@@ -204,18 +199,3 @@ export async function getDelegatedBalance(arg: {
     return `Error fetching delegated balance for: ${kavaAddress}, ${e}`;
   }
 }
-
-export type GenerateTokenMetadataParams = {
-  prompt: string;
-  about: string;
-  symbol: string;
-  name: string;
-};
-
-export type GenerateTokenMetadataResponse = {
-  id: string;
-  about: string;
-  symbol: string;
-  name: string;
-};
-
