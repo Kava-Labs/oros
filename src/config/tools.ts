@@ -85,10 +85,9 @@ export const tools: ChatCompletionTool[] = [
       parameters: {
         type: 'object',
         properties: {
-          prompt: {
+          name: {
             type: 'string',
-            description:
-              'A text description of the desired coin image optimized for dalle use the conversation context to help make the image',
+            description: 'the name of the token',
           },
           symbol: {
             type: 'string',
@@ -98,13 +97,15 @@ export const tools: ChatCompletionTool[] = [
             type: 'string',
             description: 'the description of the token',
           },
-          name: {
+          prompt: {
             type: 'string',
-            description: 'the name of the token',
+            description:
+              'A text description of the desired coin image optimized for dalle use the conversation context to help make the image',
           },
         },
-        required: ['prompt', 'symbol', 'about', 'name'],
+        required: ['name', 'symbol', 'about', 'prompt'],
         strict: true,
+        additionalProperties: false,
       },
     },
   },
