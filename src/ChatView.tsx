@@ -113,11 +113,11 @@ export const ChatView = ({
           <div id={styles.startContainer}>
             <div id={styles.start} data-testid="start">
               <img src={hardDotFunDiamond} id={styles.chatIconContainer} />
-              <h1>Let's get started!</h1>
-              <p>
+              <h3>Let's get started!</h3>
+              <h6>
                 Tell me about your memecoin idea below and we'll generate
                 everything you need to get it launched.
-              </p>
+              </h6>
             </div>
           </div>
         )}
