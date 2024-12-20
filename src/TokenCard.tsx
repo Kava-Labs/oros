@@ -63,7 +63,7 @@ export const TokenCard = ({
       <div className={styles.tokenCard}>
         <div className={styles.header}>
           <div className={styles.headerContent}>
-            <h2 className={styles.tokenName}>{name}</h2>
+            <h4 className={styles.tokenName}>{name}</h4>
             <div className={styles.tokenSymbol}>{symbol}</div>
           </div>
         </div>
@@ -88,7 +88,7 @@ export const TokenCard = ({
             </div>
           </div>
           <div className={styles.descriptionContainer}>
-            <h3 className={styles.infoTitle}>Token Info</h3>
+            <h6 className={styles.infoTitle}>Token Info</h6>
             <p className={styles.description}>{about}</p>
             {!isLoading && !isImageError && !isInIframe && (
               <button className={styles.tokenButton}>
