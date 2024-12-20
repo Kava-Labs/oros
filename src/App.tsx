@@ -25,6 +25,13 @@ let client: OpenAI | null = null;
 const CHAT_MODEL = import.meta.env['VITE_CHAT_MODEL'] ?? 'gpt-4o-mini';
 const IMAGE_GEN_MODEL = import.meta.env['VITE_IMAGE_GEN_MODEL'] ?? 'dall-e-3';
 
+if (import.meta.env['MODE'] === 'development') {
+  console.info({
+    CHAT_MODEL,
+    IMAGE_GEN_MODEL,
+  });
+}
+
 export const App = () => {
   // Do not load UI/UX until openAI client is ready
   const [isReady, setIsReady] = useState(false);
