@@ -84,6 +84,10 @@ export class ToolCallStreamStore {
     this.toolCallStreams = [...this.toolCallStreams, newToolCallStream];
 
     this.registerToolCallJSONStreamParser(newToolCallStream.index);
+
+    if (tc.function.arguments) {
+      this.parsers.get(tc.index)!.write(tc.function.arguments ?? '');
+    }
   }
 
   // sets up parser for a new tool call stream
