@@ -165,7 +165,7 @@ async function doChat(
   try {
     const stream = await client.chat.completions.create(
       {
-        model: 'gpt-4',
+        model: 'gpt-4o-mini',
         messages: messages,
         tools: tools,
         stream: true,
