@@ -8,7 +8,7 @@ type AddressAccumulator = {
  *
  * @param {string} message - The input message containing masked addresses.
  * @returns {Object} An object containing:
- *   - `updatedResult` {string}: The message with addresses replaced by placeholders.
+ *   - `result` {string}: The message with addresses replaced by placeholders.
  *   - `maskedValueMap` {Object}: A map where keys are placeholders and values are the original addresses.
  */
 export const maskAddresses = (message: string) => {
