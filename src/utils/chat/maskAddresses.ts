@@ -33,19 +33,19 @@ export const maskAddresses = (
         const address = addressMatch[0].toLowerCase();
 
         // Check if the address has already been processed
-        let key = accumulator.valuesToMasks[address];
+        let mask = accumulator.valuesToMasks[address];
 
         // If not, create a new key for this address
-        if (!key) {
+        if (!mask) {
           const existingMasks = Object.keys(accumulator.masksToValues);
-          key = `address_${existingMasks.length + 1}`;
+          mask = `address_${existingMasks.length + 1}`;
           //  build both maps with the new entry
-          accumulator.masksToValues[key] = address;
-          accumulator.valuesToMasks[address] = key;
+          accumulator.masksToValues[mask] = address;
+          accumulator.valuesToMasks[address] = mask;
         }
 
-        // Create a replacement string with the key
-        const replacement = `<${key}>`;
+        // Create a replacement string with the mask
+        const replacement = `<${mask}>`;
 
         // Replace all occurrences of the address in the result
         const regex = new RegExp(address, 'gi');

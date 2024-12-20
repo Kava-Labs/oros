@@ -140,6 +140,38 @@ describe('maskAddresses', () => {
           },
         },
       },
+      {
+        input:
+          'Send 100 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5 and 0.01 wBTC to 0xd8e30f7bcb5211e591bbc463cdab0144e82dFFE5',
+        output: {
+          result: 'Send 100 KAVA to <address_2> and 0.01 wBTC to <address_2>',
+          masksToValues: {
+            address_1: '0xc07918e451ab77023a16fa7515dd60433a3c771d',
+            address_2: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+          },
+          valuesToMasks: {
+            '0xc07918e451ab77023a16fa7515dd60433a3c771d': 'address_1',
+            '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5': 'address_2',
+          },
+        },
+      },
+      {
+        input:
+          'Send 100 KAVA to 0x7bbf300890857b8c241b219c6a489431669b3afa and 0.01 wBTC to 0x7bbf300890857b8c241b219c6a489431669b3afa',
+        output: {
+          result: 'Send 100 KAVA to <address_3> and 0.01 wBTC to <address_3>',
+          masksToValues: {
+            address_1: '0xc07918e451ab77023a16fa7515dd60433a3c771d',
+            address_2: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+            address_3: '0x7bbf300890857b8c241b219c6a489431669b3afa',
+          },
+          valuesToMasks: {
+            '0xc07918e451ab77023a16fa7515dd60433a3c771d': 'address_1',
+            '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5': 'address_2',
+            '0x7bbf300890857b8c241b219c6a489431669b3afa': 'address_3',
+          },
+        },
+      },
       //  these two addresses haven't yet been processed
       {
         input:
