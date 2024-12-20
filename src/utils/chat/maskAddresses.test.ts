@@ -68,7 +68,7 @@ describe('maskAddresses', () => {
     ];
 
     testCases.forEach((testCase) => {
-      const { output, maskedValueMap } = maskAddresses(testCase);
+      const { output, maskedValueMap } = maskAddresses(testCase.input);
 
       expect(output).toBe(testCase.result.output);
       expect(maskedValueMap).toStrictEqual(testCase.result.maskedValueMap);
@@ -103,7 +103,7 @@ describe('maskAddresses', () => {
       },
     ];
     testCases.forEach((testCase) => {
-      const { output, maskedValueMap } = maskAddresses(testCase);
+      const { output, maskedValueMap } = maskAddresses(testCase.input);
 
       expect(output).toBe(testCase.input);
       expect(maskedValueMap).toStrictEqual({});
