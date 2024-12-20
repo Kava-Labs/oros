@@ -115,7 +115,6 @@ export const TokenCardsStreamingPlaceholder = ({
     toolCallStreamStore.getSnapShot,
   );
 
-  console.log(toolCallStreams);
   return toolCallStreams.map((tcStream) => {
     if (tcStream.function.name !== ToolFunctions.GENERATE_COIN_METADATA) {
       return null;
