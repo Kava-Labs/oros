@@ -22,6 +22,9 @@ import { ToolFunctions, type GenerateCoinMetadataParams } from './tools/types';
 
 let client: OpenAI | null = null;
 
+const CHAT_MODEL = import.meta.env['VITE_CHAT_MODEL'] ?? 'gpt-4o-mini';
+const IMAGE_GEN_MODEL = import.meta.env['VITE_IMAGE_GEN_MODEL'] ?? 'dall-e-3';
+
 export const App = () => {
   // Do not load UI/UX until openAI client is ready
   const [isReady, setIsReady] = useState(false);
@@ -165,7 +168,7 @@ async function doChat(
   try {
     const stream = await client.chat.completions.create(
       {
-        model: 'gpt-4o-mini',
+        model: CHAT_MODEL,
         messages: messages,
         tools: tools,
         stream: true,
@@ -254,7 +257,7 @@ async function callTools(
         const args = toolCall.function.arguments as GenerateCoinMetadataParams;
         const response = client.images.generate(
           {
-            model: 'dall-e-3',
+            model: IMAGE_GEN_MODEL,
             prompt: args['prompt'],
             quality: 'hd',
             response_format: 'b64_json',
