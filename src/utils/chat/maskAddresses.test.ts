@@ -4,7 +4,8 @@ interface MaskedAddressTestCase {
   input: string;
   output: {
     result: string;
-    maskedValueMap: Record<string, string>;
+    masksToValues: Record<string, string>;
+    valuesToMasks: Record<string, string>;
   };
 }
 
@@ -15,8 +16,11 @@ describe('maskAddresses', () => {
         input: 'Send 100 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         output: {
           result: 'Send 100 KAVA to <address_1>',
-          maskedValueMap: {
+          masksToValues: {
             address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+          },
+          valuesToMasks: {
+            '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5': 'address_1',
           },
         },
       },
@@ -24,8 +28,11 @@ describe('maskAddresses', () => {
         input: 'Send 100 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5!',
         output: {
           result: 'Send 100 KAVA to <address_1>!',
-          maskedValueMap: {
+          masksToValues: {
             address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+          },
+          valuesToMasks: {
+            '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5': 'address_1',
           },
         },
       },
@@ -33,8 +40,11 @@ describe('maskAddresses', () => {
         input: 'Send 100 KAVA to0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         output: {
           result: 'Send 100 KAVA to<address_1>',
-          maskedValueMap: {
+          masksToValues: {
             address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+          },
+          valuesToMasks: {
+            '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5': 'address_1',
           },
         },
       },
@@ -43,8 +53,11 @@ describe('maskAddresses', () => {
           'Send 100 KAVA and 0.01 wBTC to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         output: {
           result: 'Send 100 KAVA and 0.01 wBTC to <address_1>',
-          maskedValueMap: {
+          masksToValues: {
             address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+          },
+          valuesToMasks: {
+            '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5': 'address_1',
           },
         },
       },
@@ -53,8 +66,11 @@ describe('maskAddresses', () => {
           'Send 100 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5 and 0.01 wBTC to 0xd8e30f7bcb5211e591bbc463cdab0144e82dFFE5',
         output: {
           result: 'Send 100 KAVA to <address_1> and 0.01 wBTC to <address_1>',
-          maskedValueMap: {
+          masksToValues: {
             address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+          },
+          valuesToMasks: {
+            '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5': 'address_1',
           },
         },
       },
@@ -63,9 +79,13 @@ describe('maskAddresses', () => {
           'Send 100 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5 and 0.01 wBTC to 0xC07918E451Ab77023a16Fa7515Dd60433A3c771D',
         output: {
           result: 'Send 100 KAVA to <address_1> and 0.01 wBTC to <address_2>',
-          maskedValueMap: {
+          masksToValues: {
             address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
             address_2: '0xc07918e451ab77023a16fa7515dd60433a3c771d',
+          },
+          valuesToMasks: {
+            '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5': 'address_1',
+            '0xc07918e451ab77023a16fa7515dd60433a3c771d': 'address_2',
           },
         },
       },
@@ -75,21 +95,30 @@ describe('maskAddresses', () => {
         output: {
           result:
             'Send 10 KAVA to the following addresses: <address_1>, <address_2>, <address_3>, <address_4>',
-          maskedValueMap: {
+          masksToValues: {
             address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
             address_2: '0xc07918e451ab77023a16fa7515dd60433a3c771d',
             address_3: '0x7bbf300890857b8c241b219c6a489431669b3afa',
             address_4: '0x1874c3e9d6e5f7e4f3f22c3e260c8b25ed1433f2',
+          },
+          valuesToMasks: {
+            '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5': 'address_1',
+            '0xc07918e451ab77023a16fa7515dd60433a3c771d': 'address_2',
+            '0x7bbf300890857b8c241b219c6a489431669b3afa': 'address_3',
+            '0x1874c3e9d6e5f7e4f3f22c3e260c8b25ed1433f2': 'address_4',
           },
         },
       },
     ];
 
     testCases.forEach((testCase) => {
-      const { output, maskedValueMap } = maskAddresses(testCase.input);
+      const { output, masksToValues, valuesToMasks } = maskAddresses(
+        testCase.input,
+      );
 
       expect(output).toBe(testCase.output.result);
-      expect(maskedValueMap).toStrictEqual(testCase.output.maskedValueMap);
+      expect(masksToValues).toStrictEqual(testCase.output.masksToValues);
+      expect(valuesToMasks).toStrictEqual(testCase.output.valuesToMasks);
     });
   });
 
@@ -100,14 +129,16 @@ describe('maskAddresses', () => {
         result: {
           output:
             'Send 100 KAVA to kava1vlpsrmdyuywvaqrv7rx6xga224sqfwz3fyfhwq',
-          maskedValueMap: {},
+          masksToValues: {},
+          valuesToMasks: {},
         },
       },
       {
         input: 'Send 100 KAVA to Binance',
         result: {
           output: 'Send 100 KAVA to Binance',
-          maskedValueMap: {},
+          masksToValues: {},
+          valuesToMasks: {},
         },
       },
       {
@@ -116,16 +147,20 @@ describe('maskAddresses', () => {
         result: {
           output:
             'Send 100 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe500000000000000000000000',
-          maskedValueMap: {},
+          masksToValues: {},
+          valuesToMasks: {},
         },
       },
     ];
 
     testCases.forEach((testCase) => {
-      const { output, maskedValueMap } = maskAddresses(testCase.input);
+      const { output, masksToValues, valuesToMasks } = maskAddresses(
+        testCase.input,
+      );
 
       expect(output).toBe(testCase.input);
-      expect(maskedValueMap).toStrictEqual({});
+      expect(masksToValues).toStrictEqual({});
+      expect(valuesToMasks).toStrictEqual({});
     });
   });
 });
