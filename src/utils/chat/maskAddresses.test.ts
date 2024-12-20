@@ -38,7 +38,6 @@ describe('maskAddresses', () => {
           },
         },
       },
-
       {
         input:
           'Send 100 KAVA and 0.01 wBTC to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
@@ -121,6 +120,7 @@ describe('maskAddresses', () => {
         },
       },
     ];
+
     testCases.forEach((testCase) => {
       const { output, maskedValueMap } = maskAddresses(testCase.input);
 
