@@ -48,9 +48,9 @@ export const idbDatabase = async (): Promise<IDBDatabase> => {
     });
 
     req.addEventListener('upgradeneeded', (ev) => {
-      // @ts-expect-error
+      // @ts-expect-error : result is available in ev.target
       const db: IDBDatabase = ev.target.result;
-      // @ts-expect-error
+      // @ts-expect-error : transaction is available in ev.target
       const tx: IDBTransaction = ev.target.transaction;
 
       if (db && tx) {

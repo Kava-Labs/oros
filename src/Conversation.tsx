@@ -3,7 +3,7 @@ import hardDotFunDiamond from './assets/hardDotFunDiamond.svg';
 import { Content } from './Content';
 import { StreamingText } from './StreamingText';
 import { messageStore, progressStore, toolCallStreamStore } from './store';
-import { ToolFunctions, type GenerateCoinMetadataResponse } from './tools/types';
+import { ToolFunctions, GenerateCoinMetadataResponse } from './tools/types';
 import { TokenCard, TokenCardsStreamingPlaceholder } from './TokenCard';
 
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
@@ -71,7 +71,9 @@ export const Conversation = ({
 
           const tc = prevMsg.tool_calls.find((tc) => tc.id === id);
           if (!tc) return null;
-          if (tc.function.name !== ToolFunctions.GENERATE_COIN_METADATA) return null;
+          if (tc.function.name !== ToolFunctions.GENERATE_COIN_METADATA) {
+            return null;
+          }
 
           const toolResponse: GenerateCoinMetadataResponse = JSON.parse(
             message.content as string,
