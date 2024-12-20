@@ -140,6 +140,7 @@ describe('maskAddresses', () => {
           },
         },
       },
+      //  these two addresses haven't yet been processed
       {
         input:
           'Send 100 KAVA to 0x7bbf300890857b8c241b219c6a489431669b3afa and 100 ATOM to 0x1874c3e9d6e5f7e4f3f22c3e260c8b25ed1433f2',
@@ -159,11 +160,30 @@ describe('maskAddresses', () => {
           },
         },
       },
+      //  the first address has been processed but the second hasn't
+      {
+        input:
+          'Send 100 KAVA to 0xc07918e451ab77023a16fa7515dd60433a3c771d and 100 ATOM to 0x7bbf300890857b8c241b219c6a489431669b3afa',
+        output: {
+          result: 'Send 100 KAVA to <address_1> and 100 ATOM to <address_3>',
+          masksToValues: {
+            address_1: '0xc07918e451ab77023a16fa7515dd60433a3c771d',
+            address_2: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+            address_3: '0x7bbf300890857b8c241b219c6a489431669b3afa',
+          },
+          valuesToMasks: {
+            '0xc07918e451ab77023a16fa7515dd60433a3c771d': 'address_1',
+            '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5': 'address_2',
+            '0x7bbf300890857b8c241b219c6a489431669b3afa': 'address_3',
+          },
+        },
+      },
     ];
 
     testCases.forEach((testCase) => {
       const { output, masksToValues, valuesToMasks } = maskAddresses(
         testCase.input,
+        //  two entries have been processed
         {
           '0xc07918e451ab77023a16fa7515dd60433a3c771d': 'address_1',
           '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5': 'address_2',
@@ -214,6 +234,7 @@ describe('maskAddresses', () => {
     testCases.forEach((testCase) => {
       const { output, masksToValues, valuesToMasks } = maskAddresses(
         testCase.input,
+        {},
         {},
       );
 
