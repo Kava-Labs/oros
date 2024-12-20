@@ -24,19 +24,16 @@ export const maskAddresses = (message: string) => {
         // Convert the matched address to lowercase
         const address = addressMatch[0].toLowerCase();
 
-        // Retrieve existing keys from the masksToValues map
-        const existingEntries = Object.keys(accumulator.masksToValues);
-
-        // Check if the address is already in the masksToValues map
-        let key = existingEntries.find(
-          (existingKey) => accumulator.masksToValues[existingKey] === address,
-        );
+        // Check if the address is already in the valuesToMasks map
+        let key = accumulator.valuesToMasks[address];
 
         // If not, create a new key for this address
         if (!key) {
-          key = `address_${existingEntries.length + 1}`;
-          accumulator.masksToValues[key] = address; // Add lowercased address
-          accumulator.valuesToMasks[address] = key; // Create reverse mapping
+          const existingMasks = Object.keys(accumulator.masksToValues);
+          key = `address_${existingMasks.length + 1}`;
+          accumulator.masksToValues[key] = address;
+          //  create reverse map for faster lookup
+          accumulator.valuesToMasks[address] = key;
         }
 
         // Create a replacement string with the key
