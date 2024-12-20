@@ -2,9 +2,9 @@ import styles from './ChatView.module.css';
 import hardDotFunDiamond from './assets/hardDotFunDiamond.svg';
 import { Content } from './Content';
 import { StreamingText } from './StreamingText';
-import { messageStore, progressStore } from './store';
+import { messageStore, progressStore, toolCallStreamStore } from './store';
 import type { GenerateTokenMetadataResponse } from './tools/toolFunctions';
-import { TokenCard } from './TokenCard';
+import { TokenCard, TokenCardsStreamingPlaceholder } from './TokenCard';
 
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 
@@ -141,6 +141,10 @@ export const Conversation = ({
           </div>
         </div>
       )}
+
+      <TokenCardsStreamingPlaceholder
+        toolCallStreamStore={toolCallStreamStore}
+      />
     </div>
   );
 };

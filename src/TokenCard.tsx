@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import styles from './TokenCard.module.css';
 import { imagedb } from './imagedb';
 import { LoadingSpinner } from './LoadingSpinner';
 import { LaunchIcon } from './assets/LaunchIcon';
+import { ToolCallStreamStore } from './toolCallStreamStore';
+import { GenerateTokenMetadataParams } from './tools/toolFunctions';
 
 export interface TokenCardProps {
   id: string;
@@ -101,4 +103,52 @@ export const TokenCard = ({
       </div>
     </div>
   );
+};
+
+export const TokenCardsStreamingPlaceholder = ({
+  toolCallStreamStore,
+}: {
+  toolCallStreamStore: ToolCallStreamStore;
+}) => {
+  const toolCallStreams = useSyncExternalStore(
+    toolCallStreamStore.subscribe,
+    toolCallStreamStore.getSnapShot,
+  );
+
+  return toolCallStreams.map((tcStream) => {
+    if (tcStream.function.name !== 'generateCoinMetadata') {
+      return null;
+    }
+
+    const argsStream = tcStream.function
+      .arguments as Partial<GenerateTokenMetadataParams>;
+
+    return (
+      <div key={tcStream.id} className={styles.left}>
+        <div className={styles.tokenCardWrapper}>
+          <div className={styles.tokenCard}>
+            <div className={styles.header}>
+              <div className={styles.headerContent}>
+                <h2 className={styles.tokenName}>{argsStream.name ?? ''}</h2>
+                <div className={styles.tokenSymbol}>
+                  {argsStream.symbol ?? ''}
+                </div>
+              </div>
+            </div>
+            <div className={styles.content}>
+              <div className={styles.imageWrapper}>
+                <div className={styles.tokenImage}>
+                  <LoadingSpinner />
+                </div>
+              </div>
+              <div className={styles.descriptionContainer}>
+                <h3 className={styles.infoTitle}>Token Info</h3>
+                <p className={styles.description}>{argsStream.about ?? ''}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  });
 };

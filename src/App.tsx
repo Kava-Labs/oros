@@ -2,12 +2,10 @@ import { useRef, useState, useEffect } from 'react';
 import { ChatView } from './ChatView';
 import { getToken } from './utils/token/token';
 import OpenAI from 'openai';
-import { messageStore, progressStore } from './store';
+import { messageStore, progressStore, toolCallStreamStore } from './store';
 import type {
   ChatCompletionMessageParam,
-  ChatCompletionChunk,
   ChatCompletionTool,
-  ChatCompletionMessageToolCall,
 } from 'openai/resources/index';
 import {
   isContentChunk,
@@ -19,6 +17,8 @@ import { systemPrompt } from './config/systemPrompt';
 import { tools } from './config/tools';
 import { imagedb } from './imagedb';
 import { v4 as uuidv4 } from 'uuid';
+import { ToolCallStreamStore } from './toolCallStreamStore';
+import { GenerateTokenMetadataParams } from './tools/toolFunctions';
 
 let client: OpenAI | null = null;
 
@@ -162,8 +162,6 @@ async function doChat(
 ) {
   progressStore.setText('Thinking');
   try {
-    const toolCallsState: ChatCompletionChunk.Choice.Delta.ToolCall[] = [];
-
     const stream = await client.chat.completions.create(
       {
         model: 'gpt-4',
@@ -184,7 +182,7 @@ async function doChat(
 
         messageStore.appendText(chunk.choices[0].delta.content as string);
       } else if (isToolCallChunk(chunk)) {
-        assembleToolCallsFromStream(chunk, toolCallsState);
+        assembleToolCallsFromStream(chunk, toolCallStreamStore);
       }
     }
 
@@ -197,12 +195,12 @@ async function doChat(
       messageStore.setText('');
     }
 
-    if (toolCallsState.length > 0) {
+    if (toolCallStreamStore.getSnapShot().length > 0) {
       await callTools(
         controller,
         client,
         messages,
-        toolCallsState,
+        toolCallStreamStore,
         progressStore,
         publishMessage,
       );
@@ -241,18 +239,18 @@ async function callTools(
   controller: AbortController,
   client: OpenAI,
   messages: ChatCompletionMessageParam[],
-  toolCalls: ChatCompletionChunk.Choice.Delta.ToolCall[],
+  toolCallStreamStore: ToolCallStreamStore,
   progressStore: TextStreamStore,
   publishMessage: (
     messages: ChatCompletionMessageParam[],
     message: ChatCompletionMessageParam,
   ) => void,
 ): Promise<void> {
-  for (const toolCall of toolCalls) {
+  for (const toolCall of toolCallStreamStore.getSnapShot()) {
     const name = toolCall.function?.name;
     switch (name) {
       case 'generateCoinMetadata': {
-        const args = JSON.parse(toolCall.function?.arguments || '');
+        const args = toolCall.function.arguments as GenerateTokenMetadataParams;
         const response = client.images.generate(
           {
             model: 'dall-e-3',
@@ -279,13 +277,12 @@ async function callTools(
           function_call: null,
           content: null,
           tool_calls: [
-            {
-              id: toolCall.id,
-              function: toolCall.function,
-              type: 'function',
-            } as ChatCompletionMessageToolCall,
+            toolCallStreamStore.toChatCompletionMessageToolCall(toolCall),
           ],
         });
+
+        toolCallStreamStore.deleteToolCallById(toolCall.id);
+
         publishMessage(messages, {
           role: 'tool' as const,
           tool_call_id: toolCall.id!,
