@@ -153,8 +153,9 @@ export class ToolCallStreamStore {
         if (!tcStream) {
           // If the tool call was removed before we finished parsing,
           // we stop parsing and clean up.
-          parser.end();
+          parser.onEnd = () => {};
           parser.onValue = () => {}; // Avoid memory leaks by resetting callback references.
+          parser.end();
           this.parsers.delete(tcStreamIndex);
           return;
         }
@@ -187,6 +188,7 @@ export class ToolCallStreamStore {
 
       // Reset parser callbacks and remove the parser from our tracking map
       // because we're done parsing for this tool call.
+      parser.onEnd = () => {};
       parser.onValue = () => {};
       this.parsers.delete(tcStreamIndex);
 
@@ -218,6 +220,7 @@ export class ToolCallStreamStore {
         const parser = this.parsers.get(this.toolCallStreams[i].index);
         if (parser) {
           // Stop the parser since this tool call is no longer relevant.
+          parser.onEnd = () => {};
           parser.onValue = () => {};
           parser.end();
           this.parsers.delete(this.toolCallStreams[i].index);
@@ -229,6 +232,19 @@ export class ToolCallStreamStore {
     this.toolCallStreams = structuredClone(newState);
     this.emitChange();
     return found;
+  }
+
+  
+  public clear() {
+    for (const [, parser] of this.parsers) {
+      parser.onEnd = () => {};
+      parser.onValue = () => {};
+      parser.end();
+    }
+
+    this.parsers.clear();
+    this.toolCallStreams = [];
+    this.emitChange();
   }
 
   /**

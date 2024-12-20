@@ -210,7 +210,7 @@ describe('ToolCallStreamStore', () => {
     expect(callback).toHaveBeenCalledTimes(3);
   });
 
-  it('getSnapShot should return the current state', () => {
+  it('getSnapShot should return the current state and clear should reset state', () => {
     const store = new ToolCallStreamStore();
     const jsonArgObj = {};
     const jsonArgStr = JSON.stringify(jsonArgObj);
@@ -222,5 +222,10 @@ describe('ToolCallStreamStore', () => {
     const snapshot = store.getSnapShot();
     expect(snapshot).toHaveLength(1);
     expect(snapshot[0].id).toBe('toolCall-9');
+
+    store.clear();
+
+    expect(store.getSnapShot()).toEqual([]);
+
   });
 });
