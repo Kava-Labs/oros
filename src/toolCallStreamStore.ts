@@ -142,6 +142,9 @@ export class ToolCallStreamStore {
     parser.onValue = (info) => {
       const key = info.key;
       const val = info.value;
+      // note: for simplicity the parser only works with javascript objects that are flat
+      // it is possible to support nested structures and primitive types but the complexity increases
+      // without added benefits, so for now ensure our tool call arguments are set up in a way to work with that constraint
 
       // If we received a valid key and value, we update the corresponding tool call's arguments.
       if (key && val !== undefined) {
