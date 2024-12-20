@@ -182,18 +182,17 @@ export const happyPathCases: { [key: string]: Array<TestCase> } = {
         },
       },
     },
-    //  todo - solve for this edge case
-    // {
-    //   input: 'Send .9 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
-    //   result: {
-    //     output: 'Send <amount_1> <token_1> to <address_1>',
-    //     maskedValueMap: {
-    //       address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
-    //       amount_1: '.9',
-    //       token_1: 'KAVA',
-    //     },
-    //   },
-    // },
+    {
+      input: 'Send .9 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+      result: {
+        output: 'Send <amount_1> <token_1> to <address_1>',
+        maskedValueMap: {
+          address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+          amount_1: '.9',
+          token_1: 'KAVA',
+        },
+      },
+    },
     {
       input:
         'Send 1,000 KAVA tokens to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
@@ -253,6 +252,22 @@ export const happyPathCases: { [key: string]: Array<TestCase> } = {
       result: {
         output:
           'Send <address_1> <amount_1> <token_1> and <amount_2> <token_2>',
+        maskedValueMap: {
+          address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+          amount_1: '100',
+          token_1: 'KAVA',
+          amount_2: '0.01',
+          token_2: 'wBTC',
+        },
+      },
+    },
+    {
+      description: 'one address (multiple times), multiple txs',
+      input:
+        'Send 100 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5 and 0.01 wBTC to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
+      result: {
+        output:
+          'Send <amount_1> <token_1> to <address_1> and <amount_2> <token_2> to <address_1>',
         maskedValueMap: {
           address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
           amount_1: '100',
