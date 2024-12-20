@@ -36,7 +36,7 @@ export const maskAddresses = (message: string) => {
         }
 
         // Use put '<>' around the value when we replace it in the text
-        //  but not in the map
+        // but not in the map
         const replacement = `<${key}>`;
         accumulator.updatedResult = accumulator.updatedResult.replace(
           address,
