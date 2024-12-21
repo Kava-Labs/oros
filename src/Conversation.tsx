@@ -7,7 +7,7 @@ import { ToolFunctions, GenerateCoinMetadataResponse } from './tools/types';
 import { TokenCard, TokenCardsStreamingPlaceholder } from './TokenCard';
 
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
-import { memo, useCallback } from 'react';
+import { memo } from 'react';
 
 export interface ConversationProps {
   messages: ChatCompletionMessageParam[];
@@ -17,19 +17,16 @@ export interface ConversationProps {
   onRendered(): void;
 }
 
+const StreamingTextContent = (message: string, onRendered: () => void) => {
+  return <Content role="assistant" content={message} onRendered={onRendered} />;
+};
+
 const ConversationComponent = ({
   messages,
   errorText,
   isRequesting,
   onRendered,
 }: ConversationProps) => {
-  const StreamingTextChild = useCallback(
-    (message: string) => (
-      <Content role="assistant" content={message} onRendered={onRendered} />
-    ),
-    [onRendered],
-  );
-
   return (
     <div id={styles.conversation} data-testid="conversation">
       {messages.map((message, index) => {
@@ -113,13 +110,13 @@ const ConversationComponent = ({
 
           <div className={styles.assistantContainer}>
             <div id={styles.progressStream}>
-              <StreamingText store={progressStore}>
-                {StreamingTextChild}
+              <StreamingText store={progressStore} onRendered={onRendered}>
+                {StreamingTextContent}
               </StreamingText>
             </div>
             <div id={styles.assistantStream}>
-              <StreamingText store={messageStore}>
-                {StreamingTextChild}
+              <StreamingText store={messageStore} onRendered={onRendered}>
+                {StreamingTextContent}
               </StreamingText>
             </div>
           </div>
