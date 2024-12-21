@@ -1,3 +1,42 @@
+/* variables.css */
+:root {
+  /* Colors - Core */
+  --color-bg-primary: #121212;
+  --color-bg-secondary: #1a1a1a;
+  --color-bg-tertiary: #2d2d2d;
+  --color-bg-quaternary: #333333;
+
+  /* Colors - Text */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #d1d1d1;
+  --color-text-tertiary: #bbbbbb;
+  --color-text-muted: rgb(150, 150, 150);
+
+  /* Brand Colors */
+  --color-accent: rgb(247, 73, 40);
+  --color-accent-transparent: rgba(247, 73, 40, 0.75);
+  --color-accent-border: rgba(247, 73, 40, 0.2);
+
+  /* Typography */
+  --font-family-base: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-bold: 700;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+
+  /* Border Radius */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-full: 9999px;
+}
+
 html {
   font-size: 62.5%;
 }
@@ -11,31 +50,44 @@ html {
 }
 
 body {
-  background-color: #121212;
-  font-family: "Inter";
+  background-color: var(--color-bg-primary);
+  font-family: var(--font-family-base);
   line-height: 1.5;
   min-height: 100vh;
   font-size: 1.6rem;
-  font-weight: 300;
+  font-weight: var(--font-weight-light);
 }
 
-p, h1, h2, h3, h4, h5, h6 {
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   overflow-wrap: break-word;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-wrap: balance;
+  font-weight: var(--font-weight-light);
+  margin-bottom: 2rem;
+  margin-top: 0;
 }
 
 p {
   text-wrap: pretty;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  text-wrap: balance;
-  font-weight: 300;
-  margin-bottom: 2.0rem;
+  line-height: 1.45;
   margin-top: 0;
 }
 
 h1 {
-font-size: 3.2rem;
+  font-size: 3.2rem;
   line-height: 1.2;
 }
 
@@ -51,13 +103,13 @@ h3 {
 
 h4 {
   font-size: 2.11rem;
-  letter-spacing: -.08rem;
+  letter-spacing: -0.08rem;
   line-height: 1.35;
 }
 
 h5 {
   font-size: 1.84rem;
-  letter-spacing: -.05rem;
+  letter-spacing: -0.05rem;
   line-height: 1.4;
 }
 
@@ -67,11 +119,7 @@ h6 {
   line-height: 1.45;
 }
 
-b,strong {
-  font-weight: bold;
-}
-
-p {
-  line-height: 1.45;
-  margin-top: 0;
+b,
+strong {
+  font-weight: var(--font-weight-bold);
 }
