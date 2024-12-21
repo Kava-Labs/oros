@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { ChatView } from './ChatView';
 import { getToken } from './utils/token/token';
 import OpenAI from 'openai';
@@ -64,84 +64,87 @@ export const App = () => {
   // abort controller for cancelling openai request
   const controllerRef = useRef<AbortController | null>(null);
 
-  const handleChatCompletion = async (value: string) => {
-    if (isRequesting) {
-      return;
-    }
-    // should not happen
-    if (!client) {
-      console.error('client usage before ready');
-      return;
-    }
-
-    // Abort controller integrated with UI
-    const controller = new AbortController();
-    controllerRef.current = controller;
-    setIsRequesting(true);
-
-    // Add the user message to the UI
-    const newMessages = [
-      ...messages,
-      { role: 'user' as const, content: value },
-    ];
-    setMessages(newMessages);
-
-    // Ensure local messages always matches the state messages
-    const publishMessage = (
-      messages: ChatCompletionMessageParam[],
-      message: ChatCompletionMessageParam,
-    ) => {
-      messages.push(message);
-      setMessages([...messages]);
-    };
-
-    // Call chat completions and resolve all tool calls.
-    //
-    // This is recursive and completes when all tools calls have been made
-    // and all follow ups have been completed.
-    try {
-      //  clear any existing error
-      setErrorText('');
-
-      await doChat(
-        controller,
-        client,
-        newMessages,
-        tools,
-        progressStore,
-        messageStore,
-        publishMessage,
-      );
-    } catch (error) {
-      let errorMessage =
-        typeof error === 'object' && error !== null && 'message' in error
-          ? (error as { message: string }).message
-          : 'An error occurred - please try again';
-
-      //  Errors can be thrown when recursive call is cancelled
-      if (errorMessage.includes('JSON')) {
-        errorMessage = 'You clicked cancel - please try again';
+  const handleChatCompletion = useCallback(
+    async (value: string) => {
+      if (isRequesting) {
+        return;
+      }
+      // should not happen
+      if (!client) {
+        console.error('client usage before ready');
+        return;
       }
 
-      setErrorText(errorMessage);
-    } finally {
-      setIsRequesting(false);
-      controllerRef.current = null;
-    }
-  };
+      // Abort controller integrated with UI
+      const controller = new AbortController();
+      controllerRef.current = controller;
+      setIsRequesting(true);
 
-  const handleCancel = () => {
+      // Add the user message to the UI
+      const newMessages = [
+        ...messages,
+        { role: 'user' as const, content: value },
+      ];
+      setMessages(newMessages);
+
+      // Ensure local messages always matches the state messages
+      const publishMessage = (
+        messages: ChatCompletionMessageParam[],
+        message: ChatCompletionMessageParam,
+      ) => {
+        messages.push(message);
+        setMessages([...messages]);
+      };
+
+      // Call chat completions and resolve all tool calls.
+      //
+      // This is recursive and completes when all tools calls have been made
+      // and all follow ups have been completed.
+      try {
+        //  clear any existing error
+        setErrorText('');
+
+        await doChat(
+          controller,
+          client,
+          newMessages,
+          tools,
+          progressStore,
+          messageStore,
+          publishMessage,
+        );
+      } catch (error) {
+        let errorMessage =
+          typeof error === 'object' && error !== null && 'message' in error
+            ? (error as { message: string }).message
+            : 'An error occurred - please try again';
+
+        //  Errors can be thrown when recursive call is cancelled
+        if (errorMessage.includes('JSON')) {
+          errorMessage = 'You clicked cancel - please try again';
+        }
+
+        setErrorText(errorMessage);
+      } finally {
+        setIsRequesting(false);
+        controllerRef.current = null;
+      }
+    },
+    [isRequesting, messages],
+  );
+
+  const handleCancel = useCallback(() => {
     if (controllerRef.current) {
       controllerRef.current.abort();
       controllerRef.current = null;
       toolCallStreamStore.clear();
     }
-  };
+  }, []);
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     handleCancel();
     setMessages([{ role: 'system' as const, content: systemPrompt }]);
-  };
+  }, [handleCancel]);
 
   return (
     <>

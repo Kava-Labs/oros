@@ -21,9 +21,7 @@ export const ContentComponent = ({
 
     const handleRender = async () => {
       if (content === '') {
-        if (sanitizedContent !== '') {
-          setSanitizedContent('');
-        }
+        setSanitizedContent('');
         return;
       }
 
@@ -46,7 +44,7 @@ export const ContentComponent = ({
     return () => {
       cancel = true;
     };
-  }, [content, sanitizedContent, setSanitizedContent]);
+  }, [content]);
 
   useEffect(() => {
     if (onRendered) {
@@ -70,11 +68,4 @@ export const ContentComponent = ({
   );
 };
 
-export const Content = memo(ContentComponent, (prevProps, curProps) => {
-  // todo: do we need this callback function?
-  return (
-    prevProps.content === curProps.content &&
-    prevProps.onRendered === curProps.onRendered &&
-    prevProps.role === curProps.role
-  );
-});
+export const Content = memo(ContentComponent);

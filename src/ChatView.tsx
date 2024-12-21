@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, memo } from 'react';
 import styles from './ChatView.module.css';
 import { ResetChatIcon } from './assets/ResetChatIcon';
 import { SendChatIcon } from './assets/SendChatIcon';
@@ -17,7 +17,7 @@ export interface ChatViewProps {
   onCancel(): void;
 }
 
-export const ChatView = ({
+const ChatViewComponent = ({
   messages,
   errorText,
   isRequesting,
@@ -50,7 +50,7 @@ export const ChatView = ({
 
       setInputValue(textarea.value);
     },
-    [setInputValue],
+    [],
   );
 
   const handleButtonClick = useCallback(() => {
@@ -65,7 +65,7 @@ export const ChatView = ({
 
     onSubmit(inputValue);
     setInputValue('');
-  }, [isRequesting, onSubmit, onCancel, inputValue, setInputValue]);
+  }, [isRequesting, onSubmit, onCancel, inputValue]);
 
   const buttonRef = useRef<HTMLButtonElement>(null);
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -152,3 +152,5 @@ export const ChatView = ({
     </div>
   );
 };
+
+export const ChatView = memo(ChatViewComponent);

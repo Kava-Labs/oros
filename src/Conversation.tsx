@@ -7,6 +7,7 @@ import { ToolFunctions, GenerateCoinMetadataResponse } from './tools/types';
 import { TokenCard, TokenCardsStreamingPlaceholder } from './TokenCard';
 
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
+import { memo, useCallback } from 'react';
 
 export interface ConversationProps {
   messages: ChatCompletionMessageParam[];
@@ -16,12 +17,19 @@ export interface ConversationProps {
   onRendered(): void;
 }
 
-export const Conversation = ({
+const ConversationComponent = ({
   messages,
   errorText,
   isRequesting,
   onRendered,
 }: ConversationProps) => {
+  const StreamingTextChild = useCallback(
+    (message: string) => (
+      <Content role="assistant" content={message} onRendered={onRendered} />
+    ),
+    [onRendered],
+  );
+
   return (
     <div id={styles.conversation} data-testid="conversation">
       {messages.map((message, index) => {
@@ -106,24 +114,12 @@ export const Conversation = ({
           <div className={styles.assistantContainer}>
             <div id={styles.progressStream}>
               <StreamingText store={progressStore}>
-                {(message) => (
-                  <Content
-                    role="assistant"
-                    content={message}
-                    onRendered={onRendered}
-                  />
-                )}
+                {StreamingTextChild}
               </StreamingText>
             </div>
             <div id={styles.assistantStream}>
               <StreamingText store={messageStore}>
-                {(message) => (
-                  <Content
-                    role="assistant"
-                    content={message}
-                    onRendered={onRendered}
-                  />
-                )}
+                {StreamingTextChild}
               </StreamingText>
             </div>
           </div>
@@ -152,3 +148,5 @@ export const Conversation = ({
     </div>
   );
 };
+
+export const Conversation = memo(ConversationComponent);
