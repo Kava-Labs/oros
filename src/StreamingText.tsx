@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from 'react';
+import { memo, useSyncExternalStore } from 'react';
 import { TextStreamStore } from './textStreamStore';
 
 interface StreamingTextProps {
@@ -6,8 +6,11 @@ interface StreamingTextProps {
   store: TextStreamStore;
 }
 
-export const StreamingText = ({ children, store }: StreamingTextProps) => {
+export const StreamingText = memo(function StreamingText({
+  children,
+  store,
+}: StreamingTextProps) {
   const text = useSyncExternalStore(store.subscribe, store.getSnapshot);
 
   return <div>{children(text)}</div>;
-};
+});
