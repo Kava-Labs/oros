@@ -129,7 +129,7 @@ export const TokenCardsStreamingPlaceholder = ({
           <div className={styles.tokenCard}>
             <div className={styles.header}>
               <div className={styles.headerContent}>
-                <h2 className={styles.tokenName}>{argsStream.name ?? ''}</h2>
+                <h4 className={styles.tokenName}>{argsStream.name ?? ''}</h4>
                 <div className={styles.tokenSymbol}>
                   {argsStream.symbol ?? ''}
                 </div>
@@ -142,7 +142,7 @@ export const TokenCardsStreamingPlaceholder = ({
                 </div>
               </div>
               <div className={styles.descriptionContainer}>
-                <h3 className={styles.infoTitle}>Token Info</h3>
+                <h6 className={styles.infoTitle}>Token Info</h6>
                 <p className={styles.description}>{argsStream.about ?? ''}</p>
               </div>
             </div>
