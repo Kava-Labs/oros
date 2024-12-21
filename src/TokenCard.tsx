@@ -107,13 +107,25 @@ export const TokenCard = ({
 
 export const TokenCardsStreamingPlaceholder = ({
   toolCallStreamStore,
+  onRendered,
 }: {
   toolCallStreamStore: ToolCallStreamStore;
+  onRendered: () => void;
 }) => {
   const toolCallStreams = useSyncExternalStore(
     toolCallStreamStore.subscribe,
     toolCallStreamStore.getSnapShot,
   );
+
+  useEffect(() => {
+    if (
+      toolCallStreams.find(
+        (tc) => tc.function.name === ToolFunctions.GENERATE_COIN_METADATA,
+      ) !== undefined
+    ) {
+      requestAnimationFrame(onRendered);
+    }
+  }, [toolCallStreams, onRendered]);
 
   return toolCallStreams.map((tcStream) => {
     if (tcStream.function.name !== ToolFunctions.GENERATE_COIN_METADATA) {

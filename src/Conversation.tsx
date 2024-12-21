@@ -31,7 +31,6 @@ export const Conversation = ({
               <Content
                 role={message.role}
                 content={message.content as string}
-                onRendered={onRendered}
               />
             </div>
           );
@@ -48,7 +47,6 @@ export const Conversation = ({
                 <Content
                   role={message.role}
                   content={message.content as string}
-                  onRendered={onRendered}
                 />
               </div>
             </div>
@@ -146,6 +144,7 @@ export const Conversation = ({
 
       <TokenCardsStreamingPlaceholder
         toolCallStreamStore={toolCallStreamStore}
+        onRendered={onRendered}
       />
     </div>
   );
