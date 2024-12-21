@@ -4,7 +4,7 @@ import styles from './ChatView.module.css';
 
 export interface ContentProps {
   content: string;
-  onRendered(): void;
+  onRendered?: () => void;
   role: string;
 }
 
@@ -49,7 +49,9 @@ export const ContentComponent = ({
   }, [content, sanitizedContent, setSanitizedContent]);
 
   useEffect(() => {
-    requestAnimationFrame(onRendered);
+    if (onRendered) {
+      requestAnimationFrame(onRendered);
+    }
   }, [sanitizedContent, hasError, onRendered]);
 
   if (hasError) {
