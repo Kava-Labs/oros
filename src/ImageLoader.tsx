@@ -25,7 +25,7 @@ const ImageLoader = ({ prompt }: { prompt: string }) => {
   }, [currentIndex, prompt]);
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} role="status">
       <div className={styles.spinnerContainer}>
         <Loader2 className={styles.spinner} />
       </div>
