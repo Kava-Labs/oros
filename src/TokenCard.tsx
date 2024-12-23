@@ -66,7 +66,7 @@ export const TokenCard = ({
     requestAnimationFrame(onRendered);
   }, [name, symbol, about, imageUri, onRendered]);
 
-  const isInIframe = window === window.parent;
+  const isInIframe = window !== window.parent;
   const isLoading = imageUri === undefined;
   const isImageError = imageUri === '';
 
