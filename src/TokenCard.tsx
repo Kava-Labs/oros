@@ -1,17 +1,17 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import styles from './TokenCard.module.css';
 import { imagedb } from './imagedb';
-import { LoadingSpinner } from './LoadingSpinner';
 import { LaunchIcon } from './assets/LaunchIcon';
 import { ToolCallStreamStore } from './toolCallStreamStore';
 import { ToolFunctions, type GenerateCoinMetadataParams } from './tools/types';
+import ImageLoader from './ImageLoader';
 
 export interface TokenCardProps {
   id: string;
   name: string;
   symbol: string;
   about: string;
-
+  prompt: string;
   onRendered(): void;
 }
 
@@ -21,6 +21,7 @@ export const TokenCard = ({
   symbol,
   about,
   onRendered,
+  prompt,
 }: TokenCardProps) => {
   const [imageUri, setImageUri] = useState<string | undefined>(undefined);
 
@@ -72,7 +73,7 @@ export const TokenCard = ({
         <div className={styles.content}>
           <div className={imageWrapperStyles}>
             <div className={styles.tokenImage}>
-              {isLoading && <LoadingSpinner />}
+              {isLoading && <ImageLoader prompt={prompt} />}
 
               {isImageError && (
                 <div className={styles.imageErrorText}>
@@ -150,7 +151,7 @@ export const TokenCardsStreamingPlaceholder = ({
             <div className={styles.content}>
               <div className={styles.imageWrapper}>
                 <div className={styles.tokenImage}>
-                  <LoadingSpinner />
+                  <ImageLoader prompt={argsStream.prompt ?? ''} />
                 </div>
               </div>
               <div className={styles.descriptionContainer}>
