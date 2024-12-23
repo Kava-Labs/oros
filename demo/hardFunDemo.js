@@ -27,7 +27,7 @@ document.getElementById('open_chat').addEventListener('click', () => {
   } else {
     iframeRoot.classList.add('open');
     iframeRoot.innerHTML = `
-      <iframe id="KAVA_CHAT" src="http://localhost:3000" style="width: 100%; height: 100%; border: none;"></iframe>
+      <iframe id="KAVA_CHAT" src="https://chat.app.production.kava.io" style="width: 100%; height: 100%; border: none;"></iframe>
     `;
     openChatButton.innerText = 'Close Chat';
     // make it look like hard.fun chat styling
