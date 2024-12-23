@@ -107,7 +107,7 @@ export const TokenCard = ({
           <div className={styles.descriptionContainer}>
             <h6 className={styles.infoTitle}>Token Info</h6>
             <p className={styles.description}>{about}</p>
-            {!isLoading && !isImageError && !isInIframe && (
+            {!isLoading && !isImageError && isInIframe && (
               <button
                 className={styles.tokenButton}
                 onClick={handleLaunchClick}
