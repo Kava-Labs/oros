@@ -22,7 +22,7 @@ const ImageLoader = ({ prompt }: { prompt: string }) => {
 
       return () => clearTimeout(resetTimer);
     }
-  }, [currentIndex, prompt]);
+  }, [currentIndex, prompt, words]);
 
   return (
     <div className={styles.container} role="status">
