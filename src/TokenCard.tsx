@@ -110,7 +110,7 @@ export const TokenCard = ({
             {!isLoading && !isImageError && !isInIframe && (
               <button
                 className={styles.tokenButton}
-                onClick={() => handleLaunchClick()}
+                onClick={handleLaunchClick}
               >
                 <LaunchIcon />
                 Launch
