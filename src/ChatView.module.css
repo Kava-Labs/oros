@@ -244,6 +244,7 @@
   justify-content: flex-end;
   align-items: center;
   margin: 0px;
+  z-index: 99;
 
   @media (max-width: 640px) {
     padding: var(--space-sm) var(--space-sm);
