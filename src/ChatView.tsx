@@ -50,7 +50,7 @@ export const ChatView = ({
 
       setInputValue(textarea.value);
     },
-    [setInputValue],
+    [],
   );
 
   const handleButtonClick = useCallback(() => {
@@ -65,7 +65,7 @@ export const ChatView = ({
 
     onSubmit(inputValue);
     setInputValue('');
-  }, [isRequesting, onSubmit, onCancel, inputValue, setInputValue]);
+  }, [isRequesting, onSubmit, onCancel, inputValue]);
 
   const buttonRef = useRef<HTMLButtonElement>(null);
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {

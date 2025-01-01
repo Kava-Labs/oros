@@ -8,7 +8,7 @@ describe('StreamingText', () => {
     store.setText('Initial Text');
 
     render(
-      <StreamingText store={store}>
+      <StreamingText store={store} onRendered={vi.fn()}>
         {(text) => <span data-testid="output">{text}</span>}
       </StreamingText>,
     );
@@ -21,7 +21,7 @@ describe('StreamingText', () => {
     store.setText('Initial');
 
     render(
-      <StreamingText store={store}>
+      <StreamingText store={store} onRendered={vi.fn()}>
         {(text) => <span data-testid="output">{text}</span>}
       </StreamingText>,
     );
@@ -40,7 +40,7 @@ describe('StreamingText', () => {
     store.setText('Hello');
 
     render(
-      <StreamingText store={store}>
+      <StreamingText store={store} onRendered={vi.fn()}>
         {(text) => <span data-testid="output">{text}</span>}
       </StreamingText>,
     );
@@ -58,7 +58,7 @@ describe('StreamingText', () => {
     const store = new TextStreamStore();
     // No setText called, so it should be an empty string
     render(
-      <StreamingText store={store}>
+      <StreamingText store={store} onRendered={vi.fn()}>
         {(text) => <span data-testid="output">{text}</span>}
       </StreamingText>,
     );
@@ -71,7 +71,7 @@ describe('StreamingText', () => {
     store.setText('Initial');
 
     render(
-      <StreamingText store={store}>
+      <StreamingText store={store} onRendered={vi.fn()}>
         {(text) => <span data-testid="output">{text}</span>}
       </StreamingText>,
     );
@@ -92,7 +92,7 @@ describe('StreamingText', () => {
     store.setText('Hello');
 
     render(
-      <StreamingText store={store}>
+      <StreamingText store={store} onRendered={vi.fn()}>
         {(text) => <strong data-testid="output">**{text}**</strong>}
       </StreamingText>,
     );
@@ -121,7 +121,7 @@ describe('StreamingText', () => {
     };
 
     const { unmount } = render(
-      <StreamingText store={store}>
+      <StreamingText store={store} onRendered={vi.fn()}>
         {(text) => <span>{text}</span>}
       </StreamingText>,
     );
@@ -137,7 +137,9 @@ describe('StreamingText', () => {
     const renderFn = vi.fn((text: string) => <span>{text}</span>);
 
     const { unmount } = render(
-      <StreamingText store={store}>{renderFn}</StreamingText>,
+      <StreamingText store={store} onRendered={vi.fn()}>
+        {renderFn}
+      </StreamingText>,
     );
 
     expect(renderFn).toHaveBeenCalledTimes(1);
@@ -165,7 +167,7 @@ describe('StreamingText', () => {
       parentRenderCount++;
       return (
         <div data-testid="parent">
-          <StreamingText store={store}>
+          <StreamingText store={store} onRendered={vi.fn()}>
             {(text) => <span data-testid="child">{text}</span>}
           </StreamingText>
           ,
