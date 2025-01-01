@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, memo } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import styles from './ChatView.module.css';
 import { ResetChatIcon } from './assets/ResetChatIcon';
 import { SendChatIcon } from './assets/SendChatIcon';
@@ -17,7 +17,7 @@ export interface ChatViewProps {
   onCancel(): void;
 }
 
-const ChatViewComponent = ({
+export const ChatView = ({
   messages,
   errorText,
   isRequesting,
@@ -152,5 +152,3 @@ const ChatViewComponent = ({
     </div>
   );
 };
-
-export const ChatView = memo(ChatViewComponent);
