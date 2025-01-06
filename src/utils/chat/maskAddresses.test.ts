@@ -252,11 +252,9 @@ describe('maskAddresses', () => {
         },
       },
       {
-        input:
-          'Send 100 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe500000000000000000000000',
+        input: 'Send 100 KAVA to 0x123',
         result: {
-          output:
-            'Send 100 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe500000000000000000000000',
+          output: 'Send 100 KAVA to 0x123',
           masksToValues: {},
           valuesToMasks: {},
         },

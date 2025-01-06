@@ -22,7 +22,7 @@ export const maskAddresses = (
   processedMasksToValues: Record<string, string>,
 ) => {
   // Find exactly 40 characters after '0x' (inclusive)
-  const ethAddressRegex = /0x[a-fA-F0-9]{40}(?!0)/g;
+  const ethAddressRegex = /0x[a-fA-F0-9]{40}/g;
 
   const addressesToReplace = Array.from(message.matchAll(ethAddressRegex));
 
