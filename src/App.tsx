@@ -37,7 +37,10 @@ export const App = () => {
   const [isReady, setIsReady] = useState(false);
   const [errorText, setErrorText] = useState('');
 
-  const [address, setAddress] = useState('');
+  const [wallet, setWallet] = useState({
+    address: '',
+    chainID: '',
+  });
 
   // TODO: check healthcheck and set error if backend is not availiable
   useEffect(() => {
@@ -63,7 +66,10 @@ export const App = () => {
         switch (event.data.type) {
           case 'WALLET_CONNECTION':
             console.info('WALLET_CONNECTION', event.data);
-            setAddress(() => event.data.payload.address);
+            setWallet({
+              address: event.data.payload.address,
+              chainID: event.data.payload.chainID,
+            });
             break;
           default:
             console.warn('unknown event type', event.type);
@@ -83,7 +89,6 @@ export const App = () => {
     };
   }, []);
 
-  console.log(address);
 
   // store entire thread of messages in state
   const [messages, setMessages] = useState<ChatCompletionMessageParam[]>([
@@ -182,6 +187,8 @@ export const App = () => {
     <>
       {isReady && (
         <ChatView
+          address={wallet.address}
+          chainID={wallet.chainID}
           messages={messages}
           onSubmit={handleChatCompletion}
           onReset={handleReset}
