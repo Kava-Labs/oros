@@ -37,6 +37,8 @@ export const App = () => {
   const [isReady, setIsReady] = useState(false);
   const [errorText, setErrorText] = useState('');
 
+  const [address, setAddress] = useState('');
+
   // TODO: check healthcheck and set error if backend is not availiable
   useEffect(() => {
     try {
@@ -52,6 +54,36 @@ export const App = () => {
 
     setIsReady(true);
   }, []);
+
+  useEffect(() => {
+    const parentMessageHandler = (event: MessageEvent<any>) => {
+      // Handle the message
+      if (event.data && event.data.namespace === 'KAVA_CHAT') {
+        console.info('event received from parent: ', event);
+        switch (event.data.type) {
+          case 'WALLET_CONNECTION':
+            console.info('WALLET_CONNECTION', event.data);
+            setAddress(() => event.data.payload.address);
+            break;
+          default:
+            console.warn('unknown event type', event.type);
+            break;
+        }
+      }
+    };
+
+    // register parentMessageHandler when inside iFrame
+    if (window.top !== window.self) {
+      window.addEventListener('message', parentMessageHandler);
+    }
+    return () => {
+      if (window.top !== window.self) {
+        window.removeEventListener('message', parentMessageHandler);
+      }
+    };
+  }, []);
+
+  console.log(address);
 
   // store entire thread of messages in state
   const [messages, setMessages] = useState<ChatCompletionMessageParam[]>([
