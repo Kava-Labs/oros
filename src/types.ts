@@ -1,4 +1,4 @@
-export interface WalletConnectionPayload {
+export interface WalletConnectionPayloadV1 {
   address: string;
   walletName: string;
   chainID: string;
@@ -6,7 +6,7 @@ export interface WalletConnectionPayload {
 
 // Map the type property to specific payloads
 export type MessagePayloads = {
-  'WALLET_CONNECTION/V1': WalletConnectionPayload;
+  'WALLET_CONNECTION/V1': WalletConnectionPayloadV1;
 };
 
 // Main message type
