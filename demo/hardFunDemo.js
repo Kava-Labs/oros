@@ -84,7 +84,7 @@ const connectWallet = async (iframe) => {
           type: 'WALLET_CONNECTION',
           payload: {
             address: accounts[0],
-            walletType: 'METAMASK',
+            walletName: 'MetaMask',
             chainID: chainID,
           },
         },
