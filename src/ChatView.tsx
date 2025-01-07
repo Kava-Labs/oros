@@ -16,6 +16,7 @@ export interface ChatViewProps {
   onReset(): void;
   onCancel(): void;
 
+  introText: string;
   address: string;
   chainID: string;
 }
@@ -28,6 +29,7 @@ export const ChatView = ({
   onReset,
   onCancel,
 
+  introText,
   address,
   chainID,
 }: ChatViewProps) => {
@@ -87,7 +89,6 @@ export const ChatView = ({
     }
   };
 
-  console.log(address, chainID, 'here');
   return (
     <div id={styles.chatview} data-testid="chatview">
       <div
@@ -124,8 +125,7 @@ export const ChatView = ({
               <h6>
                 {address
                   ? `your wallet address: ${address} connected to chainID: ${chainID.startsWith('0x') ? parseInt(chainID, 16) : chainID}`
-                  : `Tell me about your memecoin idea below and we'll generate
-                everything you need to get it launched.`}
+                  : introText}
               </h6>
             </div>
           </div>
