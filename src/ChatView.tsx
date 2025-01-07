@@ -15,6 +15,9 @@ export interface ChatViewProps {
   onSubmit(value: string): void;
   onReset(): void;
   onCancel(): void;
+
+  address: string;
+  chainID: string;
 }
 
 export const ChatView = ({
@@ -24,6 +27,9 @@ export const ChatView = ({
   onSubmit,
   onReset,
   onCancel,
+
+  address,
+  chainID,
 }: ChatViewProps) => {
   const hasMessages =
     messages.filter((message) => message.role != 'system').length > 0;
@@ -81,6 +87,7 @@ export const ChatView = ({
     }
   };
 
+  console.log(address, chainID, 'here');
   return (
     <div id={styles.chatview} data-testid="chatview">
       <div
@@ -115,8 +122,10 @@ export const ChatView = ({
               <img src={hardDotFunDiamond} id={styles.chatIconContainer} />
               <h3>Let's get started!</h3>
               <h6>
-                Tell me about your memecoin idea below and we'll generate
-                everything you need to get it launched.
+                {address
+                  ? `your wallet address: ${address} connected to chainID: ${chainID.startsWith('0x') ? parseInt(chainID, 16) : chainID}`
+                  : `Tell me about your memecoin idea below and we'll generate
+                everything you need to get it launched.`}
               </h6>
             </div>
           </div>

@@ -1,4 +1,7 @@
-document.getElementById('open_chat').addEventListener('click', () => {
+const openChatBtn = document.getElementById('open_chat');
+const connectWalletBtn = document.getElementById('connect_wallet');
+
+const openChatHandler = () => {
   const iframeRoot = document.getElementById('iframe-root');
   const openChatButton = document.getElementById('open_chat');
 
@@ -35,9 +38,9 @@ document.getElementById('open_chat').addEventListener('click', () => {
     openChatButton.style.background = '#1a1a1a';
     openChatButton.style.border = '1px solid rgb(247, 73, 40, 0.75)';
   }
-});
+};
 
-window.addEventListener('message', (event) => {
+const iFrameMessageHandler = (event) => {
   if (event.data.type && event.data.type === 'GENERATED_TOKEN_METADATA') {
     // log the metadata to the console for devs
     console.log('tokenMetadata', event.data.payload);
@@ -64,7 +67,51 @@ window.addEventListener('message', (event) => {
     document.getElementById('token-description-input').value =
       event.data.payload.tokenDescription;
   }
-});
+};
+
+const connectWallet = async (iframe) => {
+  try {
+    const accounts = await window.ethereum.request({
+      method: 'eth_requestAccounts',
+    });
+    if (accounts && accounts[0]) {
+      const chainID = await window.ethereum.request({ method: 'eth_chainId' });
+
+      iframe.contentWindow.postMessage(
+        {
+          namespace: 'KAVA_CHAT',
+          type: 'WALLET_CONNECTION/V1',
+          payload: {
+            address: accounts[0],
+            walletName: 'MetaMask',
+            chainID: chainID,
+          },
+        },
+        '*',
+      );
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const connectWalletHandler = () => {
+  let iframe;
+  if (!document.getElementsByTagName('iframe').length) {
+    openChatHandler();
+    iframe = document.getElementsByTagName('iframe')[0];
+    iframe.addEventListener('load', () => {
+      connectWallet(iframe);
+    });
+  } else {
+    iframe = document.getElementsByTagName('iframe')[0];
+    connectWallet(iframe);
+  }
+};
+
+openChatBtn.addEventListener('click', openChatHandler);
+connectWalletBtn.addEventListener('click', connectWalletHandler);
+window.addEventListener('message', iFrameMessageHandler);
 
 window.addEventListener('DOMContentLoaded', () => {
   // Clear input fields
@@ -99,3 +146,20 @@ window.addEventListener('DOMContentLoaded', () => {
     </svg>
   `;
 });
+
+// listen for account and network changes
+if (window.ethereum) {
+  window.ethereum.on('accountsChanged', () => {
+    const iFrames = document.getElementsByTagName('iframe');
+    if (iFrames.length) {
+      connectWallet(iFrames[0]);
+    }
+  });
+
+  window.ethereum.on('chainChanged', (chainId) => {
+    const iFrames = document.getElementsByTagName('iframe');
+    if (iFrames.length) {
+      connectWallet(iFrames[0]);
+    }
+  });
+}

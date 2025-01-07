@@ -31,6 +31,8 @@ export const Primary: Story = {
     viewport: { defaultViewport: 'reset' },
   },
   args: {
+    address: '',
+    chainID: '',
     messages: mockChatMessages,
     isRequesting: false,
     onSubmit: fn(),
@@ -45,6 +47,8 @@ export const OnPhoneSmall: Story = {
     viewport: { defaultViewport: 'mobile1' },
   },
   args: {
+    address: '',
+    chainID: '',
     messages: mockChatMessages,
     isRequesting: false,
     onSubmit: fn(),
@@ -59,6 +63,8 @@ export const OnPhoneLarge: Story = {
     viewport: { defaultViewport: 'mobile2' },
   },
   args: {
+    address: '',
+    chainID: '',
     messages: mockChatMessages,
     isRequesting: false,
     onSubmit: fn(),
@@ -73,6 +79,8 @@ export const NoMessages: Story = {
     viewport: { defaultViewport: 'reset' },
   },
   args: {
+    address: '',
+    chainID: '',
     messages: [],
     isRequesting: false,
     onSubmit: fn(),
@@ -87,6 +95,8 @@ export const NoMessagesOnPhoneSmall: Story = {
     viewport: { defaultViewport: 'mobile1' },
   },
   args: {
+    address: '',
+    chainID: '',
     messages: [],
     isRequesting: false,
     onSubmit: fn(),
@@ -101,6 +111,8 @@ export const RequestInProgress: Story = {
     viewport: { defaultViewport: 'reset' },
   },
   args: {
+    address: '',
+    chainID: '',
     messages: [],
     isRequesting: true,
     onSubmit: fn(),

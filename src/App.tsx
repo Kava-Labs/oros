@@ -19,6 +19,7 @@ import { imagedb } from './imagedb';
 import { v4 as uuidv4 } from 'uuid';
 import { ToolCallStreamStore } from './toolCallStreamStore';
 import { ToolFunctions, type GenerateCoinMetadataParams } from './tools/types';
+import type { AnyIFrameMessage } from './types';
 
 let client: OpenAI | null = null;
 
@@ -37,6 +38,11 @@ export const App = () => {
   const [isReady, setIsReady] = useState(false);
   const [errorText, setErrorText] = useState('');
 
+  const [wallet, setWallet] = useState({
+    address: '',
+    chainID: '',
+  });
+
   // TODO: check healthcheck and set error if backend is not availiable
   useEffect(() => {
     try {
@@ -51,6 +57,37 @@ export const App = () => {
     }
 
     setIsReady(true);
+  }, []);
+
+  useEffect(() => {
+    const parentMessageHandler = (event: MessageEvent<AnyIFrameMessage>) => {
+      // Handle the message
+      if (event.data && event.data.namespace === 'KAVA_CHAT') {
+        console.info('event received from parent: ', event);
+        switch (event.data.type) {
+          case 'WALLET_CONNECTION/V1':
+            console.info('WALLET_CONNECTION', event.data);
+            setWallet({
+              address: event.data.payload.address,
+              chainID: event.data.payload.chainID,
+            });
+            break;
+          default:
+            console.warn('unknown event type', event.type);
+            break;
+        }
+      }
+    };
+
+    // register parentMessageHandler when inside iFrame
+    if (window.top !== window.self) {
+      window.addEventListener('message', parentMessageHandler);
+    }
+    return () => {
+      if (window.top !== window.self) {
+        window.removeEventListener('message', parentMessageHandler);
+      }
+    };
   }, []);
 
   // store entire thread of messages in state
@@ -150,6 +187,8 @@ export const App = () => {
     <>
       {isReady && (
         <ChatView
+          address={wallet.address}
+          chainID={wallet.chainID}
           messages={messages}
           onSubmit={handleChatCompletion}
           onReset={handleReset}
