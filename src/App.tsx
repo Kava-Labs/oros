@@ -110,6 +110,28 @@ export const App = () => {
             setConfig((prev) => ({ ...prev, introText }));
             break;
           }
+
+          case `TOOL_CALL_RESPONSE/V1`: {
+            console.info(`TOOL_CALL_RESPONSE/V1`, event.data);
+            const toolCall = event.data.payload.toolCall;
+            const content = event.data.payload.content;
+
+            messageHistoryStore.addMessage({
+              role: 'assistant' as const,
+              function_call: null,
+              content: null,
+              tool_calls: [
+                toolCallStreamStore.toChatCompletionMessageToolCall(toolCall),
+              ],
+            })
+            toolCallStreamStore.deleteToolCallById(toolCall.id);
+            messageHistoryStore.addMessage({
+              role: 'tool' as const,
+              tool_call_id: toolCall.id,
+              content,
+            })
+            break;
+          }
           default:
             console.warn('unknown event type', event.type);
             break;
@@ -172,7 +194,6 @@ export const App = () => {
       setIsRequesting(true);
 
       // Add the user message to the UI
-
       messageHistoryStore.addMessage({ role: 'user' as const, content: value });
 
       // Call chat completions and resolve all tool calls.
