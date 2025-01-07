@@ -347,10 +347,7 @@ async function callTools(
         {
           type: 'TOOL_CALL',
           payload: {
-            name,
-            arguments: toolCall.function.arguments,
-            id: toolCall.id,
-            index: toolCall.index,
+            toolCall,
           },
         },
         '*',
