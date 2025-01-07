@@ -334,10 +334,22 @@ async function callTools(
   toolCallStreamStore: ToolCallStreamStore,
   progressStore: TextStreamStore,
 ): Promise<void> {
+  const isInIframe = window !== window.parent;
   for (const toolCall of toolCallStreamStore.getSnapShot()) {
     const name = toolCall.function?.name;
-    if (window.top !== window.self) {
-      // todo(sah): emit tool call events to parent
+    if (isInIframe) {
+      window.parent.postMessage(
+        {
+          type: 'TOOL_CALL',
+          payload: {
+            name,
+            arguments: toolCall.function.arguments,
+            id: toolCall.id,
+            index: toolCall.index,
+          },
+        },
+        '*',
+      );
     }
 
     switch (name) {
@@ -392,7 +404,9 @@ async function callTools(
         break;
       }
       default:
-        throw new Error(`unknown tool call: ${name}`);
+        console.warn(`unknown tool call: ${name}`);
+        // throw new Error(`unknown tool call: ${name}`);
+        break;
     }
   }
 }
