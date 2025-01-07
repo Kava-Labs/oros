@@ -359,9 +359,6 @@ async function callTools(
   for (const toolCall of toolCallStreamStore.getSnapShot()) {
     const name = toolCall.function?.name;
     if (isInIframe) {
-      // todo(sah): parent app will need to call their tool call
-      // they will also need to then send the tool call response back
-      // to this app, along with it's id so we can call publishMessage
       window.parent.postMessage(
         {
           type: 'TOOL_CALL',
