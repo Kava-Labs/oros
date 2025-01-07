@@ -21,8 +21,11 @@ import {
   assembleToolCallsFromStream,
 } from './streamUtils';
 import { TextStreamStore } from './textStreamStore';
-import { systemPrompt } from './config/systemPrompt';
-import { tools } from './config/tools';
+import {
+  memeCoinSystemPrompt,
+  memeCoinGenIntroText,
+} from './config/systemPrompt';
+import { memeCoinTools } from './config/tools';
 import { imagedb } from './imagedb';
 import { v4 as uuidv4 } from 'uuid';
 import { ToolCallStreamStore } from './toolCallStreamStore';
@@ -46,6 +49,13 @@ export const App = () => {
   // Do not load UI/UX until openAI client is ready
   const [isReady, setIsReady] = useState(false);
   const [errorText, setErrorText] = useState('');
+
+  const [{ tools, systemPrompt, introText }, setConfig] = useState({
+    introText: memeCoinGenIntroText,
+    systemPrompt: memeCoinSystemPrompt,
+    tools: memeCoinTools,
+  });
+
 
   const [wallet, setWallet] = useState({
     address: '',
@@ -74,13 +84,29 @@ export const App = () => {
       if (event.data && event.data.namespace === 'KAVA_CHAT') {
         console.info('event received from parent: ', event);
         switch (event.data.type) {
-          case 'WALLET_CONNECTION/V1':
+          case 'WALLET_CONNECTION/V1': {
             console.info('WALLET_CONNECTION', event.data);
             setWallet({
               address: event.data.payload.address,
               chainID: event.data.payload.chainID,
             });
             break;
+          }
+          case 'SET_SYSTEM_PROMPT/V1': {
+            const systemPrompt = event.data.payload.systemPrompt;
+            setConfig((prev) => ({ ...prev, systemPrompt }));
+            break;
+          }
+          case 'SET_TOOLS/V1': {
+            const tools = event.data.payload.tools;
+            setConfig((prev) => ({ ...prev, tools }));
+            break;
+          }
+          case `SET_INTRO_TEXT/v1`: {
+            const introText = event.data.payload.introText;
+            setConfig((prev) => ({ ...prev, introText }));
+            break;
+          }
           default:
             console.warn('unknown event type', event.type);
             break;
@@ -99,6 +125,7 @@ export const App = () => {
     };
   }, []);
 
+
   const messages = useSyncExternalStore(
     messageHistoryStore.subscribe,
     messageHistoryStore.getSnapshot,
@@ -111,6 +138,12 @@ export const App = () => {
       });
     }
   }, []);
+
+  // update system prompt, when it changes
+  useEffect(() => {
+    const remainingMsgs = messageHistoryStore.getSnapshot().slice(1);
+    messageHistoryStore.setMessages([{ role: 'system', content: systemPrompt }, ...remainingMsgs])
+  }, [systemPrompt]);
 
   // use is sending request to signify to the chat view that
   // a request is in progress so it can disable inputs
@@ -172,7 +205,7 @@ export const App = () => {
         controllerRef.current = null;
       }
     },
-    [isRequesting, messages],
+    [isRequesting, messages, tools],
   );
 
   const handleCancel = useCallback(() => {
@@ -194,6 +227,7 @@ export const App = () => {
     <>
       {isReady && (
         <ChatView
+          introText={introText}
           address={wallet.address}
           chainID={wallet.chainID}
           messages={messages}
