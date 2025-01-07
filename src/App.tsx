@@ -335,6 +335,10 @@ async function callTools(
 ): Promise<void> {
   for (const toolCall of toolCallStreamStore.getSnapShot()) {
     const name = toolCall.function?.name;
+    if (window.top !== window.self){
+      // todo(sah): emit tool call events to parent 
+    }
+    
     switch (name) {
       case ToolFunctions.GENERATE_COIN_METADATA: {
         const args = toolCall.function.arguments as GenerateCoinMetadataParams;
