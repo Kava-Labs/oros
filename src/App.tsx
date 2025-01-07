@@ -19,28 +19,7 @@ import { imagedb } from './imagedb';
 import { v4 as uuidv4 } from 'uuid';
 import { ToolCallStreamStore } from './toolCallStreamStore';
 import { ToolFunctions, type GenerateCoinMetadataParams } from './tools/types';
-
-interface WalletConnectionPayload {
-  address: string;
-  walletName: string;
-  chainID: string;
-}
-
-// Map the type property to specific payloads
-type MessagePayloads = {
-  WALLET_CONNECTION: WalletConnectionPayload;
-};
-
-// Main message type
-type IFrameMessage<T extends keyof MessagePayloads> = {
-  namespace: 'KAVA_CHAT';
-  version: '1';
-  type: T;
-  payload: MessagePayloads[T];
-};
-
-// union type of all possible messages (only one exists now)
-type AnyIFrameMessage = IFrameMessage<'WALLET_CONNECTION'>;
+import type { AnyIFrameMessage } from './types';
 
 let client: OpenAI | null = null;
 
