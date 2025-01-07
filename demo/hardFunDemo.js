@@ -80,8 +80,7 @@ const connectWallet = async (iframe) => {
       iframe.contentWindow.postMessage(
         {
           namespace: 'KAVA_CHAT',
-          version: '1',
-          type: 'WALLET_CONNECTION',
+          type: 'WALLET_CONNECTION/V1',
           payload: {
             address: accounts[0],
             walletName: 'MetaMask',

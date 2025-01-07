@@ -65,7 +65,7 @@ export const App = () => {
       if (event.data && event.data.namespace === 'KAVA_CHAT') {
         console.info('event received from parent: ', event);
         switch (event.data.type) {
-          case 'WALLET_CONNECTION':
+          case 'WALLET_CONNECTION/V1':
             console.info('WALLET_CONNECTION', event.data);
             setWallet({
               address: event.data.payload.address,
