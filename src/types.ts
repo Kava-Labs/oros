@@ -1,4 +1,5 @@
 import type { ChatCompletionTool } from 'openai/resources/index';
+import { ToolCallStream } from './toolCallStreamStore';
 
 export interface WalletConnectionPayloadV1 {
   address: string;
@@ -14,8 +15,13 @@ export interface SetToolsPayloadV1 {
   tools: ChatCompletionTool[];
 }
 
-export interface SetIntroTextV1 {
+export interface SetIntroTextPayloadV1 {
   introText: string;
+}
+
+export interface ToolCallResponsePayloadV1 {
+  toolCall: ToolCallStream; // the tool call
+  content: string; // tool call response string
 }
 
 // Map the type property to specific payloads
@@ -23,7 +29,8 @@ export type MessagePayloads = {
   'WALLET_CONNECTION/V1': WalletConnectionPayloadV1;
   'SET_SYSTEM_PROMPT/V1': SetSystemPromptPayloadV1;
   'SET_TOOLS/V1': SetToolsPayloadV1;
-  'SET_INTRO_TEXT/V1': SetIntroTextV1;
+  'SET_INTRO_TEXT/V1': SetIntroTextPayloadV1;
+  'TOOL_CALL_RESPONSE/V1': ToolCallResponsePayloadV1;
 };
 
 // Main message type
@@ -38,4 +45,5 @@ export type AnyIFrameMessage =
   | IFrameMessage<'WALLET_CONNECTION/V1'>
   | IFrameMessage<'SET_TOOLS/V1'>
   | IFrameMessage<'SET_SYSTEM_PROMPT/V1'>
-  | IFrameMessage<'SET_INTRO_TEXT/V1'>;
+  | IFrameMessage<'SET_INTRO_TEXT/V1'>
+  | IFrameMessage<'TOOL_CALL_RESPONSE/V1'>;

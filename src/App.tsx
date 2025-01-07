@@ -51,6 +51,14 @@ export const App = () => {
   const [messages, setMessages] = useState<ChatCompletionMessageParam[]>([
     { role: 'system' as const, content: systemPrompt },
   ]);
+  // Ensure local messages always matches the state messages
+  const publishMessage = (
+    messages: ChatCompletionMessageParam[],
+    message: ChatCompletionMessageParam,
+  ) => {
+    messages.push(message);
+    setMessages([...messages]);
+  };
 
   const [wallet, setWallet] = useState({
     address: '',
@@ -103,6 +111,30 @@ export const App = () => {
             console.info('SET_INTRO_TEXT/V1', event.data);
             const introText = event.data.payload.introText;
             setConfig((prev) => ({ ...prev, introText }));
+            break;
+          }
+
+          case `TOOL_CALL_RESPONSE/V1`: {
+            console.info(`TOOL_CALL_RESPONSE/V1`, event.data);
+            const toolCall = event.data.payload.toolCall;
+            const content = event.data.payload.content;
+            publishMessage(messages, {
+              role: 'assistant' as const,
+              function_call: null,
+              content: null,
+              tool_calls: [
+                toolCallStreamStore.toChatCompletionMessageToolCall(toolCall),
+              ],
+            });
+
+            toolCallStreamStore.deleteToolCallById(toolCall.id);
+
+            publishMessage(messages, {
+              role: 'tool' as const,
+              tool_call_id: toolCall.id,
+              content,
+            });
+
             break;
           }
           default:
@@ -159,15 +191,6 @@ export const App = () => {
         { role: 'user' as const, content: value },
       ];
       setMessages(newMessages);
-
-      // Ensure local messages always matches the state messages
-      const publishMessage = (
-        messages: ChatCompletionMessageParam[],
-        message: ChatCompletionMessageParam,
-      ) => {
-        messages.push(message);
-        setMessages([...messages]);
-      };
 
       // Call chat completions and resolve all tool calls.
       //
