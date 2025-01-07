@@ -80,7 +80,7 @@ export const App = () => {
         console.info('event received from parent: ', event);
         switch (event.data.type) {
           case 'WALLET_CONNECTION/V1': {
-            console.info('WALLET_CONNECTION', event.data);
+            console.info('WALLET_CONNECTION/V1', event.data);
             setWallet({
               address: event.data.payload.address,
               chainID: event.data.payload.chainID,
@@ -88,16 +88,19 @@ export const App = () => {
             break;
           }
           case 'SET_SYSTEM_PROMPT/V1': {
+            console.info('SET_SYSTEM_PROMPT/V1', event.data);
             const systemPrompt = event.data.payload.systemPrompt;
             setConfig((prev) => ({ ...prev, systemPrompt }));
             break;
           }
           case 'SET_TOOLS/V1': {
+            console.info('SET_TOOLS/V1', event.data);
             const tools = event.data.payload.tools;
             setConfig((prev) => ({ ...prev, tools }));
             break;
           }
-          case `SET_INTRO_TEXT/v1`: {
+          case `SET_INTRO_TEXT/V1`: {
+            console.info('SET_INTRO_TEXT/V1', event.data);
             const introText = event.data.payload.introText;
             setConfig((prev) => ({ ...prev, introText }));
             break;
@@ -335,10 +338,10 @@ async function callTools(
 ): Promise<void> {
   for (const toolCall of toolCallStreamStore.getSnapShot()) {
     const name = toolCall.function?.name;
-    if (window.top !== window.self){
-      // todo(sah): emit tool call events to parent 
+    if (window.top !== window.self) {
+      // todo(sah): emit tool call events to parent
     }
-    
+
     switch (name) {
       case ToolFunctions.GENERATE_COIN_METADATA: {
         const args = toolCall.function.arguments as GenerateCoinMetadataParams;

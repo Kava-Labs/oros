@@ -23,7 +23,7 @@ export type MessagePayloads = {
   'WALLET_CONNECTION/V1': WalletConnectionPayloadV1;
   'SET_SYSTEM_PROMPT/V1': SetSystemPromptPayloadV1;
   'SET_TOOLS/V1': SetToolsPayloadV1;
-  'SET_INTRO_TEXT/v1': SetIntroTextV1;
+  'SET_INTRO_TEXT/V1': SetIntroTextV1;
 };
 
 // Main message type
@@ -38,4 +38,4 @@ export type AnyIFrameMessage =
   | IFrameMessage<'WALLET_CONNECTION/V1'>
   | IFrameMessage<'SET_TOOLS/V1'>
   | IFrameMessage<'SET_SYSTEM_PROMPT/V1'>
-  | IFrameMessage<'SET_INTRO_TEXT/v1'>;
+  | IFrameMessage<'SET_INTRO_TEXT/V1'>;
