@@ -20,6 +20,28 @@ import { v4 as uuidv4 } from 'uuid';
 import { ToolCallStreamStore } from './toolCallStreamStore';
 import { ToolFunctions, type GenerateCoinMetadataParams } from './tools/types';
 
+interface WalletConnectionPayload {
+  address: string;
+  walletName: string;
+  chainID: string;
+}
+
+// Map the type property to specific payloads
+type MessagePayloads = {
+  WALLET_CONNECTION: WalletConnectionPayload;
+};
+
+// Main message type
+type IFrameMessage<T extends keyof MessagePayloads> = {
+  namespace: 'KAVA_CHAT';
+  version: '1';
+  type: T;
+  payload: MessagePayloads[T];
+};
+
+// union type of all possible messages (only one exists now)
+type AnyIFrameMessage = IFrameMessage<'WALLET_CONNECTION'>;
+
 let client: OpenAI | null = null;
 
 const CHAT_MODEL = import.meta.env['VITE_CHAT_MODEL'] ?? 'gpt-4o-mini';
@@ -59,7 +81,7 @@ export const App = () => {
   }, []);
 
   useEffect(() => {
-    const parentMessageHandler = (event: MessageEvent<any>) => {
+    const parentMessageHandler = (event: MessageEvent<AnyIFrameMessage>) => {
       // Handle the message
       if (event.data && event.data.namespace === 'KAVA_CHAT') {
         console.info('event received from parent: ', event);
@@ -88,7 +110,6 @@ export const App = () => {
       }
     };
   }, []);
-
 
   // store entire thread of messages in state
   const [messages, setMessages] = useState<ChatCompletionMessageParam[]>([
