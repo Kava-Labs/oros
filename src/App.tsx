@@ -28,9 +28,8 @@ import { ToolCallStreamStore } from './toolCallStreamStore';
 import { ToolFunctions, type GenerateCoinMetadataParams } from './tools/types';
 import type { AnyIFrameMessage } from './types';
 import { MessageHistoryStore } from './messageHistoryStore';
-import { navigationSystemPrompt } from './config/navigationSystemPrompt';
 import { navigateToPage } from './config/toolFunctions';
-import { memecoinSystemPrompt } from './config';
+import { memecoinSystemPrompt, navigationSystemPrompt } from './config';
 
 let client: OpenAI | null = null;
 
