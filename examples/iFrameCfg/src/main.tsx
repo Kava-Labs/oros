@@ -3,6 +3,54 @@ import { createRoot } from 'react-dom/client';
 
 const IFRAME_ORIGIN = 'http://localhost:3000/';
 
+const tools = [
+  {
+    type: 'function',
+    function: {
+      name: 'fetchWeather',
+      description: 'gets the current weather for a given place in the US',
+      parameters: {
+        type: 'object',
+        properties: {
+          city: {
+            type: 'string',
+            description: 'the name of the city',
+          },
+          state: {
+            type: 'string',
+            description: 'the name of the state',
+          },
+        },
+        required: ['city', 'state'],
+        strict: true,
+        additionalProperties: false,
+      },
+    },
+  },
+];
+
+const fetchWeather = async ({
+  state,
+  city,
+}: {
+  state: string;
+  city: string;
+}) => {
+  const randomTemperature = Math.floor(Math.random() * (90 - 32 + 1)) + 32;
+
+  await new Promise((resolve) =>
+    setTimeout(() => {
+      resolve(1);
+    }, 2000),
+  );
+
+  return {
+    city,
+    state,
+    temperature: randomTemperature,
+  };
+};
+
 const setOrosConfig = (
   cw: Window,
   cfg: {
@@ -53,9 +101,9 @@ const App = () => {
     if (orosRef.current?.contentWindow) {
       setLoaded(true);
       setOrosConfig(orosRef.current.contentWindow, {
-        introText: 'hi', // todo: set up
-        systemPrompt: 'hello', // todo: set up
-        tools: [], // todo: add a tool call
+        introText: 'hi, tell me which city you want the weather for.',
+        systemPrompt: 'you help fetch the weather',
+        tools,
       });
     }
   };
@@ -65,8 +113,27 @@ const App = () => {
       return;
     }
 
-    const msgHandler = (msg: MessageEvent<any>) => {
-      // todo: handle tool call events
+    const msgHandler = async (msg: MessageEvent<any>) => {
+      if (msg.data.type === 'TOOL_CALL') {
+        const tc = msg.data.payload.toolCall;
+        console.log(tc);
+        if (tc.function.name === 'fetchWeather') {
+          const res = await fetchWeather(tc.function.arguments);
+          const content = JSON.stringify(res);
+          // send the tool call response back to the iframe
+          orosRef.current!.contentWindow!.postMessage(
+            {
+              namespace: 'KAVA_CHAT',
+              type: 'TOOL_CALL_RESPONSE/V1',
+              payload: {
+                toolCall: tc,
+                content,
+              },
+            },
+            IFRAME_ORIGIN,
+          );
+        }
+      }
     };
 
     window.addEventListener('message', msgHandler);
@@ -80,16 +147,6 @@ const App = () => {
 
   return (
     <div>
-      <div>
-        <button
-          style={{ marginBottom: '16px' }}
-          onClick={() => {
-            // todo: connect to metamask
-          }}
-        >
-          Connect To Metamask
-        </button>
-      </div>
       <div>
         <iframe
           onLoad={onIframeLoaded}
