@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { systemPrompt } from '../src/config';
+import { memecoinSystemPrompt } from '../src/config';
 import { Chat } from './Chat';
 
 test('renders intro message', async ({ page }) => {
@@ -104,7 +104,7 @@ test.skip('messages from the UI populate local storage', async ({ page }) => {
     messages: [
       {
         role: 'system',
-        content: systemPrompt,
+        content: memecoinSystemPrompt,
       },
       {
         role: 'user',
@@ -140,7 +140,7 @@ test.skip('clicking reset chat button clears chatMessages from local storage', a
     messages: [
       {
         role: 'system',
-        content: systemPrompt,
+        content: memecoinSystemPrompt,
       },
       {
         role: 'user',

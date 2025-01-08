@@ -30,11 +30,16 @@ import type { AnyIFrameMessage } from './types';
 import { MessageHistoryStore } from './messageHistoryStore';
 import { navigationSystemPrompt } from './config/navigationSystemPrompt';
 import { navigateToPage } from './config/toolFunctions';
+import { memecoinSystemPrompt } from './config';
 
 let client: OpenAI | null = null;
 
 const CHAT_MODEL = import.meta.env['VITE_CHAT_MODEL'] ?? 'gpt-4o-mini';
 const IMAGE_GEN_MODEL = import.meta.env['VITE_IMAGE_GEN_MODEL'] ?? 'dall-e-3';
+const SYSTEM_PROMPT =
+  import.meta.env['VITE_KAVA_WEBAPP'] === 'true'
+    ? navigationSystemPrompt
+    : memecoinSystemPrompt;
 
 if (import.meta.env['MODE'] === 'development') {
   console.info({
@@ -104,11 +109,12 @@ export const App = () => {
     messageHistoryStore.subscribe,
     messageHistoryStore.getSnapshot,
   );
+
   useEffect(() => {
     if (!messageHistoryStore.getSnapshot().length) {
       messageHistoryStore.addMessage({
         role: 'system' as const,
-        content: navigationSystemPrompt,
+        content: SYSTEM_PROMPT,
       });
     }
   }, []);
@@ -187,7 +193,7 @@ export const App = () => {
   const handleReset = useCallback(() => {
     handleCancel();
     messageHistoryStore.setMessages([
-      { role: 'system' as const, content: navigationSystemPrompt },
+      { role: 'system' as const, content: SYSTEM_PROMPT },
     ]);
   }, [handleCancel]);
 
@@ -374,7 +380,7 @@ async function callTools(
 
           toolCallStreamStore.deleteToolCallById(toolCall.id);
 
-          await navigateToPage(args.url as string);
+          await navigateToPage(args.url);
         } catch (error) {
           console.error('Navigation failed:', error);
         }
