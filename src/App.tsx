@@ -56,7 +56,6 @@ export const App = () => {
     tools: memeCoinTools,
   });
 
-
   const [wallet, setWallet] = useState({
     address: '',
     chainID: '',
@@ -123,13 +122,13 @@ export const App = () => {
               tool_calls: [
                 toolCallStreamStore.toChatCompletionMessageToolCall(toolCall),
               ],
-            })
+            });
             toolCallStreamStore.deleteToolCallById(toolCall.id);
             messageHistoryStore.addMessage({
               role: 'tool' as const,
               tool_call_id: toolCall.id,
               content,
-            })
+            });
             break;
           }
           default:
@@ -150,7 +149,6 @@ export const App = () => {
     };
   }, []);
 
-
   const messages = useSyncExternalStore(
     messageHistoryStore.subscribe,
     messageHistoryStore.getSnapshot,
@@ -167,7 +165,10 @@ export const App = () => {
   // update system prompt, when it changes
   useEffect(() => {
     const remainingMsgs = messageHistoryStore.getSnapshot().slice(1);
-    messageHistoryStore.setMessages([{ role: 'system', content: systemPrompt }, ...remainingMsgs])
+    messageHistoryStore.setMessages([
+      { role: 'system', content: systemPrompt },
+      ...remainingMsgs,
+    ]);
   }, [systemPrompt]);
 
   // use is sending request to signify to the chat view that
