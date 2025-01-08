@@ -118,7 +118,8 @@ export const App = () => {
             console.info(`TOOL_CALL_RESPONSE/V1`, event.data);
             const toolCall = event.data.payload.toolCall;
             const content = event.data.payload.content;
-            setMessages((messages) => [
+
+            const newMessages = [
               ...messages,
               {
                 role: 'assistant' as const,
@@ -128,18 +129,27 @@ export const App = () => {
                   toolCallStreamStore.toChatCompletionMessageToolCall(toolCall),
                 ],
               },
-            ]);
-
-            toolCallStreamStore.deleteToolCallById(toolCall.id);
-
-            setMessages((messages) => [
-              ...messages,
               {
                 role: 'tool' as const,
                 tool_call_id: toolCall.id,
                 content,
               },
-            ]);
+            ];
+            toolCallStreamStore.deleteToolCallById(toolCall.id);
+            setMessages(newMessages);
+            controllerRef.current = new AbortController();
+            setIsRequesting(true);
+            doChat(
+              controllerRef.current,
+              client!,
+              newMessages,
+              tools,
+              progressStore,
+              messageStore,
+              publishMessage,
+            ).finally(() => {
+              setIsRequesting(false);
+            });
 
             break;
           }
@@ -159,7 +169,7 @@ export const App = () => {
         window.removeEventListener('message', parentMessageHandler);
       }
     };
-  }, []);
+  }, [messages, tools]);
 
   useEffect(() => {
     setMessages((messages) => {
@@ -315,6 +325,12 @@ async function doChat(
     }
 
     if (toolCallStreamStore.getSnapShot().length > 0) {
+      const hadMemeCoinGen =
+        toolCallStreamStore
+          .getSnapShot()
+          .find(
+            (tc) => tc.function.name === ToolFunctions.GENERATE_COIN_METADATA,
+          ) !== undefined;
       await callTools(
         controller,
         client,
@@ -324,15 +340,18 @@ async function doChat(
         publishMessage,
       );
 
-      await doChat(
-        controller,
-        client,
-        messages,
-        tools,
-        progressStore,
-        messageStore,
-        publishMessage,
-      );
+      // prevent infinite loop, for tool calls that are handled in parent iFrame
+      if (hadMemeCoinGen) {
+        await doChat(
+          controller,
+          client,
+          messages,
+          tools,
+          progressStore,
+          messageStore,
+          publishMessage,
+        );
+      }
     }
   } catch (e) {
     console.error(`An error occurred: ${e} `);
