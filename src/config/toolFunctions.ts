@@ -1,5 +1,4 @@
-export const navigateToPage = async (url: string) => {
-  console.log(`Navigate to ${url}`);
+export const navigateToPage = (url: string) => {
   window.parent.postMessage(
     {
       namespace: 'KAVA_CHAT',

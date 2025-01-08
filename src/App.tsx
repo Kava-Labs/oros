@@ -380,7 +380,7 @@ async function callTools(
 
           toolCallStreamStore.deleteToolCallById(toolCall.id);
 
-          await navigateToPage(args.url);
+          navigateToPage(args.url);
         } catch (error) {
           console.error('Navigation failed:', error);
         }
