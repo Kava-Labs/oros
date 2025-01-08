@@ -65,6 +65,16 @@ const App = () => {
       return;
     }
 
+    const msgHandler = (msg: MessageEvent<any>) => {
+      // todo: handle tool call events
+    };
+
+    window.addEventListener('message', msgHandler);
+
+    return () => {
+      window.removeEventListener('message', msgHandler);
+    };
+
     // todo: register a listener to read events from the iframe
   }, [loaded]);
 
