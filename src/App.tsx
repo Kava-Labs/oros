@@ -118,22 +118,28 @@ export const App = () => {
             console.info(`TOOL_CALL_RESPONSE/V1`, event.data);
             const toolCall = event.data.payload.toolCall;
             const content = event.data.payload.content;
-            publishMessage(messages, {
-              role: 'assistant' as const,
-              function_call: null,
-              content: null,
-              tool_calls: [
-                toolCallStreamStore.toChatCompletionMessageToolCall(toolCall),
-              ],
-            });
+            setMessages((messages) => [
+              ...messages,
+              {
+                role: 'assistant' as const,
+                function_call: null,
+                content: null,
+                tool_calls: [
+                  toolCallStreamStore.toChatCompletionMessageToolCall(toolCall),
+                ],
+              },
+            ]);
 
             toolCallStreamStore.deleteToolCallById(toolCall.id);
 
-            publishMessage(messages, {
-              role: 'tool' as const,
-              tool_call_id: toolCall.id,
-              content,
-            });
+            setMessages((messages) => [
+              ...messages,
+              {
+                role: 'tool' as const,
+                tool_call_id: toolCall.id,
+                content,
+              },
+            ]);
 
             break;
           }
