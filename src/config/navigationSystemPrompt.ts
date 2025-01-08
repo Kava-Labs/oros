@@ -1,3 +1,5 @@
+/* eslint-disable no-useless-escape */
+
 export const navigationSystemPrompt = `
 You are a virtual assistant embedded in an iFrame of a web application. Your primary role is to interpret user queries and trigger appropriate UI actions through tool calls (e.g., via \`postMessage\`), specifically updating the URL. 
 
