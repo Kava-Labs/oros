@@ -1,12 +1,20 @@
-import { useRef, useState, useEffect, useCallback } from 'react';
+import {
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+  useSyncExternalStore,
+} from 'react';
 import { ChatView } from './ChatView';
 import { getToken } from './utils/token/token';
 import OpenAI from 'openai';
-import { messageStore, progressStore, toolCallStreamStore } from './store';
-import type {
-  ChatCompletionMessageParam,
-  ChatCompletionTool,
-} from 'openai/resources/index';
+import {
+  messageHistoryStore,
+  messageStore,
+  progressStore,
+  toolCallStreamStore,
+} from './store';
+import type { ChatCompletionTool } from 'openai/resources/index';
 import {
   isContentChunk,
   isToolCallChunk,
@@ -20,6 +28,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ToolCallStreamStore } from './toolCallStreamStore';
 import { ToolFunctions, type GenerateCoinMetadataParams } from './tools/types';
 import type { AnyIFrameMessage } from './types';
+import { MessageHistoryStore } from './messageHistoryStore';
 
 let client: OpenAI | null = null;
 
@@ -90,10 +99,19 @@ export const App = () => {
     };
   }, []);
 
-  // store entire thread of messages in state
-  const [messages, setMessages] = useState<ChatCompletionMessageParam[]>([
-    { role: 'system' as const, content: systemPrompt },
-  ]);
+  const messages = useSyncExternalStore(
+    messageHistoryStore.subscribe,
+    messageHistoryStore.getSnapshot,
+  );
+  useEffect(() => {
+    if (!messageHistoryStore.getSnapshot().length) {
+      messageHistoryStore.addMessage({
+        role: 'system' as const,
+        content: systemPrompt,
+      });
+    }
+  }, []);
+
   // use is sending request to signify to the chat view that
   // a request is in progress so it can disable inputs
   const [isRequesting, setIsRequesting] = useState(false);
@@ -118,20 +136,8 @@ export const App = () => {
       setIsRequesting(true);
 
       // Add the user message to the UI
-      const newMessages = [
-        ...messages,
-        { role: 'user' as const, content: value },
-      ];
-      setMessages(newMessages);
 
-      // Ensure local messages always matches the state messages
-      const publishMessage = (
-        messages: ChatCompletionMessageParam[],
-        message: ChatCompletionMessageParam,
-      ) => {
-        messages.push(message);
-        setMessages([...messages]);
-      };
+      messageHistoryStore.addMessage({ role: 'user' as const, content: value });
 
       // Call chat completions and resolve all tool calls.
       //
@@ -144,11 +150,10 @@ export const App = () => {
         await doChat(
           controller,
           client,
-          newMessages,
+          messageHistoryStore,
           tools,
           progressStore,
           messageStore,
-          publishMessage,
         );
       } catch (error) {
         let errorMessage =
@@ -180,7 +185,9 @@ export const App = () => {
 
   const handleReset = useCallback(() => {
     handleCancel();
-    setMessages([{ role: 'system' as const, content: systemPrompt }]);
+    messageHistoryStore.setMessages([
+      { role: 'system' as const, content: systemPrompt },
+    ]);
   }, [handleCancel]);
 
   return (
@@ -204,21 +211,17 @@ export const App = () => {
 async function doChat(
   controller: AbortController,
   client: OpenAI,
-  messages: ChatCompletionMessageParam[],
+  messageHistoryStore: MessageHistoryStore,
   tools: ChatCompletionTool[],
   progressStore: TextStreamStore,
   messageStore: TextStreamStore,
-  publishMessage: (
-    messages: ChatCompletionMessageParam[],
-    message: ChatCompletionMessageParam,
-  ) => void,
 ) {
   progressStore.setText('Thinking');
   try {
     const stream = await client.chat.completions.create(
       {
         model: CHAT_MODEL,
-        messages: messages,
+        messages: messageHistoryStore.getSnapshot(),
         tools: tools,
         stream: true,
       },
@@ -241,10 +244,11 @@ async function doChat(
 
     // Push a message
     if (messageStore.getSnapshot() !== '') {
-      publishMessage(messages, {
+      messageHistoryStore.addMessage({
         role: 'assistant' as const,
         content: messageStore.getSnapshot(),
       });
+
       messageStore.setText('');
     }
 
@@ -252,20 +256,18 @@ async function doChat(
       await callTools(
         controller,
         client,
-        messages,
+        messageHistoryStore,
         toolCallStreamStore,
         progressStore,
-        publishMessage,
       );
 
       await doChat(
         controller,
         client,
-        messages,
+        messageHistoryStore,
         tools,
         progressStore,
         messageStore,
-        publishMessage,
       );
     }
   } catch (e) {
@@ -279,7 +281,7 @@ async function doChat(
 
     // Ensure content is published on abort
     if (messageStore.getSnapshot() !== '') {
-      publishMessage(messages, {
+      messageHistoryStore.addMessage({
         role: 'assistant' as const,
         content: messageStore.getSnapshot(),
       });
@@ -291,13 +293,9 @@ async function doChat(
 async function callTools(
   controller: AbortController,
   client: OpenAI,
-  messages: ChatCompletionMessageParam[],
+  messageHistoryStore: MessageHistoryStore,
   toolCallStreamStore: ToolCallStreamStore,
   progressStore: TextStreamStore,
-  publishMessage: (
-    messages: ChatCompletionMessageParam[],
-    message: ChatCompletionMessageParam,
-  ) => void,
 ): Promise<void> {
   for (const toolCall of toolCallStreamStore.getSnapShot()) {
     const name = toolCall.function?.name;
@@ -325,7 +323,7 @@ async function callTools(
           })(),
         );
 
-        publishMessage(messages, {
+        messageHistoryStore.addMessage({
           role: 'assistant' as const,
           function_call: null,
           content: null,
@@ -336,7 +334,7 @@ async function callTools(
 
         toolCallStreamStore.deleteToolCallById(toolCall.id);
 
-        publishMessage(messages, {
+        messageHistoryStore.addMessage({
           role: 'tool' as const,
           tool_call_id: toolCall.id!,
           content: JSON.stringify({

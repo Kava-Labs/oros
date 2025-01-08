@@ -87,7 +87,6 @@ export const ChatView = ({
     }
   };
 
-  console.log(address, chainID, 'here');
   return (
     <div id={styles.chatview} data-testid="chatview">
       <div
