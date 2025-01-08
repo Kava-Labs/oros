@@ -110,4 +110,24 @@ export const tools: ChatCompletionTool[] = [
       },
     },
   },
+  {
+    type: 'function',
+    function: {
+      name: ToolFunctions.NAVIGATE_TO_PAGE,
+      description:
+        'navigates to the balances page at /balances so a user can view their positions and possibly take more actions',
+      parameters: {
+        type: 'object',
+        properties: {
+          url: {
+            type: 'string',
+            description: 'the url of the page to navigate to',
+          },
+        },
+        required: ['url'],
+        strict: true,
+        additionalProperties: false,
+      },
+    },
+  },
 ];

@@ -21,4 +21,5 @@ export type GenerateCoinMetadataResponse = {
 
 export enum ToolFunctions {
   GENERATE_COIN_METADATA = 'generateCoinMetadata',
+  NAVIGATE_TO_PAGE = 'navigateToPage',
 }

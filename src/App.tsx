@@ -21,7 +21,6 @@ import {
   assembleToolCallsFromStream,
 } from './streamUtils';
 import { TextStreamStore } from './textStreamStore';
-import { systemPrompt } from './config/systemPrompt';
 import { tools } from './config/tools';
 import { imagedb } from './imagedb';
 import { v4 as uuidv4 } from 'uuid';
@@ -29,6 +28,8 @@ import { ToolCallStreamStore } from './toolCallStreamStore';
 import { ToolFunctions, type GenerateCoinMetadataParams } from './tools/types';
 import type { AnyIFrameMessage } from './types';
 import { MessageHistoryStore } from './messageHistoryStore';
+import { navigationSystemPrompt } from './config/navigationSystemPrompt';
+import { navigateToPage } from './config/toolFunctions';
 
 let client: OpenAI | null = null;
 
@@ -42,25 +43,6 @@ if (import.meta.env['MODE'] === 'development') {
   });
 }
 
-export enum UIActionType {
-  NAVIGATE = 'NAVIGATE',
-  CLICK_TEST_ID = 'CLICK_TEST_ID',
-  FILL_AMOUNT = 'FILL_AMOUNT',
-  FILL_ADDRESS = 'FILL_ADDRESS',
-  INITIATE_TX = 'INITIATE_TX',
-}
-
-export interface UICommand {
-  action: UIActionType;
-  path?: string;
-  targetId?: string;
-}
-
-export interface UIAutomationMessage {
-  type: 'UI_AUTOMATION';
-  payload: UICommand[];
-}
-
 export const App = () => {
   // Do not load UI/UX until openAI client is ready
   const [isReady, setIsReady] = useState(false);
@@ -70,36 +52,6 @@ export const App = () => {
     address: '',
     chainID: '',
   });
-
-  const handleRedirect = (): void => {
-    const message: UIAutomationMessage = {
-      type: 'UI_AUTOMATION',
-      payload: [
-        {
-          action: UIActionType.NAVIGATE,
-          path: '/balances',
-        },
-        {
-          action: UIActionType.CLICK_TEST_ID,
-          targetId: 'send-button',
-        },
-        {
-          action: UIActionType.FILL_ADDRESS,
-          targetId: 'address-input',
-        },
-        {
-          action: UIActionType.FILL_AMOUNT,
-          targetId: 'balance-input',
-        },
-        {
-          action: UIActionType.INITIATE_TX,
-          targetId: 'modal-send-button',
-        },
-      ],
-    };
-
-    window.parent.postMessage(message, '*');
-  };
 
   // TODO: check healthcheck and set error if backend is not availiable
   useEffect(() => {
@@ -156,7 +108,7 @@ export const App = () => {
     if (!messageHistoryStore.getSnapshot().length) {
       messageHistoryStore.addMessage({
         role: 'system' as const,
-        content: systemPrompt,
+        content: navigationSystemPrompt,
       });
     }
   }, []);
@@ -235,25 +187,24 @@ export const App = () => {
   const handleReset = useCallback(() => {
     handleCancel();
     messageHistoryStore.setMessages([
-      { role: 'system' as const, content: systemPrompt },
+      { role: 'system' as const, content: navigationSystemPrompt },
     ]);
   }, [handleCancel]);
 
   return (
     <>
-      {/*{isReady && (*/}
-      {/*  <ChatView*/}
-      {/*    address={wallet.address}*/}
-      {/*    chainID={wallet.chainID}*/}
-      {/*    messages={messages}*/}
-      {/*    onSubmit={handleChatCompletion}*/}
-      {/*    onReset={handleReset}*/}
-      {/*    onCancel={handleCancel}*/}
-      {/*    isRequesting={isRequesting}*/}
-      {/*    errorText={errorText}*/}
-      {/*  />*/}
-      {/*)}*/}
-      <button onClick={handleRedirect}>Send KAVA</button>
+      {isReady && (
+        <ChatView
+          address={wallet.address}
+          chainID={wallet.chainID}
+          messages={messages}
+          onSubmit={handleChatCompletion}
+          onReset={handleReset}
+          onCancel={handleCancel}
+          isRequesting={isRequesting}
+          errorText={errorText}
+        />
+      )}
     </>
   );
 };
@@ -400,447 +351,37 @@ async function callTools(
 
         break;
       }
+      case ToolFunctions.NAVIGATE_TO_PAGE: {
+        try {
+          const args = toolCall.function.arguments as Record<string, string>;
+
+          messageHistoryStore.addMessage({
+            role: 'assistant' as const,
+            function_call: null,
+            content: null,
+            tool_calls: [
+              toolCallStreamStore.toChatCompletionMessageToolCall(toolCall),
+            ],
+          });
+
+          messageHistoryStore.addMessage({
+            role: 'tool' as const,
+            tool_call_id: toolCall.id!,
+            content: JSON.stringify({
+              url: args.url,
+            }),
+          });
+
+          toolCallStreamStore.deleteToolCallById(toolCall.id);
+
+          await navigateToPage(args.url as string);
+        } catch (error) {
+          console.error('Navigation failed:', error);
+        }
+        break;
+      }
       default:
         throw new Error(`unknown tool call: ${name}`);
     }
   }
 }
-
-//import { useRef, useState, useEffect } from 'react';
-// import { ChatView } from './ChatView';
-// import { getToken } from './utils/token/token';
-// import OpenAI from 'openai';
-// import { messageStore, progressStore } from './store';
-// import type {
-//   ChatCompletionMessageParam,
-//   ChatCompletionChunk,
-//   ChatCompletionTool,
-//   ChatCompletionMessageToolCall,
-// } from 'openai/resources/index';
-// import {
-//   isContentChunk,
-//   isToolCallChunk,
-//   assembleToolCallsFromStream,
-// } from './streamUtils';
-// import { TextStreamStore } from './textStreamStore';
-// import { memecoinSystemPrompt } from './config/memecoinSystemPrompt';
-// import { tools } from './config/tools';
-// import { imagedb } from './imagedb';
-// import { v4 as uuidv4 } from 'uuid';
-// // import { toast } from 'react-toastify';
-// // import PromptToggle from './PromptToggle';
-// import { transferAsset } from './tools/toolFunctions';
-// import { transferAssetSystemPrompt } from './config/transferAssetSystemPrompt';
-//
-// let client: OpenAI | null = null;
-//
-// export interface IMaskedMessage {
-//   output: string;
-//   masksToValues: Record<string, string>;
-//   valuesToMasks: Record<string, string>;
-// }
-// // types.ts
-// export enum UIActionType {
-//   NAVIGATE = 'NAVIGATE',
-//   CLICK_TEST_ID = 'CLICK_TEST_ID',
-//   FILL_AMOUNT = 'FILL_AMOUNT',
-//   FILL_ADDRESS = 'FILL_ADDRESS',
-//   INITIATE_TX = 'INITIATE_TX',
-// }
-//
-// export interface UICommand {
-//   action: UIActionType;
-//   path?: string;
-//   targetId?: string;
-// }
-//
-// export interface UIAutomationMessage {
-//   type: 'UI_AUTOMATION';
-//   payload: UICommand[];
-// }
-// export const App = () => {
-//   // Do not load UI/UX until openAI client is ready
-//   const [isReady, setIsReady] = useState(false);
-//   const [errorText, setErrorText] = useState('');
-//   const [maskedMessage, setMaskedMessage] = useState<IMaskedMessage>({
-//     output: '',
-//     masksToValues: {},
-//     valuesToMasks: {},
-//   });
-//
-//   const [systemPrompt, setSystemPrompt] = useState(transferAssetSystemPrompt);
-//
-//   useEffect(() => {
-//     handleReset();
-//     setSystemPrompt(systemPrompt);
-//   }, [systemPrompt]);
-//
-//   // iframeComponent.tsx
-//   const handleRedirect = (): void => {
-//     const message: UIAutomationMessage = {
-//       type: 'UI_AUTOMATION',
-//       payload: [
-//         {
-//           action: UIActionType.NAVIGATE,
-//           path: '/balances',
-//         },
-//         {
-//           action: UIActionType.CLICK_TEST_ID,
-//           targetId: 'send-button',
-//         },
-//         {
-//           action: UIActionType.FILL_ADDRESS,
-//           targetId: 'address-input',
-//         },
-//         {
-//           action: UIActionType.FILL_AMOUNT,
-//           targetId: 'balance-input',
-//         },
-//         {
-//           action: UIActionType.INITIATE_TX,
-//           targetId: 'modal-send-button',
-//         },
-//       ],
-//     };
-//
-//     window.parent.postMessage(message, '*');
-//   };
-//
-//   // const memoizedMasksToValues = useMemo(
-//   //   () => maskedMessage.masksToValues,
-//   //   [maskedMessage.masksToValues],
-//   // );
-//   // useEffect(() => {
-//   //   if (shouldUseMask) {
-//   //     if (Object.keys(memoizedMasksToValues).length > 0) {
-//   //       toast.info(`Masked message detected: ${maskedMessage.output}`);
-//   //     } else {
-//   //       toast.dismiss();
-//   //     }
-//   //   }
-//   // }, [memoizedMasksToValues]);
-//
-//   // TODO: check healthcheck and set error if backend is not availiable
-//   useEffect(() => {
-//     try {
-//       client = new OpenAI({
-//         baseURL: import.meta.env['VITE_OPENAI_BASE_URL'],
-//         apiKey: getToken(),
-//         dangerouslyAllowBrowser: true,
-//       });
-//     } catch (err) {
-//       console.error(err);
-//       return;
-//     }
-//
-//     setIsReady(true);
-//   }, []);
-//
-//   // store entire thread of messages in state
-//   const [messages, setMessages] = useState<ChatCompletionMessageParam[]>([
-//     { role: 'system' as const, content: systemPrompt },
-//   ]);
-//   // use is sending request to signify to the chat view that
-//   // a request is in progress so it can disable inputs
-//   const [isRequesting, setIsRequesting] = useState(false);
-//
-//   // abort controller for cancelling openai request
-//   const controllerRef = useRef<AbortController | null>(null);
-//
-//   const handleChatCompletion = async (value: string) => {
-//     if (isRequesting) {
-//       return;
-//     }
-//     // should not happen
-//     if (!client) {
-//       console.error('client usage before ready');
-//       return;
-//     }
-//
-//     // Abort controller integrated with UI
-//     const controller = new AbortController();
-//     controllerRef.current = controller;
-//     setIsRequesting(true);
-//
-//     // Add the user message to the UI
-//     const newMessages = [
-//       ...messages,
-//       { role: 'user' as const, content: value },
-//     ];
-//     setMessages(newMessages);
-//
-//     // Ensure local messages always matches the state messages
-//     const publishMessage = (
-//       messages: ChatCompletionMessageParam[],
-//       message: ChatCompletionMessageParam,
-//     ) => {
-//       messages.push(message);
-//       setMessages([...messages]);
-//     };
-//
-//     // Call chat completions and resolve all tool calls.
-//     //
-//     // This is recursive and completes when all tools calls have been made
-//     // and all follow ups have been completed.
-//     try {
-//       //  clear any existing error
-//       setErrorText('');
-//
-//       await doChat(
-//         controller,
-//         client,
-//         newMessages,
-//         tools,
-//         progressStore,
-//         messageStore,
-//         publishMessage,
-//       );
-//     } catch (error) {
-//       let errorMessage =
-//         typeof error === 'object' && error !== null && 'message' in error
-//           ? (error as { message: string }).message
-//           : 'An error occurred - please try again';
-//
-//       //  Errors can be thrown when recursive call is cancelled
-//       if (errorMessage.includes('JSON')) {
-//         errorMessage = 'You clicked cancel - please try again';
-//       }
-//
-//       setErrorText(errorMessage);
-//     } finally {
-//       setIsRequesting(false);
-//       controllerRef.current = null;
-//     }
-//   };
-//
-//   const handleCancel = () => {
-//     if (controllerRef.current) {
-//       controllerRef.current.abort();
-//       controllerRef.current = null;
-//     }
-//   };
-//
-//   const handleReset = () => {
-//     handleCancel();
-//     setMessages([{ role: 'system' as const, content: systemPrompt }]);
-//   };
-//   // const [shouldUseMask, setShouldUseMask] = useState(false);
-//
-//   return (
-//     <>
-//       {isReady && (
-//         <>
-//           {/*<PromptToggle*/}
-//           {/*  systemPrompt={systemPrompt}*/}
-//           {/*  setSystemPrompt={setSystemPrompt}*/}
-//           {/*  shouldUseMask={shouldUseMask}*/}
-//           {/*  setShouldUseMask={setShouldUseMask}*/}
-//           {/*/>*/}
-//           <button onClick={handleRedirect}>Navigate to balances</button>
-//
-//           <ChatView
-//             messages={messages}
-//             onSubmit={handleChatCompletion}
-//             onReset={handleReset}
-//             onCancel={handleCancel}
-//             isRequesting={isRequesting}
-//             errorText={errorText}
-//             processedMasksToValues={maskedMessage.masksToValues}
-//             processedValuesToMasks={maskedMessage.valuesToMasks}
-//             setMaskedMessage={setMaskedMessage}
-//             systemPrompt={systemPrompt}
-//             // useMask={shouldUseMask}
-//           />
-//         </>
-//       )}
-//     </>
-//   );
-// };
-//
-// async function doChat(
-//   controller: AbortController,
-//   client: OpenAI,
-//   messages: ChatCompletionMessageParam[],
-//   tools: ChatCompletionTool[],
-//   progressStore: TextStreamStore,
-//   messageStore: TextStreamStore,
-//   publishMessage: (
-//     messages: ChatCompletionMessageParam[],
-//     message: ChatCompletionMessageParam,
-//   ) => void,
-// ) {
-//   progressStore.setText('Thinking');
-//   try {
-//     const toolCallsState: ChatCompletionChunk.Choice.Delta.ToolCall[] = [];
-//
-//     const stream = await client.chat.completions.create(
-//       {
-//         model: 'gpt-4',
-//         messages: messages,
-//         tools: tools,
-//         stream: true,
-//       },
-//       {
-//         signal: controller.signal,
-//       },
-//     );
-//
-//     for await (const chunk of stream) {
-//       if (isContentChunk(chunk)) {
-//         if (progressStore.getSnapshot() !== '') {
-//           progressStore.setText('');
-//         }
-//
-//         messageStore.appendText(chunk.choices[0].delta.content as string);
-//       } else if (isToolCallChunk(chunk)) {
-//         assembleToolCallsFromStream(chunk, toolCallsState);
-//       }
-//     }
-//
-//     // Push a message
-//     if (messageStore.getSnapshot() !== '') {
-//       publishMessage(messages, {
-//         role: 'assistant' as const,
-//         content: messageStore.getSnapshot(),
-//       });
-//       messageStore.setText('');
-//     }
-//
-//     if (toolCallsState.length > 0) {
-//       await callTools(
-//         controller,
-//         client,
-//         messages,
-//         toolCallsState,
-//         progressStore,
-//         publishMessage,
-//       );
-//
-//       await doChat(
-//         controller,
-//         client,
-//         messages,
-//         tools,
-//         progressStore,
-//         messageStore,
-//         publishMessage,
-//       );
-//     }
-//   } catch (e) {
-//     console.error(`An error occurred: ${e} `);
-//     throw e;
-//   } finally {
-//     // Clear progress text if not cleared already
-//     if (progressStore.getSnapshot() !== '') {
-//       progressStore.setText('');
-//     }
-//
-//     // Ensure content is published on abort
-//     if (messageStore.getSnapshot() !== '') {
-//       publishMessage(messages, {
-//         role: 'assistant' as const,
-//         content: messageStore.getSnapshot(),
-//       });
-//       messageStore.setText('');
-//     }
-//   }
-// }
-//
-// async function callTools(
-//   controller: AbortController,
-//   client: OpenAI,
-//   messages: ChatCompletionMessageParam[],
-//   toolCalls: ChatCompletionChunk.Choice.Delta.ToolCall[],
-//   progressStore: TextStreamStore,
-//   publishMessage: (
-//     messages: ChatCompletionMessageParam[],
-//     message: ChatCompletionMessageParam,
-//   ) => void,
-// ): Promise<void> {
-//   for (const toolCall of toolCalls) {
-//     const name = toolCall.function?.name;
-//     switch (name) {
-//       case 'generateCoinMetadata': {
-//         const args = JSON.parse(toolCall.function?.arguments || '');
-//         const response = client.images.generate(
-//           {
-//             model: 'dall-e-3',
-//             prompt: args['prompt'],
-//             quality: 'hd',
-//             response_format: 'b64_json',
-//           },
-//           {
-//             signal: controller.signal,
-//           },
-//         );
-//         const imageId = uuidv4();
-//         imagedb.set(
-//           imageId,
-//           (async () => {
-//             const image = await response;
-//
-//             return `data:image/png;base64,${image.data[0].b64_json!}`;
-//           })(),
-//         );
-//
-//         publishMessage(messages, {
-//           role: 'assistant' as const,
-//           function_call: null,
-//           content: null,
-//           tool_calls: [
-//             {
-//               id: toolCall.id,
-//               function: toolCall.function,
-//               type: 'function',
-//             } as ChatCompletionMessageToolCall,
-//           ],
-//         });
-//         publishMessage(messages, {
-//           role: 'tool' as const,
-//           tool_call_id: toolCall.id!,
-//           content: JSON.stringify({
-//             id: imageId,
-//             name: args['name'],
-//             about: args['about'],
-//             symbol: args['symbol'],
-//           }),
-//         });
-//
-//         progressStore.setText('Generating Image');
-//         await imagedb.get(imageId);
-//
-//         break;
-//       }
-//       case 'transferAsset': {
-//         const args = JSON.parse(toolCall.function?.arguments || '');
-//
-//         publishMessage(messages, {
-//           role: 'assistant' as const,
-//           function_call: null,
-//           content: null,
-//           tool_calls: [
-//             {
-//               id: toolCall.id,
-//               function: toolCall.function,
-//               type: 'function',
-//             } as ChatCompletionMessageToolCall,
-//           ],
-//         });
-//         publishMessage(messages, {
-//           role: 'tool' as const,
-//           tool_call_id: toolCall.id!,
-//           content: JSON.stringify({
-//             id: toolCall.id,
-//             name: args['name'],
-//             about: args['about'],
-//             symbol: args['symbol'],
-//           }),
-//         });
-//         await transferAsset(args);
-//         break;
-//       }
-//       default:
-//         throw new Error(`unknown tool call: ${name}`);
-//     }
-//   }
-// }
