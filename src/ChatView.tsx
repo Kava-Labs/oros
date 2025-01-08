@@ -20,6 +20,8 @@ export interface ChatViewProps {
   chainID: string;
 }
 
+const isWebappIntegration = import.meta.env['VITE_KAVA_WEBAPP'] === 'true';
+
 export const ChatView = ({
   messages,
   errorText,
@@ -121,9 +123,11 @@ export const ChatView = ({
               <img src={hardDotFunDiamond} id={styles.chatIconContainer} />
               <h3>Let's get started!</h3>
               <h6>
-                {address
-                  ? `your wallet address: ${address} connected to chainID: ${chainID.startsWith('0x') ? parseInt(chainID, 16) : chainID}`
-                  : `Tell me about your memecoin idea below and we'll generate
+                {isWebappIntegration
+                  ? "I'm Oros - an AI Assistant to guide you! How can I help?"
+                  : address
+                    ? `your wallet address: ${address} connected to chainID: ${chainID.startsWith('0x') ? parseInt(chainID, 16) : chainID}`
+                    : `Tell me about your memecoin idea below and we'll generate
                 everything you need to get it launched.`}
               </h6>
             </div>
