@@ -44,14 +44,11 @@ export const maskAddresses = (
           accumulator.valuesToMasks[address] = mask;
         }
 
-        // Create a replacement string with the mask
-        const replacement = `<${mask}>`;
-
         // Replace all occurrences of the address in the result
         const regex = new RegExp(address, 'gi');
         accumulator.updatedResult = accumulator.updatedResult.replace(
           regex,
-          replacement,
+          mask,
         );
 
         return accumulator;
