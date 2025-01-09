@@ -9,7 +9,7 @@ project:
     Currently, it focuses on bridging user prompts to GPT-based AI, 
     proxying requests through a stateless Golang server, 
     and rendering a React frontend. In the long term, Oros may expand 
-    to encompass many single and multi-chain agentic blockchain actions (using on or more LLMs/deModels), 
+    to encompass many single and multi-chain agentic blockchain actions (using one or more LLMs/deModels), 
     long-term memory and user-shared context, and expansion to different user-interfaces
     /entry points (TG, mobile,etc). 
   marketing: "Oros: bring deAI to any dApp".
