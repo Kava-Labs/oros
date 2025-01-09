@@ -2,7 +2,7 @@ import type { ChatCompletionTool } from 'openai/resources/index';
 import { ToolFunctions } from '../tools/types';
 
 export const tools: ChatCompletionTool[] =
-  import.meta.env['VITE_KAVA_WEBAPP'] === 'true'
+  (import.meta.env['VITE_KAVA_WEBAPP'] ?? 'false') === 'true'
     ? [
         {
           type: 'function',
