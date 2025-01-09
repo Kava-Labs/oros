@@ -1,2 +1,3 @@
-# kavachat
-Monorepo for E2E Chatbot based DApp for Kava Chain
+# Oros
+
+Bringing DeAI to any dApp
