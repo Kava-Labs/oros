@@ -160,6 +160,8 @@ export const App = () => {
         content: systemPrompt,
       });
     }
+    // we only want this to run once, so don't include [systemPrompt] 
+    // eslint-disable-next-line
   }, []);
 
   // update system prompt, when it changes
@@ -230,7 +232,7 @@ export const App = () => {
         controllerRef.current = null;
       }
     },
-    [isRequesting, messages, tools],
+    [isRequesting, tools],
   );
 
   const handleCancel = useCallback(() => {
@@ -246,7 +248,7 @@ export const App = () => {
     messageHistoryStore.setMessages([
       { role: 'system' as const, content: systemPrompt },
     ]);
-  }, [handleCancel]);
+  }, [handleCancel, systemPrompt]);
 
   return (
     <>
