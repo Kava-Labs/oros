@@ -133,6 +133,8 @@ export const App = () => {
             controllerRef.current = new AbortController();
             setIsRequesting(true);
             setErrorText('');
+            // once the tool call response is received from the dapp
+            // call doChat to inform the model
             doChat(
               controllerRef.current,
               client!,
