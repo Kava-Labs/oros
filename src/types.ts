@@ -45,7 +45,6 @@ export type IFrameMessage<T extends keyof MessagePayloads> = {
   payload: MessagePayloads[T];
 };
 
-// union type of all possible messages (only one exists now)
 export type AnyIFrameMessage =
   | IFrameMessage<'WALLET_CONNECTION/V1'>
   | IFrameMessage<'SET_TOOLS/V1'>
