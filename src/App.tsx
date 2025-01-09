@@ -110,6 +110,12 @@ export const App = () => {
             break;
           }
 
+          case 'SET_PROGRESS_TEXT/V1': {
+            console.info('SET_PROGRESS_TEXT/V1', event.data);
+            progressStore.setText(event.data.payload.text);
+            break;
+          }
+
           case `TOOL_CALL_RESPONSE/V1`: {
             console.info(`TOOL_CALL_RESPONSE/V1`, event.data);
             const toolCall = event.data.payload.toolCall;

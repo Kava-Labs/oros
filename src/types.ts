@@ -24,6 +24,10 @@ export interface ToolCallResponsePayloadV1 {
   content: string; // tool call response string
 }
 
+export interface SetProgressStorePayloadV1 {
+  text: string;
+}
+
 // Map the type property to specific payloads
 export type MessagePayloads = {
   'WALLET_CONNECTION/V1': WalletConnectionPayloadV1;
@@ -31,6 +35,7 @@ export type MessagePayloads = {
   'SET_TOOLS/V1': SetToolsPayloadV1;
   'SET_INTRO_TEXT/V1': SetIntroTextPayloadV1;
   'TOOL_CALL_RESPONSE/V1': ToolCallResponsePayloadV1;
+  'SET_PROGRESS_TEXT/V1': SetProgressStorePayloadV1;
 };
 
 // Main message type
@@ -46,4 +51,5 @@ export type AnyIFrameMessage =
   | IFrameMessage<'SET_TOOLS/V1'>
   | IFrameMessage<'SET_SYSTEM_PROMPT/V1'>
   | IFrameMessage<'SET_INTRO_TEXT/V1'>
-  | IFrameMessage<'TOOL_CALL_RESPONSE/V1'>;
+  | IFrameMessage<'TOOL_CALL_RESPONSE/V1'>
+  | IFrameMessage<'SET_PROGRESS_TEXT/V1'>;
