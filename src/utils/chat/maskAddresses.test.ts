@@ -15,7 +15,7 @@ describe('maskAddresses', () => {
       {
         input: 'Send 100 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         output: {
-          result: 'Send 100 KAVA to <address_1>',
+          result: 'Send 100 KAVA to address_1',
           masksToValues: {
             address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
           },
@@ -27,7 +27,7 @@ describe('maskAddresses', () => {
       {
         input: 'Send 100 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5!',
         output: {
-          result: 'Send 100 KAVA to <address_1>!',
+          result: 'Send 100 KAVA to address_1!',
           masksToValues: {
             address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
           },
@@ -39,7 +39,7 @@ describe('maskAddresses', () => {
       {
         input: 'Send 100 KAVA to0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         output: {
-          result: 'Send 100 KAVA to<address_1>',
+          result: 'Send 100 KAVA toaddress_1',
           masksToValues: {
             address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
           },
@@ -52,7 +52,7 @@ describe('maskAddresses', () => {
         input:
           'Send 100 KAVA and 0.01 wBTC to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         output: {
-          result: 'Send 100 KAVA and 0.01 wBTC to <address_1>',
+          result: 'Send 100 KAVA and 0.01 wBTC to address_1',
           masksToValues: {
             address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
           },
@@ -65,7 +65,7 @@ describe('maskAddresses', () => {
         input:
           'Send 100 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5 and 0.01 wBTC to 0xd8e30f7bcb5211e591bbc463cdab0144e82dFFE5',
         output: {
-          result: 'Send 100 KAVA to <address_1> and 0.01 wBTC to <address_1>',
+          result: 'Send 100 KAVA to address_1 and 0.01 wBTC to address_1',
           masksToValues: {
             address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
           },
@@ -78,7 +78,7 @@ describe('maskAddresses', () => {
         input:
           'Send 100 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5 and 0.01 wBTC to 0xC07918E451Ab77023a16Fa7515Dd60433A3c771D',
         output: {
-          result: 'Send 100 KAVA to <address_1> and 0.01 wBTC to <address_2>',
+          result: 'Send 100 KAVA to address_1 and 0.01 wBTC to address_2',
           masksToValues: {
             address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
             address_2: '0xc07918e451ab77023a16fa7515dd60433a3c771d',
@@ -94,7 +94,7 @@ describe('maskAddresses', () => {
           'Send 10 KAVA to the following addresses: 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5, 0xC07918E451Ab77023a16Fa7515Dd60433A3c771D, 0x7Bbf300890857b8c241b219C6a489431669b3aFA, 0x1874C3e9D6E5f7e4F3F22C3E260C8b25Ed1433f2',
         output: {
           result:
-            'Send 10 KAVA to the following addresses: <address_1>, <address_2>, <address_3>, <address_4>',
+            'Send 10 KAVA to the following addresses: address_1, address_2, address_3, address_4',
           masksToValues: {
             address_1: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
             address_2: '0xc07918e451ab77023a16fa7515dd60433a3c771d',
@@ -129,7 +129,7 @@ describe('maskAddresses', () => {
       {
         input: 'Send 100 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
         output: {
-          result: 'Send 100 KAVA to <address_2>',
+          result: 'Send 100 KAVA to address_2',
           masksToValues: {
             address_1: '0xc07918e451ab77023a16fa7515dd60433a3c771d',
             address_2: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
@@ -144,7 +144,7 @@ describe('maskAddresses', () => {
         input:
           'Send 100 KAVA to 0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5 and 0.01 wBTC to 0xd8e30f7bcb5211e591bbc463cdab0144e82dFFE5',
         output: {
-          result: 'Send 100 KAVA to <address_2> and 0.01 wBTC to <address_2>',
+          result: 'Send 100 KAVA to address_2 and 0.01 wBTC to address_2',
           masksToValues: {
             address_1: '0xc07918e451ab77023a16fa7515dd60433a3c771d',
             address_2: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
@@ -159,7 +159,7 @@ describe('maskAddresses', () => {
         input:
           'Send 100 KAVA to 0x7bbf300890857b8c241b219c6a489431669b3afa and 0.01 wBTC to 0x7bbf300890857b8c241b219c6a489431669b3afa',
         output: {
-          result: 'Send 100 KAVA to <address_3> and 0.01 wBTC to <address_3>',
+          result: 'Send 100 KAVA to address_3 and 0.01 wBTC to address_3',
           masksToValues: {
             address_1: '0xc07918e451ab77023a16fa7515dd60433a3c771d',
             address_2: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
@@ -177,7 +177,7 @@ describe('maskAddresses', () => {
         input:
           'Send 100 KAVA to 0x7bbf300890857b8c241b219c6a489431669b3afa and 100 ATOM to 0x1874c3e9d6e5f7e4f3f22c3e260c8b25ed1433f2',
         output: {
-          result: 'Send 100 KAVA to <address_3> and 100 ATOM to <address_4>',
+          result: 'Send 100 KAVA to address_3 and 100 ATOM to address_4',
           masksToValues: {
             address_1: '0xc07918e451ab77023a16fa7515dd60433a3c771d',
             address_2: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',
@@ -197,7 +197,7 @@ describe('maskAddresses', () => {
         input:
           'Send 100 KAVA to 0xc07918e451ab77023a16fa7515dd60433a3c771d and 100 ATOM to 0x7bbf300890857b8c241b219c6a489431669b3afa',
         output: {
-          result: 'Send 100 KAVA to <address_1> and 100 ATOM to <address_3>',
+          result: 'Send 100 KAVA to address_1 and 100 ATOM to address_3',
           masksToValues: {
             address_1: '0xc07918e451ab77023a16fa7515dd60433a3c771d',
             address_2: '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5',

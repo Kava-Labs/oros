@@ -5,7 +5,7 @@ type AddressAccumulator = {
 };
 
 /**
- * Masks unique 0x addresses in a given message with placeholders (e.g., <address_1>, <address_2>, etc.).
+ * Masks unique 0x addresses in a given message with placeholders (e.g., address_1, address_2, etc.).
  * If no addresses are found, the original input message is returned.
  *
  * @param {string} message - The input message potentially containing 0x addresses to be masked.
@@ -13,7 +13,7 @@ type AddressAccumulator = {
  * @param {Record<string, string>} [processedMasksToValues={}] - An existing map of placeholder keys to their corresponding Ethereum addresses.
  * @returns {Object} An object containing:
  *   - `output` {string}: The message with Ethereum addresses replaced by placeholders.
- *   - `masksToValues` {Record<string, string>}: A map where keys are placeholders (e.g., `<address_1>`) and values are the original 0x addresses.
+ *   - `masksToValues` {Record<string, string>}: A map where keys are placeholders (e.g., `address_1`) and values are the original 0x addresses.
  *   - `valuesToMasks` {Record<string, string>}: A map where keys are 0x addresses and values are their corresponding placeholders, the reverse of `masksToValues`
  */
 export const maskAddresses = (
