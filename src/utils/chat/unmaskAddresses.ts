@@ -9,19 +9,8 @@ export const unmaskAddresses = (
   message: string,
   masksToValues: Record<string, string>,
 ): string => {
-  // Create a regular expression that matches any of the masks
   const maskPattern = new RegExp(Object.keys(masksToValues).join('|'), 'g');
 
-  // Replace each mask, falling back to the original string if any mapping is missing
-  const result = message.replace(
-    maskPattern,
-    (match) => masksToValues[match] ?? match,
-  );
-
-  // If no replacements were made , return original message
-  if (result === message) {
-    return message;
-  } else {
-    return result;
-  }
+  // Replace each mask, falling back to the original string if it isn't found
+  return message.replace(maskPattern, (match) => masksToValues[match] ?? match);
 };
