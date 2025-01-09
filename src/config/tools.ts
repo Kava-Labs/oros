@@ -9,7 +9,7 @@ export const tools: ChatCompletionTool[] =
           function: {
             name: ToolFunctions.NAVIGATE_TO_PAGE,
             description:
-              'navigates to the balances page at /balances so a user can view their positions and possibly take more actions',
+              'navigates to a page (like /balances) so a user can view their positions and possibly take more actions',
             parameters: {
               type: 'object',
               properties: {
