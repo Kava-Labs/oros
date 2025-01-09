@@ -312,6 +312,13 @@ async function doChat(
     }
 
     if (toolCallStreamStore.getSnapShot().length > 0) {
+      const hasMemeCoinGenToolCall =
+        toolCallStreamStore
+          .getSnapShot()
+          .find(
+            (tc) => tc.function.name === ToolFunctions.GENERATE_COIN_METADATA,
+          ) !== undefined;
+
       await callTools(
         controller,
         client,
@@ -320,14 +327,21 @@ async function doChat(
         progressStore,
       );
 
-      await doChat(
-        controller,
-        client,
-        messageHistoryStore,
-        tools,
-        progressStore,
-        messageStore,
-      );
+      // only call doChat for meme coin generation
+      // dapps will send the TOOL_CALL_RESPONSE/V1 event
+      // which is when we can call doChat
+      // calling doChat here for anything other than a memecoin gen will result
+      // in an infinite loop of requests
+      if (hasMemeCoinGenToolCall) {
+        await doChat(
+          controller,
+          client,
+          messageHistoryStore,
+          tools,
+          progressStore,
+          messageStore,
+        );
+      }
     }
   } catch (e) {
     console.error(`An error occurred: ${e} `);
