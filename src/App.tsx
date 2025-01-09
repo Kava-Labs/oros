@@ -160,7 +160,7 @@ export const App = () => {
         content: systemPrompt,
       });
     }
-    // we only want this to run once, so don't include [systemPrompt] 
+    // we only want this to run once, so don't include [systemPrompt]
     // eslint-disable-next-line
   }, []);
 
