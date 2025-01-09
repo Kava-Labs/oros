@@ -129,6 +129,38 @@ export const App = () => {
               tool_call_id: toolCall.id,
               content,
             });
+
+            controllerRef.current = new AbortController();
+            setIsRequesting(true);
+            setErrorText('');
+            doChat(
+              controllerRef.current,
+              client!,
+              messageHistoryStore,
+              tools,
+              progressStore,
+              messageStore,
+            )
+              .catch((error) => {
+                let errorMessage =
+                  typeof error === 'object' &&
+                  error !== null &&
+                  'message' in error
+                    ? (error as { message: string }).message
+                    : 'An error occurred - please try again';
+
+                //  Errors can be thrown when recursive call is cancelled
+                if (errorMessage.includes('JSON')) {
+                  errorMessage = 'You clicked cancel - please try again';
+                }
+
+                setErrorText(errorMessage);
+              })
+              .finally(() => {
+                controllerRef.current = null;
+                setIsRequesting(false);
+              });
+
             break;
           }
           default:
@@ -147,7 +179,7 @@ export const App = () => {
         window.removeEventListener('message', parentMessageHandler);
       }
     };
-  }, []);
+  }, [tools]);
 
   const messages = useSyncExternalStore(
     messageHistoryStore.subscribe,
