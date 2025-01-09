@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       VITE_OPENAI_BASE_URL: https://kavachat-api.production.kava.io/openai/v1
-      VITE_KAVA_CHAT: false
+      VITE_KAVA_WEBAPP: false
     outputs:
       changed: ${{ steps.diff.outputs.diff != '' }}
     steps:
@@ -84,7 +84,7 @@ jobs:
       OPENAI_BASE_URL: https://api.openai.com/v1
       # Frontend playwright tests
       VITE_OPENAI_BASE_URL: http://localhost:5555/openai/v1
-      VITE_KAVA_CHAT: false
+      VITE_KAVA_WEBAPP: false
     outputs:
       changed: ${{ steps.diff.outputs.diff != '' }}
       image-name: ${{ steps.image-name.outputs.image }}
