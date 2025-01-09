@@ -3,6 +3,7 @@ import { fn } from '@storybook/test';
 
 import { ChatView } from '../ChatView';
 import { mockChatMessages } from '../mockdata';
+import { memeCoinGenIntroText } from '../config';
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
@@ -31,6 +32,7 @@ export const Primary: Story = {
     viewport: { defaultViewport: 'reset' },
   },
   args: {
+    introText: memeCoinGenIntroText,
     address: '',
     chainID: '',
     messages: mockChatMessages,
@@ -47,6 +49,7 @@ export const OnPhoneSmall: Story = {
     viewport: { defaultViewport: 'mobile1' },
   },
   args: {
+    introText: memeCoinGenIntroText,
     address: '',
     chainID: '',
     messages: mockChatMessages,
@@ -63,6 +66,7 @@ export const OnPhoneLarge: Story = {
     viewport: { defaultViewport: 'mobile2' },
   },
   args: {
+    introText: memeCoinGenIntroText,
     address: '',
     chainID: '',
     messages: mockChatMessages,
@@ -79,6 +83,7 @@ export const NoMessages: Story = {
     viewport: { defaultViewport: 'reset' },
   },
   args: {
+    introText: memeCoinGenIntroText,
     address: '',
     chainID: '',
     messages: [],
@@ -95,6 +100,7 @@ export const NoMessagesOnPhoneSmall: Story = {
     viewport: { defaultViewport: 'mobile1' },
   },
   args: {
+    introText: memeCoinGenIntroText,
     address: '',
     chainID: '',
     messages: [],
@@ -111,6 +117,7 @@ export const RequestInProgress: Story = {
     viewport: { defaultViewport: 'reset' },
   },
   args: {
+    introText: memeCoinGenIntroText,
     address: '',
     chainID: '',
     messages: [],

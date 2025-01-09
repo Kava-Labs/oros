@@ -21,8 +21,11 @@ import {
   assembleToolCallsFromStream,
 } from './streamUtils';
 import { TextStreamStore } from './textStreamStore';
-import { systemPrompt } from './config/systemPrompt';
-import { tools } from './config/tools';
+import {
+  memeCoinSystemPrompt,
+  memeCoinGenIntroText,
+} from './config/systemPrompt';
+import { memeCoinTools } from './config/tools';
 import { imagedb } from './imagedb';
 import { v4 as uuidv4 } from 'uuid';
 import { ToolCallStreamStore } from './toolCallStreamStore';
@@ -46,6 +49,12 @@ export const App = () => {
   // Do not load UI/UX until openAI client is ready
   const [isReady, setIsReady] = useState(false);
   const [errorText, setErrorText] = useState('');
+
+  const [{ tools, systemPrompt, introText }, setConfig] = useState({
+    introText: memeCoinGenIntroText,
+    systemPrompt: memeCoinSystemPrompt,
+    tools: memeCoinTools,
+  });
 
   const [wallet, setWallet] = useState({
     address: '',
@@ -74,13 +83,94 @@ export const App = () => {
       if (event.data && event.data.namespace === 'KAVA_CHAT') {
         console.info('event received from parent: ', event);
         switch (event.data.type) {
-          case 'WALLET_CONNECTION/V1':
-            console.info('WALLET_CONNECTION', event.data);
+          case 'WALLET_CONNECTION/V1': {
+            console.info('WALLET_CONNECTION/V1', event.data);
             setWallet({
               address: event.data.payload.address,
               chainID: event.data.payload.chainID,
             });
             break;
+          }
+          case 'SET_SYSTEM_PROMPT/V1': {
+            console.info('SET_SYSTEM_PROMPT/V1', event.data);
+            const systemPrompt = event.data.payload.systemPrompt;
+            setConfig((prev) => ({ ...prev, systemPrompt }));
+            break;
+          }
+          case 'SET_TOOLS/V1': {
+            console.info('SET_TOOLS/V1', event.data);
+            const tools = event.data.payload.tools;
+            setConfig((prev) => ({ ...prev, tools }));
+            break;
+          }
+          case `SET_INTRO_TEXT/V1`: {
+            console.info('SET_INTRO_TEXT/V1', event.data);
+            const introText = event.data.payload.introText;
+            setConfig((prev) => ({ ...prev, introText }));
+            break;
+          }
+
+          case 'SET_PROGRESS_TEXT/V1': {
+            console.info('SET_PROGRESS_TEXT/V1', event.data);
+            progressStore.setText(event.data.payload.text);
+            break;
+          }
+
+          case `TOOL_CALL_RESPONSE/V1`: {
+            console.info(`TOOL_CALL_RESPONSE/V1`, event.data);
+            const toolCall = event.data.payload.toolCall;
+            const content = event.data.payload.content;
+
+            messageHistoryStore.addMessage({
+              role: 'assistant' as const,
+              function_call: null,
+              content: null,
+              tool_calls: [
+                toolCallStreamStore.toChatCompletionMessageToolCall(toolCall),
+              ],
+            });
+            toolCallStreamStore.deleteToolCallById(toolCall.id);
+            messageHistoryStore.addMessage({
+              role: 'tool' as const,
+              tool_call_id: toolCall.id,
+              content,
+            });
+
+            controllerRef.current = new AbortController();
+            setIsRequesting(true);
+            setErrorText('');
+            // once the tool call response is received from the dapp
+            // call doChat to inform the model
+            doChat(
+              controllerRef.current,
+              client!,
+              messageHistoryStore,
+              tools,
+              progressStore,
+              messageStore,
+            )
+              .catch((error) => {
+                let errorMessage =
+                  typeof error === 'object' &&
+                  error !== null &&
+                  'message' in error
+                    ? (error as { message: string }).message
+                    : 'An error occurred - please try again';
+
+                //  Errors can be thrown when recursive call is cancelled
+                if (errorMessage.includes('JSON')) {
+                  errorMessage = 'You clicked cancel - please try again';
+                }
+
+                setErrorText(errorMessage);
+              })
+              .finally(() => {
+                controllerRef.current = null;
+                setIsRequesting(false);
+              });
+
+            break;
+          }
           default:
             console.warn('unknown event type', event.type);
             break;
@@ -97,7 +187,7 @@ export const App = () => {
         window.removeEventListener('message', parentMessageHandler);
       }
     };
-  }, []);
+  }, [tools]);
 
   const messages = useSyncExternalStore(
     messageHistoryStore.subscribe,
@@ -110,7 +200,18 @@ export const App = () => {
         content: systemPrompt,
       });
     }
+    // we only want this to run once, so don't include [systemPrompt]
+    // eslint-disable-next-line
   }, []);
+
+  // update system prompt, when it changes
+  useEffect(() => {
+    const remainingMsgs = messageHistoryStore.getSnapshot().slice(1);
+    messageHistoryStore.setMessages([
+      { role: 'system', content: systemPrompt },
+      ...remainingMsgs,
+    ]);
+  }, [systemPrompt]);
 
   // use is sending request to signify to the chat view that
   // a request is in progress so it can disable inputs
@@ -136,7 +237,6 @@ export const App = () => {
       setIsRequesting(true);
 
       // Add the user message to the UI
-
       messageHistoryStore.addMessage({ role: 'user' as const, content: value });
 
       // Call chat completions and resolve all tool calls.
@@ -172,7 +272,7 @@ export const App = () => {
         controllerRef.current = null;
       }
     },
-    [isRequesting, messages],
+    [isRequesting, tools],
   );
 
   const handleCancel = useCallback(() => {
@@ -188,12 +288,13 @@ export const App = () => {
     messageHistoryStore.setMessages([
       { role: 'system' as const, content: systemPrompt },
     ]);
-  }, [handleCancel]);
+  }, [handleCancel, systemPrompt]);
 
   return (
     <>
       {isReady && (
         <ChatView
+          introText={introText}
           address={wallet.address}
           chainID={wallet.chainID}
           messages={messages}
@@ -253,6 +354,13 @@ async function doChat(
     }
 
     if (toolCallStreamStore.getSnapShot().length > 0) {
+      const hasMemeCoinGenToolCall =
+        toolCallStreamStore
+          .getSnapShot()
+          .find(
+            (tc) => tc.function.name === ToolFunctions.GENERATE_COIN_METADATA,
+          ) !== undefined;
+
       await callTools(
         controller,
         client,
@@ -261,14 +369,21 @@ async function doChat(
         progressStore,
       );
 
-      await doChat(
-        controller,
-        client,
-        messageHistoryStore,
-        tools,
-        progressStore,
-        messageStore,
-      );
+      // only call doChat for meme coin generation
+      // dapps will send the TOOL_CALL_RESPONSE/V1 event
+      // which is when we can call doChat
+      // calling doChat here for anything other than a memecoin gen will result
+      // in an infinite loop of requests
+      if (hasMemeCoinGenToolCall) {
+        await doChat(
+          controller,
+          client,
+          messageHistoryStore,
+          tools,
+          progressStore,
+          messageStore,
+        );
+      }
     }
   } catch (e) {
     console.error(`An error occurred: ${e} `);
@@ -297,8 +412,21 @@ async function callTools(
   toolCallStreamStore: ToolCallStreamStore,
   progressStore: TextStreamStore,
 ): Promise<void> {
+  const isInIframe = window !== window.parent;
   for (const toolCall of toolCallStreamStore.getSnapShot()) {
     const name = toolCall.function?.name;
+    if (isInIframe) {
+      window.parent.postMessage(
+        {
+          type: 'TOOL_CALL',
+          payload: {
+            toolCall,
+          },
+        },
+        '*',
+      );
+    }
+
     switch (name) {
       case ToolFunctions.GENERATE_COIN_METADATA: {
         const args = toolCall.function.arguments as GenerateCoinMetadataParams;
@@ -351,7 +479,9 @@ async function callTools(
         break;
       }
       default:
-        throw new Error(`unknown tool call: ${name}`);
+        console.warn(`unknown tool call: ${name}`);
+        // throw new Error(`unknown tool call: ${name}`);
+        break;
     }
   }
 }
