@@ -56,14 +56,6 @@ export const ChatView = ({
       textarea.style.height = 'auto';
       textarea.style.height = `min(${textarea.scrollHeight}px, 60vh)`;
 
-      const storedMasks = getStoredMasks();
-      const { masksToValues, valuesToMasks } = maskAddresses(
-        textarea.value,
-        storedMasks.valuesToMasks,
-        storedMasks.masksToValues,
-      );
-
-      updateStoredMasks(masksToValues, valuesToMasks);
       setInputValue(textarea.value);
     },
     [],
@@ -80,11 +72,13 @@ export const ChatView = ({
     }
 
     const storedMasks = getStoredMasks();
-    const { output } = maskAddresses(
+    const { output, masksToValues, valuesToMasks } = maskAddresses(
       inputValue,
       storedMasks.valuesToMasks,
       storedMasks.masksToValues,
     );
+
+    updateStoredMasks(masksToValues, valuesToMasks);
 
     onSubmit(output);
     setInputValue('');
