@@ -28,6 +28,21 @@ const tools = [
   },
 ];
 
+// const validateTransactionalToolCall = () => {
+//   // check is the user connected if not respond
+//   // looks like you need to connect to metamask
+//   // check if they have enough balances for what they want to send
+//   // if not then respond with: looks like you dont have enough balances
+// };
+
+// const sendERC20 = () => {
+//   validateTransactionalToolCall();
+// };
+
+// const depositLend = () => {
+//   validateTransactionalToolCall();
+// };
+
 const fetchWeather = async ({
   state,
   city,
@@ -96,17 +111,6 @@ export const App = () => {
   const orosRef = useRef<HTMLIFrameElement>(null);
   const [loaded, setLoaded] = useState(false);
 
-  const onIframeLoaded = () => {
-    if (orosRef.current?.contentWindow) {
-      setLoaded(true);
-      setOrosConfig(orosRef.current.contentWindow, {
-        introText: 'hi, tell me which city you want the weather for.',
-        systemPrompt: 'you help fetch the weather',
-        tools,
-      });
-    }
-  };
-
   useEffect(() => {
     if (!loaded) {
       return;
@@ -114,10 +118,10 @@ export const App = () => {
 
     const msgHandler = async (msg: MessageEvent<any>) => {
       if (msg.data.type === 'TOOL_CALL') {
-        const tc = msg.data.payload.toolCall;
-        console.log(tc);
-        if (tc.function.name === 'fetchWeather') {
-          const res = await fetchWeather(tc.function.arguments);
+        const toolCall = msg.data.payload.toolCall;
+        console.log(toolCall);
+        if (toolCall.function.name === 'fetchWeather') {
+          const res = await fetchWeather(toolCall.function.arguments);
           const content = JSON.stringify(res);
           // send the tool call response back to the iframe
           orosRef.current!.contentWindow!.postMessage(
@@ -125,7 +129,7 @@ export const App = () => {
               namespace: 'KAVA_CHAT',
               type: 'TOOL_CALL_RESPONSE/V1',
               payload: {
-                toolCall: tc,
+                toolCall,
                 content,
               },
             },
@@ -140,9 +144,18 @@ export const App = () => {
     return () => {
       window.removeEventListener('message', msgHandler);
     };
-
-    // todo: register a listener to read events from the iframe
   }, [loaded]);
+
+  const onIframeLoaded = () => {
+    if (orosRef.current?.contentWindow) {
+      setLoaded(true);
+      setOrosConfig(orosRef.current.contentWindow, {
+        introText: 'hi, tell me which city you want the weather for.',
+        systemPrompt: 'you help fetch the weather',
+        tools,
+      });
+    }
+  };
 
   return (
     <div>
