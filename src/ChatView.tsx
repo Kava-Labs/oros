@@ -7,27 +7,7 @@ import hardDotFunDiamond from './assets/hardDotFunDiamond.svg';
 import { Conversation } from './Conversation';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { maskAddresses } from './utils/chat/maskAddresses';
-
-//  todo - convert to use interface
-const getStoredMasks = () => {
-  try {
-    return {
-      masksToValues: JSON.parse(localStorage.getItem('masksToValues') || '{}'),
-      valuesToMasks: JSON.parse(localStorage.getItem('valuesToMasks') || '{}'),
-    };
-  } catch (e) {
-    console.error('Error parsing masks from localStorage:', e);
-    return { masksToValues: {}, valuesToMasks: {} };
-  }
-};
-
-const updateStoredMasks = (
-  masksToValues: Record<string, string>,
-  valuesToMasks: Record<string, string>,
-) => {
-  localStorage.setItem('masksToValues', JSON.stringify(masksToValues));
-  localStorage.setItem('valuesToMasks', JSON.stringify(valuesToMasks));
-};
+import { getStoredMasks, updateStoredMasks } from './utils/chat/helpers';
 
 export interface ChatViewProps {
   messages: ChatCompletionMessageParam[];
@@ -36,7 +16,6 @@ export interface ChatViewProps {
   onSubmit(value: string): void;
   onReset(): void;
   onCancel(): void;
-
   introText: string;
   address: string;
   chainID: string;
@@ -49,7 +28,6 @@ export const ChatView = ({
   onSubmit,
   onReset,
   onCancel,
-
   introText,
   address,
   chainID,
@@ -101,6 +79,7 @@ export const ChatView = ({
       storedMasks.valuesToMasks,
       storedMasks.masksToValues,
     );
+
     onSubmit(output);
     setInputValue('');
   }, [isRequesting, onSubmit, onCancel, inputValue]);
