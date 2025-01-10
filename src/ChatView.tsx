@@ -5,8 +5,29 @@ import { SendChatIcon } from './assets/SendChatIcon';
 import { CancelChatIcon } from './assets/CancelChatIcon';
 import hardDotFunDiamond from './assets/hardDotFunDiamond.svg';
 import { Conversation } from './Conversation';
-
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
+import { maskAddresses } from './utils/chat/maskAddresses';
+
+//  todo - convert to use interface
+const getStoredMasks = () => {
+  try {
+    return {
+      masksToValues: JSON.parse(localStorage.getItem('masksToValues') || '{}'),
+      valuesToMasks: JSON.parse(localStorage.getItem('valuesToMasks') || '{}'),
+    };
+  } catch (e) {
+    console.error('Error parsing masks from localStorage:', e);
+    return { masksToValues: {}, valuesToMasks: {} };
+  }
+};
+
+const updateStoredMasks = (
+  masksToValues: Record<string, string>,
+  valuesToMasks: Record<string, string>,
+) => {
+  localStorage.setItem('masksToValues', JSON.stringify(masksToValues));
+  localStorage.setItem('valuesToMasks', JSON.stringify(valuesToMasks));
+};
 
 export interface ChatViewProps {
   messages: ChatCompletionMessageParam[];
@@ -44,21 +65,24 @@ export const ChatView = ({
   }, [containerRef]);
 
   const [inputValue, setInputValue] = useState('');
+
   const handleInputChange = useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-      /**
-       * Set the text area height to 'auto' on change so the height is
-       * automatically adjusted as the user types. Set it to the
-       * scrollHeight so as the user types, the textarea content moves
-       * upward keeping the user on the same line
-       */
       const textarea = event.target;
       textarea.style.height = 'auto';
-      textarea.style.height = `min(${textarea.scrollHeight}px, 60vh)`; // Adjust to scrollHeight
+      textarea.style.height = `min(${textarea.scrollHeight}px, 60vh)`;
 
+      const storedMasks = getStoredMasks();
+      const { masksToValues, valuesToMasks } = maskAddresses(
+        textarea.value,
+        storedMasks.valuesToMasks,
+        storedMasks.masksToValues,
+      );
+
+      updateStoredMasks(masksToValues, valuesToMasks);
       setInputValue(textarea.value);
     },
-    [],
+    [setInputValue],
   );
 
   const handleButtonClick = useCallback(() => {
@@ -71,7 +95,13 @@ export const ChatView = ({
       return;
     }
 
-    onSubmit(inputValue);
+    const storedMasks = getStoredMasks();
+    const { output } = maskAddresses(
+      inputValue,
+      storedMasks.valuesToMasks,
+      storedMasks.masksToValues,
+    );
+    onSubmit(output);
     setInputValue('');
   }, [isRequesting, onSubmit, onCancel, inputValue]);
 
