@@ -1,5 +1,8 @@
 //  todo - convert to use interface
-export const getStoredMasks = () => {
+export const getStoredMasks = (): {
+  masksToValues: Record<string, string>;
+  valuesToMasks: Record<string, string>;
+} => {
   try {
     return {
       masksToValues: JSON.parse(localStorage.getItem('masksToValues') || '{}'),

@@ -46,6 +46,12 @@ export const ChatView = ({
 
   const handleInputChange = useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      /**
+       * Set the text area height to 'auto' on change so the height is
+       * automatically adjusted as the user types. Set it to the
+       * scrollHeight so as the user types, the textarea content moves
+       * upward keeping the user on the same line
+       */
       const textarea = event.target;
       textarea.style.height = 'auto';
       textarea.style.height = `min(${textarea.scrollHeight}px, 60vh)`;
