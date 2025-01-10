@@ -66,7 +66,7 @@ export const ChatView = ({
       updateStoredMasks(masksToValues, valuesToMasks);
       setInputValue(textarea.value);
     },
-    [setInputValue],
+    [],
   );
 
   const handleButtonClick = useCallback(() => {
