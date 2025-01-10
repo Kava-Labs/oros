@@ -49,7 +49,7 @@ export const ContentComponent = ({
     return () => {
       cancel = true;
     };
-  }, [content]);
+  }, [content, storedMasks.masksToValues]);
 
   useEffect(() => {
     if (onRendered) {
