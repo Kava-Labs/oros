@@ -1,0 +1,118 @@
+# .cursorrules
+version: 1
+
+project:
+  name: "oros"
+  description: >
+    Oros (f.k.a. “kavachat") is an evolving codebase 
+    for a multi-LLM chat application that interacts with blockchain tasks. 
+    Currently, it focuses on bridging user prompts to GPT-based AI, 
+    proxying requests through a stateless Golang server, 
+    and rendering a React frontend. In the long term, Oros may expand 
+    to encompass many single and multi-chain agentic blockchain actions (using one or more LLMs/deModels), 
+    long-term memory and user-shared context, and expansion to different user-interfaces
+    /entry points (TG, mobile,etc). 
+  marketing: "Oros: bring deAI to any dApp".
+
+repos:
+  - name: "oros"
+    description: "Core codebase containing the stateless API proxy (Go) + React web app."
+
+context:
+  # Summarize the main system architecture, early-stage development, and 
+  # how we see the future expansion of the project.
+  overview: >
+    The project’s current architecture has three main components:
+    1) A **Golang Proxy** that sits between the frontend and the LLM. 
+       This is a stateless server exposing HTTP endpoints and routing 
+       user chat requests to a remote LLM (e.g., GPT-4o). 
+       It also handles partial application logic, such as 
+       prompt engineering, streaming responses, and code injection prevention.
+
+    2) A **React Frontend** that provides a chat interface. 
+       Users can send messages, connect wallets, 
+       and see real-time streaming replies from the proxy.
+
+    3) **Tests** that aim to cover critical behaviors, integration points, 
+       and resilience. The codebase includes unit tests (Go and TypeScript), 
+       plus integration tests verifying correct LLM responses, 
+       and a Docker-based environment for end-to-end checks.
+
+  future:
+    - Incorporating multi-LLM support (community open models + GPT, deModels).
+    - Adding ephemeral or partial memory for conversation context. 
+    - Expanding to multi-chain interactions. 
+    - Evolving to multi-chain AI agent 
+      that can propose on-chain transactions, orchestrate bridging, etc.
+    - Expanding to other user-interfaces/entry points (TG, mobile,etc).
+
+guidingPrinciples:
+  - testCoverage: >
+      Build robust, readable tests for the proxy, the UI, 
+      and any integration endpoints. Achieve high coverage 
+      for critical paths, ensuring behavior is documented 
+      and future refactors remain safe.
+  - architectureClarity: >
+      Keep the stateless proxy design straightforward. 
+      Defer complex session logic or advanced memory 
+      to future expansions. Maintain minimal dependencies 
+      for faster iteration.
+  - incrementalImprovements: >
+      Prioritize small, frequent PRs with clear commit histories. 
+      Integrate new features behind flags or environment configs 
+      to ensure stability for production usage.
+  - userFocus: >
+      Present a user-friendly chat UI. 
+      The impetus is smooth interactions with the LLM 
+      and eventually bridging real blockchain tasks. 
+      Keep the developer experience in mind with clear docs 
+      and function signatures.
+
+workflow:
+  codeReviews: >
+    - Create a short-lived feature branch off of main or dev.
+    - Open a Pull Request with a succinct description, referencing 
+      the relevant issue or user story. 
+    - Tag relevant reviewers (product lead, lead engineer, or others 
+      if domain-specific knowledge is needed).
+    - Ensure tests pass. 
+    - Merge with a squash commit if approved.
+  versioning: >
+    We follow semantic versioning for major releases. 
+    However, as the codebase is still early, we might do 
+    frequent minor or patch releases with `v0.x.x`.
+  ciProcess: >
+    GitHub Actions / any CI pipeline runs:
+      - Linting
+      - Tests (unit, integration)
+      - Build steps for both Go and React
+      - Docker build for local e2e tests
+
+communication:
+  - platforms: >
+      - Slack for day-to-day engineering + urgent matters.
+      - GitHub issues and PRs for tasks, feedback, bug tracking.
+      - Regular stand-ups or asynchronous updates for the core team.
+  - feedbackLoop: >
+      - Provide inline PR commentary for code-level suggestions.
+      - Larger architectural changes should be proposed 
+        to team in docs/architecture or an ADR (Architecture Decision Record).
+
+faq:
+  - "What is the main goal of this stage of dev?"
+    answer: >
+      Solidify core functionality (chat proxy + tests + minimal UI) 
+      and ensure we can easily expand to multi-LLM or multi-chain usage.
+  - "Are we storing conversation data or user sessions in the backend?"
+    answer: >
+      Currently, the proxy is stateless. 
+      Any partial memory or session logic 
+      is either ephemeral in the UI or a future enhancement.
+
+notes:
+  - >
+    This .cursorrules file is living documentation. 
+    Update it as the architecture evolves (e.g., multi-LLM or memory logic), 
+    so new developers grasp the purpose, flow, 
+    and higher-level context of Oros.
+
