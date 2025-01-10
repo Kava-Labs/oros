@@ -17,6 +17,7 @@ export const ContentComponent = ({
 }: ContentProps) => {
   const [hasError, setHasError] = useState(false);
   const [sanitizedContent, setSanitizedContent] = useState<string>('');
+  const storedMasks = getStoredMasks();
 
   useEffect(() => {
     let cancel = false;
@@ -28,7 +29,6 @@ export const ContentComponent = ({
       }
 
       try {
-        const storedMasks = getStoredMasks();
         const updatedContent = await sanitizeContent(
           unmaskAddresses(content, storedMasks.masksToValues),
         );
