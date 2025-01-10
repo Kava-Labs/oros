@@ -29,6 +29,7 @@ export const ContentComponent = ({
 
       try {
         const storedMasks = getStoredMasks();
+        console.log(content);
         const updatedContent = await sanitizeContent(
           unmaskAddresses(content, storedMasks.masksToValues),
         );
