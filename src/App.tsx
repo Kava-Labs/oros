@@ -32,6 +32,7 @@ import { ToolCallStreamStore } from './toolCallStreamStore';
 import { ToolFunctions, type GenerateCoinMetadataParams } from './tools/types';
 import type { AnyIFrameMessage } from './types';
 import { MessageHistoryStore } from './messageHistoryStore';
+import { getStoredMasks } from './utils/chat/helpers';
 
 let client: OpenAI | null = null;
 
@@ -415,12 +416,14 @@ async function callTools(
   const isInIframe = window !== window.parent;
   for (const toolCall of toolCallStreamStore.getSnapShot()) {
     const name = toolCall.function?.name;
+    const storedMasks = getStoredMasks();
     if (isInIframe) {
       window.parent.postMessage(
         {
           type: 'TOOL_CALL',
           payload: {
             toolCall,
+            storedMasks,
           },
         },
         '*',
