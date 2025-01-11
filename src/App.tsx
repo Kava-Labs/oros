@@ -28,7 +28,7 @@ import {
 import { memeCoinTools } from './config/tools';
 import { imagedb } from './imagedb';
 import { v4 as uuidv4 } from 'uuid';
-import { ToolCallStreamStore } from './toolCallStreamStore';
+import { ToolCallStream, ToolCallStreamStore } from './toolCallStreamStore';
 import { ToolFunctions, type GenerateCoinMetadataParams } from './tools/types';
 import type { AnyIFrameMessage } from './types';
 import { MessageHistoryStore } from './messageHistoryStore';
@@ -416,15 +416,28 @@ async function callTools(
   const isInIframe = window !== window.parent;
   for (const toolCall of toolCallStreamStore.getSnapShot()) {
     const name = toolCall.function?.name;
-    const storedMasks = getStoredMasks();
+    const { masksToValues } = getStoredMasks();
+
+    let payload: {
+      toolCall: Readonly<ToolCallStream>;
+      masksToValues?: Record<string, string>;
+    } = {
+      toolCall,
+    };
+
+    //  send along the masksToValues only if entries exist
+    if (Object.keys(masksToValues).length > 0) {
+      payload = {
+        ...payload,
+        masksToValues,
+      };
+    }
+
     if (isInIframe) {
       window.parent.postMessage(
         {
           type: 'TOOL_CALL',
-          payload: {
-            toolCall,
-            storedMasks,
-          },
+          payload,
         },
         '*',
       );
