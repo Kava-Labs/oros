@@ -54,7 +54,7 @@ export const ChatView = ({
        */
       const textarea = event.target;
       textarea.style.height = 'auto';
-      textarea.style.height = `min(${textarea.scrollHeight}px, 60vh)`;
+      textarea.style.height = `min(${textarea.scrollHeight}px, 60vh)`; // Adjust to scrollHeight
 
       setInputValue(textarea.value);
     },
