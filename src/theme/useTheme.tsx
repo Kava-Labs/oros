@@ -1,8 +1,19 @@
 import { useContext } from 'react';
-import { ThemeContextProps, ThemeContext } from './themeContext';
+import { ThemeContext } from './themeContext';
 
-export const useTheme = (): ThemeContextProps => {
+/**
+ * TODO: This should recursively flatten so we don't have to add manual
+ *       keys when we want to add/modify properties on the theme
+ */
+export const useTheme = () => {
   const context = useContext(ThemeContext);
   if (!context) throw new Error('useTheme must be used within a ThemeProvider');
-  return context;
+
+  // Destructure theme to make properties like `colors` directly accessible
+  const {
+    theme: { colors, typography, spacing, borderRadius, logo },
+  } = context;
+
+  // Return the destructured properties for direct use
+  return { colors, typography, spacing, borderRadius, logo };
 };

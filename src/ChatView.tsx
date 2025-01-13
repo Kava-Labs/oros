@@ -89,7 +89,7 @@ export const ChatView = ({
     }
   };
 
-  const { theme } = useTheme();
+  const { colors, logo } = useTheme();
 
   return (
     <div id={styles.chatview} data-testid="chatview">
@@ -106,7 +106,7 @@ export const ChatView = ({
                 aria-label="Reset Chat"
                 onClick={onReset}
               >
-                <ResetChatIcon color={theme.colors.accentTransparent} />
+                <ResetChatIcon color={colors.accentTransparent} />
               </button>
             </div>
 
@@ -122,7 +122,7 @@ export const ChatView = ({
         {!hasMessages && (
           <div id={styles.startContainer}>
             <div id={styles.start} data-testid="start">
-              <img src={theme.logo} id={styles.chatIconContainer} />
+              <img src={logo} id={styles.chatIconContainer} />
               <h3>Let's get started!</h3>
               <h6>
                 {address
@@ -154,9 +154,9 @@ export const ChatView = ({
             aria-label="Send Chat"
           >
             {isRequesting ? (
-              <CancelChatIcon color={theme.colors.accentTransparent} />
+              <CancelChatIcon color={colors.accentTransparent} />
             ) : (
-              <SendChatIcon color={theme.colors.accentTransparent} />
+              <SendChatIcon color={colors.accentTransparent} />
             )}
           </button>
         </div>

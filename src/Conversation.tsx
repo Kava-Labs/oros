@@ -27,7 +27,7 @@ const ConversationComponent = ({
   isRequesting,
   onRendered,
 }: ConversationProps) => {
-  const { theme } = useTheme();
+  const { logo } = useTheme();
 
   return (
     <div id={styles.conversation} data-testid="conversation">
@@ -46,7 +46,7 @@ const ConversationComponent = ({
         if (message.role === 'assistant' && message.content) {
           return (
             <div key={index} className={styles.left}>
-              <img src={theme.logo} className={styles.conversationChatIcon} />
+              <img src={logo} className={styles.conversationChatIcon} />
               <div className={styles.assistantContainer}>
                 <Content
                   role={message.role}
@@ -102,7 +102,7 @@ const ConversationComponent = ({
       })}
       {isRequesting && (
         <div className={styles.left}>
-          <img src={theme.logo} className={styles.conversationChatIcon} />
+          <img src={logo} className={styles.conversationChatIcon} />
 
           <div className={styles.assistantContainer}>
             <div id={styles.progressStream}>
@@ -120,7 +120,7 @@ const ConversationComponent = ({
       )}
       {errorText.length > 0 && (
         <div className={styles.left}>
-          <img src={theme.logo} className={styles.conversationChatIcon} />
+          <img src={logo} className={styles.conversationChatIcon} />
           <div className={styles.assistantContainer}>
             <Content
               content={errorText}
