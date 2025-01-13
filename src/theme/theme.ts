@@ -91,9 +91,6 @@ export const hardDotFunTheme: Theme = {
   ...baseTheme,
   colors: {
     ...baseTheme.colors,
-    bgPrimary: '#121212',
-    bgSecondary: '#1a1a1a',
-    textPrimary: '#ffffff',
     accent: 'rgb(247, 73, 40)',
     accentTransparent: 'rgba(247, 73, 40, 0.75)',
     accentBorder: 'rgba(247, 73, 40, 0.2)',
@@ -106,9 +103,6 @@ export const kavaWebappTheme: Theme = {
   ...baseTheme,
   colors: {
     ...baseTheme.colors,
-    bgPrimary: '#ffffff',
-    bgSecondary: '#f0f0f0',
-    textPrimary: '#1a1a1a',
     accent: '#0070f3',
     accentTransparent: 'rgba(0, 112, 243, 0.75)',
     accentBorder: 'rgba(0, 112, 243, 0.2)',
