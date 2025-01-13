@@ -5,8 +5,9 @@ import { SendChatIcon } from './assets/SendChatIcon';
 import { CancelChatIcon } from './assets/CancelChatIcon';
 import hardDotFunDiamond from './assets/hardDotFunDiamond.svg';
 import { Conversation } from './Conversation';
-
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
+import { maskAddresses } from './utils/chat/maskAddresses';
+import { getStoredMasks, updateStoredMasks } from './utils/chat/helpers';
 
 export interface ChatViewProps {
   messages: ChatCompletionMessageParam[];
@@ -15,7 +16,6 @@ export interface ChatViewProps {
   onSubmit(value: string): void;
   onReset(): void;
   onCancel(): void;
-
   introText: string;
   address: string;
   chainID: string;
@@ -28,7 +28,6 @@ export const ChatView = ({
   onSubmit,
   onReset,
   onCancel,
-
   introText,
   address,
   chainID,
@@ -44,6 +43,7 @@ export const ChatView = ({
   }, [containerRef]);
 
   const [inputValue, setInputValue] = useState('');
+
   const handleInputChange = useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {
       /**
@@ -71,7 +71,16 @@ export const ChatView = ({
       return;
     }
 
-    onSubmit(inputValue);
+    const storedMasks = getStoredMasks();
+    const { output, masksToValues, valuesToMasks } = maskAddresses(
+      inputValue,
+      storedMasks.valuesToMasks,
+      storedMasks.masksToValues,
+    );
+
+    updateStoredMasks(masksToValues, valuesToMasks);
+
+    onSubmit(output);
     setInputValue('');
   }, [isRequesting, onSubmit, onCancel, inputValue]);
 

@@ -285,3 +285,89 @@ test('handles cancelling an in progress token metadata request', async ({
     await messageElements[messageElements.length - 1].textContent(),
   ).toMatch(/Request was aborted/i);
 });
+
+test('shows original address in UI but sends masked version to API', async ({
+  page,
+}) => {
+  test.setTimeout(90 * 1000);
+
+  const chat = new Chat(page);
+  await chat.goto();
+
+  //
+  let requestBody;
+  await page.route('**/chat/completions', async (route) => {
+    const request = route.request();
+    requestBody = request.postData();
+    await route.continue();
+  });
+
+  const firstAddress = '0xc07918e451ab77023a16fa7515dd60433a3c771d';
+  await chat.submitMessage(`Send 10 KAVA to ${firstAddress}`);
+  await chat.waitForStreamToFinish();
+  await chat.waitForAssistantResponse();
+
+  let messages = await chat.getMessageElementsWithContent();
+  let userMessage = messages[messages.length - 2];
+  let messageText = await userMessage.innerText();
+  expect(messageText).toMatch(`Send 10 KAVA to ${firstAddress}`);
+
+  let parsedRequest = JSON.parse(requestBody);
+  let userMessages = parsedRequest.messages.filter((m) => m.role === 'user');
+  let sentMessage = userMessages[userMessages.length - 1].content;
+  expect(sentMessage).toMatch('Send 10 KAVA to address_1');
+  expect(sentMessage).not.toContain(firstAddress);
+
+  // Second Message - new address
+  const secondResponsePromise = page.waitForResponse(async (res) => {
+    if (res.url().includes('completions')) {
+      requestBody = await res.request().postData();
+      expect(res.status()).toBe(200);
+      await res.finished();
+      return true;
+    }
+    return false;
+  });
+
+  const secondAddress = '0xd8e30f7bcb5211e591bbc463cdab0144e82dffe5';
+  await chat.submitMessage(`Send 10 KAVA to ${secondAddress}`);
+  await secondResponsePromise;
+  await chat.waitForAssistantResponse();
+
+  messages = await chat.getMessageElementsWithContent();
+  userMessage = messages[messages.length - 2];
+  messageText = await userMessage.innerText();
+  expect(messageText).toMatch(`Send 10 KAVA to ${secondAddress}`);
+
+  parsedRequest = JSON.parse(requestBody);
+  userMessages = parsedRequest.messages.filter((m) => m.role === 'user');
+  sentMessage = userMessages[userMessages.length - 1].content;
+  expect(sentMessage).toMatch('Send 10 KAVA to address_2');
+  expect(sentMessage).not.toContain(secondAddress);
+
+  // Third Message - Reusing first address
+  const thirdResponsePromise = page.waitForResponse(async (res) => {
+    if (res.url().includes('completions')) {
+      requestBody = await res.request().postData();
+      expect(res.status()).toBe(200);
+      await res.finished();
+      return true;
+    }
+    return false;
+  });
+
+  await chat.submitMessage(`Send 10 KAVA to ${firstAddress}`);
+  await thirdResponsePromise;
+  await chat.waitForAssistantResponse();
+
+  messages = await chat.getMessageElementsWithContent();
+  userMessage = messages[messages.length - 2];
+  messageText = await userMessage.innerText();
+  expect(messageText).toMatch(`Send 10 KAVA to ${firstAddress}`);
+
+  parsedRequest = JSON.parse(requestBody);
+  userMessages = parsedRequest.messages.filter((m) => m.role === 'user');
+  sentMessage = userMessages[userMessages.length - 1].content;
+  expect(sentMessage).toContain('Send 10 KAVA to address_1');
+  expect(sentMessage).not.toContain(firstAddress);
+});
