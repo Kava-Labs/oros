@@ -1,18 +1,14 @@
 // ThemeContext.tsx
-import React, {
-  createContext,
-  useContext,
-  ReactNode,
-  useEffect,
-  useMemo,
-} from 'react';
+import React, { createContext, ReactNode, useEffect, useMemo } from 'react';
 import { Theme, themes, ThemeName, baseTheme } from './theme';
 
-interface ThemeContextProps {
+export interface ThemeContextProps {
   theme: Theme;
 }
 
-const ThemeContext = createContext<ThemeContextProps | undefined>(undefined);
+export const ThemeContext = createContext<ThemeContextProps | undefined>(
+  undefined,
+);
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
   children,
@@ -61,10 +57,4 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
       {children}
     </ThemeContext.Provider>
   );
-};
-
-export const useTheme = (): ThemeContextProps => {
-  const context = useContext(ThemeContext);
-  if (!context) throw new Error('useTheme must be used within a ThemeProvider');
-  return context;
 };

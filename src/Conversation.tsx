@@ -7,7 +7,7 @@ import { TokenCard, TokenCardsStreamingPlaceholder } from './TokenCard';
 
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { memo } from 'react';
-import { useTheme } from './theme/themeContext';
+import { useTheme } from './theme/useTheme';
 
 export interface ConversationProps {
   messages: ChatCompletionMessageParam[];
