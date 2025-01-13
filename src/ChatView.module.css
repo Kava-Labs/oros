@@ -4,23 +4,23 @@
   flex-direction: column;
   height: 100vh;
   justify-content: center;
-  background: var(--color-bg-primary);
+  background: var(--colors-bgPrimary);
 }
 
 ::-webkit-scrollbar {
-  background-color: var(--color-bg-primary);
+  background-color: var(--colors-bgPrimary);
   width: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--color-bg-tertiary);
-  border-radius: var(--radius-md);
+  background-color: var(--colors-bgTertiary);
+  border-radius: var(--borderRadius-md);
 }
 
 #startContainer {
   max-width: 768px;
   width: 100%;
-  padding: 0 var(--space-sm);
+  padding: 0 var(--spacing-sm);
   margin-top: -10px;
   height: 100%;
   display: flex;
@@ -28,7 +28,7 @@
 }
 
 #start {
-  color: var(--color-text-primary);
+  color: var(--colors-textPrimary);
   margin: auto;
   display: flex;
   flex-direction: column;
@@ -48,43 +48,43 @@
 
   h3 {
     text-align: center;
-    margin-bottom: var(--space-sm);
-    margin-top: var(--space-sm);
+    margin-bottom: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
   }
 
   h6 {
     text-align: center;
-    margin-top: var(--space-sm);
+    margin-top: var(--spacing-sm);
   }
 }
 
 .right {
   flex-shrink: 0;
-  border-radius: var(--radius-md);
-  background: var(--color-bg-tertiary);
-  color: var(--color-text-primary);
-  padding: var(--space-md);
+  border-radius: var(--borderRadius-md);
+  background: var(--colors-bgTertiary);
+  color: var(--colors-textPrimary);
+  padding: var(--spacing-md);
   margin-left: auto;
-  margin-top: var(--radius-sm);
+  margin-top: var(--borderRadius-sm);
 }
 
 .left {
   flex-shrink: 0;
-  margin-top: var(--space-lg);
-  padding: var(--space-md) var(--space-md) var(--space-md) 0px;
-  color: var(--color-text-primary);
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) 0px;
+  color: var(--colors-textPrimary);
   display: flex;
   flex-direction: row;
   align-items: start;
 }
 
 .assistantContainer {
-  margin-top: var(--space-md);
+  margin-top: var(--spacing-md);
 }
 
 #progressStream {
   .content {
-    color: var(--color-text-tertiary);
+    color: var(--colors-textTertiary);
 
     p::after {
       content: '.';
@@ -113,7 +113,7 @@
 .conversationChatIcon {
   height: 60px;
   width: 60px;
-  margin-right: var(--space-sm);
+  margin-right: var(--spacing-sm);
   object-fit: contain;
   aspect-ratio: 1 / 1;
   transform: scale(0.75);
@@ -127,7 +127,7 @@
   display: flex;
   flex-direction: column;
 
-  scrollbar-color: var(--color-bg-tertiary) var(--color-bg-primary);
+  scrollbar-color: var(--colors-bgTertiary) var(--colors-bgPrimary);
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
 }
@@ -135,7 +135,7 @@
 #conversation {
   max-width: 768px;
   width: 100%;
-  padding: 0 var(--space-sm);
+  padding: 0 var(--spacing-sm);
   margin-top: -10px;
   height: 100%;
   display: flex;
@@ -153,11 +153,11 @@
     min-height: 50px;
     max-width: 768px;
     width: 100%;
-    background-color: var(--color-bg-tertiary);
-    border-radius: var(--radius-md);
+    background-color: var(--colors-bgTertiary);
+    border-radius: var(--borderRadius-md);
     border: none;
-    padding: var(--space-md);
-    color: var(--color-text-primary);
+    padding: var(--spacing-md);
+    color: var(--colors-textPrimary);
     font-family: inherit;
     font-weight: inherit;
     line-height: inherit;
@@ -185,8 +185,8 @@
   padding: 0;
   border-radius: 50%;
   box-sizing: border-box;
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-accent-transparent);
+  background: var(--colors-bgSecondary);
+  border: 1px solid var(--colors-accentTransparent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -214,10 +214,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  scrollbar-color: var(--color-bg-tertiary) var(--color-bg-primary);
+  scrollbar-color: var(--colors-bgTertiary) var(--colors-bgPrimary);
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
-  padding: 0px var(--space-xs) var(--space-xs) var(--space-xs);
+  padding: 0px var(--spacing-xs) var(--spacing-xs) var(--spacing-xs);
 
   @media (max-width: 768px) {
     overflow-y: hidden;
@@ -225,11 +225,11 @@
 }
 
 #importantInfo {
-  margin-top: var(--space-xs);
+  margin-top: var(--spacing-xs);
   /* custom font-size for chat warning */
   font-size: 1rem;
   text-align: center;
-  color: var(--color-text-muted);
+  color: var(--colors-textMuted);
 }
 
 #stickyHeader {
@@ -238,8 +238,8 @@
   width: 100%;
   max-width: 768px;
   margin: 0 auto;
-  background: var(--color-bg-primary);
-  padding: var(--space-sm) var(--space-sm);
+  background: var(--colors-bgPrimary);
+  padding: var(--spacing-sm) var(--spacing-sm);
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -247,15 +247,15 @@
   z-index: 99;
 
   @media (max-width: 640px) {
-    padding: var(--space-sm) var(--space-sm);
+    padding: var(--spacing-sm) var(--spacing-sm);
   }
 
   #resetButton {
-    background: var(--color-bg-secondary);
-    border: 1.5px solid var(--color-accent-transparent);
-    color: var(--color-text-primary);
-    border-radius: var(--radius-sm);
-    padding: var(--space-xs) var(--space-sm);
+    background: var(--colors-bgSecondary);
+    border: 1.5px solid var(--colors-accentTransparent);
+    color: var(--colors-textPrimary);
+    border-radius: var(--borderRadius-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
     cursor: pointer;
     transition: background-color 0.3s ease;
 
@@ -273,7 +273,7 @@
     }
 
     @media (max-width: 640px) {
-      padding: var(--space-xs) var(--space-xs);
+      padding: var(--spacing-xs) var(--spacing-xs);
 
       svg {
         height: 20px;

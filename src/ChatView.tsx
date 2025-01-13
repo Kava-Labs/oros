@@ -4,6 +4,7 @@ import { ResetChatIcon } from './assets/ResetChatIcon';
 import { SendChatIcon } from './assets/SendChatIcon';
 import { CancelChatIcon } from './assets/CancelChatIcon';
 import hardDotFunDiamond from './assets/hardDotFunDiamond.svg';
+import { useTheme } from './theme/themeContext';
 import { Conversation } from './Conversation';
 
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
@@ -89,6 +90,8 @@ export const ChatView = ({
     }
   };
 
+  const { theme } = useTheme();
+
   return (
     <div id={styles.chatview} data-testid="chatview">
       <div
@@ -104,7 +107,7 @@ export const ChatView = ({
                 aria-label="Reset Chat"
                 onClick={onReset}
               >
-                <ResetChatIcon />
+                <ResetChatIcon color={theme.colors.accentTransparent} />
               </button>
             </div>
 
@@ -120,7 +123,7 @@ export const ChatView = ({
         {!hasMessages && (
           <div id={styles.startContainer}>
             <div id={styles.start} data-testid="start">
-              <img src={hardDotFunDiamond} id={styles.chatIconContainer} />
+              <img src={theme.logo} id={styles.chatIconContainer} />
               <h3>Let's get started!</h3>
               <h6>
                 {address
@@ -151,7 +154,11 @@ export const ChatView = ({
             onClick={handleButtonClick}
             aria-label="Send Chat"
           >
-            {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
+            {isRequesting ? (
+              <CancelChatIcon color={theme.colors.accentTransparent} />
+            ) : (
+              <SendChatIcon color={theme.colors.accentTransparent} />
+            )}
           </button>
         </div>
         <span id={styles.importantInfo} data-testid="importantInfo">

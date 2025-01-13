@@ -1,13 +1,13 @@
 .tokenCardWrapper {
-  background: var(--color-bg-primary);
-  padding: clamp(var(--space-md), 5vw, 32px);
+  background: var(--colors-bgPrimary);
+  padding: clamp(var(--spacing-md), 5vw, 32px);
   width: 90%;
   max-width: 500px;
 }
 
 .tokenCard {
-  background: var(--color-bg-secondary);
-  border-radius: var(--radius-md);
+  background: var(--colors-bgSecondary);
+  border-radius: var(--borderRadius-md);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   font-family:
@@ -26,16 +26,16 @@
 
     .tokenName {
       font-weight: bold;
-      color: var(--color-text-primary);
+      color: var(--colors-textPrimary);
       margin: 0;
-      margin-left: var(--space-sm);
+      margin-left: var(--spacing-sm);
       line-height: 1;
     }
 
     .tokenSymbol {
-      color: var(--color-accent-transparent);
-      font-weight: var(--font-weight-regular);
-      border-bottom: 1px solid var(--color-accent-border);
+      color: var(--colors-accentTransparent);
+      font-weight: var(--typography-fontWeightRegular);
+      border-bottom: 1px solid var(--colors-accentBorder);
       padding-bottom: 2px;
       line-height: 1;
       margin-top: 5px;
@@ -43,15 +43,15 @@
   }
 
   .content {
-    padding: 0 var(--space-lg) var(--space-lg) var(--space-lg);
+    padding: 0 var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
   }
 }
 
 .imageWrapper {
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--spacing-lg);
   min-height: 200px;
-  background: var(----color-bg-quaternary);
-  border-radius: var(--radius-sm);
+  background: var(--colors-bgQuaternary);
+  border-radius: var(--borderRadius-sm);
   overflow: hidden;
   display: flex;
   justify-content: center;
@@ -62,7 +62,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: var(--radius-sm);
+  border-radius: var(--borderRadius-sm);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -73,21 +73,21 @@
 }
 
 .descriptionContainer {
-  padding: var(--space-lg);
-  background: var(--color-bg-tertiary);
-  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  background: var(--colors-bgTertiary);
+  border-radius: var(--borderRadius-md);
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--spacing-md);
 
   .infoTitle {
-    font-weight: var(--font-weight-bold);
-    color: var(--color-text-primary);
+    font-weight: var(--typography-fontWeightBold);
+    color: var(--colors-textPrimary);
     margin: 0;
   }
 
   .description {
-    color: var(--color-text-secondary);
+    color: var(--colors-textSecondary);
     line-height: 1.6;
     margin: 0;
   }
@@ -98,21 +98,21 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  background: var(--color-bg-quaternary);
+  background: var(--colors-bgQuaternary);
   border: 2px dashed #444;
   padding: 1rem;
-  border-radius: var(--radius-sm);
+  border-radius: var(--borderRadius-sm);
 }
 
 .imageErrorText p {
-  color: var(--color-text-muted);
-  font-weight: var(--font-weight-regular);
+  color: var(--colors-textMuted);
+  font-weight: var(--typography-fontWeightRegular);
   margin: 0;
 }
 
 .tokenButton {
   line-height: 1.2;
-  font-weight: var(--font-weight-bold);
+  font-weight: var(var(--typography-fontWeightBold));
   font-family: 'Inter';
   display: flex;
   align-items: center;
@@ -121,9 +121,9 @@
   width: 100%;
   /* special case rounded button */
   border-radius: 30px;
-  color: var(--color-accent-transparent);
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-accent-transparent);
+  color: var(--colors-accentTransparent);
+  background: var(--colors-bgSecondary);
+  border: 1px solid var(--colors-accentTransparent);
   padding: 8px;
   transition:
     background 0.3s,
@@ -154,27 +154,27 @@
   }
 
   .content {
-    padding: 0 var(--space-md) var(--space-md) var(--space-md);
+    padding: 0 var(--spacing-md) var(--spacing-md) var(--spacing-md);
   }
 
   .imageWrapper {
-    margin-bottom: var(--space-md);
+    margin-bottom: var(--spacing-md);
     min-height: 160px;
   }
 
   .descriptionContainer {
-    padding: var(--space-md);
+    padding: var(--spacing-md);
     gap: 12px;
   }
 
   .tokenButton {
-    padding: var(--space-sm);
+    padding: var(--spacing-sm);
   }
 }
 
 @media (max-width: 350px) {
   .tokenCardWrapper {
-    padding: var(--space-md);
+    padding: var(--spacing-md);
     width: 100%;
   }
 

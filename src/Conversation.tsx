@@ -1,5 +1,4 @@
 import styles from './ChatView.module.css';
-import hardDotFunDiamond from './assets/hardDotFunDiamond.svg';
 import { Content } from './Content';
 import { StreamingText } from './StreamingText';
 import { messageStore, progressStore, toolCallStreamStore } from './store';
@@ -8,6 +7,7 @@ import { TokenCard, TokenCardsStreamingPlaceholder } from './TokenCard';
 
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { memo } from 'react';
+import { useTheme } from './theme/themeContext';
 
 export interface ConversationProps {
   messages: ChatCompletionMessageParam[];
@@ -27,6 +27,8 @@ const ConversationComponent = ({
   isRequesting,
   onRendered,
 }: ConversationProps) => {
+  const { theme } = useTheme();
+
   return (
     <div id={styles.conversation} data-testid="conversation">
       {messages.map((message, index) => {
@@ -44,10 +46,7 @@ const ConversationComponent = ({
         if (message.role === 'assistant' && message.content) {
           return (
             <div key={index} className={styles.left}>
-              <img
-                src={hardDotFunDiamond}
-                className={styles.conversationChatIcon}
-              />
+              <img src={theme.logo} className={styles.conversationChatIcon} />
               <div className={styles.assistantContainer}>
                 <Content
                   role={message.role}
@@ -103,10 +102,7 @@ const ConversationComponent = ({
       })}
       {isRequesting && (
         <div className={styles.left}>
-          <img
-            src={hardDotFunDiamond}
-            className={styles.conversationChatIcon}
-          />
+          <img src={theme.logo} className={styles.conversationChatIcon} />
 
           <div className={styles.assistantContainer}>
             <div id={styles.progressStream}>
@@ -124,10 +120,7 @@ const ConversationComponent = ({
       )}
       {errorText.length > 0 && (
         <div className={styles.left}>
-          <img
-            src={hardDotFunDiamond}
-            className={styles.conversationChatIcon}
-          />
+          <img src={theme.logo} className={styles.conversationChatIcon} />
           <div className={styles.assistantContainer}>
             <Content
               content={errorText}
