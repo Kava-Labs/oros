@@ -13,9 +13,28 @@ export const ThemeContext = createContext<ThemeContextProps | undefined>(
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const selectedThemeName: ThemeName =
-    (import.meta.env.VITE_THEME as ThemeName) || 'base';
-  const selectedTheme = themes[selectedThemeName] || themes.base;
+  const parentHost = (() => {
+    try {
+      return window.parent.location.hostname;
+    } catch {
+      return '';
+    }
+  })();
+
+  const themeName: ThemeName = useMemo(() => {
+    switch (parentHost) {
+      case 'app.kava.io':
+        return 'kavaWebapp';
+      case 'hard.fun':
+        return 'hardDotFun';
+      case 'localhost':
+        return 'hardDotFun';
+      default:
+        return 'base';
+    }
+  }, [parentHost]);
+
+  const selectedTheme = themes[themeName] || themes.base;
 
   const currentTheme: Theme = useMemo(() => {
     return {
