@@ -8,7 +8,20 @@ interface SanitizeOptions {
 }
 
 export async function sanitizeContent(content: string): Promise<string> {
-  const htmlContent: string = await marked.parse(content);
+  // Check for incomplete markdown links and return just the text portion
+  const processLinks = (text: string): string => {
+    // If we see a partial end of a link like "Claude](..." or just "](..."
+    text = text.replace(/[^[]*\]\([^)]*$/, '');
+
+    // If we see a partial start of a link like "[Cla..."
+    text = text.replace(/\[[^\]]*$/, '');
+
+    // Complete links will be handled by marked
+    return text;
+  };
+
+  const processedContent = processLinks(content);
+  const htmlContent: string = await marked.parse(processedContent);
 
   // Configure links to open in new tabs
   const afterSanitizeAttributes = (node: Element): void => {

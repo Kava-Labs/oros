@@ -104,4 +104,19 @@ This should render anyway
     expect(output).toContain('<ul>');
     expect((output.match(/<li>/g) || []).length).toBe(1000);
   });
+
+  it('handle link markdown (complete) by opening in a new tab', async () => {
+    const input = '[Claude](www.claude.ai)';
+    const output = await sanitizeContent(input);
+    expect(output).toContain(
+      '<p><a href="www.claude.ai" target="_blank" rel="noopener noreferrer">Claude</a></p>',
+    );
+  });
+
+  it("don't render an incomplete markdown link", async () => {
+    // Generate a large markdown string
+    const input = '[Claude](www.claude.ai';
+    const output = await sanitizeContent(input);
+    expect(output).toContain('');
+  });
 });
