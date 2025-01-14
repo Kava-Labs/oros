@@ -18,10 +18,14 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
     switch (parentHost) {
       case 'app.kava.io':
         return 'kavaWebapp';
+      // TODO: temporary for demo
+      case 'oros-preview':
+        return 'kavaWebapp';
       case 'hard.fun':
         return 'hardDotFun';
       case 'hardfunai':
         return 'hardDotFun';
+      // TODO: temporary for local development
       case 'localhost':
         return 'hardDotFun';
       default:
