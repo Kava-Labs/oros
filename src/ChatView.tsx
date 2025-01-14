@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import styles from './ChatView.module.css';
 import { ResetChatIcon } from './assets/ResetChatIcon';
 import { SendChatIcon } from './assets/SendChatIcon';
@@ -108,6 +108,14 @@ export const ChatView = ({
 
   const { colors, logo } = useTheme();
 
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
+
   return (
     <div id={styles.chatview} data-testid="chatview">
       <div
@@ -160,6 +168,7 @@ export const ChatView = ({
             value={inputValue}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
+            ref={inputRef}
           ></textarea>
 
           <button
