@@ -25,7 +25,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
       case 'localhost':
         return 'hardDotFun';
       default:
-        return 'base';
+        return 'hardDotFun';
     }
   }, [parentHost]);
 
