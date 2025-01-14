@@ -1,5 +1,5 @@
 // ThemeContext.tsx
-import React, { ReactNode, useLayoutEffect, useMemo } from 'react';
+import React, { ReactNode, useInsertionEffect, useMemo } from 'react';
 import { Theme, themes, ThemeName, baseTheme } from './themes';
 import { ThemeContext } from './themeContext';
 
@@ -53,7 +53,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
   }, [selectedTheme]);
 
   // Apply CSS variables dynamically
-  useLayoutEffect(() => {
+  useInsertionEffect(() => {
     const root = document.documentElement;
     Object.entries(currentTheme).forEach(([section, values]) => {
       if (typeof values === 'object') {
