@@ -17,13 +17,13 @@
   animation: spin 1s linear infinite;
   height: 4rem;
   width: 4rem;
-  color: var(--color-accent-transparent);
+  color: var(--colors-accentTransparent);
 }
 
 .content {
   text-align: center;
   max-width: 32rem;
-  color: var(--color-text-primary);
+  color: var(--colors-textPrimary);
 }
 
 .promptContainer {
@@ -44,7 +44,7 @@
 }
 
 .progressBar {
-  background-color: var(--color-accent);
+  background-color: var(--colors-accent);
   height: 100%;
   border-radius: 9999px;
   transition: width 0.2s ease;

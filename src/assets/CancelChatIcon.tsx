@@ -1,10 +1,16 @@
-import { memo } from 'react';
+import React, { useMemo } from 'react';
 
-export const CancelChatIcon = memo(
-  () => {
+interface CancelChatIconProps {
+  color: string;
+}
+
+export const CancelChatIcon: React.FC<CancelChatIconProps> = React.memo(
+  ({ color }) => {
+    const fillStyle = useMemo(() => ({ fill: color }), [color]);
+
     return (
       <svg
-        fill="rgb(247, 73, 40, 0.75)"
+        style={fillStyle}
         viewBox="0 0 32 32"
         xmlns="http://www.w3.org/2000/svg"
       >
@@ -12,5 +18,4 @@ export const CancelChatIcon = memo(
       </svg>
     );
   },
-  () => true,
 );

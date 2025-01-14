@@ -34,6 +34,7 @@ import '@fontsource/inter/700-italic.css';
 // Components & Context
 //
 import { App } from './App.tsx';
+import { ThemeProvider } from './theme/themeProvider.tsx';
 
 //
 // Render!
@@ -42,6 +43,8 @@ const root = createRoot(document.getElementById('root')!);
 
 root.render(
   <StrictMode>
-    <App />
+    <ThemeProvider>
+      <App />
+    </ThemeProvider>
   </StrictMode>,
 );
