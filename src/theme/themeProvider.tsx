@@ -20,6 +20,8 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
         return 'kavaWebapp';
       case 'hard.fun':
         return 'hardDotFun';
+      case 'hardfunai':
+        return 'hardDotFun';
       case 'localhost':
         return 'hardDotFun';
       default:
