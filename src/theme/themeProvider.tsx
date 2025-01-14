@@ -1,4 +1,3 @@
-// ThemeContext.tsx
 import React, { ReactNode, useInsertionEffect, useMemo } from 'react';
 import { Theme, themes, ThemeName, baseTheme } from './themes';
 import { ThemeContext } from './themeContext';
@@ -6,29 +5,22 @@ import { ThemeContext } from './themeContext';
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const parentHost = (() => {
-    try {
-      return window.parent.location.hostname;
-    } catch {
-      return '';
-    }
-  })();
+  // Function to extract and validate the theme from query parameters
+  const getThemeFromQuery = (): ThemeName | null => {
+    const params = new URLSearchParams(window.location.search);
+    const theme = params.get('theme') as ThemeName | null;
+    return theme && themes[theme] ? theme : null;
+  };
+
+  const queryTheme = getThemeFromQuery();
 
   const themeName: ThemeName = useMemo(() => {
-    if (parentHost.includes('app.kava.io')) {
-      return 'kavaWebapp';
-    } else if (parentHost.includes('oros-preview')) {
-      return 'kavaWebapp';
-    } else if (parentHost.includes('hard.fun')) {
-      return 'hardDotFun';
-    } else if (parentHost.includes('hardfunai')) {
-      return 'hardDotFun';
-    } else if (parentHost.includes('localhost')) {
-      return 'hardDotFun';
-    } else {
-      return 'hardDotFun';
+    if (queryTheme) {
+      return queryTheme;
     }
-  }, [parentHost]);
+    // Fallback to default theme `hardDotFun`
+    return 'hardDotFun';
+  }, [queryTheme]);
 
   const selectedTheme = themes[themeName] || themes.base;
 
