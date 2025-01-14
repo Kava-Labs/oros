@@ -1,14 +1,7 @@
 // ThemeContext.tsx
-import React, { createContext, ReactNode, useEffect, useMemo } from 'react';
-import { Theme, themes, ThemeName, baseTheme } from './theme';
-
-export interface ThemeContextProps {
-  theme: Theme;
-}
-
-export const ThemeContext = createContext<ThemeContextProps | undefined>(
-  undefined,
-);
+import React, { ReactNode, useLayoutEffect, useMemo } from 'react';
+import { Theme, themes, ThemeName, baseTheme } from './themes';
+import { ThemeContext } from './themeContext';
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
   children,
@@ -60,7 +53,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
   }, [selectedTheme]);
 
   // Apply CSS variables dynamically
-  useEffect(() => {
+  useLayoutEffect(() => {
     const root = document.documentElement;
     Object.entries(currentTheme).forEach(([section, values]) => {
       if (typeof values === 'object') {
