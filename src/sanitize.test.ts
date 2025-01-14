@@ -114,7 +114,6 @@ This should render anyway
   });
 
   it("don't render an incomplete markdown link", async () => {
-    // Generate a large markdown string
     const input = '[Claude](www.claude.ai';
     const output = await sanitizeContent(input);
     expect(output).toContain('');
