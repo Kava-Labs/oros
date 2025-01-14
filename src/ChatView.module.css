@@ -142,38 +142,38 @@
   flex-direction: column;
 }
 
+#input {
+  min-height: 50px;
+  max-width: 768px;
+  width: 100%;
+  background-color: var(--colors-bgTertiary);
+  border-radius: var(--borderRadius-md);
+  border: none;
+  padding: var(--spacing-md);
+  color: var(--colors-textPrimary);
+  font-family: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  flex: 1;
+  /* 12px works with line-height to center text veritically  in textarea */
+  padding: 12px 55px 10px 20px;
+  overflow-y: auto; /* Enable vertical scrolling */
+  resize: none; /* Disable manual resizing */
+  text-wrap: wrap;
+
+  &:focus {
+    border: none;
+    outline: none;
+    caret-color: white;
+  }
+}
+
 #inputContainer {
   width: 100%;
   max-width: 768px;
   display: flex;
   align-items: flex-start;
   position: relative;
-
-  #input {
-    min-height: 50px;
-    max-width: 768px;
-    width: 100%;
-    background-color: var(--colors-bgTertiary);
-    border-radius: var(--borderRadius-md);
-    border: none;
-    padding: var(--spacing-md);
-    color: var(--colors-textPrimary);
-    font-family: inherit;
-    font-weight: inherit;
-    line-height: inherit;
-    flex: 1;
-    /* 12px works with line-height to center text veritically  in textarea */
-    padding: 12px 55px 10px 20px;
-    overflow-y: auto; /* Enable vertical scrolling */
-    resize: none; /* Disable manual resizing */
-    text-wrap: wrap;
-
-    &:focus {
-      border: none;
-      outline: none;
-      caret-color: white;
-    }
-  }
 }
 
 #sendChatButton {
