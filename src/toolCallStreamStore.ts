@@ -61,9 +61,12 @@ export class ToolCallStreamStore {
     if (streamingTc) {
       // If we already have a tool call for this "index", we just append new argument data.
       const streamParser = this.parsers.get(tc.index);
+      if (!streamParser) {
+        return;
+      }
       // The parser will handle streaming JSON. If the new data isn't valid JSON, it might throw.
       // caller should handle catching the error
-      streamParser!.write(tc.function?.arguments ?? '');
+      streamParser.write(tc.function?.arguments ?? '');
     } else {
       // If this is the first time we see this tool call, we need to set it up.
       this.addToolCall(tc);
