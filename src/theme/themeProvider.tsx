@@ -15,21 +15,18 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
   })();
 
   const themeName: ThemeName = useMemo(() => {
-    switch (parentHost) {
-      case 'app.kava.io':
-        return 'kavaWebapp';
-      // TODO: temporary for demo
-      case 'oros-preview':
-        return 'kavaWebapp';
-      case 'hard.fun':
-        return 'hardDotFun';
-      case 'hardfunai':
-        return 'hardDotFun';
-      // TODO: temporary for local development
-      case 'localhost':
-        return 'hardDotFun';
-      default:
-        return 'hardDotFun';
+    if (parentHost.includes('app.kava.io')) {
+      return 'kavaWebapp';
+    } else if (parentHost.includes('oros-preview')) {
+      return 'kavaWebapp';
+    } else if (parentHost.includes('hard.fun')) {
+      return 'hardDotFun';
+    } else if (parentHost.includes('hardfunai')) {
+      return 'hardDotFun';
+    } else if (parentHost.includes('localhost')) {
+      return 'hardDotFun';
+    } else {
+      return 'hardDotFun';
     }
   }, [parentHost]);
 
