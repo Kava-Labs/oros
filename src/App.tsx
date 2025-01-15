@@ -151,17 +151,12 @@ export const App = () => {
               messageStore,
             )
               .catch((error) => {
-                let errorMessage =
+                const errorMessage =
                   typeof error === 'object' &&
                   error !== null &&
                   'message' in error
                     ? (error as { message: string }).message
                     : 'An error occurred - please try again';
-
-                //  Errors can be thrown when recursive call is cancelled
-                if (errorMessage.includes('JSON')) {
-                  errorMessage = 'You clicked cancel - please try again';
-                }
 
                 setErrorText(errorMessage);
               })
