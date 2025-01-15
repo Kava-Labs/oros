@@ -59,6 +59,7 @@
 }
 
 .right {
+  text-align: right;
   flex-shrink: 0;
   border-radius: var(--borderRadius-md);
   background: var(--colors-bgTertiary);

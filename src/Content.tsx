@@ -2,7 +2,7 @@ import { useState, useEffect, memo } from 'react';
 import { sanitizeContent } from './sanitize';
 import styles from './Content.module.css';
 import { unmaskAddresses } from './utils/chat/unmaskAddresses';
-import { getStoredMasks } from './utils/chat/helpers';
+import { enforceWordBreak, getStoredMasks } from './utils/chat/helpers';
 
 export interface ContentProps {
   content: string;
@@ -70,7 +70,9 @@ export const ContentComponent = ({
       {sanitizedContent !== '' && (
         <span
           className={styles.content}
-          dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+          dangerouslySetInnerHTML={{
+            __html: enforceWordBreak(sanitizedContent),
+          }}
         ></span>
       )}
     </div>
