@@ -24,7 +24,7 @@ import { TextStreamStore } from './textStreamStore';
 import {
   memeCoinSystemPrompt,
   memeCoinGenIntroText,
-} from './config/systemPrompt';
+} from './config/prompts/systemPrompt';
 import { memeCoinTools } from './config/tools';
 import { imagedb } from './imagedb';
 import { v4 as uuidv4 } from 'uuid';

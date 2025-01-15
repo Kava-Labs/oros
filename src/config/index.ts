@@ -1,2 +1,2 @@
 export * from './tools';
-export * from './systemPrompt';
+export * from './prompts/systemPrompt';
