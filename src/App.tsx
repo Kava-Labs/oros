@@ -115,7 +115,7 @@ export const App = () => {
             break;
           }
           case `SET_CAUTION_TEXT/V1`: {
-            console.info('SET_INTRO_TEXT/V1', event.data);
+            console.info('SET_CAUTION_TEXT/V1', event.data);
             const cautionText = event.data.payload.cautionText;
             setConfig((prev) => ({ ...prev, cautionText }));
             break;
