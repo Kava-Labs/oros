@@ -62,15 +62,15 @@ export const ChatView = ({
   );
 
   const handleButtonClick = useCallback(() => {
-    // const lastMessage = messages[messages.length - 1];
-    // const lastMessageRole = lastMessage.role;
-    //
-    // //  if a user has initiated a wallet-based tool call, but not confirmed or denied it
-    // //  we don't want to add more messages to the history
-    // const userRequestInProgress =
-    //   messages.length > 1 && lastMessageRole === 'user';
+    const lastMessage = messages[messages.length - 1];
+    const lastMessageRole = lastMessage.role;
 
-    if (isRequesting) {
+    //  if a user has initiated a wallet-based tool call, but not confirmed or denied it
+    //  we don't want to add more messages to the history
+    const userRequestInProgress =
+      messages.length > 1 && lastMessageRole === 'user';
+
+    if (isRequesting || userRequestInProgress) {
       onCancel();
       return;
     }
