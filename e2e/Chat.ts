@@ -61,14 +61,19 @@ export class Chat {
   }
 
   async waitForImageGenerationToFinish() {
-    await this.page.waitForResponse(async (res) => {
-      if (res.url().includes('generations')) {
-        expect(res.status()).toBe(200);
-        await res.finished();
-        return true;
-      }
-      return false;
-    });
+    await this.page.waitForResponse(
+      async (res) => {
+        if (res.url().includes('generations')) {
+          expect(res.status()).toBe(200);
+          await res.finished();
+          return true;
+        }
+        return false;
+      },
+      {
+        timeout: 20000,
+      },
+    );
   }
 
   async waitForAssistantResponse() {
