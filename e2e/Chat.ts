@@ -71,7 +71,7 @@ export class Chat {
         return false;
       },
       {
-        timeout: 20000,
+        timeout: 40000,
       },
     );
   }
