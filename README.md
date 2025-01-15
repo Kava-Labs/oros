@@ -60,3 +60,62 @@ At its core, Oros is a bridge between natural language and blockchain actions, l
 ## Getting Started
 
 ### For Developers
+
+Ready to dive in and set up Oros locally? Follow these steps to get started:
+
+---
+
+#### 1. **Prerequisites**
+
+Before you begin, ensure you have the following tools installed:
+
+- **Go**: [Install Go](https://go.dev/doc/install) (version 1.19 or higher recommended)
+- **Node.js and npm**: [Install Node.js](https://nodejs.org/) (version 18.x or higher recommended)
+
+To verify installations, run:
+
+```bash
+go version
+node -v
+npm -v
+```
+
+#### 2. **Clone the Repository**
+
+Clone the Oros project to your local machine:
+
+```bash
+git clone https://github.com/<your-repo-path>/oros.git
+cd oros
+```
+
+#### 3. **Set Up the Backend**
+
+Oros requires an OpenAI API key for its backend. Obtain your key from [OpenAI's API portal](https://platform.openai.com/account/api-keys).
+
+Run the following command to start the backend API:
+
+```bash
+OPENAI_API_KEY=<your_key> OPENAI_BASE_URL=https://api.openai.com/v1 go run ./api/cmd/api/main.go
+```
+
+#### 4. **Set Up the Frontend**
+
+Open a new terminal, navigate to the project root, and install the necessary dependencies:
+
+```bash
+npm install
+npm run dev
+```
+
+#### 5. **Access the Application**
+
+The frontend should now be running on `http://localhost:3000`. Open your browser and interact with Oros locally!
+
+#### 6. **Troubleshooting**
+
+If you encounter issues:
+
+- Ensure your OpenAI API key is valid.
+- Verify all required tools (Go, Node.js, npm) are installed and up-to-date.
+- Check for detailed error logs in the backend or frontend terminal output.
