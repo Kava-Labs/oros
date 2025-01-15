@@ -1,0 +1,11 @@
+#messageContainer {
+  width: auto;
+  max-width: 400px;
+}
+
+#content {
+  display: inline-block;
+  word-wrap: break-word; /* Break words to prevent overflow */
+  overflow-wrap: break-word; /* Modern browsers */
+  word-break: break-word; /* For better word breaking */
+}

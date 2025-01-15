@@ -1,6 +1,6 @@
 import { useState, useEffect, memo } from 'react';
 import { sanitizeContent } from './sanitize';
-import styles from './ChatView.module.css';
+import styles from './Content.module.css';
 import { unmaskAddresses } from './utils/chat/unmaskAddresses';
 import { getStoredMasks } from './utils/chat/helpers';
 
@@ -62,7 +62,11 @@ export const ContentComponent = ({
   }
 
   return (
-    <div data-testid="conversation-message" data-chat-role={role}>
+    <div
+      data-testid="conversation-message"
+      data-chat-role={role}
+      className={styles.messageContainer}
+    >
       {sanitizedContent !== '' && (
         <span
           className={styles.content}
