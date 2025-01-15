@@ -212,7 +212,7 @@ describe('ToolCallStreamStore', () => {
     );
   });
 
-  it.only('should call subscribers on changes', () => {
+  it('should call subscribers on changes', () => {
     const store = new ToolCallStreamStore();
     const callback = vi.fn();
     const unsubscribe = store.subscribe(callback);
