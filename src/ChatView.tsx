@@ -185,7 +185,10 @@ export const ChatView = ({
           </button>
         </div>
         <span id={styles.importantInfo} data-testid="importantInfo">
-          <p>This application may produce errors and incorrect information.</p>
+          <p>
+            Executing transactions could result in loss of funds. Please use
+            caution and review all details.
+          </p>
         </span>
       </div>
     </div>
