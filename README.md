@@ -101,7 +101,13 @@ OPENAI_API_KEY=<your_key> OPENAI_BASE_URL=https://api.openai.com/v1 go run ./api
 
 #### 4. **Set Up the Frontend**
 
-Open a new terminal, navigate to the project root, and install the necessary dependencies:
+Before starting the frontend, create a `.env` file in the root of the project to configure the necessary environment variable. The file should contain the following:
+
+```bash
+VITE_OPENAI_BASE_URL=http://localhost:5555/openai/v1
+```
+
+After creating the `.env` file, install the required dependencies by running:
 
 ```bash
 npm install
