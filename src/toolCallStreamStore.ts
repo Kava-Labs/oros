@@ -145,12 +145,8 @@ export class ToolCallStreamStore {
     parser.onValue = (info) => {
       const key = info.key;
       const val = info.value;
-      // note: for simplicity the parser only works with javascript objects that are flat
-      // it is possible to support nested structures and primitive types but the complexity increases
-      // without added benefits, so for now ensure our tool call arguments are set up in a way to work with that constraint
 
-      // If we received a valid key and value, we update the corresponding tool call's arguments.
-      if (key && val !== undefined) {
+      if (val !== undefined) {
         // Again, we use .find here rather than direct indexing,
         // because the position of a tool call in our array may not match its API "index".
         const tcStream = this.toolCallStreams.find(
@@ -164,11 +160,17 @@ export class ToolCallStreamStore {
           return;
         }
 
-        // Update the tool call's arguments with the newly parsed key-value pair.
-        tcStream.function.arguments = {
-          ...tcStream.function.arguments,
-          [key]: val,
-        };
+        if (key !== undefined) {
+          if (info.stack.length <= 1) {
+            tcStream.function.arguments = {
+              ...tcStream.function.arguments,
+              [key]: val,
+            };
+          }
+        } else {
+          // @ts-expect-error some other structure with no key
+          tcStream.function.arguments = val;
+        }
 
         // Because we've mutated the tool call's arguments, create a fresh copy of the state
         this.toolCallStreams = structuredClone(this.toolCallStreams);

@@ -3,6 +3,62 @@ import { ToolCallStreamStore } from './toolCallStreamStore';
 import type { ChatCompletionChunk } from 'openai/resources/index';
 
 describe('ToolCallStreamStore', () => {
+  it('should work with strings, numbers, null, booleans, key value objects, arrays, and deeply nested objects', () => {
+    const testCases = [
+      'test json string', // string
+      100000000, // number
+      null, // null
+      true, // booleans
+      false, // booleans
+      {
+        key: 'value', // object
+      },
+      {
+        abc: 'def',
+        name: 'oros',
+        bd: { nested: 'efg', deeper: { more: [1, 2, 3] } },
+      }, // nested object
+      {
+        nested: [1, 2, 3, { obj: 'val' }],
+        hello: 'oros', // nested object
+      },
+
+      ['abc', 'def', 'efg'], // arrays
+    ];
+    const testTable = testCases.map((testCase) => ({
+      obj: testCase,
+      stringified: JSON.stringify(testCase),
+    }));
+
+    testTable.forEach((testCase) => {
+      const store = new ToolCallStreamStore();
+
+      const { obj, stringified } = testCase;
+      const firstChunk: ChatCompletionChunk.Choice.Delta.ToolCall = {
+        id: 'toolCall-1',
+        index: 0,
+        function: {
+          name: 'myFunction',
+        },
+      };
+
+      store.setToolCall(firstChunk);
+
+      for (const char of stringified) {
+        store.setToolCall({
+          index: 0,
+          function: { arguments: char },
+        });
+      }
+
+      const snapshot = store.getSnapShot();
+      expect(snapshot).toHaveLength(1);
+      expect(snapshot[0].id).toBe('toolCall-1');
+      expect(snapshot[0].function.name).toBe('myFunction');
+      expect(snapshot[0].function.arguments).toEqual(obj);
+    });
+  });
+
   it('should initialize a new tool call and incrementally parse JSON stream', () => {
     const store = new ToolCallStreamStore();
     const jsonArgObj = { a: 'bcd' };
@@ -166,7 +222,6 @@ describe('ToolCallStreamStore', () => {
     // We'll stream it in two parts
     const part1 = jsonArgStr.slice(0, -1);
     const part2 = jsonArgStr.slice(-1);
-
     store.setToolCall({
       id: 'toolCall-7',
       index: 4,
@@ -181,6 +236,7 @@ describe('ToolCallStreamStore', () => {
       function: { name: 'notifyFunc', arguments: part1 },
     });
 
+    // one emit change
     expect(callback).toHaveBeenCalledTimes(1);
 
     // Now stream the last character, causing parser to finish
@@ -189,11 +245,14 @@ describe('ToolCallStreamStore', () => {
       index: 4,
       function: { arguments: part2 },
     });
-    expect(callback).toHaveBeenCalledTimes(2);
+    // two more emit change, one for the second part,
+    // and one for the "onEnd" since the json is fully parsed should leave as at 3
+    expect(callback).toHaveBeenCalledTimes(3);
 
     // Another change: delete the tool call
+    // should also cause an emit change and lead us to 4
     store.deleteToolCallById('toolCall-7');
-    expect(callback).toHaveBeenCalledTimes(3);
+    expect(callback).toHaveBeenCalledTimes(4);
 
     // Unsubscribe and ensure no more calls occur
     unsubscribe();
@@ -207,7 +266,7 @@ describe('ToolCallStreamStore', () => {
       },
     });
     // This should emit a change, but we unsubscribed, so callback not called again
-    expect(callback).toHaveBeenCalledTimes(3);
+    expect(callback).toHaveBeenCalledTimes(4);
   });
 
   it('getSnapShot should return the current state and clear should reset state', () => {
