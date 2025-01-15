@@ -10,6 +10,7 @@ import { getStoredMasks, updateStoredMasks } from './utils/chat/helpers';
 export interface ChatViewProps {
   messages: ChatCompletionMessageParam[];
   errorText: string;
+  cautionText: string;
   isRequesting: boolean;
   onSubmit(value: string): void;
   onReset(): void;
@@ -22,6 +23,7 @@ export interface ChatViewProps {
 export const ChatView = ({
   messages,
   errorText,
+  cautionText,
   isRequesting,
   onSubmit,
   onReset,
@@ -185,10 +187,7 @@ export const ChatView = ({
           </button>
         </div>
         <span id={styles.importantInfo} data-testid="importantInfo">
-          <p>
-            Executing transactions could result in loss of funds. Please use
-            caution and review all details.
-          </p>
+          <p>{cautionText}</p>
         </span>
       </div>
     </div>
