@@ -1,8 +1,11 @@
 # Oros AI: Empowering Decentralized Applications with Intelligent Agents
 
-![Oros Logo](https://raw.githubusercontent.com/Kava-Labs/oros/refs/heads/main/src/assets/orosLogo.svg?token=GHSAT0AAAAAAC2PI2UV4YLEUHJB63XNY6J4Z4IEMUA)
+![Oros Logo](https://raw.githubusercontent.com/Kava-Labs/oros/refs/heads/main/src/assets/orosLogo.svg)
+
 [![Build Status](https://img.shields.io/github/actions/workflow/status/kava-labs/oros/ci.yml?branch=main&label=CI)](https://github.com/kava-labs/oros/actions)
+
 [![License](https://img.shields.io/github/license/kava-labs/oros.svg)](./LICENSE)
+
 [![Dependencies](https://img.shields.io/david/kava-labs/oros?label=deps)](https://github.com/kava-labs/oros)
 
 Oros brings AI-driven interactions to any dApp. Designed as an intuitive agent layer, Oros transforms how users interact with blockchain ecosystems by bridging advanced AI with on-chain capabilities. Imagine managing your assets, executing complex DeFi strategies, or exploring new dApps—all with a simple conversation. That’s the vision of Oros.
@@ -34,32 +37,31 @@ Integrating Oros means less time spent building custom AI tools and more time fo
 ## Technical Architecture
 
 ```markdown
-     +------------------------------+
-     |   Oros UI (Front-End)        |
-     |    (React/Typescript)        |
-     +-------------+----------------+
-                   |
-                   ▼
-
+    +------------------------------+
+    |     Oros UI (Front-End)      |
+    |     (React/Typescript)       |
+    +---------------+--------------+
+                    |
+                    ▼
 +---------------------------------------+
-| Oros Agent (Chat + Tools Orchestr.) |
-| - Core AI logic (LLM-based) |
-| - Tool registry (function specs) |
-| - Session & memory layer |
-+------------------+--------------------+
-|
-▼
+|  Oros Agent (Chat + Tools Orchestr.)  |
+|    - Core AI logic (LLM-based)        |
+|    - Tool registry (function specs)   |
+|    - Session & memory layer           |
++-------------------+-------------------+
+                    |
+                    ▼
 +---------------------------------------+
-| Tools / Skills |
-| - Contract calls, off-chain APIs |
-| e.g., stakeTokens(), transferERC20() |
-+------------------+--------------------+
-|
-▼
-+--------------------+
-| Blockchain(s) |
-| (Kava, EVM, etc.) |
-+--------------------+
+|            Tools / Skills             |
+|  - Contract calls, off-chain APIs     |
+|  e.g., stakeTokens(), transferERC20() |
++-------------------+-------------------+
+                    |
+                    ▼
+          +--------------------+
+          |    Blockchain(s)   |
+          |  (Kava, EVM, etc.) |
+          +--------------------+
 ```
 
 1. **Front-End**: The user-facing interface (React) that embeds an Oros chat widget.
