@@ -232,6 +232,7 @@ export const App = () => {
         return;
       }
 
+      toolCallStreamStore.clear();
       // Abort controller integrated with UI
       const controller = new AbortController();
       controllerRef.current = controller;
