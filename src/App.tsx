@@ -34,6 +34,7 @@ import { ToolFunctions, type GenerateCoinMetadataParams } from './tools/types';
 import type { AnyIFrameMessage } from './types';
 import { MessageHistoryStore } from './messageHistoryStore';
 import { getStoredMasks } from './utils/chat/helpers';
+import { useAppContext } from './AppContext';
 
 let client: OpenAI | null = null;
 
@@ -48,9 +49,8 @@ if (import.meta.env['MODE'] === 'development') {
 }
 
 export const App = () => {
-  // Do not load UI/UX until openAI client is ready
-  const [isReady, setIsReady] = useState(false);
-  const [errorText, setErrorText] = useState('');
+  const { setErrorText, isReady, setIsReady, isRequesting, setIsRequesting } =
+    useAppContext();
 
   const [{ tools, systemPrompt, introText, cautionText }, setConfig] = useState(
     {
@@ -80,7 +80,7 @@ export const App = () => {
     }
 
     setIsReady(true);
-  }, []);
+  }, [setIsReady]);
 
   useEffect(() => {
     const parentMessageHandler = (event: MessageEvent<AnyIFrameMessage>) => {
@@ -193,7 +193,7 @@ export const App = () => {
         window.removeEventListener('message', parentMessageHandler);
       }
     };
-  }, [tools]);
+  }, [setErrorText, setIsRequesting, tools]);
 
   const messages = useSyncExternalStore(
     messageHistoryStore.subscribe,
@@ -218,10 +218,6 @@ export const App = () => {
       ...remainingMsgs,
     ]);
   }, [systemPrompt]);
-
-  // use is sending request to signify to the chat view that
-  // a request is in progress so it can disable inputs
-  const [isRequesting, setIsRequesting] = useState(false);
 
   // abort controller for cancelling openai request
   const controllerRef = useRef<AbortController | null>(null);
@@ -279,7 +275,7 @@ export const App = () => {
         controllerRef.current = null;
       }
     },
-    [isRequesting, tools],
+    [isRequesting, setErrorText, setIsRequesting, tools],
   );
 
   const handleCancel = useCallback(() => {
@@ -309,8 +305,6 @@ export const App = () => {
           onSubmit={handleChatCompletion}
           onReset={handleReset}
           onCancel={handleCancel}
-          isRequesting={isRequesting}
-          errorText={errorText}
         />
       )}
     </>

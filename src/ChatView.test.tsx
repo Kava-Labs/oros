@@ -5,10 +5,8 @@ import { ThemeProvider } from './theme/themeProvider';
 describe('ChatView', () => {
   const props: ChatViewProps = {
     messages: [],
-    errorText: '',
     cautionText: '',
     introText: 'Foobar',
-    isRequesting: false,
     onSubmit: () => {},
     onReset: () => {},
     onCancel: () => {},

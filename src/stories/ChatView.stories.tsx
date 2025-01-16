@@ -43,7 +43,6 @@ const args: ChatViewProps = {
   onSubmit: fn(),
   onReset: fn(),
   onCancel: fn(),
-  errorText: '',
   cautionText: '',
 };
 
@@ -96,6 +95,5 @@ export const RequestInProgress: Story = {
   args: {
     ...args,
     messages: [],
-    isRequesting: true,
   },
 };
