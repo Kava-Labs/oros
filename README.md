@@ -4,7 +4,7 @@
 
 [![Build Status](https://img.shields.io/github/actions/workflow/status/kava-labs/oros/ci.yml?branch=main&label=CI)](https://github.com/kava-labs/oros/actions)
 
-[![License](https://img.shields.io/github/license/kava-labs/oros.svg)](./LICENSE)
+[![License](https://img.shields.io/github/license/kava-labs/oros)](./LICENSE)
 
 [![Dependencies](https://img.shields.io/david/kava-labs/oros?label=deps)](https://github.com/kava-labs/oros)
 
