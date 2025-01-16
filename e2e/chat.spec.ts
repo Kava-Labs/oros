@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { memeCoinSystemPrompt } from '../src/config';
+import { memeCoinSystemPrompt } from '../src/config/prompts/systemPrompt';
 import { Chat } from './Chat';
 
 test('renders intro message', async ({ page }) => {

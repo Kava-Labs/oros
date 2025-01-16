@@ -1,7 +1,7 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import styles from './TokenCard.module.css';
 import { imagedb } from './imagedb';
-import { LaunchIcon } from './assets/LaunchIcon';
+import { LaunchIcon } from './assets';
 import { ToolCallStreamStore } from './toolCallStreamStore';
 import { ToolFunctions, type GenerateCoinMetadataParams } from './tools/types';
 import ImageLoader from './ImageLoader';
