@@ -59,6 +59,7 @@
 }
 
 .right {
+  text-align: right;
   flex-shrink: 0;
   border-radius: var(--borderRadius-md);
   background: var(--colors-bgTertiary);
@@ -155,7 +156,7 @@
   font-weight: inherit;
   line-height: inherit;
   flex: 1;
-  /* 12px works with line-height to center text veritically  in textarea */
+  /* 12px works with line-height to center text vertically  in textarea */
   padding: 12px 55px 10px 20px;
   overflow-y: auto; /* Enable vertical scrolling */
   resize: none; /* Disable manual resizing */
