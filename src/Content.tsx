@@ -1,7 +1,7 @@
 import { useState, useEffect, memo } from 'react';
 import { sanitizeContent } from './sanitize';
 import { unmaskAddresses } from './utils/chat/unmaskAddresses';
-import { enforceWordBreak, getStoredMasks } from './utils/chat/helpers';
+import { enforceLineBreak, getStoredMasks } from './utils/chat/helpers';
 
 export interface ContentProps {
   content: string;
@@ -29,7 +29,7 @@ export const ContentComponent = ({
 
       try {
         const updatedContent = await sanitizeContent(
-          enforceWordBreak(unmaskAddresses(content, storedMasks.masksToValues)),
+          enforceLineBreak(unmaskAddresses(content, storedMasks.masksToValues)),
         );
         if (!cancel) {
           setSanitizedContent(updatedContent);

@@ -30,7 +30,7 @@ export const updateStoredMasks = (
  * @param {number} [maxWordLength=45] - The maximum allowed length of a word before breaking. Slightly longer than 0x addresses
  * @returns {string} - The processed string with `<wbr>` tags inserted at appropriate points.
  */
-export const enforceWordBreak = (
+export const enforceLineBreak = (
   text: string,
   maxWordLength: number = 45,
 ): string => {
