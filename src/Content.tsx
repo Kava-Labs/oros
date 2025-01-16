@@ -30,7 +30,7 @@ export const ContentComponent = ({
 
       try {
         const updatedContent = await sanitizeContent(
-          unmaskAddresses(content, storedMasks.masksToValues),
+          enforceWordBreak(unmaskAddresses(content, storedMasks.masksToValues)),
         );
         if (!cancel) {
           setSanitizedContent(updatedContent);
@@ -71,7 +71,7 @@ export const ContentComponent = ({
         <span
           className={styles.content}
           dangerouslySetInnerHTML={{
-            __html: enforceWordBreak(sanitizedContent),
+            __html: sanitizedContent,
           }}
         ></span>
       )}
