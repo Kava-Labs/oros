@@ -34,15 +34,20 @@ export const enforceLineBreak = (
   text: string,
   maxWordLength: number = 45,
 ): string => {
-  return text
-    .split(' ')
+  if (text.length <= maxWordLength) return text;
+
+  const words = text.split(' ');
+  return words
     .map((word) => {
-      // If the word length exceeds maxWordLength, insert a line break
+      // If the word length exceeds maxWordLength
       if (word.length > maxWordLength) {
-        // Insert <br> only if the word is not the last word in the string
-        return (
-          word.slice(0, maxWordLength) + '<br>' + word.slice(maxWordLength)
-        );
+        // Split the word into chunks of maxWordLength
+        const chunks = [];
+        for (let i = 0; i < word.length; i += maxWordLength) {
+          chunks.push(word.slice(i, i + maxWordLength));
+        }
+        // Join chunks with <br>
+        return chunks.join('<br>');
       }
       return word;
     })
