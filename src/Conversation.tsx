@@ -18,7 +18,12 @@ export interface ConversationProps {
 }
 
 const StreamingTextContent = (message: string, onRendered: () => void) => {
-  return <Content role="assistant" content={message} onRendered={onRendered} />;
+  return (
+    <Content
+      message={{ role: 'assistant', content: message }}
+      onRendered={onRendered}
+    />
+  );
 };
 
 const ConversationComponent = ({
@@ -35,10 +40,7 @@ const ConversationComponent = ({
         if (message.role === 'user') {
           return (
             <div key={index} className={styles.right}>
-              <Content
-                role={message.role}
-                content={message.content as string}
-              />
+              <Content message={message} />
             </div>
           );
         }
@@ -48,10 +50,7 @@ const ConversationComponent = ({
             <div key={index} className={styles.left}>
               <img src={logo} className={styles.conversationChatIcon} />
               <div className={styles.assistantContainer}>
-                <Content
-                  role={message.role}
-                  content={message.content as string}
-                />
+                <Content message={message} />
               </div>
             </div>
           );
@@ -123,9 +122,8 @@ const ConversationComponent = ({
           <img src={logo} className={styles.conversationChatIcon} />
           <div className={styles.assistantContainer}>
             <Content
-              content={errorText}
+              message={{ role: 'assistant', content: errorText }}
               onRendered={onRendered}
-              role="assistant"
             />
           </div>
         </div>

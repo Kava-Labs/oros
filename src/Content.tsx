@@ -3,18 +3,15 @@ import { sanitizeContent } from './sanitize';
 import styles from './ChatView.module.css';
 import { unmaskAddresses } from './utils/chat/unmaskAddresses';
 import { enforceLineBreak, getStoredMasks } from './utils/chat/helpers';
+import { ChatCompletionMessageParam } from 'openai/resources/index';
 
 export interface ContentProps {
-  content: string;
+  message: ChatCompletionMessageParam;
   onRendered?: () => void;
-  role: string;
 }
 
-export const ContentComponent = ({
-  content,
-  onRendered,
-  role,
-}: ContentProps) => {
+export const ContentComponent = ({ message, onRendered }: ContentProps) => {
+  const { content, role } = message;
   const [hasError, setHasError] = useState(false);
   const [sanitizedContent, setSanitizedContent] = useState<string>('');
   const storedMasks = getStoredMasks();
@@ -30,7 +27,9 @@ export const ContentComponent = ({
 
       try {
         const updatedContent = await sanitizeContent(
-          enforceLineBreak(unmaskAddresses(content, storedMasks.masksToValues)),
+          enforceLineBreak(
+            unmaskAddresses(content as string, storedMasks.masksToValues),
+          ),
         );
         if (!cancel) {
           setSanitizedContent(updatedContent);
