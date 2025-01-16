@@ -1,16 +1,20 @@
 # Oros AI: Empowering Decentralized Applications with Intelligent Agents
 
 ![Oros Logo](https://raw.githubusercontent.com/Kava-Labs/oros/refs/heads/main/src/assets/orosLogo.svg?token=GHSAT0AAAAAAC2PI2UV4YLEUHJB63XNY6J4Z4IEMUA)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/kava-labs/oros/ci.yml?branch=main&label=CI)](https://github.com/kava-labs/oros/actions)
+[![License](https://img.shields.io/github/license/kava-labs/oros.svg)](./LICENSE)
+[![Dependencies](https://img.shields.io/david/kava-labs/oros?label=deps)](https://github.com/kava-labs/oros)
 
-Oros is the future of AI in decentralized applications (dApps). Designed as an intuitive agent layer, Oros transforms how users interact with blockchain ecosystems by bridging advanced AI with on-chain capabilities. Imagine managing your assets, executing complex DeFi strategies, or exploring new dApps—all with a simple conversation. That’s the vision of Oros.
+Oros brings AI-driven interactions to any dApp. Designed as an intuitive agent layer, Oros transforms how users interact with blockchain ecosystems by bridging advanced AI with on-chain capabilities. Imagine managing your assets, executing complex DeFi strategies, or exploring new dApps—all with a simple conversation. That’s the vision of Oros.
 
 ---
 
 ## Oros: AI for Everyone, Everywhere
 
-In a world dominated by technical jargon and fragmented user experiences, Oros simplifies blockchain interaction. It introduces a consistent, approachable AI persona—your trusted guide across dApps.
+Overcoming technical complexity and fragmented user experiences is a key unlock for web3 adoption. Oros simplifies blockchain interaction, introducing a consistent, approachable AI persona—your trusted guide across dApps.
 
-- **One Agent, One Brand**: Oros isn’t just another chatbot. It’s a unified, intelligent presence that feels personal and seamless, whether you’re staking tokens or exploring yield strategies.
+- **Natural Language → On-Chain Actions**: Oros translates user queries and prompts into blockchain function calls, letting your users “speak” directly to DeFi, NFTs, governance, or any on-chain logic.
+- **Smart Context**: Oros provides a unified, intelligent presence that feels personalized and seamless across web3, whether you’re staking tokens or exploring yield strategies.
 - **Universal Access**: By integrating with decentralized applications, Oros democratizes access to blockchain intelligence, making Web3 easier for everyone.
 
 ### Why It Matters
@@ -24,6 +28,44 @@ Blockchain interactions often feel complex. With Oros, you can simply say:
 
 **For Developers**  
 Integrating Oros means less time spent building custom AI tools and more time focusing on what your dApp does best. A straightforward SDK enables any dApp to embed the Oros experience effortlessly.
+
+---
+
+## Technical Architecture
+
+```markdown
+     +------------------------------+
+     |   Oros UI (Front-End)        |
+     |    (React/Typescript)        |
+     +-------------+----------------+
+                   |
+                   ▼
+
++---------------------------------------+
+| Oros Agent (Chat + Tools Orchestr.) |
+| - Core AI logic (LLM-based) |
+| - Tool registry (function specs) |
+| - Session & memory layer |
++------------------+--------------------+
+|
+▼
++---------------------------------------+
+| Tools / Skills |
+| - Contract calls, off-chain APIs |
+| e.g., stakeTokens(), transferERC20() |
++------------------+--------------------+
+|
+▼
++--------------------+
+| Blockchain(s) |
+| (Kava, EVM, etc.) |
++--------------------+
+```
+
+1. **Front-End**: The user-facing interface (React) that embeds an Oros chat widget.
+2. **Oros Agent**: Receives user prompts, uses LLM logic & memory, decides which tool(s) to call.
+3. **Tool Registry**: A set of typed “function calls.” Each function can be a contract method or off-chain API.
+4. **Blockchain**: Actual transaction logic — Kava chain, EVM, or custom protocols.
 
 ---
 
@@ -57,13 +99,20 @@ At its core, Oros is a bridge between natural language and blockchain actions, l
 
 ---
 
-## Getting Started
+## Product Roadmap
 
-### For Developers
-
-Ready to dive in and set up Oros locally? Follow these steps to get started:
+| Milestone                  | Description                                          | Status         |
+| -------------------------- | ---------------------------------------------------- | -------------- |
+| **Oros MVP**               | Basic chat + tool bridging, single dApp integration  | ✅ Done        |
+| **Multi-dApp Integration** | Expand Oros to multiple Kava dApps                   | 🚧 In progress |
+| **Cross-Chain Support**    | EVM bridging (ERC20 transfers, bridging logic)       | 🚧 In progress |
+| **Advanced Memory**        | Persistent user context across sessions              | 📅 Planned     |
+| **TEE / Security**         | Integrate secure enclaves for private data + signing | 📅 Planned     |
+| **deModel Integration**    | Connection to community-trained LLMs                 | 📅 Planned     |
 
 ---
+
+## Getting Started
 
 #### 1. **Prerequisites**
 
@@ -85,7 +134,7 @@ npm -v
 Clone the Oros project to your local machine:
 
 ```bash
-git clone https://github.com/<your-repo-path>/oros.git
+git clone https://github.com/Kava-Labs/oros.git
 cd oros
 ```
 
