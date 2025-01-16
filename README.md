@@ -2,11 +2,11 @@
 
 ![Oros Logo](https://raw.githubusercontent.com/Kava-Labs/oros/refs/heads/main/src/assets/orosLogo.svg)
 
-[![Build Status](https://img.shields.io/github/actions/workflow/status/kava-labs/oros/ci.yml?branch=main&label=CI)](https://github.com/kava-labs/oros/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/kava-labs/oros/ci-cd.yml?branch=main&label=CI)](https://github.com/kava-labs/oros/actions)
 
-[![License](https://img.shields.io/github/license/kava-labs/oros)](./LICENSE)
+[![License](https://img.shields.io/github/license/Kava-Labs/oros)](https://github.com/Kava-Labs/oros/blob/main/LICENSE)
 
-[![Dependencies](https://img.shields.io/david/kava-labs/oros?label=deps)](https://github.com/kava-labs/oros)
+[![Dependencies](https://img.shields.io/badge/dependencies-up%20to%20date-brightgreen)](https://github.com/Kava-Labs/oros/network/dependencies)
 
 Oros brings AI-driven interactions to any dApp. Designed as an intuitive agent layer, Oros transforms how users interact with blockchain ecosystems by bridging advanced AI with on-chain capabilities. Imagine managing your assets, executing complex DeFi strategies, or exploring new dApps—all with a simple conversation. That’s the vision of Oros.
 
