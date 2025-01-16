@@ -17,12 +17,9 @@ export interface ConversationProps {
   onRendered(): void;
 }
 
-const StreamingTextContent = (message: string, onRendered: () => void) => {
+const StreamingTextContent = (content: string, onRendered: () => void) => {
   return (
-    <Content
-      message={{ role: 'assistant', content: message }}
-      onRendered={onRendered}
-    />
+    <Content message={{ role: 'assistant', content }} onRendered={onRendered} />
   );
 };
 
