@@ -11,7 +11,6 @@ import { useAppContext } from './AppContext';
 export interface ChatViewProps {
   messages: ChatCompletionMessageParam[];
   cautionText: string;
-  isRequesting: boolean;
   onSubmit(value: string): void;
   onReset(): void;
   onCancel(): void;

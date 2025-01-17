@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 
-type ErrorContextType = {
+type AppContextType = {
   errorText: string;
   setErrorText: (e: string) => void;
   isReady: boolean;
@@ -9,7 +9,7 @@ type ErrorContextType = {
   setIsRequesting: (i: boolean) => void;
 };
 
-const AppContext = createContext<ErrorContextType | undefined>(undefined);
+const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppContextProvider = ({
   children,
