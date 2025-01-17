@@ -3,6 +3,14 @@ import { fn } from '@storybook/test';
 import { ChatView, ChatViewProps } from '../ChatView';
 import { mockChatMessages } from '../mockdata';
 import { memeCoinGenIntroText } from '../config';
+import type { Decorator } from '@storybook/react';
+import { ThemeProvider } from '../theme/themeProvider';
+
+const withThemeProvider: Decorator = (Story) => (
+  <ThemeProvider>
+    <Story />
+  </ThemeProvider>
+);
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
@@ -20,6 +28,7 @@ const meta = {
   //},
   // Use `fn` to spy on the onClick arg, which will appear in the actions panel once invoked: https://storybook.js.org/docs/essentials/actions#action-args
   //args: { onClick: fn() },
+  decorators: [withThemeProvider],
 } satisfies Meta<typeof ChatView>;
 
 export default meta;
