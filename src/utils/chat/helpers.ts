@@ -44,14 +44,11 @@ export const enforceLineBreak = (
   const words = text.split(' ');
   return words
     .map((word) => {
-      // If the word length exceeds maxWordLength
       if (word.length > maxWordLength) {
-        // Split the word into chunks of maxWordLength
         const chunks = [];
         for (let i = 0; i < word.length; i += maxWordLength) {
           chunks.push(word.slice(i, i + maxWordLength));
         }
-        // Join chunks with <br>
         return chunks.join('<br>');
       }
       return word;
