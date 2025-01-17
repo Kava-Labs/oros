@@ -1,6 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
 import { ToolCallStreamStore } from './toolCallStreamStore';
 import type { ChatCompletionChunk } from 'openai/resources/index';
+import { JSONParser } from '@streamparser/json';
+
+type ToolCall = ChatCompletionChunk.Choice.Delta.ToolCall;
 
 describe('ToolCallStreamStore', () => {
   it('should work with strings, numbers, null, booleans, key value objects, arrays, and deeply nested objects', () => {
@@ -34,7 +37,7 @@ describe('ToolCallStreamStore', () => {
       const store = new ToolCallStreamStore();
 
       const { obj, stringified } = testCase;
-      const firstChunk: ChatCompletionChunk.Choice.Delta.ToolCall = {
+      const firstChunk: ToolCall = {
         id: 'toolCall-1',
         index: 0,
         function: {
@@ -64,7 +67,7 @@ describe('ToolCallStreamStore', () => {
     const jsonArgObj = { a: 'bcd' };
     const jsonArgStr = JSON.stringify(jsonArgObj);
 
-    const firstChunk: ChatCompletionChunk.Choice.Delta.ToolCall = {
+    const firstChunk: ToolCall = {
       id: 'toolCall-1',
       index: 0,
       function: {
@@ -285,5 +288,111 @@ describe('ToolCallStreamStore', () => {
     store.clear();
 
     expect(store.getSnapShot()).toEqual([]);
+  });
+
+  it('should throw an error when tool call ID is undefined', () => {
+    const expectedError =
+      'Expected the initial chunk to have a tool call ID, but got undefined';
+    const store = new ToolCallStreamStore();
+
+    const invalidChunk: ToolCall = {
+      index: 0,
+      id: undefined,
+      function: {
+        name: 'test_function',
+        arguments: '{}',
+      },
+      type: 'function',
+    };
+
+    expect(() => store.setToolCall(invalidChunk)).toThrow(expectedError);
+  });
+
+  it('should silently return if parser is not found for existing tool call', () => {
+    const store = new ToolCallStreamStore();
+    let parser: JSONParser | undefined;
+
+    // Create a spy to capture the parser instance
+    store.subscribe(() => {
+      if (store.getSnapShot().length > 0 && !parser) {
+        parser = store['parsers'].get(0);
+      }
+    });
+
+    const initialChunk: ToolCall = {
+      index: 0,
+      id: 'call_123',
+      function: {
+        name: 'test_function',
+        arguments: '{"firstParam": "value"}',
+      },
+      type: 'function',
+    };
+    store.setToolCall(initialChunk);
+
+    //  Remove the parser
+    store['parsers'].clear();
+
+    // Try to update the existing tool call
+    const updateChunk: ToolCall = {
+      index: 0,
+      id: 'call_123',
+      function: {
+        name: 'test_function',
+        arguments: '{"secondParam": "value"}',
+      },
+      type: 'function',
+    };
+
+    // Should not throw an error
+    expect(() => store.setToolCall(updateChunk)).not.toThrow();
+
+    // Verify the tool call still exists but wasn't updated
+    const snapshot = store.getSnapShot();
+    expect(snapshot).toHaveLength(1);
+    expect(snapshot[0].function.arguments).toEqual({ firstParam: 'value' });
+  });
+
+  it('should throw an error when function name is undefined', () => {
+    const expectedError =
+      'Expected the initial chunk to have a function name, but got undefined';
+    const store = new ToolCallStreamStore();
+
+    const invalidChunk: ToolCall = {
+      index: 0,
+      id: 'call_123',
+      function: {
+        name: undefined,
+        arguments: '{}',
+      },
+      type: 'function',
+    };
+
+    expect(() => store.setToolCall(invalidChunk)).toThrow(expectedError);
+
+    // No tool call added
+    const snapshot = store.getSnapShot();
+    expect(snapshot).toHaveLength(0);
+  });
+
+  it('should throw an error when trying to register a parser that already exists', () => {
+    const store = new ToolCallStreamStore();
+
+    const expectedError = 'A parser for tool call index 0 already exists.';
+
+    // Create a parser at index zero
+    store['parsers'].set(0, new JSONParser());
+
+    const chunk: ToolCall = {
+      index: 0,
+      id: 'call_123',
+      function: {
+        name: 'test_function',
+        arguments: '{}',
+      },
+      type: 'function',
+    };
+
+    expect(() => store.setToolCall(chunk)).toThrow(expectedError);
   });
 });
