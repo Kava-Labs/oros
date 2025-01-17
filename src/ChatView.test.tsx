@@ -6,6 +6,7 @@ describe('ChatView', () => {
   const props: ChatViewProps = {
     messages: [],
     errorText: '',
+    cautionText: '',
     introText: 'Foobar',
     isRequesting: false,
     onSubmit: () => {},

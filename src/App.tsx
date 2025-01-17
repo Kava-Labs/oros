@@ -24,6 +24,7 @@ import { TextStreamStore } from './textStreamStore';
 import {
   memeCoinSystemPrompt,
   memeCoinGenIntroText,
+  memeCoinGenWarningText,
 } from './config/prompts/systemPrompt';
 import { memeCoinTools } from './config/tools';
 import { imagedb } from './imagedb';
@@ -51,11 +52,14 @@ export const App = () => {
   const [isReady, setIsReady] = useState(false);
   const [errorText, setErrorText] = useState('');
 
-  const [{ tools, systemPrompt, introText }, setConfig] = useState({
-    introText: memeCoinGenIntroText,
-    systemPrompt: memeCoinSystemPrompt,
-    tools: memeCoinTools,
-  });
+  const [{ tools, systemPrompt, introText, cautionText }, setConfig] = useState(
+    {
+      introText: memeCoinGenIntroText,
+      systemPrompt: memeCoinSystemPrompt,
+      tools: memeCoinTools,
+      cautionText: memeCoinGenWarningText,
+    },
+  );
 
   const [wallet, setWallet] = useState({
     address: '',
@@ -108,6 +112,12 @@ export const App = () => {
             console.info('SET_INTRO_TEXT/V1', event.data);
             const introText = event.data.payload.introText;
             setConfig((prev) => ({ ...prev, introText }));
+            break;
+          }
+          case `SET_CAUTION_TEXT/V1`: {
+            console.info('SET_CAUTION_TEXT/V1', event.data);
+            const cautionText = event.data.payload.cautionText;
+            setConfig((prev) => ({ ...prev, cautionText }));
             break;
           }
 
@@ -297,6 +307,7 @@ export const App = () => {
       {isReady && (
         <ChatView
           introText={introText}
+          cautionText={cautionText}
           address={wallet.address}
           chainID={wallet.chainID}
           messages={messages}

@@ -83,3 +83,6 @@ Use the provided tool to produce the final token metadata when appropriate. Afte
 `;
 
 export const memeCoinGenIntroText = `Tell me about your memecoin idea below and we'll generate everything you need to get it launched.`;
+
+export const memeCoinGenWarningText =
+  'This application may produce errors and incorrect information.';

@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
-
-import { ChatView } from '../ChatView';
+import { ChatView, ChatViewProps } from '../ChatView';
 import { mockChatMessages } from '../mockdata';
 import { memeCoinGenIntroText } from '../config';
 
@@ -26,56 +25,39 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+const args: ChatViewProps = {
+  introText: memeCoinGenIntroText,
+  messages: mockChatMessages,
+  address: '',
+  chainID: '',
+  isRequesting: false,
+  onSubmit: fn(),
+  onReset: fn(),
+  onCancel: fn(),
+  errorText: '',
+  cautionText: '',
+};
+
 // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
 export const Primary: Story = {
   parameters: {
     viewport: { defaultViewport: 'reset' },
   },
-  args: {
-    introText: memeCoinGenIntroText,
-    address: '',
-    chainID: '',
-    messages: mockChatMessages,
-    isRequesting: false,
-    onSubmit: fn(),
-    onReset: fn(),
-    onCancel: fn(),
-    errorText: '',
-  },
+  args,
 };
 
 export const OnPhoneSmall: Story = {
   parameters: {
     viewport: { defaultViewport: 'mobile1' },
   },
-  args: {
-    introText: memeCoinGenIntroText,
-    address: '',
-    chainID: '',
-    messages: mockChatMessages,
-    isRequesting: false,
-    onSubmit: fn(),
-    onReset: fn(),
-    onCancel: fn(),
-    errorText: '',
-  },
+  args,
 };
 
 export const OnPhoneLarge: Story = {
   parameters: {
     viewport: { defaultViewport: 'mobile2' },
   },
-  args: {
-    introText: memeCoinGenIntroText,
-    address: '',
-    chainID: '',
-    messages: mockChatMessages,
-    isRequesting: false,
-    onSubmit: fn(),
-    onReset: fn(),
-    onCancel: fn(),
-    errorText: '',
-  },
+  args,
 };
 
 export const NoMessages: Story = {
@@ -83,15 +65,8 @@ export const NoMessages: Story = {
     viewport: { defaultViewport: 'reset' },
   },
   args: {
-    introText: memeCoinGenIntroText,
-    address: '',
-    chainID: '',
+    ...args,
     messages: [],
-    isRequesting: false,
-    onSubmit: fn(),
-    onReset: fn(),
-    onCancel: fn(),
-    errorText: '',
   },
 };
 
@@ -100,15 +75,8 @@ export const NoMessagesOnPhoneSmall: Story = {
     viewport: { defaultViewport: 'mobile1' },
   },
   args: {
-    introText: memeCoinGenIntroText,
-    address: '',
-    chainID: '',
+    ...args,
     messages: [],
-    isRequesting: false,
-    onSubmit: fn(),
-    onReset: fn(),
-    onCancel: fn(),
-    errorText: '',
   },
 };
 
@@ -117,14 +85,8 @@ export const RequestInProgress: Story = {
     viewport: { defaultViewport: 'reset' },
   },
   args: {
-    introText: memeCoinGenIntroText,
-    address: '',
-    chainID: '',
+    ...args,
     messages: [],
     isRequesting: true,
-    onSubmit: fn(),
-    onCancel: fn(),
-    onReset: fn(),
-    errorText: '',
   },
 };
