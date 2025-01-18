@@ -2,7 +2,7 @@ import { useState, useEffect, memo } from 'react';
 import { sanitizeContent } from './sanitize';
 import styles from './ChatView.module.css';
 import { unmaskAddresses } from './utils/chat/unmaskAddresses';
-import { enforceLineBreak, getStoredMasks } from './utils/chat/helpers';
+import { getStoredMasks } from './utils/chat/helpers';
 
 export interface ContentProps {
   content: string;
@@ -30,7 +30,7 @@ export const ContentComponent = ({
 
       try {
         const updatedContent = await sanitizeContent(
-          enforceLineBreak(unmaskAddresses(content, storedMasks.masksToValues)),
+          unmaskAddresses(content, storedMasks.masksToValues),
         );
         if (!cancel) {
           setSanitizedContent(updatedContent);
