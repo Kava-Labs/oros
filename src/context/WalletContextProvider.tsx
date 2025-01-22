@@ -63,17 +63,17 @@ export const WalletContextProvider = ({
 
     if (wallet.walletType === WalletTypes.METAMASK) {
       // @ts-expect-error window.ethereum.on does exist
-      window.ethereum.on('chainChanged', onAccountChange);
+      window.ethereum.on('chainChanged', onChainChange);
       // @ts-expect-error window.ethereum.on does exist
-      window.ethereum.on('accountsChanged', onChainChange);
+      window.ethereum.on('accountsChanged', onAccountChange);
     }
 
     return () => {
       if (wallet.walletType === WalletTypes.METAMASK) {
         // @ts-expect-error window.ethereum.off does exist
-        window.ethereum.off('chainChanged', onAccountChange);
+        window.ethereum.off('chainChanged', onChainChange);
         // @ts-expect-error window.ethereum.off does exist
-        window.ethereum.off('accountsChanged', onChainChange);
+        window.ethereum.off('accountsChanged', onAccountChange);
       }
     };
   }, [wallet]);
