@@ -2,11 +2,11 @@ import { createContext } from 'react';
 
 export type AppContextType = {
   errorText: string;
-  setErrorText: (e: string) => void;
+  setErrorText: React.Dispatch<React.SetStateAction<string>>;
   isReady: boolean;
-  setIsReady: (i: boolean) => void;
+  setIsReady: React.Dispatch<React.SetStateAction<boolean>>;
   isRequesting: boolean;
-  setIsRequesting: (i: boolean) => void;
+  setIsRequesting: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
