@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
-import { ChatView, ChatViewProps } from '../ChatView';
+import { ChatView, ChatViewProps } from '../components/ChatView';
 import { mockChatMessages } from '../mockdata';
 import { memeCoinGenIntroText } from '../config';
 import type { Decorator } from '@storybook/react';
