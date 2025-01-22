@@ -57,7 +57,7 @@ export const Chat = () => {
    * @param toolName - Name of the tool to execute
    * @param params - Parameters for the tool
    */
-  const handleToolCall = async (toolName: string, params: any) => {
+  const handleToolCall = async (toolName: string, params: unknown) => {
     try {
       // TODO: This could be improved
       const operationType = toolName.replace(/_/g, '/').toUpperCase();
@@ -104,9 +104,12 @@ export const Chat = () => {
         success: true,
         hash: broadcastResult.tx_response.txhash,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error executing tool:', error);
-      return { success: false, error: error.message };
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : error,
+      };
     }
   };
 

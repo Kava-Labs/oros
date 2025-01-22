@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import { ChatView, ChatViewProps } from './ChatView';
 import { ThemeProvider } from './theme/themeProvider';
-import { AppContextProvider } from './AppContext';
+import { AppContextProvider } from './context/AppContextProvider';
 
 describe('ChatView', () => {
   const props: ChatViewProps = {
@@ -11,8 +11,6 @@ describe('ChatView', () => {
     onSubmit: () => {},
     onReset: () => {},
     onCancel: () => {},
-    address: '',
-    chainID: '2222',
   };
 
   test('input is focused by default', () => {

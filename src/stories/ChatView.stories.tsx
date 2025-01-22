@@ -5,7 +5,7 @@ import { mockChatMessages } from '../mockdata';
 import { memeCoinGenIntroText } from '../config';
 import type { Decorator } from '@storybook/react';
 import { ThemeProvider } from '../theme/themeProvider';
-import { AppContextProvider } from '../AppContext';
+import { AppContextProvider } from '../context/AppContextProvider';
 
 const withProviders =
   (
@@ -48,8 +48,6 @@ type Story = StoryObj<typeof meta>;
 const args: ChatViewProps = {
   introText: memeCoinGenIntroText,
   messages: mockChatMessages,
-  address: '',
-  chainID: '',
   onSubmit: fn(),
   onReset: fn(),
   onCancel: fn(),

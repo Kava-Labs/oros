@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { ethers, Eip1193Provider } from 'ethers';
 import { ChainConfig, WalletProvider } from '../../../types/wallet';
 
 /**
@@ -15,7 +15,7 @@ export class MetamaskWallet implements WalletProvider {
    * Ensures the MetaMask extension is available in the browser.
    * @throws Error if MetaMask is not detected
    */
-  private async ensureEthereum(): Promise<any> {
+  private async ensureEthereum(): Promise<Eip1193Provider> {
     if (typeof window === 'undefined' || !window.ethereum) {
       throw new Error('Metamask not detected');
     }
@@ -30,9 +30,10 @@ export class MetamaskWallet implements WalletProvider {
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: chainConfig.chainId }],
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       // If the chain doesn't exist, add it.
       // https://docs.metamask.io/wallet/reference/json-rpc-methods/wallet_switchethereumchain/
+      // @ts-expect-error todo: better types
       if (error.code === 4902) {
         await ethereum.request({
           method: 'wallet_addEthereumChain',
@@ -85,7 +86,7 @@ export class MetamaskWallet implements WalletProvider {
    * @param tx - Transaction to sign
    * @throws Error if wallet is not connected
    */
-  async signTransaction(tx: any): Promise<any> {
+  async signTransaction(tx: unknown): Promise<unknown> {
     if (!this.provider || !this.address) {
       throw new Error('Wallet not connected');
     }
@@ -93,5 +94,6 @@ export class MetamaskWallet implements WalletProvider {
     /**
      * TODO: Need to add custom signer logic here
      */
+    return null;
   }
 }
