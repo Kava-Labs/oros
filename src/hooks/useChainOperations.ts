@@ -39,7 +39,7 @@ export function useChainOperations() {
    * @returns Result of the operation (transaction or query result)
    */
   const executeOperation = useCallback(
-    async (operationType: string, params: any) => {
+    async (operationType: string, params: unknown) => {
       const operation = registry.get(operationType);
       if (!operation) {
         throw new Error(`Unknown operation type: ${operationType}`);

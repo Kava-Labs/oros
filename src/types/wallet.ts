@@ -30,5 +30,5 @@ export interface WalletProvider {
   disconnect(): Promise<void>;
   isConnected(): Promise<boolean>;
   getAddress(): Promise<string>;
-  signTransaction(tx: any): Promise<any>;
+  signTransaction(tx: unknown): Promise<unknown>;
 }

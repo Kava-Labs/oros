@@ -50,8 +50,9 @@ export class CosmosSendMessage implements ChainMessage {
    * @param params - Parameters to validate
    * @returns True if parameters are valid
    */
-  validate(params: any): boolean {
+  validate(params: unknown): boolean {
     return (
+      // @ts-expect-error todo: better types needed
       params.fromAddress && params.toAddress && params.amount && params.denom
     );
   }
@@ -61,7 +62,7 @@ export class CosmosSendMessage implements ChainMessage {
    * @param params - Validated parameters for the transaction
    * @returns Transaction object ready for signing
    */
-  async buildTransaction(params: any): Promise<any> {
+  async buildTransaction(params: unknown): Promise<unknown> {
     /**
      * TODO: This could utilize some of our helpers like buildCoin and our explicit
      *       typings for this message type
@@ -70,11 +71,15 @@ export class CosmosSendMessage implements ChainMessage {
     return {
       typeUrl: '/cosmos.bank.v1beta1.MsgSend',
       value: {
+        // @ts-expect-error todo: better types needed
         fromAddress: params.fromAddress,
+        // @ts-expect-error todo: better types needed
         toAddress: params.toAddress,
         amount: [
           {
+            // @ts-expect-error todo: better types needed
             amount: params.amount,
+            // @ts-expect-error todo: better types needed
             denom: params.denom,
           },
         ],

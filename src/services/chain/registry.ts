@@ -61,7 +61,7 @@ export class OperationRegistry {
    * These definitions are used to create function-calling tools in the AI model.
    * @returns Array of tool definitions in OpenAI format
    */
-  getToolDefinitions(): any[] {
+  getToolDefinitions(): unknown[] {
     return this.getAllOperations().map((operation) => ({
       type: 'function',
       function: {
