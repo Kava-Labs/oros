@@ -18,12 +18,17 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
     if (queryTheme) {
       return queryTheme;
     }
-    // Fallback to default theme `hardDotFun`
-    return 'hardDotFun';
+    // Fallback to default theme `base`
+    return 'base';
   }, [queryTheme]);
 
   const selectedTheme = themes[themeName] || themes.base;
 
+  /**
+   * Having selected theme allows for multiple theming options in
+   * the future if we want to have custom branding for a specific
+   * partner or offer different "Oros" themes, like 'light' or 'dark' mode
+   */
   const currentTheme: Theme = useMemo(() => {
     return {
       ...baseTheme,
