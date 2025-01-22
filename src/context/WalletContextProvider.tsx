@@ -5,12 +5,7 @@ import {
   WalletContext,
   WalletTypes,
 } from './WalletContext';
-import {
-  addMetamaskChangeListeners,
-  connectMetamask,
-  metamaskSign,
-  removeMetamaskChangeListeners,
-} from './wallets/metamask';
+import { connectMetamask, metamaskSign } from './wallets/metamask';
 
 export const WalletContextProvider = ({
   children,
@@ -58,23 +53,27 @@ export const WalletContextProvider = ({
   );
 
   useEffect(() => {
-    const onChainChanged = () => {
+    const onChainChange = () => {
       window.location.reload();
     };
 
+    const onAccountChange = () => {
+      connectMetamask(setWallet);
+    };
+
     if (wallet.walletType === WalletTypes.METAMASK) {
-      addMetamaskChangeListeners({
-        onAccountChange: connectMetamask,
-        onChainChange: onChainChanged,
-      });
+      // @ts-expect-error window.ethereum.on does exist
+      window.ethereum.on('chainChanged', onAccountChange);
+      // @ts-expect-error window.ethereum.on does exist
+      window.ethereum.on('accountsChanged', onChainChange);
     }
 
     return () => {
       if (wallet.walletType === WalletTypes.METAMASK) {
-        removeMetamaskChangeListeners({
-          onAccountChange: connectMetamask,
-          onChainChange: onChainChanged,
-        });
+        // @ts-expect-error window.ethereum.off does exist
+        window.ethereum.off('chainChanged', onAccountChange);
+        // @ts-expect-error window.ethereum.off does exist
+        window.ethereum.off('accountsChanged', onChainChange);
       }
     };
   }, [wallet]);
