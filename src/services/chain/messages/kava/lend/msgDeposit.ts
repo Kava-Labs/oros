@@ -18,7 +18,7 @@ interface LendMsgArgs {
 /**
  * Implementation of the Kava Lend MsgDeposit message type.
  */
-export class LendMsgDeposit extends CosmosMessageBase<LendToolParams> {
+export class LendDepositMessage extends CosmosMessageBase<LendToolParams> {
   type = 'hard/MsgDeposit';
   description = 'Deposit tokens from an address into a Lend money market';
 
