@@ -1,7 +1,7 @@
 import { ChainMessage, CosmosMsg } from '../../../../types/chain';
 
 // Base abstract class for Cosmos messages
-export abstract class CosmosMessageBase<T> implements ChainMessage {
+export abstract class CosmosMessageBase<T, MsgArgs> implements ChainMessage {
   abstract type: string;
   operationType = 'transaction' as const;
   chainType = 'cosmos' as const;
@@ -15,5 +15,5 @@ export abstract class CosmosMessageBase<T> implements ChainMessage {
 
   abstract validate(params: T): boolean;
 
-  abstract buildTransaction(params: T): Promise<CosmosMsg<unknown>>;
+  abstract buildTransaction(params: T): Promise<CosmosMsg<MsgArgs>>;
 }
