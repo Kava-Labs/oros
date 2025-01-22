@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-  SignatureTypes,
   SignOpts,
   WalletConnectionOpts,
   WalletContext,
@@ -26,20 +25,27 @@ export const WalletContextProvider = ({
 
   const isWalletConnected: boolean = wallet.address.length > 0;
 
-  const connectWallet = useCallback(async (opts: WalletConnectionOpts) => {
-    switch (opts.walletType) {
-      case WalletTypes.METAMASK: {
-        await connectMetamask(setWallet);
-        break;
-      }
-      case WalletTypes.NONE: {
-        disconnectWallet(); // disconnect when passed WalletTypes.NONE
-        break;
-      }
-      default:
-        throw new Error(`unknown wallet type: ${opts.walletType}`);
-    }
+  const disconnectWallet = useCallback(() => {
+    setWallet({ address: '', chainId: '', walletType: WalletTypes.NONE });
   }, []);
+
+  const connectWallet = useCallback(
+    async (opts: WalletConnectionOpts) => {
+      switch (opts.walletType) {
+        case WalletTypes.METAMASK: {
+          await connectMetamask(setWallet);
+          break;
+        }
+        case WalletTypes.NONE: {
+          disconnectWallet(); // disconnect when passed WalletTypes.NONE
+          break;
+        }
+        default:
+          throw new Error(`unknown wallet type: ${opts.walletType}`);
+      }
+    },
+    [disconnectWallet],
+  );
 
   const sign = useCallback(
     async (opts: SignOpts) => {
@@ -50,10 +56,6 @@ export const WalletContextProvider = ({
     },
     [wallet],
   );
-
-  const disconnectWallet = useCallback(() => {
-    setWallet({ address: '', chainId: '', walletType: WalletTypes.NONE });
-  }, []);
 
   useEffect(() => {
     const onChainChanged = () => {
@@ -77,7 +79,7 @@ export const WalletContextProvider = ({
         });
       }
     };
-  }, [wallet, connectMetamask]);
+  }, [wallet]);
 
   return (
     <WalletContext.Provider
