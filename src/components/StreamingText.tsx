@@ -1,5 +1,5 @@
 import { memo, useSyncExternalStore } from 'react';
-import { TextStreamStore } from './textStreamStore';
+import { TextStreamStore } from '../textStreamStore';
 
 interface StreamingTextProps {
   children: (text: string, onRendered: () => void) => React.ReactNode;
