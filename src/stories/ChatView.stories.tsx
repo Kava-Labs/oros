@@ -48,8 +48,6 @@ type Story = StoryObj<typeof meta>;
 const args: ChatViewProps = {
   introText: memeCoinGenIntroText,
   messages: mockChatMessages,
-  address: '',
-  chainID: '',
   onSubmit: fn(),
   onReset: fn(),
   onCancel: fn(),
