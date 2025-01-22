@@ -1,5 +1,5 @@
-import { CosmosMessageBase } from '.././cosmos/base';
-import { CosmosCoin, CosmosMsg } from '../../../../types/chain';
+import { CosmosMessageBase } from '../base';
+import { CosmosCoin, CosmosMsg } from '../../../../types/messages';
 import { MessageTypeUrl } from '../../../../types/messages';
 
 //  sent to model
@@ -22,7 +22,10 @@ interface SendMsgArgs {
  * Handles the creation and validation of token transfer messages
  * in the Cosmos ecosystem.
  */
-export class CosmosSendMessage extends CosmosMessageBase<SendToolParams> {
+export class CosmosSendMessage extends CosmosMessageBase<
+  SendToolParams,
+  SendMsgArgs
+> {
   type = 'cosmos-sdk/MsgSend';
   /** Human-readable description for AI tools */
   description = 'Send tokens from one address to another';
@@ -84,7 +87,7 @@ export class CosmosSendMessage extends CosmosMessageBase<SendToolParams> {
   ): Promise<CosmosMsg<SendMsgArgs>> {
     const { fromAddress, toAddress, amount, denom } = params;
     return {
-      typeUrl: MessageTypeUrl.LEND_MSG_DEPOSIT,
+      typeUrl: MessageTypeUrl.COSMOS_MSG_SEND,
       value: {
         fromAddress,
         toAddress,

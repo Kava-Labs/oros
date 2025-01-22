@@ -1,5 +1,5 @@
 import { CosmosMessageBase } from '../.././cosmos/base';
-import { CosmosCoin, CosmosMsg } from '../../../../../types/chain';
+import { CosmosCoin, CosmosMsg } from '../../../../../types/messages';
 import { MessageTypeUrl } from '../../../../../types/messages';
 
 //  sent to model
@@ -18,7 +18,10 @@ interface LendMsgArgs {
 /**
  * Implementation of the Kava Lend MsgDeposit message type.
  */
-export class LendDepositMessage extends CosmosMessageBase<LendToolParams> {
+export class LendDepositMessage extends CosmosMessageBase<
+  LendToolParams,
+  LendMsgArgs
+> {
   type = 'hard/MsgDeposit';
   description = 'Deposit tokens from an address into a Lend money market';
 
