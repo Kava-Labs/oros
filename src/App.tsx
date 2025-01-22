@@ -5,7 +5,7 @@ import {
   useCallback,
   useSyncExternalStore,
 } from 'react';
-import { ChatView } from './ChatView';
+import { ChatView } from './components/ChatView';
 import { getToken } from './utils/token/token';
 import OpenAI from 'openai';
 import {

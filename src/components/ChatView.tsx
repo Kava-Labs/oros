@@ -1,12 +1,12 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import styles from './ChatView.module.css';
-import { CancelChatIcon, ResetChatIcon, SendChatIcon } from './assets';
-import { useTheme } from './theme/useTheme';
+import { CancelChatIcon, ResetChatIcon, SendChatIcon } from '../assets';
+import { useTheme } from '../theme/useTheme';
 import { Conversation } from './Conversation';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
-import { maskAddresses } from './utils/chat/maskAddresses';
-import { getStoredMasks, updateStoredMasks } from './utils/chat/helpers';
-import { useAppContext } from './context/useAppContext';
+import { maskAddresses } from '../utils/chat/maskAddresses';
+import { getStoredMasks, updateStoredMasks } from '../utils/chat/helpers';
+import { useAppContext } from '../context/useAppContext';
 
 export interface ChatViewProps {
   messages: ChatCompletionMessageParam[];
