@@ -63,7 +63,6 @@ export const WalletContextProvider = ({
     };
 
     if (wallet.walletType === WalletTypes.METAMASK) {
-      console.log('adding');
       addMetamaskChangeListeners({
         onAccountChange: connectMetamask,
         onChainChange: onChainChanged,
@@ -72,7 +71,6 @@ export const WalletContextProvider = ({
 
     return () => {
       if (wallet.walletType === WalletTypes.METAMASK) {
-        console.log('removing');
         removeMetamaskChangeListeners({
           onAccountChange: connectMetamask,
           onChainChange: onChainChanged,
