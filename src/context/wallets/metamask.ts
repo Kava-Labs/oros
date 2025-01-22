@@ -26,31 +26,6 @@ export const connectMetamask = async (setWallet: WalletSetter) => {
   }
 };
 
-export const addMetamaskChangeListeners = ({
-  onAccountChange,
-  onChainChange,
-}: {
-  onAccountChange: (setWallet: WalletSetter) => void;
-  onChainChange: () => void;
-}) => {
-  // @ts-expect-error window.ethereum.on does exist
-  window.ethereum.on('chainChanged', onAccountChange);
-  // @ts-expect-error window.ethereum.on does exist
-  window.ethereum.on('accountsChanged', onChainChange);
-};
-
-export const removeMetamaskChangeListeners = ({
-  onAccountChange,
-  onChainChange,
-}: {
-  onAccountChange: (setWallet: WalletSetter) => void;
-  onChainChange: () => void;
-}) => {
-  // @ts-expect-error window.ethereum.off does exist
-  window.ethereum.off('chainChanged', onAccountChange);
-  // @ts-expect-error window.ethereum.off does exist
-  window.ethereum.off('accountsChanged', onChainChange);
-};
 
 export const metamaskSign = async (opts: SignOpts) => {
   if (opts.signatureType === SignatureTypes.EVM) {
