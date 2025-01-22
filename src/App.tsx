@@ -34,6 +34,8 @@ import { ToolCallStream, ToolCallStreamStore } from './toolCallStreamStore';
 import { MessageHistoryStore } from './messageHistoryStore';
 import { getStoredMasks } from './utils/chat/helpers';
 import { useAppContext } from './context/useAppContext';
+import { useWalletContext } from './context/useWalletContext';
+import { WalletTypes } from './context/WalletContext';
 
 let client: OpenAI | null = null;
 
@@ -50,6 +52,18 @@ if (import.meta.env['MODE'] === 'development') {
 export const App = () => {
   const { setErrorText, isReady, setIsReady, isRequesting, setIsRequesting } =
     useAppContext();
+
+  const { walletAddress, walletType, walletChainId, connectWallet } =
+    useWalletContext();
+
+  console.log({ walletAddress, walletChainId, walletType });
+
+  useEffect(() => {
+    connectWallet({
+      chainId: `0x${Number(2222).toString(16)}`,
+      walletType: WalletTypes.METAMASK,
+    });
+  }, [connectWallet]);
 
   const [{ tools, systemPrompt, introText, cautionText }] = useState({
     introText: memeCoinGenIntroText,
