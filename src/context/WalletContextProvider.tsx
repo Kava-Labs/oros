@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
+  SignatureTypes,
   SignOpts,
   WalletConnectionOpts,
   WalletContext,
@@ -53,6 +54,15 @@ export const WalletContextProvider = ({
 
   const sign = useCallback(async (opts: SignOpts) => {
     // todo: implement
+    if (opts.signatureType === SignatureTypes.EVM) {
+      window.ethereum.request({
+        method: 'eth_sendTransaction',
+        // @ts-expect-error todo: improved types
+        params: opts.payload,
+      });
+    } else if (opts.signatureType === SignatureTypes.EIP712) {
+      // todo: implement
+    }
     return '';
   }, []);
 
