@@ -1,4 +1,21 @@
-import { ChainConfigs, ChainConfig } from '../../types/wallet';
+export interface ChainConfig {
+  chainId: string;
+  chainName: string;
+  restUrls: string[];
+  rpcUrls: string[];
+  nativeCurrency: {
+    displayName: string;
+    microDenom: string; // maybe this isn't needed?
+    symbol: string;
+    decimals: number;
+  };
+  blockExplorerUrls: string[];
+  bech32Config?: {
+    bech32Prefix: string;
+  };
+}
+
+export type ChainConfigs = ChainConfig[];
 
 export const KAVA_COSMOS_CONFIG: ChainConfig = {
   chainId: 'kava_2222-10',
