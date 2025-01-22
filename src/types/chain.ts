@@ -49,3 +49,13 @@ export interface ChainQuery extends ChainOperation {
   /** Executes the query with the provided parameters */
   executeQuery(params: unknown): Promise<unknown>;
 }
+
+export interface CosmosMsg<T> {
+  typeUrl: string;
+  value: T;
+}
+
+export interface CosmosCoin {
+  amount: string;
+  denom: string;
+}

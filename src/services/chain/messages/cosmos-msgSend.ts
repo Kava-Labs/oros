@@ -1,16 +1,26 @@
-import { ChainMessage } from '../../../types/chain';
+import { CosmosMessageBase } from './cosmos/base';
+import { CosmosCoin, CosmosMsg } from '../../../types/chain';
+
+interface SendMsgToolParams {
+  fromAddress: string;
+  toAddress: string;
+  amount: string;
+  denom: string;
+}
+
+interface SendMsgValue {
+  fromAddress: string;
+  toAddress: string;
+  amount: CosmosCoin;
+}
 
 /**
  * Implementation of the Cosmos SDK MsgSend message type.
  * Handles the creation and validation of token transfer messages
  * in the Cosmos ecosystem.
  */
-export class CosmosSendMessage implements ChainMessage {
-  name = 'msgSend';
-  /** Identifies this as a transaction operation vs query */
-  operationType = 'transaction' as const;
-  /** Specifies this as a Cosmos chain operation not evm */
-  chainType = 'cosmos' as const;
+export class CosmosSendMessage extends CosmosMessageBase<SendMsgToolParams> {
+  type = 'cosmos-sdk/MsgSend';
   /** Human-readable description for AI tools */
   description = 'Send tokens from one address to another';
 
@@ -50,10 +60,14 @@ export class CosmosSendMessage implements ChainMessage {
    * @param params - Parameters to validate
    * @returns True if parameters are valid
    */
-  validate(params: unknown): boolean {
-    return (
-      // @ts-expect-error todo: better types needed
-      params.fromAddress && params.toAddress && params.amount && params.denom
+  validate(params: SendMsgToolParams): boolean {
+    const { fromAddress, toAddress, amount, denom } = params;
+
+    return Boolean(
+      fromAddress.length > 0 &&
+        toAddress.length > 0 &&
+        Number(amount) > 0 &&
+        denom.length > 0,
     );
   }
 
@@ -62,27 +76,19 @@ export class CosmosSendMessage implements ChainMessage {
    * @param params - Validated parameters for the transaction
    * @returns Transaction object ready for signing
    */
-  async buildTransaction(params: unknown): Promise<unknown> {
-    /**
-     * TODO: This could utilize some of our helpers like buildCoin and our explicit
-     *       typings for this message type
-     */
-
+  async buildTransaction(
+    params: SendMsgToolParams,
+  ): Promise<CosmosMsg<SendMsgValue>> {
+    const { fromAddress, toAddress, amount, denom } = params;
     return {
       typeUrl: '/cosmos.bank.v1beta1.MsgSend',
       value: {
-        // @ts-expect-error todo: better types needed
-        fromAddress: params.fromAddress,
-        // @ts-expect-error todo: better types needed
-        toAddress: params.toAddress,
-        amount: [
-          {
-            // @ts-expect-error todo: better types needed
-            amount: params.amount,
-            // @ts-expect-error todo: better types needed
-            denom: params.denom,
-          },
-        ],
+        fromAddress,
+        toAddress,
+        amount: {
+          amount,
+          denom,
+        },
       },
     };
   }
