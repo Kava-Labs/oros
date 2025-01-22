@@ -55,7 +55,7 @@ export const WalletContextProvider = ({
   const sign = useCallback(async (opts: SignOpts) => {
     // todo: implement
     if (opts.signatureType === SignatureTypes.EVM) {
-      window.ethereum.request({
+      return await window.ethereum.request({
         method: 'eth_sendTransaction',
         // @ts-expect-error todo: improved types
         params: opts.payload,
