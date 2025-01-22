@@ -1,13 +1,16 @@
-import { CosmosMessageBase } from './cosmos/base';
-import { CosmosCoin, CosmosMsg } from '../../../types/chain';
+import { CosmosMessageBase } from '../.././cosmos/base';
+import { CosmosCoin, CosmosMsg } from '../../../../../types/chain';
+import { MessageTypeUrl } from '../../../../../types/messages';
 
-interface LendMsgToolParams {
+//  sent to model
+interface LendToolParams {
   depositor: string;
   amount: string;
   denom: string;
 }
 
-interface MsgDepositValue {
+//  broadcast to chain
+interface LendMsgArgs {
   depositor: string;
   amount: CosmosCoin;
 }
@@ -15,7 +18,7 @@ interface MsgDepositValue {
 /**
  * Implementation of the Kava Lend MsgDeposit message type.
  */
-export class LendMsgDeposit extends CosmosMessageBase<LendMsgToolParams> {
+export class LendMsgDeposit extends CosmosMessageBase<LendToolParams> {
   type = 'hard/MsgDeposit';
   description = 'Deposit tokens from an address into a Lend money market';
 
@@ -49,7 +52,7 @@ export class LendMsgDeposit extends CosmosMessageBase<LendMsgToolParams> {
    * @param params - Parameters to validate
    * @returns True if parameters are valid
    */
-  validate(params: LendMsgToolParams): boolean {
+  validate(params: LendToolParams): boolean {
     const { depositor, amount, denom } = params;
 
     return Boolean(
@@ -63,11 +66,11 @@ export class LendMsgDeposit extends CosmosMessageBase<LendMsgToolParams> {
    * @returns Transaction object ready for signing
    */
   async buildTransaction(
-    params: LendMsgToolParams,
-  ): Promise<CosmosMsg<MsgDepositValue>> {
+    params: LendToolParams,
+  ): Promise<CosmosMsg<LendMsgArgs>> {
     const { depositor, amount, denom } = params;
     return {
-      typeUrl: '/kava.hard.v1beta1.MsgDeposit',
+      typeUrl: MessageTypeUrl.LEND_MSG_DEPOSIT,
       value: {
         depositor,
         amount: {

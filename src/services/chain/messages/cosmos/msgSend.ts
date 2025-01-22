@@ -1,14 +1,17 @@
-import { CosmosMessageBase } from './cosmos/base';
-import { CosmosCoin, CosmosMsg } from '../../../types/chain';
+import { CosmosMessageBase } from '.././cosmos/base';
+import { CosmosCoin, CosmosMsg } from '../../../../types/chain';
+import { MessageTypeUrl } from '../../../../types/messages';
 
-interface SendMsgToolParams {
+//  sent to model
+interface SendToolParams {
   fromAddress: string;
   toAddress: string;
   amount: string;
   denom: string;
 }
 
-interface SendMsgValue {
+//  broadcast to chain
+interface SendMsgArgs {
   fromAddress: string;
   toAddress: string;
   amount: CosmosCoin;
@@ -19,7 +22,7 @@ interface SendMsgValue {
  * Handles the creation and validation of token transfer messages
  * in the Cosmos ecosystem.
  */
-export class CosmosSendMessage extends CosmosMessageBase<SendMsgToolParams> {
+export class CosmosSendMessage extends CosmosMessageBase<SendToolParams> {
   type = 'cosmos-sdk/MsgSend';
   /** Human-readable description for AI tools */
   description = 'Send tokens from one address to another';
@@ -60,7 +63,7 @@ export class CosmosSendMessage extends CosmosMessageBase<SendMsgToolParams> {
    * @param params - Parameters to validate
    * @returns True if parameters are valid
    */
-  validate(params: SendMsgToolParams): boolean {
+  validate(params: SendToolParams): boolean {
     const { fromAddress, toAddress, amount, denom } = params;
 
     return Boolean(
@@ -77,11 +80,11 @@ export class CosmosSendMessage extends CosmosMessageBase<SendMsgToolParams> {
    * @returns Transaction object ready for signing
    */
   async buildTransaction(
-    params: SendMsgToolParams,
-  ): Promise<CosmosMsg<SendMsgValue>> {
+    params: SendToolParams,
+  ): Promise<CosmosMsg<SendMsgArgs>> {
     const { fromAddress, toAddress, amount, denom } = params;
     return {
-      typeUrl: '/cosmos.bank.v1beta1.MsgSend',
+      typeUrl: MessageTypeUrl.LEND_MSG_DEPOSIT,
       value: {
         fromAddress,
         toAddress,
