@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   SignOpts,
   WalletConnectionOpts,
@@ -19,24 +19,27 @@ export const WalletContextProvider = ({
 
   const isWalletConnected: boolean = wallet.address.length > 0;
 
+  const connectMetamask = useCallback(async () => {
+    const accounts: string[] = await window.ethereum.request({
+      method: 'eth_requestAccounts',
+    });
+    if (Array.isArray(accounts) && accounts.length) {
+      const chainId = await window.ethereum.request({
+        method: 'eth_chainId',
+      });
+
+      setWallet({
+        address: accounts[0],
+        chainId: chainId,
+        walletType: WalletTypes.METAMASK,
+      });
+    }
+  }, []);
+
   const connectWallet = useCallback(async (opts: WalletConnectionOpts) => {
     switch (opts.walletType) {
       case WalletTypes.METAMASK: {
-        const accounts: string[] = await window.ethereum.request({
-          method: 'eth_requestAccounts',
-        });
-        if (Array.isArray(accounts) && accounts.length) {
-          const chainId = await window.ethereum.request({
-            method: 'eth_chainId',
-          });
-
-          setWallet({
-            address: accounts[0],
-            chainId: chainId,
-            walletType: WalletTypes.METAMASK,
-          });
-        }
-
+        await connectMetamask();
         break;
       }
       case WalletTypes.NONE: {
@@ -56,6 +59,28 @@ export const WalletContextProvider = ({
   const disconnectWallet = useCallback(() => {
     setWallet({ address: '', chainId: '', walletType: WalletTypes.NONE });
   }, []);
+
+  useEffect(() => {
+    const onChainChanged = () => {
+      window.location.reload();
+    };
+
+    if (wallet.walletType === WalletTypes.METAMASK) {
+      // @ts-expect-error window.ethereum.on does exist
+      window.ethereum.on('chainChanged', onChainChanged);
+      // @ts-expect-error window.ethereum.on does exist
+      window.ethereum.on('accountsChanged', connectMetamask);
+    }
+
+    return () => {
+      if (wallet.walletType === WalletTypes.METAMASK) {
+        // @ts-expect-error window.ethereum.off does exist
+        window.ethereum.off('chainChanged', onChainChanged);
+        // @ts-expect-error window.ethereum.off does exist
+        window.ethereum.off('accountsChanged', connectMetamask);
+      }
+    };
+  }, [wallet, connectMetamask]);
 
   return (
     <WalletContext.Provider
