@@ -27,10 +27,10 @@ import {
   memeCoinGenWarningText,
 } from './config/prompts/systemPrompt';
 import { memeCoinTools } from './config/tools';
-import { imagedb } from './imagedb';
-import { v4 as uuidv4 } from 'uuid';
+// import { imagedb } from './imagedb';
+// import { v4 as uuidv4 } from 'uuid';
 import { ToolCallStream, ToolCallStreamStore } from './toolCallStreamStore';
-import { ToolFunctions, type GenerateCoinMetadataParams } from './tools/types';
+// import { ToolFunctions, type GenerateCoinMetadataParams } from './tools/types';
 import { MessageHistoryStore } from './messageHistoryStore';
 import { getStoredMasks } from './utils/chat/helpers';
 import { useAppContext } from './context/useAppContext';
@@ -235,11 +235,11 @@ async function doChat(
     if (toolCallStreamStore.getSnapShot().length > 0) {
       // do the tool calls
       await callTools(
-        controller,
-        client,
-        messageHistoryStore,
+        // controller,
+        // client,
+        // messageHistoryStore,
         toolCallStreamStore,
-        progressStore,
+        // progressStore,
       );
 
       // inform the model of the tool call responses
@@ -273,11 +273,11 @@ async function doChat(
 }
 
 async function callTools(
-  controller: AbortController,
-  client: OpenAI,
-  messageHistoryStore: MessageHistoryStore,
+  // controller: AbortController,
+  // client: OpenAI,
+  // messageHistoryStore: MessageHistoryStore,
   toolCallStreamStore: ToolCallStreamStore,
-  progressStore: TextStreamStore,
+  // progressStore: TextStreamStore,
 ): Promise<void> {
   for (const toolCall of toolCallStreamStore.getSnapShot()) {
     const name = toolCall.function?.name;

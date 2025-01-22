@@ -1,5 +1,4 @@
 import OrosLogo from '../../src/assets/orosLogo.svg';
-import HardDotFunLogo from '../../src/assets/hardDotFunDiamond.svg';
 
 export interface ThemeColors {
   bgPrimary: string;

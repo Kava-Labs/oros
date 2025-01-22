@@ -90,7 +90,9 @@ export class MetamaskWallet implements WalletProvider {
     if (!this.provider || !this.address) {
       throw new Error('Wallet not connected');
     }
-    const signer = await this.provider.getSigner();
+    //  todo - remove
+    console.log(tx);
+    // const signer = await this.provider.getSigner();
     /**
      * TODO: Need to add custom signer logic here
      */

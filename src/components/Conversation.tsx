@@ -1,7 +1,7 @@
 import styles from './ChatView.module.css';
 import { Content } from './Content';
 import { StreamingText } from './StreamingText';
-import { messageStore, progressStore, toolCallStreamStore } from '../store';
+import { messageStore, progressStore } from '../store';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { memo } from 'react';
 import { useTheme } from '../theme/useTheme';
