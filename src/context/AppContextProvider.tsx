@@ -1,15 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
-
-type AppContextType = {
-  errorText: string;
-  setErrorText: (e: string) => void;
-  isReady: boolean;
-  setIsReady: (i: boolean) => void;
-  isRequesting: boolean;
-  setIsRequesting: (i: boolean) => void;
-};
-
-const AppContext = createContext<AppContextType | undefined>(undefined);
+import React, { useState } from 'react';
+import { AppContext } from './AppContext';
 
 export const AppContextProvider = ({
   children,
@@ -38,12 +28,4 @@ export const AppContextProvider = ({
       {children}
     </AppContext.Provider>
   );
-};
-
-export const useAppContext = () => {
-  const context = useContext(AppContext);
-  if (context === undefined) {
-    throw new Error('useAppContext must be used within an AppContextProvider');
-  }
-  return context;
 };

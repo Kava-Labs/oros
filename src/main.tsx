@@ -35,7 +35,7 @@ import '@fontsource/inter/700-italic.css';
 //
 import { App } from './App.tsx';
 import { ThemeProvider } from './theme/themeProvider.tsx';
-import { AppContextProvider } from './AppContext';
+import { AppContextProvider } from './context/AppContextProvider.tsx';
 
 //
 // Render!

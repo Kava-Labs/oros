@@ -31,10 +31,9 @@ import { imagedb } from './imagedb';
 import { v4 as uuidv4 } from 'uuid';
 import { ToolCallStream, ToolCallStreamStore } from './toolCallStreamStore';
 import { ToolFunctions, type GenerateCoinMetadataParams } from './tools/types';
-import type { AnyIFrameMessage } from './types';
 import { MessageHistoryStore } from './messageHistoryStore';
 import { getStoredMasks } from './utils/chat/helpers';
-import { useAppContext } from './AppContext';
+import { useAppContext } from './context/useAppContext';
 
 let client: OpenAI | null = null;
 
@@ -52,18 +51,11 @@ export const App = () => {
   const { setErrorText, isReady, setIsReady, isRequesting, setIsRequesting } =
     useAppContext();
 
-  const [{ tools, systemPrompt, introText, cautionText }, setConfig] = useState(
-    {
-      introText: memeCoinGenIntroText,
-      systemPrompt: memeCoinSystemPrompt,
-      tools: memeCoinTools,
-      cautionText: memeCoinGenWarningText,
-    },
-  );
-
-  const [wallet, setWallet] = useState({
-    address: '',
-    chainID: '',
+  const [{ tools, systemPrompt, introText, cautionText }] = useState({
+    introText: memeCoinGenIntroText,
+    systemPrompt: memeCoinSystemPrompt,
+    tools: memeCoinTools,
+    cautionText: memeCoinGenWarningText,
   });
 
   // TODO: check healthcheck and set error if backend is not availiable
@@ -81,119 +73,6 @@ export const App = () => {
 
     setIsReady(true);
   }, [setIsReady]);
-
-  useEffect(() => {
-    const parentMessageHandler = (event: MessageEvent<AnyIFrameMessage>) => {
-      // Handle the message
-      if (event.data && event.data.namespace === 'KAVA_CHAT') {
-        console.info('event received from parent: ', event);
-        switch (event.data.type) {
-          case 'WALLET_CONNECTION/V1': {
-            console.info('WALLET_CONNECTION/V1', event.data);
-            setWallet({
-              address: event.data.payload.address,
-              chainID: event.data.payload.chainID,
-            });
-            break;
-          }
-          case 'SET_SYSTEM_PROMPT/V1': {
-            console.info('SET_SYSTEM_PROMPT/V1', event.data);
-            const systemPrompt = event.data.payload.systemPrompt;
-            setConfig((prev) => ({ ...prev, systemPrompt }));
-            break;
-          }
-          case 'SET_TOOLS/V1': {
-            console.info('SET_TOOLS/V1', event.data);
-            const tools = event.data.payload.tools;
-            setConfig((prev) => ({ ...prev, tools }));
-            break;
-          }
-          case `SET_INTRO_TEXT/V1`: {
-            console.info('SET_INTRO_TEXT/V1', event.data);
-            const introText = event.data.payload.introText;
-            setConfig((prev) => ({ ...prev, introText }));
-            break;
-          }
-          case `SET_CAUTION_TEXT/V1`: {
-            console.info('SET_CAUTION_TEXT/V1', event.data);
-            const cautionText = event.data.payload.cautionText;
-            setConfig((prev) => ({ ...prev, cautionText }));
-            break;
-          }
-
-          case 'SET_PROGRESS_TEXT/V1': {
-            console.info('SET_PROGRESS_TEXT/V1', event.data);
-            progressStore.setText(event.data.payload.text);
-            break;
-          }
-
-          case `TOOL_CALL_RESPONSE/V1`: {
-            console.info(`TOOL_CALL_RESPONSE/V1`, event.data);
-            const toolCall = event.data.payload.toolCall;
-            const content = event.data.payload.content;
-
-            messageHistoryStore.addMessage({
-              role: 'assistant' as const,
-              function_call: null,
-              content: null,
-              tool_calls: [
-                toolCallStreamStore.toChatCompletionMessageToolCall(toolCall),
-              ],
-            });
-            toolCallStreamStore.deleteToolCallById(toolCall.id);
-            messageHistoryStore.addMessage({
-              role: 'tool' as const,
-              tool_call_id: toolCall.id,
-              content,
-            });
-
-            controllerRef.current = new AbortController();
-            setIsRequesting(true);
-            setErrorText('');
-            // once the tool call response is received from the dapp
-            // call doChat to inform the model
-            doChat(
-              controllerRef.current,
-              client!,
-              messageHistoryStore,
-              tools,
-              progressStore,
-              messageStore,
-            )
-              .catch((error) => {
-                const errorMessage =
-                  typeof error === 'object' &&
-                  error !== null &&
-                  'message' in error
-                    ? (error as { message: string }).message
-                    : 'An error occurred - please try again';
-
-                setErrorText(errorMessage);
-              })
-              .finally(() => {
-                controllerRef.current = null;
-                setIsRequesting(false);
-              });
-
-            break;
-          }
-          default:
-            console.warn('unknown event type', event.type);
-            break;
-        }
-      }
-    };
-
-    // register parentMessageHandler when inside iFrame
-    if (window.top !== window.self) {
-      window.addEventListener('message', parentMessageHandler);
-    }
-    return () => {
-      if (window.top !== window.self) {
-        window.removeEventListener('message', parentMessageHandler);
-      }
-    };
-  }, [setErrorText, setIsRequesting, tools]);
 
   const messages = useSyncExternalStore(
     messageHistoryStore.subscribe,
@@ -299,8 +178,6 @@ export const App = () => {
         <ChatView
           introText={introText}
           cautionText={cautionText}
-          address={wallet.address}
-          chainID={wallet.chainID}
           messages={messages}
           onSubmit={handleChatCompletion}
           onReset={handleReset}
@@ -356,13 +233,7 @@ async function doChat(
     }
 
     if (toolCallStreamStore.getSnapShot().length > 0) {
-      const hasMemeCoinGenToolCall =
-        toolCallStreamStore
-          .getSnapShot()
-          .find(
-            (tc) => tc.function.name === ToolFunctions.GENERATE_COIN_METADATA,
-          ) !== undefined;
-
+      // do the tool calls
       await callTools(
         controller,
         client,
@@ -371,21 +242,15 @@ async function doChat(
         progressStore,
       );
 
-      // only call doChat for meme coin generation
-      // dapps will send the TOOL_CALL_RESPONSE/V1 event
-      // which is when we can call doChat
-      // calling doChat here for anything other than a memecoin gen will result
-      // in an infinite loop of requests
-      if (hasMemeCoinGenToolCall) {
-        await doChat(
-          controller,
-          client,
-          messageHistoryStore,
-          tools,
-          progressStore,
-          messageStore,
-        );
-      }
+      // inform the model of the tool call responses
+      await doChat(
+        controller,
+        client,
+        messageHistoryStore,
+        tools,
+        progressStore,
+        messageStore,
+      );
     }
   } catch (e) {
     console.error(`An error occurred: ${e} `);
@@ -414,7 +279,6 @@ async function callTools(
   toolCallStreamStore: ToolCallStreamStore,
   progressStore: TextStreamStore,
 ): Promise<void> {
-  const isInIframe = window !== window.parent;
   for (const toolCall of toolCallStreamStore.getSnapShot()) {
     const name = toolCall.function?.name;
     const { masksToValues } = getStoredMasks();
@@ -434,67 +298,8 @@ async function callTools(
       };
     }
 
-    if (isInIframe) {
-      window.parent.postMessage(
-        {
-          type: 'TOOL_CALL',
-          payload,
-        },
-        '*',
-      );
-    }
-
     switch (name) {
-      case ToolFunctions.GENERATE_COIN_METADATA: {
-        const args = toolCall.function.arguments as GenerateCoinMetadataParams;
-        const response = client.images.generate(
-          {
-            model: IMAGE_GEN_MODEL,
-            prompt: args['prompt'],
-            quality: 'hd',
-            response_format: 'b64_json',
-          },
-          {
-            signal: controller.signal,
-          },
-        );
-        const imageId = uuidv4();
-        imagedb.set(
-          imageId,
-          (async () => {
-            const image = await response;
-
-            return `data:image/png;base64,${image.data[0].b64_json!}`;
-          })(),
-        );
-
-        messageHistoryStore.addMessage({
-          role: 'assistant' as const,
-          function_call: null,
-          content: null,
-          tool_calls: [
-            toolCallStreamStore.toChatCompletionMessageToolCall(toolCall),
-          ],
-        });
-
-        toolCallStreamStore.deleteToolCallById(toolCall.id);
-
-        messageHistoryStore.addMessage({
-          role: 'tool' as const,
-          tool_call_id: toolCall.id!,
-          content: JSON.stringify({
-            id: imageId,
-            name: args['name'],
-            about: args['about'],
-            symbol: args['symbol'],
-          }),
-        });
-
-        progressStore.setText('Generating Image');
-        await imagedb.get(imageId);
-
-        break;
-      }
+      // todo (sah): handle tool calls based on their name
       default:
         console.warn(`unknown tool call: ${name}`);
         // throw new Error(`unknown tool call: ${name}`);

@@ -6,7 +6,7 @@ import { Conversation } from './Conversation';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { maskAddresses } from './utils/chat/maskAddresses';
 import { getStoredMasks, updateStoredMasks } from './utils/chat/helpers';
-import { useAppContext } from './AppContext';
+import { useAppContext } from './context/useAppContext';
 
 export interface ChatViewProps {
   messages: ChatCompletionMessageParam[];
@@ -15,8 +15,6 @@ export interface ChatViewProps {
   onReset(): void;
   onCancel(): void;
   introText: string;
-  address: string;
-  chainID: string;
 }
 
 export const ChatView = ({
@@ -26,8 +24,6 @@ export const ChatView = ({
   onReset,
   onCancel,
   introText,
-  address,
-  chainID,
 }: ChatViewProps) => {
   const { isRequesting } = useAppContext();
   const hasMessages =
@@ -137,11 +133,7 @@ export const ChatView = ({
             <div id={styles.start} data-testid="start">
               <img src={logo} id={styles.chatIconContainer} />
               <h3>Let's get started!</h3>
-              <h6>
-                {address
-                  ? `your wallet address: ${address} connected to chainID: ${chainID.startsWith('0x') ? parseInt(chainID, 16) : chainID}`
-                  : introText}
-              </h6>
+              <h6>{introText}</h6>
             </div>
           </div>
         )}

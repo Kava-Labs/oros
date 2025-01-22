@@ -25,7 +25,7 @@ export interface ChainOperation {
   /** List of parameters this operation accepts */
   parameters: MessageParam[];
   /** Validates the provided parameters match requirements */
-  validate(params: any): boolean;
+  validate(params: unknown): boolean;
 }
 
 /**
@@ -36,7 +36,7 @@ export interface ChainMessage extends ChainOperation {
   /** Identifies this as a transaction operation */
   operationType: 'transaction';
   /** Builds the transaction object from the provided parameters */
-  buildTransaction(params: any): Promise<any>;
+  buildTransaction(params: unknown): Promise<unknown>;
 }
 
 /**
@@ -47,5 +47,5 @@ export interface ChainQuery extends ChainOperation {
   /** Identifies this as a query operation */
   operationType: 'query';
   /** Executes the query with the provided parameters */
-  executeQuery(params: any): Promise<any>;
+  executeQuery(params: unknown): Promise<unknown>;
 }
