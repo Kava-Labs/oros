@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import { ChatView, ChatViewProps } from './ChatView';
-import { ThemeProvider } from './theme/themeProvider';
-import { AppContextProvider } from './context/AppContextProvider';
+import { ThemeProvider } from '../theme/themeProvider';
+import { AppContextProvider } from '../context/AppContextProvider';
 
 describe('ChatView', () => {
   const props: ChatViewProps = {
