@@ -76,6 +76,7 @@ export const WalletContextProvider = ({
     };
 
     if (wallet.walletType === WalletTypes.METAMASK) {
+      console.log('adding');
       // @ts-expect-error window.ethereum.on does exist
       window.ethereum.on('chainChanged', onChainChanged);
       // @ts-expect-error window.ethereum.on does exist
@@ -84,6 +85,7 @@ export const WalletContextProvider = ({
 
     return () => {
       if (wallet.walletType === WalletTypes.METAMASK) {
+        console.log('removing');
         // @ts-expect-error window.ethereum.off does exist
         window.ethereum.off('chainChanged', onChainChanged);
         // @ts-expect-error window.ethereum.off does exist
