@@ -6,12 +6,11 @@ import { Conversation } from './Conversation';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { maskAddresses } from './utils/chat/maskAddresses';
 import { getStoredMasks, updateStoredMasks } from './utils/chat/helpers';
+import { useAppContext } from './AppContext';
 
 export interface ChatViewProps {
   messages: ChatCompletionMessageParam[];
-  errorText: string;
   cautionText: string;
-  isRequesting: boolean;
   onSubmit(value: string): void;
   onReset(): void;
   onCancel(): void;
@@ -22,9 +21,7 @@ export interface ChatViewProps {
 
 export const ChatView = ({
   messages,
-  errorText,
   cautionText,
-  isRequesting,
   onSubmit,
   onReset,
   onCancel,
@@ -32,6 +29,7 @@ export const ChatView = ({
   address,
   chainID,
 }: ChatViewProps) => {
+  const { isRequesting } = useAppContext();
   const hasMessages =
     messages.filter((message) => message.role != 'system').length > 0;
 
@@ -129,8 +127,6 @@ export const ChatView = ({
 
             <Conversation
               messages={messages}
-              errorText={errorText}
-              isRequesting={isRequesting}
               onRendered={handleContentRendered}
             />
           </>

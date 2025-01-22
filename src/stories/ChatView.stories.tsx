@@ -5,12 +5,23 @@ import { mockChatMessages } from '../mockdata';
 import { memeCoinGenIntroText } from '../config';
 import type { Decorator } from '@storybook/react';
 import { ThemeProvider } from '../theme/themeProvider';
+import { AppContextProvider } from '../AppContext';
 
-const withThemeProvider: Decorator = (Story) => (
-  <ThemeProvider>
-    <Story />
-  </ThemeProvider>
-);
+const withProviders =
+  (
+    _ = {
+      isRequesting: false,
+      isReady: true,
+      errorText: '',
+    },
+  ): Decorator =>
+  (Story) => (
+    <ThemeProvider>
+      <AppContextProvider>
+        <Story />
+      </AppContextProvider>
+    </ThemeProvider>
+  );
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
@@ -28,7 +39,7 @@ const meta = {
   //},
   // Use `fn` to spy on the onClick arg, which will appear in the actions panel once invoked: https://storybook.js.org/docs/essentials/actions#action-args
   //args: { onClick: fn() },
-  decorators: [withThemeProvider],
+  decorators: [withProviders()],
 } satisfies Meta<typeof ChatView>;
 
 export default meta;
@@ -39,11 +50,9 @@ const args: ChatViewProps = {
   messages: mockChatMessages,
   address: '',
   chainID: '',
-  isRequesting: false,
   onSubmit: fn(),
   onReset: fn(),
   onCancel: fn(),
-  errorText: '',
   cautionText: '',
 };
 
@@ -60,6 +69,13 @@ export const OnPhoneSmall: Story = {
     viewport: { defaultViewport: 'mobile1' },
   },
   args,
+  decorators: [
+    withProviders({
+      isRequesting: false,
+      isReady: true,
+      errorText: '',
+    }),
+  ],
 };
 
 export const OnPhoneLarge: Story = {
@@ -96,6 +112,12 @@ export const RequestInProgress: Story = {
   args: {
     ...args,
     messages: [],
-    isRequesting: true,
   },
+  decorators: [
+    withProviders({
+      isRequesting: true,
+      isReady: true,
+      errorText: '',
+    }),
+  ],
 };

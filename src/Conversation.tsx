@@ -4,16 +4,13 @@ import { StreamingText } from './StreamingText';
 import { messageStore, progressStore, toolCallStreamStore } from './store';
 import { ToolFunctions, GenerateCoinMetadataResponse } from './tools/types';
 import { TokenCard, TokenCardsStreamingPlaceholder } from './TokenCard';
-
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { memo } from 'react';
 import { useTheme } from './theme/useTheme';
+import { useAppContext } from './AppContext';
 
 export interface ConversationProps {
   messages: ChatCompletionMessageParam[];
-  errorText: string;
-  isRequesting: boolean;
-
   onRendered(): void;
 }
 
@@ -21,13 +18,9 @@ const StreamingTextContent = (message: string, onRendered: () => void) => {
   return <Content role="assistant" content={message} onRendered={onRendered} />;
 };
 
-const ConversationComponent = ({
-  messages,
-  errorText,
-  isRequesting,
-  onRendered,
-}: ConversationProps) => {
+const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
   const { logo } = useTheme();
+  const { errorText, isRequesting } = useAppContext();
 
   return (
     <div id={styles.conversation} data-testid="conversation">

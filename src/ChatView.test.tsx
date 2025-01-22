@@ -1,14 +1,13 @@
 import { render } from '@testing-library/react';
 import { ChatView, ChatViewProps } from './ChatView';
 import { ThemeProvider } from './theme/themeProvider';
+import { AppContextProvider } from './AppContext';
 
 describe('ChatView', () => {
   const props: ChatViewProps = {
     messages: [],
-    errorText: '',
     cautionText: '',
     introText: 'Foobar',
-    isRequesting: false,
     onSubmit: () => {},
     onReset: () => {},
     onCancel: () => {},
@@ -19,7 +18,9 @@ describe('ChatView', () => {
   test('input is focused by default', () => {
     const wrapper = render(
       <ThemeProvider>
-        <ChatView {...props} />
+        <AppContextProvider>
+          <ChatView {...props} />
+        </AppContextProvider>
       </ThemeProvider>,
     );
     const input = wrapper.getByTestId('chat-view-input');
