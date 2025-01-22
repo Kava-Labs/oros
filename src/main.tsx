@@ -36,6 +36,7 @@ import '@fontsource/inter/700-italic.css';
 import { App } from './App.tsx';
 import { ThemeProvider } from './theme/themeProvider.tsx';
 import { AppContextProvider } from './context/AppContextProvider.tsx';
+import { WalletContextProvider } from './context/WalletContextProvider.tsx';
 
 //
 // Render!
@@ -46,7 +47,9 @@ root.render(
   <StrictMode>
     <ThemeProvider>
       <AppContextProvider>
-        <App />
+        <WalletContextProvider>
+          <App />
+        </WalletContextProvider>
       </AppContextProvider>
     </ThemeProvider>
   </StrictMode>,
