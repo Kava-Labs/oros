@@ -6,7 +6,7 @@ import { ChainMessage } from '../../../types/chain';
  * in the Cosmos ecosystem.
  */
 export class CosmosSendMessage implements ChainMessage {
-  type = 'cosmos-sdk/MsgSend';
+  name = 'msgSend';
   /** Identifies this as a transaction operation vs query */
   operationType = 'transaction' as const;
   /** Specifies this as a Cosmos chain operation not evm */

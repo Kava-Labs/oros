@@ -14,7 +14,7 @@ export class OperationRegistry {
    * @param operation - Operation to register
    */
   register(operation: ChainOperation) {
-    this.operations.set(operation.type, operation);
+    this.operations.set(operation.name, operation);
   }
 
   /**
@@ -65,7 +65,7 @@ export class OperationRegistry {
     return this.getAllOperations().map((operation) => ({
       type: 'function',
       function: {
-        name: operation.type.replace(/\//g, '_').toLowerCase(),
+        name: operation.name,
         description: operation.description,
         parameters: {
           type: 'object',
