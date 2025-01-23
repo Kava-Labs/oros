@@ -5,7 +5,10 @@ import { ChainMessage, ChainQuery } from '../types/chain';
 import { LendDepositMessage } from '../services/chain/messages/kava/lend/msgDeposit';
 import { EvmTransferMessage } from '../services/chain/messages/evm/transfer';
 import { EvmBalancesQuery } from '../services/chain/queries/evm/evmBalances';
-import { walletStore } from '../store';
+import { WalletStore } from '../walletStore';
+import { TextStreamStore } from '../textStreamStore';
+import { ToolCallStreamStore } from '../toolCallStreamStore';
+import { MessageHistoryStore } from '../messageHistoryStore';
 
 /**
  * Initializes the operation registry with all supported operations.
@@ -25,8 +28,18 @@ function initializeRegistry(): OperationRegistry<unknown> {
 
 export const AppContextProvider = ({
   children,
+  walletStore,
+  messageStore,
+  toolCallStreamStore,
+  progressStore,
+  messageHistoryStore,
 }: {
   children: React.ReactNode;
+  walletStore: WalletStore;
+  messageStore: TextStreamStore;
+  toolCallStreamStore: ToolCallStreamStore;
+  progressStore: TextStreamStore;
+  messageHistoryStore: MessageHistoryStore;
 }) => {
   const [errorText, setErrorText] = useState('');
   // use is sending request to signify to the chat view that
@@ -77,12 +90,18 @@ export const AppContextProvider = ({
 
       throw new Error('Invalid operation type');
     },
-    [registry],
+    [registry, walletStore],
   );
 
   return (
     <AppContext.Provider
       value={{
+        messageHistoryStore,
+        messageStore,
+        progressStore,
+        walletStore,
+        toolCallStreamStore,
+
         getOpenAITools,
         executeOperation,
         registry,

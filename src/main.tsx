@@ -37,6 +37,17 @@ import { App } from './App.tsx';
 import { ThemeProvider } from './theme/themeProvider.tsx';
 import { AppContextProvider } from './context/AppContextProvider.tsx';
 
+import { TextStreamStore } from './textStreamStore';
+import { ToolCallStreamStore } from './toolCallStreamStore';
+import { MessageHistoryStore } from './messageHistoryStore';
+import { WalletStore } from './walletStore';
+
+const messageStore = new TextStreamStore();
+const progressStore = new TextStreamStore();
+const toolCallStreamStore = new ToolCallStreamStore();
+const messageHistoryStore = new MessageHistoryStore();
+const walletStore = new WalletStore();
+
 //
 // Render!
 //
@@ -45,7 +56,13 @@ const root = createRoot(document.getElementById('root')!);
 root.render(
   <StrictMode>
     <ThemeProvider>
-      <AppContextProvider>
+      <AppContextProvider
+        progressStore={progressStore}
+        messageStore={messageStore}
+        toolCallStreamStore={toolCallStreamStore}
+        walletStore={walletStore}
+        messageHistoryStore={messageHistoryStore}
+      >
         <App />
       </AppContextProvider>
     </ThemeProvider>
