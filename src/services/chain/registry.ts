@@ -1,5 +1,5 @@
 import { ChainMessage, ChainOperation, ChainQuery } from '../../types/chain';
-
+import type { ChatCompletionTool } from 'openai/resources/index';
 /**
  * Central registry for all chain operations (messages and queries).
  * Manages the registration and retrieval of operations, and generates
@@ -61,7 +61,8 @@ export class OperationRegistry {
    * These definitions are used to create function-calling tools in the AI model.
    * @returns Array of tool definitions in OpenAI format
    */
-  getToolDefinitions(): unknown[] {
+  
+  getToolDefinitions():  ChatCompletionTool[] {
     return this.getAllOperations().map((operation) => ({
       type: 'function',
       function: {
