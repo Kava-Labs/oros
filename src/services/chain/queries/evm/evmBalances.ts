@@ -13,7 +13,7 @@ export class EvmBalancesQuery implements ChainQuery<void> {
   operationType = OperationType.QUERY;
   chainType = ChainType.EVM;
 
-  validate(params: void, wallet: WalletConnection): boolean {
+  validate(_params: void, wallet: WalletConnection): boolean {
     if (!wallet.isWalletConnected) {
       throw new Error('please connect to a wallet');
     }
@@ -25,7 +25,7 @@ export class EvmBalancesQuery implements ChainQuery<void> {
     return true;
   }
 
-  async executeQuery(params: void, wallet: WalletConnection): Promise<string> {
+  async executeQuery(_params: void, wallet: WalletConnection): Promise<string> {
     const address = wallet.walletAddress;
     const balanceCalls: (() => Promise<string>)[] = [];
 
