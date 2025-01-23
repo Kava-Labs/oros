@@ -2,8 +2,8 @@ import { ChainQuery, ChainType, OperationType } from '../../../../types/chain';
 import { ethers } from 'ethers';
 import { erc20ABI } from '../../../../tools/erc20ABI';
 import { ASSET_ADDRESSES, kavaEVMProvider } from '../../../../config/evm';
-import { WalletConnection } from '../../../../types/chain';
 import { QueryInProgress } from '../../../../components/QueryInProgress';
+import { WalletStore } from '../../../../walletStore';
 
 export class EvmBalancesQuery implements ChainQuery<void> {
   name = 'evm-balances';
@@ -13,13 +13,15 @@ export class EvmBalancesQuery implements ChainQuery<void> {
   chainType = ChainType.EVM;
   compatibleWallets = '*' as const;
 
-  validate(_params: void, wallet: WalletConnection): boolean {
-    if (!wallet.isWalletConnected) {
+  validate(_params: void, walletStore: WalletStore): boolean {
+    if (!walletStore.getSnapshot().isWalletConnected) {
       throw new Error('please connect to a compatible wallet');
     }
 
     if (Array.isArray(this.compatibleWallets)) {
-      if (!this.compatibleWallets.includes(wallet.walletType)) {
+      if (
+        !this.compatibleWallets.includes(walletStore.getSnapshot().walletType)
+      ) {
         throw new Error('please connect to a compatible wallet');
       }
     }
@@ -31,8 +33,8 @@ export class EvmBalancesQuery implements ChainQuery<void> {
     return QueryInProgress;
   }
 
-  async executeQuery(_params: void, wallet: WalletConnection): Promise<string> {
-    const address = wallet.walletAddress;
+  async executeQuery(_params: void, walletStore: WalletStore): Promise<string> {
+    const address = walletStore.getSnapshot().walletAddress;
     const balanceCalls: (() => Promise<string>)[] = [];
 
     // KAVA fetching is a bit different

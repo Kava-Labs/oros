@@ -5,7 +5,7 @@ import { ChainMessage, ChainQuery } from '../types/chain';
 import { LendDepositMessage } from '../services/chain/messages/kava/lend/msgDeposit';
 import { EvmTransferMessage } from '../services/chain/messages/evm/transfer';
 import { EvmBalancesQuery } from '../services/chain/queries/evm/evmBalances';
-import { useWalletContext } from './useWalletContext';
+import { walletStore } from '../store';
 
 /**
  * Initializes the operation registry with all supported operations.
@@ -35,8 +35,6 @@ export const AppContextProvider = ({
   // a request is in progress so it can disable inputs
   const [isRequesting, setIsRequesting] = useState(false);
   const [isReady, setIsReady] = useState(false);
-  const { walletAddress, walletType, walletChainId, isWalletConnected } =
-    useWalletContext();
 
   const [registry] = useState<OperationRegistry<unknown>>(() =>
     initializeRegistry(),
@@ -56,34 +54,30 @@ export const AppContextProvider = ({
    */
   const executeOperation = useCallback(
     async (operationName: string, params: unknown) => {
-      const wallet = {
-        walletChainId,
-        walletType,
-        walletAddress,
-        isWalletConnected,
-      };
-
       const operation = registry.get(operationName);
       if (!operation) {
         throw new Error(`Unknown operation type: ${operationName}`);
       }
 
-      if (!operation.validate(params, wallet)) {
+      if (!operation.validate(params, walletStore)) {
         throw new Error('Invalid parameters for operation');
       }
 
       if ('buildTransaction' in operation) {
         return (operation as ChainMessage<unknown>).buildTransaction(
           params,
-          wallet,
+          walletStore,
         );
       } else if ('executeQuery' in operation) {
-        return (operation as ChainQuery<unknown>).executeQuery(params, wallet);
+        return (operation as ChainQuery<unknown>).executeQuery(
+          params,
+          walletStore,
+        );
       }
 
       throw new Error('Invalid operation type');
     },
-    [registry, walletChainId, walletType, walletAddress, isWalletConnected],
+    [registry],
   );
 
   return (
