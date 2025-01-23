@@ -114,7 +114,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
             ...txParams,
             from: sendingAddress,
             gasPrice: '0x4a817c800',
-            gas: '0x76c0',
+            gas: '0x16120',
           },
         ],
       });
