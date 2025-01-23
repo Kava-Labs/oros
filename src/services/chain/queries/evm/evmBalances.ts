@@ -35,7 +35,6 @@ export class EvmBalancesQuery implements ChainQuery<void> {
     const address = wallet.walletAddress;
     const balanceCalls: (() => Promise<string>)[] = [];
 
-
     // KAVA fetching is a bit different
     balanceCalls.push(async () => {
       try {
@@ -51,8 +50,11 @@ export class EvmBalancesQuery implements ChainQuery<void> {
     // add other assets
     for (const asset in ASSET_ADDRESSES) {
       balanceCalls.push(async () => {
+        const contractAddress = ASSET_ADDRESSES[asset].contractAddress;
+        const displayName = ASSET_ADDRESSES[asset].displayName;
+
         const contract = new ethers.Contract(
-          ASSET_ADDRESSES[asset],
+          contractAddress,
           erc20ABI,
           kavaEVMProvider,
         );
@@ -65,9 +67,9 @@ export class EvmBalancesQuery implements ChainQuery<void> {
             return '';
           }
 
-          return `${asset}: ${formattedBalance}`;
+          return `${displayName}: ${formattedBalance}`;
         } catch (err) {
-          return `${asset}: failed to fetch balance ${JSON.stringify(err)}`;
+          return `${displayName}: failed to fetch balance ${JSON.stringify(err)}`;
         }
       });
     }

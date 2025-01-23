@@ -33,7 +33,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
     {
       name: 'amount',
       type: 'string',
-      description: 'Amount to send (in base units)',
+      description: 'Amount to send',
       required: true,
     },
     {
@@ -65,8 +65,14 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
 
     const validToAddress = masksToValues[toAddress] ?? '';
 
+    const validDenomWithContract =
+      denom.toUpperCase() in ASSET_ADDRESSES || isNativeAsset(denom);
+
     return Boolean(
-      validToAddress.length > 0 && Number(amount) > 0 && denom.length > 0,
+      validToAddress.length > 0 &&
+        Number(amount) > 0 &&
+        denom.length > 0 &&
+        validDenomWithContract,
     );
   }
 
@@ -87,7 +93,6 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
 
       const receivingAddress = ethers.getAddress(addressTo);
       const sendingAddress = ethers.getAddress(addressFrom);
-      console.log(wallet, receivingAddress, sendingAddress);
 
       if (isNativeAsset(denom)) {
         txParams = {
@@ -96,7 +101,9 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
           value: ethers.parseEther(amount).toString(16),
         };
       } else {
-        const contractAddress = ASSET_ADDRESSES[denom.toUpperCase()] ?? '';
+        const contractAddress =
+          ASSET_ADDRESSES[denom.toUpperCase()].contractAddress;
+
         const contract = new ethers.Contract(
           contractAddress,
           erc20ABI,
