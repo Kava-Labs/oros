@@ -213,11 +213,11 @@ async function doChat(
     );
 
     for await (const chunk of stream) {
-      if (isContentChunk(chunk)) {
-        if (progressStore.getSnapshot() !== '') {
-          progressStore.setText('');
-        }
+      if (progressStore.getSnapshot() !== '') {
+        progressStore.setText('');
+      }
 
+      if (isContentChunk(chunk)) {
         messageStore.appendText(chunk.choices[0].delta.content as string);
       } else if (isToolCallChunk(chunk)) {
         assembleToolCallsFromStream(chunk, toolCallStreamStore);
