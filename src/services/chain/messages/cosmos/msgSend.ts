@@ -1,6 +1,5 @@
 import { CosmosMessageBase } from '../base';
-import { CosmosCoin, CosmosMsg } from '../../../../types/messages';
-import { MessageTypeUrl } from '../../../../types/messages';
+import { CosmosCoin } from '../../../../types/messages';
 
 //  sent to model
 interface SendToolParams {
@@ -10,22 +9,12 @@ interface SendToolParams {
   denom: string;
 }
 
-//  broadcast to chain
-interface SendMsgArgs {
-  fromAddress: string;
-  toAddress: string;
-  amount: CosmosCoin;
-}
-
 /**
  * Implementation of the Cosmos SDK MsgSend message type.
  * Handles the creation and validation of token transfer messages
  * in the Cosmos ecosystem.
  */
-export class CosmosSendMessage extends CosmosMessageBase<
-  SendToolParams,
-  SendMsgArgs
-> {
+export class CosmosSendMessage extends CosmosMessageBase<SendToolParams> {
   name = 'msgSend';
   /** Human-readable description for AI tools */
   description = 'Send tokens from one address to another';
@@ -82,20 +71,20 @@ export class CosmosSendMessage extends CosmosMessageBase<
    * @param params - Validated parameters for the transaction
    * @returns Transaction object ready for signing
    */
-  async buildTransaction(
-    params: SendToolParams,
-  ): Promise<CosmosMsg<SendMsgArgs>> {
-    const { fromAddress, toAddress, amount, denom } = params;
-    return {
-      typeUrl: MessageTypeUrl.COSMOS_MSG_SEND,
-      value: {
-        fromAddress,
-        toAddress,
-        amount: {
-          amount,
-          denom,
-        },
-      },
-    };
+  async buildTransaction(params: SendToolParams): Promise<string> {
+    // const { fromAddress, toAddress, amount, denom } = params;
+    // {
+    //   typeUrl: MessageTypeUrl.COSMOS_MSG_SEND,
+    //   value: {
+    //     fromAddress,
+    //     toAddress,
+    //     amount: {
+    //       amount,
+    //       denom,
+    //     },
+    //   },
+    // };
+
+    return 'Unimplemented';
   }
 }

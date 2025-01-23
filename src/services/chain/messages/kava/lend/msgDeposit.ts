@@ -9,19 +9,10 @@ interface LendToolParams {
   denom: string;
 }
 
-//  broadcast to chain
-interface LendMsgArgs {
-  depositor: string;
-  amount: CosmosCoin;
-}
-
 /**
  * Implementation of the Kava Lend MsgDeposit message type.
  */
-export class LendDepositMessage extends CosmosMessageBase<
-  LendToolParams,
-  LendMsgArgs
-> {
+export class LendDepositMessage extends CosmosMessageBase<LendToolParams> {
   name = 'msgDeposit';
   description = 'Deposit tokens from an address into a Lend money market';
 
@@ -68,19 +59,19 @@ export class LendDepositMessage extends CosmosMessageBase<
    * @param params - Validated parameters for the transaction
    * @returns Transaction object ready for signing
    */
-  async buildTransaction(
-    params: LendToolParams,
-  ): Promise<CosmosMsg<LendMsgArgs>> {
-    const { depositor, amount, denom } = params;
-    return {
-      typeUrl: MessageTypeUrl.LEND_MSG_DEPOSIT,
-      value: {
-        depositor,
-        amount: {
-          amount,
-          denom,
-        },
-      },
-    };
+  async buildTransaction(params: LendToolParams): Promise<string> {
+    // const { depositor, amount, denom } = params;
+    //  {
+    //   typeUrl: MessageTypeUrl.LEND_MSG_DEPOSIT,
+    //   value: {
+    //     depositor,
+    //     amount: {
+    //       amount,
+    //       denom,
+    //     },
+    //   },
+    // };
+
+    return 'unimplemented';
   }
 }
