@@ -64,51 +64,44 @@ export class EvmTransferMessage extends EvmMessageBase<SendToolParams> {
     const receivingAddress = ethers.getAddress(addressTo);
     const sendingAddress = ethers.getAddress(addressFrom);
 
+    let txParams: Record<string, string>;
+
     if (isNativeAsset(denom)) {
-      return window.ethereum.request({
-        method: 'eth_sendTransaction',
-        params: [
-          {
-            to: sendingAddress,
-            from: receivingAddress,
-            value: ethers.parseEther(amount).toString(16),
-            gasPrice: '0x4a817c800',
-            gas: '0x76c0',
-            data: '0x',
-          },
-        ],
-      });
+      txParams = {
+        to: sendingAddress,
+        data: '0x',
+        value: ethers.parseEther(amount).toString(16),
+      };
     } else {
       const contractAddress = ASSET_ADDRESSES[denom.toUpperCase()] ?? '';
-
       const contract = new ethers.Contract(
         contractAddress,
         erc20ABI,
         kavaEVMProvider,
       );
-
       const decimals = await contract.decimals();
-
       const formattedTxAmount = ethers.parseUnits(amount, Number(decimals));
 
-      const txData = contract.interface.encodeFunctionData('transfer', [
-        receivingAddress,
-        formattedTxAmount,
-      ]);
-
-      return window.ethereum.request({
-        method: 'eth_sendTransaction',
-        params: [
-          {
-            to: contractAddress,
-            from: sendingAddress,
-            value: '0', // this must be zero
-            gasPrice: '0x4a817c800',
-            gas: '0x16120',
-            data: txData,
-          },
-        ],
-      });
+      txParams = {
+        to: contractAddress,
+        value: '0', // this must be zero
+        data: contract.interface.encodeFunctionData('transfer', [
+          receivingAddress,
+          formattedTxAmount,
+        ]),
+      };
     }
+
+    return window.ethereum.request({
+      method: 'eth_sendTransaction',
+      params: [
+        {
+          ...txParams,
+          from: fromAddress,
+          gasPrice: '0x4a817c800',
+          gas: '0x76c0',
+        },
+      ],
+    });
   }
 }
