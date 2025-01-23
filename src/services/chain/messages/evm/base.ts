@@ -10,5 +10,5 @@ export abstract class EvmMessageBase<T> implements ChainMessage {
 
   abstract validate(params: T): boolean;
 
-  abstract buildTransaction(params: T): Promise<unknown>;
+  abstract buildTransaction(params: T): Promise<string>;
 }

@@ -1,5 +1,5 @@
 import { EvmMessageBase } from './base';
-import { ethers, TransactionResponse } from 'ethers';
+import { ethers } from 'ethers';
 import { ASSET_ADDRESSES, kavaEVMProvider } from '../../../../config/evm';
 import { erc20ABI } from '../../../../tools/erc20ABI';
 import { getStoredMasks, isNativeAsset } from '../../../../utils/chat/helpers';
@@ -53,7 +53,7 @@ export class EvmTransferMessage extends EvmMessageBase<SendToolParams> {
     );
   }
 
-  async buildTransaction(params: SendToolParams): Promise<TransactionResponse> {
+  async buildTransaction(params: SendToolParams): Promise<string> {
     const { fromAddress, toAddress, amount, denom } = params;
 
     const { masksToValues } = getStoredMasks();

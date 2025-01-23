@@ -1,6 +1,5 @@
 import { CosmosMessageBase } from './base';
 
-//  sent to model
 interface SendToolParams {
   fromAddress: string;
   toAddress: string;
