@@ -1,7 +1,6 @@
 import styles from './ChatView.module.css';
 import { Content } from './Content';
 import { StreamingText } from './StreamingText';
-import { messageStore, progressStore } from '../store';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { memo } from 'react';
 import { useTheme } from '../theme/useTheme';
@@ -19,7 +18,8 @@ const StreamingTextContent = (message: string, onRendered: () => void) => {
 
 const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
   const { logo } = useTheme();
-  const { errorText, isRequesting } = useAppContext();
+  const { errorText, isRequesting, progressStore, messageStore } =
+    useAppContext();
 
   return (
     <div id={styles.conversation} data-testid="conversation">

@@ -1,8 +1,10 @@
+import { useAppContext } from '../context/useAppContext';
 import { ToolCallStream } from '../toolCallStreamStore';
 import { useEffect, useSyncExternalStore } from 'react';
-import { progressStore } from '../store';
 
 export const QueryInProgress = (_props: ToolCallStream) => {
+  const { progressStore } = useAppContext();
+
   const progressText = useSyncExternalStore(
     progressStore.subscribe,
     progressStore.getSnapshot,
@@ -13,7 +15,7 @@ export const QueryInProgress = (_props: ToolCallStream) => {
     return () => {
       progressStore.setText('');
     };
-  }, [progressText]);
+  }, [progressStore, progressText]);
 
   return null;
 };

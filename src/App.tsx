@@ -2,13 +2,6 @@ import { useRef, useEffect, useCallback, useSyncExternalStore } from 'react';
 import { ChatView } from './components/ChatView';
 import { getToken } from './utils/token/token';
 import OpenAI from 'openai';
-import {
-  messageHistoryStore,
-  messageStore,
-  progressStore,
-  toolCallStreamStore,
-  walletStore,
-} from './store';
 import type { ChatCompletionTool } from 'openai/resources/index';
 import {
   isContentChunk,
@@ -48,8 +41,12 @@ export const App = () => {
     setIsRequesting,
     getOpenAITools,
     executeOperation,
+    walletStore,
+    messageHistoryStore,
+    toolCallStreamStore,
+    progressStore,
+    messageStore,
   } = useAppContext();
-
 
   const { walletAddress, walletType, walletChainId } = useSyncExternalStore(
     walletStore.subscribe,
@@ -68,7 +65,7 @@ export const App = () => {
       chainId: `0x${Number(2222).toString(16)}`,
       walletType: WalletTypes.METAMASK,
     });
-  }, []);
+  }, [walletStore]);
 
   // TODO: check healthcheck and set error if backend is not availiable
   useEffect(() => {
@@ -97,8 +94,7 @@ export const App = () => {
         content: defaultSystemPrompt,
       });
     }
-    // we only want this to run once, so don't include [systemPrompt]
-  }, []);
+  }, [messageHistoryStore]);
 
   // abort controller for cancelling openai request
   const controllerRef = useRef<AbortController | null>(null);
@@ -138,6 +134,7 @@ export const App = () => {
           getOpenAITools(),
           progressStore,
           messageStore,
+          toolCallStreamStore,
           executeOperation,
         );
       } catch (error) {
@@ -163,6 +160,10 @@ export const App = () => {
       setIsRequesting,
       executeOperation,
       getOpenAITools,
+      messageHistoryStore,
+      progressStore,
+      toolCallStreamStore,
+      messageStore,
     ],
   );
 
@@ -172,14 +173,14 @@ export const App = () => {
       controllerRef.current = null;
       toolCallStreamStore.clear();
     }
-  }, []);
+  }, [toolCallStreamStore]);
 
   const handleReset = useCallback(() => {
     handleCancel();
     messageHistoryStore.setMessages([
       { role: 'system' as const, content: defaultSystemPrompt },
     ]);
-  }, [handleCancel]);
+  }, [handleCancel, messageHistoryStore]);
 
   return (
     <>
@@ -204,6 +205,7 @@ async function doChat(
   tools: ChatCompletionTool[],
   progressStore: TextStreamStore,
   messageStore: TextStreamStore,
+  toolCallStreamStore: ToolCallStreamStore,
   executeOperation: ExecuteOperation,
 ) {
   progressStore.setText('Thinking');
@@ -244,7 +246,11 @@ async function doChat(
 
     if (toolCallStreamStore.getSnapShot().length > 0) {
       // do the tool calls
-      await callTools(toolCallStreamStore, executeOperation);
+      await callTools(
+        toolCallStreamStore,
+        messageHistoryStore,
+        executeOperation,
+      );
 
       // inform the model of the tool call responses
       await doChat(
@@ -254,6 +260,7 @@ async function doChat(
         tools,
         progressStore,
         messageStore,
+        toolCallStreamStore,
         executeOperation,
       );
     }
@@ -279,6 +286,7 @@ async function doChat(
 
 async function callTools(
   toolCallStreamStore: ToolCallStreamStore,
+  messageHistoryStore: MessageHistoryStore,
   executeOperation: ExecuteOperation,
 ): Promise<void> {
   for (const toolCall of toolCallStreamStore.getSnapShot()) {
