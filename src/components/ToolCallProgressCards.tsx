@@ -1,8 +1,9 @@
 import { useSyncExternalStore } from 'react';
-import { toolCallStreamStore } from '../store';
 import { useAppContext } from '../context/useAppContext';
 
 export const ToolCallProgressCards = () => {
+  const { toolCallStreamStore } = useAppContext();
+
   const toolCallStreams = useSyncExternalStore(
     toolCallStreamStore.subscribe,
     toolCallStreamStore.getSnapShot,
