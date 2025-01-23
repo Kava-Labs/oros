@@ -1,5 +1,6 @@
 import { createContext } from 'react';
 import { OperationRegistry } from '../services/chain/registry';
+import { ChatCompletionTool } from 'openai/resources/index.mjs';
 
 export type ExecuteOperation = (
   operationName: string,
@@ -15,7 +16,7 @@ export type AppContextType = {
   setIsRequesting: React.Dispatch<React.SetStateAction<boolean>>;
   registry: OperationRegistry;
 
-  getOpenAITools: () => unknown[];
+  getOpenAITools: () => ChatCompletionTool[];
   executeOperation: ExecuteOperation;
 };
 

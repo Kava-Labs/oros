@@ -26,7 +26,6 @@ import {
   defaultIntroText,
   defaultCautionText,
 } from './config/prompts/defaultPrompts';
-import { memeCoinTools } from './config/tools';
 import { ToolCallStreamStore } from './toolCallStreamStore';
 import { MessageHistoryStore } from './messageHistoryStore';
 import { useAppContext } from './context/useAppContext';
@@ -74,12 +73,7 @@ export const App = () => {
     });
   }, [connectWallet]);
 
-  const [{ tools, systemPrompt, introText, cautionText }] = useState({
-    introText: defaultIntroText,
-    systemPrompt: defaultSystemPrompt,
-    tools: memeCoinTools,
-    cautionText: defaultCautionText,
-  });
+
 
   // TODO: check healthcheck and set error if backend is not availiable
   useEffect(() => {
@@ -105,21 +99,14 @@ export const App = () => {
     if (!messageHistoryStore.getSnapshot().length) {
       messageHistoryStore.addMessage({
         role: 'system' as const,
-        content: systemPrompt,
+        content: defaultSystemPrompt,
       });
     }
     // we only want this to run once, so don't include [systemPrompt]
     // eslint-disable-next-line
   }, []);
 
-  // update system prompt, when it changes
-  useEffect(() => {
-    const remainingMsgs = messageHistoryStore.getSnapshot().slice(1);
-    messageHistoryStore.setMessages([
-      { role: 'system', content: systemPrompt },
-      ...remainingMsgs,
-    ]);
-  }, [systemPrompt]);
+
 
   // abort controller for cancelling openai request
   const controllerRef = useRef<AbortController | null>(null);
@@ -156,7 +143,7 @@ export const App = () => {
           controller,
           client,
           messageHistoryStore,
-          tools,
+          getOpenAITools(),
           progressStore,
           messageStore,
           executeOperation,
@@ -178,7 +165,7 @@ export const App = () => {
         controllerRef.current = null;
       }
     },
-    [isRequesting, setErrorText, setIsRequesting, tools, executeOperation],
+    [isRequesting, setErrorText, setIsRequesting, executeOperation],
   );
 
   const handleCancel = useCallback(() => {
@@ -192,16 +179,16 @@ export const App = () => {
   const handleReset = useCallback(() => {
     handleCancel();
     messageHistoryStore.setMessages([
-      { role: 'system' as const, content: systemPrompt },
+      { role: 'system' as const, content: defaultSystemPrompt },
     ]);
-  }, [handleCancel, systemPrompt]);
+  }, [handleCancel]);
 
   return (
     <>
       {isReady && (
         <ChatView
-          introText={introText}
-          cautionText={cautionText}
+          introText={defaultIntroText}
+          cautionText={defaultCautionText}
           messages={messages}
           onSubmit={handleChatCompletion}
           onReset={handleReset}
