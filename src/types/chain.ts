@@ -1,6 +1,6 @@
 import { MessageParam } from './messages';
 import { ToolCallStream } from '../toolCallStreamStore';
-import { WalletTypes } from '../context/WalletContext';
+import { WalletTypes, WalletStore } from '../walletStore';
 
 export enum OperationType {
   TRANSACTION = 'transaction',
@@ -11,14 +11,6 @@ export enum ChainType {
   COSMOS = 'cosmos',
   EVM = 'evm',
 }
-
-export type WalletConnection = {
-  walletAddress: string;
-  walletChainId: string;
-  walletType: WalletTypes;
-  isWalletConnected: boolean;
-};
-
 /**
  * Base interface for all chain operations.
  * Both messages (transactions) and queries extend this interface.
@@ -35,7 +27,7 @@ export interface ChainOperation<T> {
   compatibleWallets: '*' | WalletTypes[];
 
   /** Validates the provided parameters match requirements */
-  validate(params: T, wallet: WalletConnection): boolean;
+  validate(params: T, walletStore: WalletStore): boolean;
 
   /** Optional React component that displays as the model is streaming the tool call arguments */
   inProgressComponent?: () => React.FunctionComponent<ToolCallStream>;
@@ -49,7 +41,7 @@ export interface ChainMessage<T> extends ChainOperation<T> {
   /** Identifies this as a transaction operation */
   operationType: OperationType;
   /** Builds the transaction object from the provided parameters */
-  buildTransaction(params: T, wallet: WalletConnection): Promise<string>;
+  buildTransaction(params: T, walletStore: WalletStore): Promise<string>;
 }
 
 /**
@@ -60,5 +52,5 @@ export interface ChainQuery<T> extends ChainOperation<T> {
   /** Identifies this as a query operation */
   operationType: OperationType;
   /** Executes the query with the provided parameters */
-  executeQuery(params: T, wallet: WalletConnection): Promise<string>;
+  executeQuery(params: T, walletStore: WalletStore): Promise<string>;
 }

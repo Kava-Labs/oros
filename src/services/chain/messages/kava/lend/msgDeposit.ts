@@ -2,9 +2,9 @@ import {
   ChainMessage,
   ChainType,
   OperationType,
-  WalletConnection,
 } from '../../../../../types/chain';
 import { TransactionDisplay } from '../../../../../components/TransactionDisplay';
+import { WalletStore } from '../../../../../walletStore';
 
 //  sent to model
 interface LendToolParams {
@@ -49,13 +49,15 @@ export class LendDepositMessage implements ChainMessage<LendToolParams> {
    * @param params - Parameters to validate
    * @returns True if parameters are valid
    */
-  validate(params: LendToolParams, wallet: WalletConnection): boolean {
-    if (!wallet.isWalletConnected) {
+  validate(params: LendToolParams, walletStore: WalletStore): boolean {
+    if (!walletStore.getSnapshot().isWalletConnected) {
       throw new Error('please connect to a compatible wallet');
     }
 
     if (Array.isArray(this.compatibleWallets)) {
-      if (!this.compatibleWallets.includes(wallet.walletType)) {
+      if (
+        !this.compatibleWallets.includes(walletStore.getSnapshot().walletType)
+      ) {
         throw new Error('please connect to a compatible wallet');
       }
     }
@@ -72,7 +74,7 @@ export class LendDepositMessage implements ChainMessage<LendToolParams> {
    */
   async buildTransaction(
     params: LendToolParams,
-    _wallet: WalletConnection,
+    _walletStore: WalletStore,
   ): Promise<string> {
     console.log(params);
 

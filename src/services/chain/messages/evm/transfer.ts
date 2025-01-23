@@ -4,11 +4,11 @@ import { erc20ABI } from '../../../../tools/erc20ABI';
 import { getStoredMasks, isNativeAsset } from '../../../../utils/chat/helpers';
 import { TransactionDisplay } from '../../../../components/TransactionDisplay';
 import {
-  WalletConnection,
   ChainMessage,
   OperationType,
   ChainType,
 } from '../../../../types/chain';
+import { SignatureTypes, WalletStore } from '../../../../walletStore';
 
 interface SendToolParams {
   toAddress: string;
@@ -48,13 +48,15 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
     return TransactionDisplay;
   }
 
-  validate(params: SendToolParams, wallet: WalletConnection): boolean {
-    if (!wallet.isWalletConnected) {
+  validate(params: SendToolParams, walletStore: WalletStore): boolean {
+    if (!walletStore.getSnapshot().isWalletConnected) {
       throw new Error('please connect to a compatible wallet');
     }
 
     if (Array.isArray(this.compatibleWallets)) {
-      if (!this.compatibleWallets.includes(wallet.walletType)) {
+      if (
+        !this.compatibleWallets.includes(walletStore.getSnapshot().walletType)
+      ) {
         throw new Error('please connect to a compatible wallet');
       }
     }
@@ -78,7 +80,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
 
   async buildTransaction(
     params: SendToolParams,
-    wallet: WalletConnection,
+    walletStore: WalletStore,
   ): Promise<string> {
     const { toAddress, amount, denom } = params;
 
@@ -89,7 +91,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
 
       //  validate method will check that these mask-addresses exist
       const addressTo = masksToValues[toAddress];
-      const addressFrom = wallet.walletAddress;
+      const addressFrom = walletStore.getSnapshot().walletAddress;
 
       const receivingAddress = ethers.getAddress(addressTo);
       const sendingAddress = ethers.getAddress(addressFrom);
@@ -122,16 +124,20 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
         };
       }
 
-      return window.ethereum.request({
-        method: 'eth_sendTransaction',
-        params: [
-          {
-            ...txParams,
-            from: sendingAddress,
-            gasPrice: '0x4a817c800',
-            gas: '0x16120',
-          },
-        ],
+      return walletStore.sign({
+        chainId: `0x${Number(2222).toString(16)}`,
+        signatureType: SignatureTypes.EVM,
+        payload: {
+          method: 'eth_sendTransaction',
+          params: [
+            {
+              ...txParams,
+              from: sendingAddress,
+              gasPrice: '0x4a817c800',
+              gas: '0x16120',
+            },
+          ],
+        },
       });
     } catch (e) {
       throw `An error occurred building the transaction: ${JSON.stringify(e)}`;
