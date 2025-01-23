@@ -26,7 +26,7 @@ export class CosmosSendMessage extends CosmosMessageBase<
   SendToolParams,
   SendMsgArgs
 > {
-  type = 'cosmos-sdk/MsgSend';
+  name = 'msgSend';
   /** Human-readable description for AI tools */
   description = 'Send tokens from one address to another';
 

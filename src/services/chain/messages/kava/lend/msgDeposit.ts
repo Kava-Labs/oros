@@ -1,4 +1,4 @@
-import { CosmosMessageBase } from '../.././base';
+import { CosmosMessageBase } from '../../base';
 import { CosmosCoin, CosmosMsg } from '../../../../../types/messages';
 import { MessageTypeUrl } from '../../../../../types/messages';
 
@@ -22,7 +22,7 @@ export class LendDepositMessage extends CosmosMessageBase<
   LendToolParams,
   LendMsgArgs
 > {
-  type = 'hard/MsgDeposit';
+  name = 'msgDeposit';
   description = 'Deposit tokens from an address into a Lend money market';
 
   /**

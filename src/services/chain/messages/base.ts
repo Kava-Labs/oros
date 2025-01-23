@@ -3,7 +3,7 @@ import { CosmosMsg, MessageParam } from '../../../types/messages';
 
 // Base abstract class for Cosmos messages
 export abstract class CosmosMessageBase<T, MsgArgs> implements ChainMessage {
-  abstract type: string;
+  abstract name: string;
   operationType = 'transaction' as const;
   chainType = 'cosmos' as const;
   abstract description: string;
