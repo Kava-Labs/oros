@@ -1,4 +1,8 @@
-import { CosmosMessageBase } from '../../cosmos/base';
+import {
+  ChainMessage,
+  ChainType,
+  OperationType,
+} from '../../../../../types/chain';
 import { TransactionDisplay } from '../../../../../components/TransactionDisplay';
 
 //  sent to model
@@ -10,9 +14,11 @@ interface LendToolParams {
 /**
  * Implementation of the Kava Lend MsgDeposit message type.
  */
-export class LendDepositMessage extends CosmosMessageBase<LendToolParams> {
+export class LendDepositMessage implements ChainMessage<LendToolParams> {
   name = 'msgDeposit';
   description = 'Deposit tokens from an address into a Lend money market';
+  chainType = ChainType.COSMOS;
+  operationType = OperationType.TRANSACTION;
 
   /**
    * Parameter definitions for the message.
@@ -44,9 +50,7 @@ export class LendDepositMessage extends CosmosMessageBase<LendToolParams> {
   validate(params: LendToolParams): boolean {
     const { amount, denom } = params;
 
-    return Boolean(
-    Number(amount) > 0 && denom.length > 0,
-    );
+    return Boolean(Number(amount) > 0 && denom.length > 0);
   }
 
   /**

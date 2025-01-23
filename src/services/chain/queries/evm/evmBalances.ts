@@ -1,36 +1,32 @@
-import { QueryBase } from './base';
+import { ChainQuery, ChainType, OperationType } from '../../../../types/chain';
 import { ethers } from 'ethers';
 import { erc20ABI } from '../../../../tools/erc20ABI';
 import { getStoredMasks } from '../../../../utils/chat/helpers';
 import { ASSET_ADDRESSES, kavaEVMProvider } from '../../../../config/evm';
+import { WalletConnection } from '../../../../types/chain';
+import { WalletTypes } from '../../../../context/WalletContext';
 
-interface AddressQuery {
-  address: string;
-}
-
-export class EvmBalancesQuery extends QueryBase<AddressQuery> {
+export class EvmBalancesQuery implements ChainQuery<void> {
   name = 'evm-balances';
   description = 'Returns the erc20 token balances for a given address';
-  parameters = [
-    {
-      name: 'address',
-      type: 'string',
-      description: 'the address to check the balances',
-      required: true,
-    },
-  ];
+  parameters = [];
+  operationType = OperationType.QUERY;
+  chainType = ChainType.EVM;
 
-  validate(params: AddressQuery): boolean {
-    const { address } = params;
-    const { masksToValues } = getStoredMasks();
+  validate(_params: void, wallet: WalletConnection): boolean {
+    if (!wallet.isWalletConnected) {
+      throw new Error('please connect to a wallet');
+    }
 
-    const validatedAddress = masksToValues[address] ?? '';
+    if (wallet.walletType !== WalletTypes.METAMASK) {
+      throw new Error('must use a Metamask wallet for this operation');
+    }
 
-    return validatedAddress.length > 0;
+    return true;
   }
 
-  async executeQuery(params: AddressQuery): Promise<string> {
-    const { address } = params;
+  async executeQuery(_params: void, wallet: WalletConnection): Promise<string> {
+    const address = wallet.walletAddress;
     const balanceCalls: (() => Promise<string>)[] = [];
 
     const { masksToValues } = getStoredMasks();
@@ -60,6 +56,10 @@ export class EvmBalancesQuery extends QueryBase<AddressQuery> {
           const decimals = await contract.decimals();
           const rawBalance = await contract.balanceOf(address);
           const formattedBalance = ethers.formatUnits(rawBalance, decimals);
+          if (Number(formattedBalance) === 0) {
+            return '';
+          }
+
           return `${asset}: ${formattedBalance}`;
         } catch (err) {
           return `${asset}: failed to fetch balance ${JSON.stringify(err)}`;

@@ -12,11 +12,10 @@ export enum ChainType {
   EVM = 'evm',
 }
 
-
 export type WalletConnection = {
   walletAddress: string;
   walletChainId: string;
-  walletType: WalletTypes; 
+  walletType: WalletTypes;
   isWalletConnected: boolean;
 };
 
@@ -24,7 +23,7 @@ export type WalletConnection = {
  * Base interface for all chain operations.
  * Both messages (transactions) and queries extend this interface.
  */
-export interface ChainOperation {
+export interface ChainOperation<T> {
   /** Unique identifier for the operation name */
   name: string;
   chainType: ChainType;
@@ -33,7 +32,7 @@ export interface ChainOperation {
   /** List of parameters this operation accepts */
   parameters: MessageParam[];
   /** Validates the provided parameters match requirements */
-  validate(params: unknown, wallet: WalletConnection): boolean;
+  validate(params: T, wallet: WalletConnection): boolean;
 
   /** Optional React component that displays as the model is streaming the tool call arguments */
   inProgressComponent?: () => React.FunctionComponent<ToolCallStream>;
@@ -43,20 +42,20 @@ export interface ChainOperation {
  * Interface for blockchain transaction messages.
  * Extends ChainOperation to add transaction-specific functionality.
  */
-export interface ChainMessage extends ChainOperation {
+export interface ChainMessage<T> extends ChainOperation<T> {
   /** Identifies this as a transaction operation */
   operationType: OperationType;
   /** Builds the transaction object from the provided parameters */
-  buildTransaction(params: unknown, wallet: WalletConnection): Promise<string>;
+  buildTransaction(params: T, wallet: WalletConnection): Promise<string>;
 }
 
 /**
  * Interface for blockchain queries.
  * Extends ChainOperation to add query-specific functionality.
  */
-export interface ChainQuery extends ChainOperation {
+export interface ChainQuery<T> extends ChainOperation<T> {
   /** Identifies this as a query operation */
   operationType: OperationType;
   /** Executes the query with the provided parameters */
-  executeQuery(params: unknown, wallet: WalletConnection): Promise<string>;
+  executeQuery(params: T, wallet: WalletConnection): Promise<string>;
 }

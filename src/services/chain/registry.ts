@@ -10,15 +10,15 @@ import type { ChatCompletionTool } from 'openai/resources/index';
  * Manages the registration and retrieval of operations, and generates
  * OpenAI tool definitions based on registered operations.
  */
-export class OperationRegistry {
+export class OperationRegistry<T> {
   /** Map of operation type to operation implementation */
-  private operations: Map<string, ChainOperation> = new Map();
+  private operations: Map<string, ChainOperation<T>> = new Map();
 
   /**
    * Registers a new operation in the registry.
    * @param operation - Operation to register
    */
-  register(operation: ChainOperation) {
+  register(operation: ChainOperation<T>) {
     this.operations.set(operation.name, operation);
   }
 
@@ -27,7 +27,7 @@ export class OperationRegistry {
    * @param type - Operation type identifier
    * @returns The operation implementation or undefined if not found
    */
-  get(type: string): ChainOperation | undefined {
+  get(type: string): ChainOperation<T> | undefined {
     return this.operations.get(type);
   }
 
@@ -35,7 +35,7 @@ export class OperationRegistry {
    * Gets all registered operations.
    * @returns Array of all registered operations
    */
-  getAllOperations(): ChainOperation[] {
+  getAllOperations(): ChainOperation<T>[] {
     return Array.from(this.operations.values());
   }
 
@@ -43,9 +43,9 @@ export class OperationRegistry {
    * Gets all registered transaction message operations.
    * @returns Array of transaction operations
    */
-  getMessages(): ChainMessage[] {
+  getMessages(): ChainMessage<T>[] {
     return this.getAllOperations().filter(
-      (op): op is ChainMessage =>
+      (op): op is ChainMessage<T> =>
         'operationType' in op && op.operationType === OperationType.TRANSACTION,
     );
   }
@@ -54,9 +54,9 @@ export class OperationRegistry {
    * Gets all registered query operations.
    * @returns Array of query operations
    */
-  getQueries(): ChainQuery[] {
+  getQueries(): ChainQuery<T>[] {
     return this.getAllOperations().filter(
-      (op): op is ChainQuery =>
+      (op): op is ChainQuery<T> =>
         'operationType' in op && op.operationType === OperationType.QUERY,
     );
   }
