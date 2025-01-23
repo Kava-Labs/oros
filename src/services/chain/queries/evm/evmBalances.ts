@@ -4,7 +4,7 @@ import { erc20ABI } from '../../../../tools/erc20ABI';
 import { getStoredMasks } from '../../../../utils/chat/helpers';
 import { ASSET_ADDRESSES, kavaEVMProvider } from '../../../../config/evm';
 import { WalletConnection } from '../../../../types/chain';
-import { WalletTypes } from '../../../../context/WalletContext';
+
 
 export class EvmBalancesQuery implements ChainQuery<void> {
   name = 'evm-balances';
@@ -12,14 +12,17 @@ export class EvmBalancesQuery implements ChainQuery<void> {
   parameters = [];
   operationType = OperationType.QUERY;
   chainType = ChainType.EVM;
+  compatibleWallets = '*' as const;
 
   validate(_params: void, wallet: WalletConnection): boolean {
     if (!wallet.isWalletConnected) {
-      throw new Error('please connect to a wallet');
+      throw new Error('please connect to a compatible wallet');
     }
 
-    if (wallet.walletType !== WalletTypes.METAMASK) {
-      throw new Error('must use a Metamask wallet for this operation');
+    if (Array.isArray(this.compatibleWallets)) {
+      if (!this.compatibleWallets.includes(wallet.walletType)) {
+        throw new Error('please connect to a compatible wallet');
+      }
     }
 
     return true;
