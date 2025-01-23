@@ -1,4 +1,5 @@
 import { MessageParam } from './messages';
+import { ToolCallStream } from '../toolCallStreamStore';
 
 /**
  * Base interface for all chain operations.
@@ -14,6 +15,9 @@ export interface ChainOperation {
   parameters: MessageParam[];
   /** Validates the provided parameters match requirements */
   validate(params: unknown): boolean;
+
+  /** Optional React component that displays as the model is streaming the tool call arguments */
+  inProgressComponent?: () => React.FunctionComponent<ToolCallStream>;
 }
 
 /**
