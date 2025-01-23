@@ -1,11 +1,15 @@
 import React, { useCallback, useState } from 'react';
 import { AppContext } from './AppContext';
 import { OperationRegistry } from '../services/chain/registry';
-import { CosmosSendMessage } from '../services/chain/messages/cosmos/msgSend';
+// import { CosmosSendMessage } from '../services/chain/messages/cosmos/msgSend';
 import { ChainMessage, ChainQuery } from '../types/chain';
-import { LendDepositMessage } from '../services/chain/messages/kava/lend/msgDeposit';
-import { EvmTransferMessage } from '../services/chain/messages/evm/transfer';
-import { EvmBalancesQuery } from '../services/chain/queries/evm/evmBalances';
+// import { LendDepositMessage } from '../services/chain/messages/kava/lend/msgDeposit';
+// import { EvmTransferMessage } from '../services/chain/messages/evm/transfer';
+// import { EvmBalancesQuery } from '../services/chain/queries/evm/evmBalances';
+import { EvmRegistry } from '../services/chain/generator';
+import { erc20ABI } from '../tools/erc20ABI';
+
+const usdtContactAddress = '0x919C1c267BC06a7039e03fcc2eF738525769109c';
 
 /**
  * Initializes the operation registry with all supported operations.
@@ -13,14 +17,16 @@ import { EvmBalancesQuery } from '../services/chain/queries/evm/evmBalances';
  * @returns Initialized OperationRegistry
  */
 function initializeRegistry(): OperationRegistry {
-  const registry = new OperationRegistry();
-  // Register all supported operations
+  const whiteListAbiCalls = ['balanceOf', 'transfer'];
+  const registry = new EvmRegistry(whiteListAbiCalls);
+
+  registry.registerContract(erc20ABI, usdtContactAddress);
 
   /** TODO: This probably needs to not be manual */
-  registry.register(new CosmosSendMessage());
-  registry.register(new LendDepositMessage());
-  registry.register(new EvmTransferMessage());
-  registry.register(new EvmBalancesQuery());
+  // registry.register(new CosmosSendMessage());
+  // registry.register(new LendDepositMessage());
+  // registry.register(new EvmTransferMessage());
+  // registry.register(new EvmBalancesQuery());
   return registry;
 }
 
