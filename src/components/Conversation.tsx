@@ -6,7 +6,7 @@ import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { memo } from 'react';
 import { useTheme } from '../theme/useTheme';
 import { useAppContext } from '../context/useAppContext';
-import { ToolCallProgressCard } from './ToolCallProgressCards';
+import { ToolCallProgressCards } from './ToolCallProgressCards';
 
 export interface ConversationProps {
   messages: ChatCompletionMessageParam[];
@@ -86,7 +86,7 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
         </div>
       )}
 
-      <ToolCallProgressCard />
+      <ToolCallProgressCards />
     </div>
   );
 };
