@@ -48,10 +48,10 @@ export const AppContextProvider = ({
    * @returns Result of the operation (transaction or query result)
    */
   const executeOperation = useCallback(
-    async (operationType: string, params: unknown) => {
-      const operation = registry.get(operationType);
+    async (operationName: string, params: unknown) => {
+      const operation = registry.get(operationName);
       if (!operation) {
-        throw new Error(`Unknown operation type: ${operationType}`);
+        throw new Error(`Unknown operation type: ${operationName}`);
       }
 
       if (!operation.validate(params)) {
