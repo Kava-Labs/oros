@@ -1,4 +1,5 @@
 import { CosmosMessageBase } from './base';
+import { TransactionDisplay } from '../../../../components/TransactionDisplay';
 
 interface SendToolParams {
   fromAddress: string;
@@ -62,6 +63,10 @@ export class CosmosSendMessage extends CosmosMessageBase<SendToolParams> {
         Number(amount) > 0 &&
         denom.length > 0,
     );
+  }
+
+  inProgressComponent() {
+    return TransactionDisplay;
   }
 
   /**
