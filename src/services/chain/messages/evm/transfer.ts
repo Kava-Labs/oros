@@ -4,9 +4,9 @@ import { ASSET_ADDRESSES, kavaEVMProvider } from '../../../../config/evm';
 import { erc20ABI } from '../../../../tools/erc20ABI';
 import { getStoredMasks, isNativeAsset } from '../../../../utils/chat/helpers';
 import { TransactionDisplay } from '../../../../components/TransactionDisplay';
+import { WalletConnection } from '../../../../types/chain';
 
 interface SendToolParams {
-  fromAddress: string;
   toAddress: string;
   amount: string;
   denom: string;
@@ -17,12 +17,6 @@ export class EvmTransferMessage extends EvmMessageBase<SendToolParams> {
   description = 'Send erc20 tokens from one address to another';
 
   parameters = [
-    {
-      name: 'fromAddress',
-      type: 'string',
-      description: 'Sender address',
-      required: true,
-    },
     {
       name: 'toAddress',
       type: 'string',
@@ -47,24 +41,27 @@ export class EvmTransferMessage extends EvmMessageBase<SendToolParams> {
     return TransactionDisplay;
   }
 
-  validate(params: SendToolParams): boolean {
-    const { fromAddress, toAddress, amount, denom } = params;
+  validate(params: SendToolParams, wallet: WalletConnection): boolean {
+    if (!wallet.isWalletConnected) {
+      return false;
+    }
+    const { toAddress, amount, denom } = params;
+
 
     const { masksToValues } = getStoredMasks();
 
-    const validFromAddress = masksToValues[fromAddress] ?? '';
     const validToAddress = masksToValues[toAddress] ?? '';
 
     return Boolean(
-      validFromAddress.length > 0 &&
-        validToAddress.length > 0 &&
-        Number(amount) > 0 &&
-        denom.length > 0,
+      validToAddress.length > 0 && Number(amount) > 0 && denom.length > 0,
     );
   }
 
-  async buildTransaction(params: SendToolParams): Promise<string> {
-    const { fromAddress, toAddress, amount, denom } = params;
+  async buildTransaction(
+    params: SendToolParams,
+    wallet: WalletConnection,
+  ): Promise<string> {
+    const { toAddress, amount, denom } = params;
 
     try {
       let txParams: Record<string, string>;
@@ -73,14 +70,15 @@ export class EvmTransferMessage extends EvmMessageBase<SendToolParams> {
 
       //  validate method will check that these mask-addresses exist
       const addressTo = masksToValues[toAddress];
-      const addressFrom = masksToValues[fromAddress];
+      const addressFrom = wallet.walletAddress;
 
       const receivingAddress = ethers.getAddress(addressTo);
       const sendingAddress = ethers.getAddress(addressFrom);
+      console.log(wallet, receivingAddress, sendingAddress);
 
       if (isNativeAsset(denom)) {
         txParams = {
-          to: sendingAddress,
+          to: receivingAddress,
           data: '0x',
           value: ethers.parseEther(amount).toString(16),
         };
@@ -109,7 +107,7 @@ export class EvmTransferMessage extends EvmMessageBase<SendToolParams> {
         params: [
           {
             ...txParams,
-            from: fromAddress,
+            from: sendingAddress,
             gasPrice: '0x4a817c800',
             gas: '0x76c0',
           },

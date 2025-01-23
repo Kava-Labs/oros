@@ -3,7 +3,6 @@ import { TransactionDisplay } from '../../../../../components/TransactionDisplay
 
 //  sent to model
 interface LendToolParams {
-  depositor: string;
   amount: string;
   denom: string;
 }
@@ -20,12 +19,6 @@ export class LendDepositMessage extends CosmosMessageBase<LendToolParams> {
    * Used for validation and OpenAI tool generation.
    */
   parameters = [
-    {
-      name: 'depositor',
-      type: 'string',
-      description: 'Depositor address',
-      required: true,
-    },
     {
       name: 'amount',
       type: 'string',
@@ -49,10 +42,10 @@ export class LendDepositMessage extends CosmosMessageBase<LendToolParams> {
    * @returns True if parameters are valid
    */
   validate(params: LendToolParams): boolean {
-    const { depositor, amount, denom } = params;
+    const { amount, denom } = params;
 
     return Boolean(
-      depositor.length > 0 && Number(amount) > 0 && denom.length > 0,
+    Number(amount) > 0 && denom.length > 0,
     );
   }
 

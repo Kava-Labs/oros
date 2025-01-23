@@ -46,11 +46,11 @@ const root = createRoot(document.getElementById('root')!);
 root.render(
   <StrictMode>
     <ThemeProvider>
-      <AppContextProvider>
-        <WalletContextProvider>
+      <WalletContextProvider>
+        <AppContextProvider>
           <App />
-        </WalletContextProvider>
-      </AppContextProvider>
+        </AppContextProvider>
+      </WalletContextProvider>
     </ThemeProvider>
   </StrictMode>,
 );
