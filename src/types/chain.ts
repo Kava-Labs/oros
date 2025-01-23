@@ -17,8 +17,8 @@ export interface MessageParam {
  * Both messages (transactions) and queries extend this interface.
  */
 export interface ChainOperation {
-  /** Unique identifier for the operation type */
-  type: string;
+  /** Unique identifier for the operation name */
+  name: string;
   chainType: 'cosmos' | 'evm';
   /** Human-readable description of what the operation does */
   description: string;
