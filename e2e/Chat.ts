@@ -1,11 +1,18 @@
-import { ElementHandle, expect, Locator, Page } from '@playwright/test';
+import {
+  BrowserContext,
+  ElementHandle,
+  expect,
+  Locator,
+  Page,
+} from '@playwright/test';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
+import { Wallet } from './Wallet';
 
 export class Chat {
   public page: Page;
   public messageContainer: Locator;
 
-  constructor(page: Page) {
+  constructor(page: Page, ctx: BrowserContext, wallet?: Wallet) {
     this.page = page;
     this.messageContainer = this.page.locator(
       `[data-testid="conversation"] div div`,
