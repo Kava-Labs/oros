@@ -4,7 +4,7 @@ import { erc20ABI } from '../../../../tools/erc20ABI';
 import { getStoredMasks } from '../../../../utils/chat/helpers';
 import { ASSET_ADDRESSES, kavaEVMProvider } from '../../../../config/evm';
 import { WalletConnection } from '../../../../types/chain';
-import { WalletTypes } from '../../../../context/WalletContext';
+
 
 export class EvmBalancesQuery implements ChainQuery<void> {
   name = 'evm-balances';
