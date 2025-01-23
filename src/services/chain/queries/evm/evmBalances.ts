@@ -1,14 +1,11 @@
-import { QueryBase } from './base';
+import { ChainQuery, ChainType, OperationType } from '../../../../types/chain';
 import { ethers } from 'ethers';
 import { erc20ABI } from '../../../../tools/erc20ABI';
 import { getStoredMasks } from '../../../../utils/chat/helpers';
 import { ASSET_ADDRESSES, kavaEVMProvider } from '../../../../config/evm';
+import { WalletConnection } from '../../../../types/chain';
 
-interface AddressQuery {
-  address: string;
-}
-
-export class EvmBalancesQuery extends QueryBase<AddressQuery> {
+export class EvmBalancesQuery implements ChainQuery<{}> {
   name = 'evm-balances';
   description = 'Returns the erc20 token balances for a given address';
   parameters = [
@@ -19,9 +16,11 @@ export class EvmBalancesQuery extends QueryBase<AddressQuery> {
       required: true,
     },
   ];
+  operationType = OperationType.QUERY;
+  chainType = ChainType.EVM;
 
-  validate(params: AddressQuery): boolean {
-    const { address } = params;
+  validate(params: {}, wallet: WalletConnection): boolean {
+    const address = wallet.walletAddress;
     const { masksToValues } = getStoredMasks();
 
     const validatedAddress = masksToValues[address] ?? '';
@@ -29,8 +28,8 @@ export class EvmBalancesQuery extends QueryBase<AddressQuery> {
     return validatedAddress.length > 0;
   }
 
-  async executeQuery(params: AddressQuery): Promise<string> {
-    const { address } = params;
+  async executeQuery(params: {}, wallet: WalletConnection): Promise<string> {
+    const address = wallet.walletAddress;
     const balanceCalls: (() => Promise<string>)[] = [];
 
     const { masksToValues } = getStoredMasks();

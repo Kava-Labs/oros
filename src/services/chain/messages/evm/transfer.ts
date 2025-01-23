@@ -1,10 +1,14 @@
-import { EvmMessageBase } from './base';
 import { ethers } from 'ethers';
 import { ASSET_ADDRESSES, kavaEVMProvider } from '../../../../config/evm';
 import { erc20ABI } from '../../../../tools/erc20ABI';
 import { getStoredMasks, isNativeAsset } from '../../../../utils/chat/helpers';
 import { TransactionDisplay } from '../../../../components/TransactionDisplay';
-import { WalletConnection } from '../../../../types/chain';
+import {
+  WalletConnection,
+  ChainMessage,
+  OperationType,
+  ChainType,
+} from '../../../../types/chain';
 
 interface SendToolParams {
   toAddress: string;
@@ -12,9 +16,11 @@ interface SendToolParams {
   denom: string;
 }
 
-export class EvmTransferMessage extends EvmMessageBase<SendToolParams> {
+export class EvmTransferMessage implements ChainMessage<SendToolParams> {
   name = 'evm-transfer';
   description = 'Send erc20 tokens from one address to another';
+  operationType = OperationType.TRANSACTION;
+  chainType = ChainType.EVM;
 
   parameters = [
     {
@@ -46,7 +52,6 @@ export class EvmTransferMessage extends EvmMessageBase<SendToolParams> {
       return false;
     }
     const { toAddress, amount, denom } = params;
-
 
     const { masksToValues } = getStoredMasks();
 
