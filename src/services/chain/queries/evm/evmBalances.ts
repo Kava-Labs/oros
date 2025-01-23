@@ -3,7 +3,8 @@ import { ethers } from 'ethers';
 import { erc20ABI } from '../../../../tools/erc20ABI';
 import { ASSET_ADDRESSES, kavaEVMProvider } from '../../../../config/evm';
 import { WalletConnection } from '../../../../types/chain';
-
+import { ToolCallStream } from '../../../../toolCallStreamStore';
+import { QueryInProgress } from '../../../../components/QueryInProgress';
 
 export class EvmBalancesQuery implements ChainQuery<void> {
   name = 'evm-balances';
@@ -27,10 +28,19 @@ export class EvmBalancesQuery implements ChainQuery<void> {
     return true;
   }
 
+  inProgressComponent() {
+    return QueryInProgress;
+  }
+
   async executeQuery(_params: void, wallet: WalletConnection): Promise<string> {
     const address = wallet.walletAddress;
     const balanceCalls: (() => Promise<string>)[] = [];
 
+    await new Promise((resolve) =>
+      setTimeout(() => {
+        resolve(1);
+      }, 3000),
+    );
 
     // KAVA fetching is a bit different
     balanceCalls.push(async () => {
