@@ -65,8 +65,13 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
 
     const validToAddress = masksToValues[toAddress] ?? '';
 
+    const validDenomWithContract = denom.toUpperCase() in ASSET_ADDRESSES;
+
     return Boolean(
-      validToAddress.length > 0 && Number(amount) > 0 && denom.length > 0,
+      validToAddress.length > 0 &&
+        Number(amount) > 0 &&
+        denom.length > 0 &&
+        validDenomWithContract,
     );
   }
 
