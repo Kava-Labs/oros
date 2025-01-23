@@ -4,6 +4,7 @@ import { OperationRegistry } from '../services/chain/registry';
 import { CosmosSendMessage } from '../services/chain/messages/cosmos/msgSend';
 import { ChainMessage, ChainQuery } from '../types/chain';
 import { LendDepositMessage } from '../services/chain/messages/kava/lend/msgDeposit';
+import { EvmTransferMessage } from '../services/chain/messages/evm/transfer';
 
 /**
  * Initializes the operation registry with all supported operations.
@@ -17,6 +18,7 @@ function initializeRegistry(): OperationRegistry {
   /** TODO: This probably needs to not be manual */
   registry.register(new CosmosSendMessage());
   registry.register(new LendDepositMessage());
+  registry.register(new EvmTransferMessage());
   return registry;
 }
 

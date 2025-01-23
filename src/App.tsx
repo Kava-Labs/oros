@@ -1,10 +1,4 @@
-import {
-  useRef,
-  useState,
-  useEffect,
-  useCallback,
-  useSyncExternalStore,
-} from 'react';
+import { useRef, useEffect, useCallback, useSyncExternalStore } from 'react';
 import { ChatView } from './components/ChatView';
 import { getToken } from './utils/token/token';
 import OpenAI from 'openai';
@@ -73,8 +67,6 @@ export const App = () => {
     });
   }, [connectWallet]);
 
-
-
   // TODO: check healthcheck and set error if backend is not availiable
   useEffect(() => {
     try {
@@ -105,8 +97,6 @@ export const App = () => {
     // we only want this to run once, so don't include [systemPrompt]
     // eslint-disable-next-line
   }, []);
-
-
 
   // abort controller for cancelling openai request
   const controllerRef = useRef<AbortController | null>(null);
