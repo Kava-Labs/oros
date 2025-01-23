@@ -1,4 +1,9 @@
-import { ChainMessage, ChainOperation, ChainQuery } from '../../types/chain';
+import {
+  ChainMessage,
+  ChainOperation,
+  ChainQuery,
+  OperationType,
+} from '../../types/chain';
 import type { ChatCompletionTool } from 'openai/resources/index';
 /**
  * Central registry for all chain operations (messages and queries).
@@ -41,7 +46,7 @@ export class OperationRegistry {
   getMessages(): ChainMessage[] {
     return this.getAllOperations().filter(
       (op): op is ChainMessage =>
-        'operationType' in op && op.operationType === 'transaction',
+        'operationType' in op && op.operationType === OperationType.TRANSACTION,
     );
   }
 
@@ -52,7 +57,7 @@ export class OperationRegistry {
   getQueries(): ChainQuery[] {
     return this.getAllOperations().filter(
       (op): op is ChainQuery =>
-        'operationType' in op && op.operationType === 'query',
+        'operationType' in op && op.operationType === OperationType.QUERY,
     );
   }
 
