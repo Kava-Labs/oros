@@ -79,7 +79,7 @@ export const AppContextProvider = ({
         );
       } else if ('executeQuery' in operation) {
         return (operation as ChainQuery<unknown>).executeQuery(params, wallet);
-      } 
+      }
 
       throw new Error('Invalid operation type');
     },

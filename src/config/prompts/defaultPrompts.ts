@@ -1,5 +1,3 @@
-/* eslint-disable no-useless-escape */
-
 export const defaultIntroText = `
 Welcome to Oros! I'm here to help you with all things blockchain and DeFi. Whether you're checking your balances, managing transactions, or exploring earning opportunities, I'll guide you every step of the way. 
 

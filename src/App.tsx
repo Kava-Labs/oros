@@ -95,7 +95,6 @@ export const App = () => {
       });
     }
     // we only want this to run once, so don't include [systemPrompt]
-    // eslint-disable-next-line
   }, []);
 
   // abort controller for cancelling openai request
@@ -155,7 +154,13 @@ export const App = () => {
         controllerRef.current = null;
       }
     },
-    [isRequesting, setErrorText, setIsRequesting, executeOperation],
+    [
+      isRequesting,
+      setErrorText,
+      setIsRequesting,
+      executeOperation,
+      getOpenAITools,
+    ],
   );
 
   const handleCancel = useCallback(() => {

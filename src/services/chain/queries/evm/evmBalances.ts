@@ -6,15 +6,14 @@ import { ASSET_ADDRESSES, kavaEVMProvider } from '../../../../config/evm';
 import { WalletConnection } from '../../../../types/chain';
 import { WalletTypes } from '../../../../context/WalletContext';
 
-export class EvmBalancesQuery implements ChainQuery<{}> {
+export class EvmBalancesQuery implements ChainQuery<void> {
   name = 'evm-balances';
   description = 'Returns the erc20 token balances for a given address';
   parameters = [];
   operationType = OperationType.QUERY;
   chainType = ChainType.EVM;
 
-  validate(params: {}, wallet: WalletConnection): boolean {
-    params; // eslint
+  validate(params: void, wallet: WalletConnection): boolean {
     if (!wallet.isWalletConnected) {
       throw new Error('please connect to a wallet');
     }
@@ -26,8 +25,7 @@ export class EvmBalancesQuery implements ChainQuery<{}> {
     return true;
   }
 
-  async executeQuery(params: {}, wallet: WalletConnection): Promise<string> {
-    params; // eslint
+  async executeQuery(params: void, wallet: WalletConnection): Promise<string> {
     const address = wallet.walletAddress;
     const balanceCalls: (() => Promise<string>)[] = [];
 

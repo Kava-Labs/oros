@@ -2,7 +2,6 @@ import { MessageParam } from './messages';
 import { ToolCallStream } from '../toolCallStreamStore';
 import { WalletTypes } from '../context/WalletContext';
 
-
 export enum OperationType {
   TRANSACTION = 'transaction',
   QUERY = 'query',
