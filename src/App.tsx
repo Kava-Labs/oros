@@ -50,13 +50,14 @@ if (import.meta.env['MODE'] === 'development') {
 }
 
 export const App = () => {
-  const { setErrorText, isReady, setIsReady, isRequesting, setIsRequesting } =
+  const { setErrorText, isReady, setIsReady, isRequesting, setIsRequesting, getOpenAITools } =
     useAppContext();
 
   const { walletAddress, walletType, walletChainId, connectWallet } =
     useWalletContext();
 
-  console.log({ walletAddress, walletChainId, walletType });
+
+  console.log({ walletAddress, walletChainId, walletType, tools: getOpenAITools() });
 
   useEffect(() => {
     connectWallet({
