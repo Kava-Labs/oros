@@ -27,15 +27,12 @@ import {
   defaultCautionText,
 } from './config/prompts/defaultPrompts';
 import { memeCoinTools } from './config/tools';
-// import { imagedb } from './imagedb';
-// import { v4 as uuidv4 } from 'uuid';
-import { ToolCallStream, ToolCallStreamStore } from './toolCallStreamStore';
-// import { ToolFunctions, type GenerateCoinMetadataParams } from './tools/types';
+import { ToolCallStreamStore } from './toolCallStreamStore';
 import { MessageHistoryStore } from './messageHistoryStore';
-import { getStoredMasks } from './utils/chat/helpers';
 import { useAppContext } from './context/useAppContext';
 import { useWalletContext } from './context/useWalletContext';
 import { WalletTypes } from './context/WalletContext';
+import { ExecuteOperation } from './context/AppContext';
 
 let client: OpenAI | null = null;
 
@@ -50,14 +47,25 @@ if (import.meta.env['MODE'] === 'development') {
 }
 
 export const App = () => {
-  const { setErrorText, isReady, setIsReady, isRequesting, setIsRequesting, getOpenAITools } =
-    useAppContext();
+  const {
+    setErrorText,
+    isReady,
+    setIsReady,
+    isRequesting,
+    setIsRequesting,
+    getOpenAITools,
+    executeOperation,
+  } = useAppContext();
 
   const { walletAddress, walletType, walletChainId, connectWallet } =
     useWalletContext();
 
-
-  console.log({ walletAddress, walletChainId, walletType, tools: getOpenAITools() });
+  console.log({
+    walletAddress,
+    walletChainId,
+    walletType,
+    tools: getOpenAITools(),
+  });
 
   useEffect(() => {
     connectWallet({
@@ -151,6 +159,7 @@ export const App = () => {
           tools,
           progressStore,
           messageStore,
+          executeOperation,
         );
       } catch (error) {
         let errorMessage =
@@ -169,7 +178,7 @@ export const App = () => {
         controllerRef.current = null;
       }
     },
-    [isRequesting, setErrorText, setIsRequesting, tools],
+    [isRequesting, setErrorText, setIsRequesting, tools, executeOperation],
   );
 
   const handleCancel = useCallback(() => {
@@ -210,6 +219,7 @@ async function doChat(
   tools: ChatCompletionTool[],
   progressStore: TextStreamStore,
   messageStore: TextStreamStore,
+  executeOperation: ExecuteOperation,
 ) {
   progressStore.setText('Thinking');
   try {
@@ -249,13 +259,7 @@ async function doChat(
 
     if (toolCallStreamStore.getSnapShot().length > 0) {
       // do the tool calls
-      await callTools(
-        // controller,
-        // client,
-        // messageHistoryStore,
-        toolCallStreamStore,
-        // progressStore,
-      );
+      await callTools(toolCallStreamStore, executeOperation);
 
       // inform the model of the tool call responses
       await doChat(
@@ -265,6 +269,7 @@ async function doChat(
         tools,
         progressStore,
         messageStore,
+        executeOperation,
       );
     }
   } catch (e) {
@@ -288,37 +293,34 @@ async function doChat(
 }
 
 async function callTools(
-  // controller: AbortController,
-  // client: OpenAI,
-  // messageHistoryStore: MessageHistoryStore,
   toolCallStreamStore: ToolCallStreamStore,
-  // progressStore: TextStreamStore,
+  executeOperation: ExecuteOperation,
 ): Promise<void> {
   for (const toolCall of toolCallStreamStore.getSnapShot()) {
     const name = toolCall.function?.name;
-    const { masksToValues } = getStoredMasks();
 
-    let payload: {
-      toolCall: Readonly<ToolCallStream>;
-      masksToValues?: Record<string, string>;
-    } = {
-      toolCall,
-    };
+    if (name) {
+      let content = '';
+      try {
+        content = await executeOperation(name, toolCall.function.arguments);
+      } catch (err) {
+        content = err instanceof Error ? err.message : JSON.stringify(err);
+      }
 
-    //  send along the masksToValues only if entries exist
-    if (Object.keys(masksToValues).length > 0) {
-      payload = {
-        ...payload,
-        masksToValues,
-      };
-    }
-
-    switch (name) {
-      // todo (sah): handle tool calls based on their name
-      default:
-        console.warn(`unknown tool call: ${name}`);
-        // throw new Error(`unknown tool call: ${name}`);
-        break;
+      messageHistoryStore.addMessage({
+        role: 'assistant' as const,
+        function_call: null,
+        content: null,
+        tool_calls: [
+          toolCallStreamStore.toChatCompletionMessageToolCall(toolCall),
+        ],
+      });
+      toolCallStreamStore.deleteToolCallById(toolCall.id);
+      messageHistoryStore.addMessage({
+        role: 'tool' as const,
+        tool_call_id: toolCall.id,
+        content,
+      });
     }
   }
 }
