@@ -1,5 +1,5 @@
 import { CosmosMessageBase } from './base';
-import { TransactionDisplay } from '../../../../components/TransactionDisplay';
+import { TransactionDisplay } from '../../../../components/InProgressTxDisplay';
 
 interface SendToolParams {
   fromAddress: string;

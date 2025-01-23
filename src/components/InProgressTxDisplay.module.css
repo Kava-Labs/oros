@@ -37,7 +37,7 @@
   line-height: 1.5;
 }
 
-.transactionAmount {
+.sectionValue {
   color: #ffffff;
   font-size: 1.125rem;
   font-weight: 500;
@@ -82,4 +82,38 @@
 
 .transactionCard {
   animation: fadeIn 0.2s ease-out;
+}
+
+.paramsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.paramRow {
+  display: flex;
+  gap: 16px;
+}
+
+.paramRow .transactionSection {
+  flex: 1;
+  min-width: 0; /* This prevents flex items from overflowing */
+}
+
+.paramsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.paramRow {
+  display: flex;
+  gap: 16px;
+}
+
+.paramRow .transactionSection {
+  flex: 1;
+  min-width: 0; /* This prevents flex items from overflowing */
 }

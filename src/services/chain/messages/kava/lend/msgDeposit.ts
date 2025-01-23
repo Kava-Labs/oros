@@ -1,5 +1,5 @@
 import { CosmosMessageBase } from '../../cosmos/base';
-import { TransactionDisplay } from '../../../../../components/TransactionDisplay';
+import { TransactionDisplay } from '../../../../../components/InProgressTxDisplay';
 
 //  sent to model
 interface LendToolParams {
