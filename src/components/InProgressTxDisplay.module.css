@@ -83,3 +83,20 @@
 .transactionCard {
   animation: fadeIn 0.2s ease-out;
 }
+
+.paramsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.paramRow {
+  display: flex;
+  gap: 16px;
+}
+
+.paramRow .transactionSection {
+  flex: 1;
+  min-width: 0;
+}

@@ -1,8 +1,8 @@
 import { FC } from 'react';
-import styles from './TransactionDisplay.module.css';
+import styles from './InProgressTxDisplay.module.css';
 import { ToolCallStream } from '../toolCallStreamStore';
 
-export const TransactionDisplay: FC<ToolCallStream> = () => {
+export const InProgressTxDisplay: FC<ToolCallStream> = () => {
   return (
     <div className={styles.transactionContainer}>
       <div className={styles.transactionCard}>
