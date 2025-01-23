@@ -1,14 +1,14 @@
-import { getStoredMasks } from '../../../utils/chat/helpers';
 import { QueryBase } from './base';
-import { ASSET_ADDRESSES, kavaEVMProvider } from '../../../config/evm';
 import { ethers } from 'ethers';
-import { erc20ABI } from '../../../tools/erc20ABI';
+import { erc20ABI } from '../../../../tools/erc20ABI';
+import { getStoredMasks } from '../../../../utils/chat/helpers';
+import { ASSET_ADDRESSES, kavaEVMProvider } from '../../../../config/evm';
 
 interface AddressQuery {
   address: string;
 }
 
-export class EvmBalances extends QueryBase<AddressQuery> {
+export class EvmBalancesQuery extends QueryBase<AddressQuery> {
   name = 'evm-balances';
   description = 'Returns the erc20 token balances for a given address';
   parameters = [
