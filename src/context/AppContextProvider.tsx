@@ -12,7 +12,7 @@ import { useWalletContext } from './useWalletContext';
  * Called once when the hook is first used.
  * @returns Initialized OperationRegistry
  */
-function initializeRegistry(): OperationRegistry {
+function initializeRegistry(): OperationRegistry<unknown> {
   const registry = new OperationRegistry();
   // Register all supported operations
 
@@ -38,7 +38,9 @@ export const AppContextProvider = ({
   const { walletAddress, walletType, walletChainId, isWalletConnected } =
     useWalletContext();
 
-  const [registry] = useState<OperationRegistry>(() => initializeRegistry());
+  const [registry] = useState<OperationRegistry<unknown>>(() =>
+    initializeRegistry(),
+  );
 
   // Memoized to prevent unnecessary regeneration.
   const getOpenAITools = useCallback(() => {
@@ -71,9 +73,12 @@ export const AppContextProvider = ({
       }
 
       if ('buildTransaction' in operation) {
-        return (operation as ChainMessage).buildTransaction(params, wallet);
+        return (operation as ChainMessage<unknown>).buildTransaction(
+          params,
+          wallet,
+        );
       } else if ('executeQuery' in operation) {
-        return (operation as ChainQuery).executeQuery(params, wallet);
+        return (operation as ChainQuery<unknown>).executeQuery(params, wallet);
       }
 
       throw new Error('Invalid operation type');
