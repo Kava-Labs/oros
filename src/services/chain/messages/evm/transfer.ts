@@ -61,53 +61,57 @@ export class EvmTransferMessage extends EvmMessageBase<SendToolParams> {
   async buildTransaction(params: SendToolParams): Promise<string> {
     const { fromAddress, toAddress, amount, denom } = params;
 
-    const { masksToValues } = getStoredMasks();
+    try {
+      let txParams: Record<string, string>;
 
-    //  validate method will check that these mask-addresses exist
-    const addressTo = masksToValues[toAddress];
-    const addressFrom = masksToValues[fromAddress];
+      const { masksToValues } = getStoredMasks();
 
-    const receivingAddress = ethers.getAddress(addressTo);
-    const sendingAddress = ethers.getAddress(addressFrom);
+      //  validate method will check that these mask-addresses exist
+      const addressTo = masksToValues[toAddress];
+      const addressFrom = masksToValues[fromAddress];
 
-    let txParams: Record<string, string>;
+      const receivingAddress = ethers.getAddress(addressTo);
+      const sendingAddress = ethers.getAddress(addressFrom);
 
-    if (isNativeAsset(denom)) {
-      txParams = {
-        to: sendingAddress,
-        data: '0x',
-        value: ethers.parseEther(amount).toString(16),
-      };
-    } else {
-      const contractAddress = ASSET_ADDRESSES[denom.toUpperCase()] ?? '';
-      const contract = new ethers.Contract(
-        contractAddress,
-        erc20ABI,
-        kavaEVMProvider,
-      );
-      const decimals = await contract.decimals();
-      const formattedTxAmount = ethers.parseUnits(amount, Number(decimals));
+      if (isNativeAsset(denom)) {
+        txParams = {
+          to: sendingAddress,
+          data: '0x',
+          value: ethers.parseEther(amount).toString(16),
+        };
+      } else {
+        const contractAddress = ASSET_ADDRESSES[denom.toUpperCase()] ?? '';
+        const contract = new ethers.Contract(
+          contractAddress,
+          erc20ABI,
+          kavaEVMProvider,
+        );
+        const decimals = await contract.decimals();
+        const formattedTxAmount = ethers.parseUnits(amount, Number(decimals));
 
-      txParams = {
-        to: contractAddress,
-        value: '0', // this must be zero
-        data: contract.interface.encodeFunctionData('transfer', [
-          receivingAddress,
-          formattedTxAmount,
-        ]),
-      };
+        txParams = {
+          to: contractAddress,
+          value: '0', // this must be zero
+          data: contract.interface.encodeFunctionData('transfer', [
+            receivingAddress,
+            formattedTxAmount,
+          ]),
+        };
+      }
+
+      return window.ethereum.request({
+        method: 'eth_sendTransaction',
+        params: [
+          {
+            ...txParams,
+            from: fromAddress,
+            gasPrice: '0x4a817c800',
+            gas: '0x76c0',
+          },
+        ],
+      });
+    } catch (e) {
+      throw `An error occurred building the transaction: ${JSON.stringify(e)}`;
     }
-
-    return window.ethereum.request({
-      method: 'eth_sendTransaction',
-      params: [
-        {
-          ...txParams,
-          from: fromAddress,
-          gasPrice: '0x4a817c800',
-          gas: '0x76c0',
-        },
-      ],
-    });
   }
 }
