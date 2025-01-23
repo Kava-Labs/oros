@@ -14,7 +14,7 @@ export type AppContextType = {
   setIsReady: React.Dispatch<React.SetStateAction<boolean>>;
   isRequesting: boolean;
   setIsRequesting: React.Dispatch<React.SetStateAction<boolean>>;
-  registry: OperationRegistry;
+  registry: OperationRegistry<unknown>;
 
   getOpenAITools: () => ChatCompletionTool[];
   executeOperation: ExecuteOperation;
