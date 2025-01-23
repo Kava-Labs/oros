@@ -3,7 +3,7 @@ import { ethers } from 'ethers';
 import { erc20ABI } from '../../../../tools/erc20ABI';
 import { ASSET_ADDRESSES, kavaEVMProvider } from '../../../../config/evm';
 import { WalletConnection } from '../../../../types/chain';
-
+import { QueryInProgress } from '../../../../components/QueryInProgress';
 
 export class EvmBalancesQuery implements ChainQuery<void> {
   name = 'evm-balances';
@@ -25,6 +25,10 @@ export class EvmBalancesQuery implements ChainQuery<void> {
     }
 
     return true;
+  }
+
+  inProgressComponent() {
+    return QueryInProgress;
   }
 
   async executeQuery(_params: void, wallet: WalletConnection): Promise<string> {
