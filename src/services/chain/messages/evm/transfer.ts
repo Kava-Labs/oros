@@ -3,6 +3,7 @@ import { ethers } from 'ethers';
 import { ASSET_ADDRESSES, kavaEVMProvider } from '../../../../config/evm';
 import { erc20ABI } from '../../../../tools/erc20ABI';
 import { getStoredMasks, isNativeAsset } from '../../../../utils/chat/helpers';
+import { TransactionDisplay } from '../../../../components/TransactionDisplay';
 
 interface SendToolParams {
   fromAddress: string;
@@ -41,6 +42,10 @@ export class EvmTransferMessage extends EvmMessageBase<SendToolParams> {
       required: true,
     },
   ];
+
+  inProgressComponent() {
+    return TransactionDisplay;
+  }
 
   validate(params: SendToolParams): boolean {
     const { fromAddress, toAddress, amount, denom } = params;

@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { AppContext } from './AppContext';
 import { OperationRegistry } from '../services/chain/registry';
-import { CosmosSendMessage } from '../services/chain/messages/cosmos/msgSend';
 import { ChainMessage, ChainQuery } from '../types/chain';
 import { LendDepositMessage } from '../services/chain/messages/kava/lend/msgDeposit';
 import { EvmTransferMessage } from '../services/chain/messages/evm/transfer';
@@ -17,7 +16,6 @@ function initializeRegistry(): OperationRegistry {
   // Register all supported operations
 
   /** TODO: This probably needs to not be manual */
-  registry.register(new CosmosSendMessage());
   registry.register(new LendDepositMessage());
   registry.register(new EvmTransferMessage());
   registry.register(new EvmBalancesQuery());
