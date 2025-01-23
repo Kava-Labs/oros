@@ -8,7 +8,11 @@ import {
   OperationType,
   ChainType,
 } from '../../../../types/chain';
-import { SignatureTypes, WalletStore } from '../../../../walletStore';
+import {
+  SignatureTypes,
+  WalletStore,
+  WalletTypes,
+} from '../../../../walletStore';
 
 interface SendToolParams {
   toAddress: string;
@@ -21,7 +25,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
   description = 'Send erc20 tokens from one address to another';
   operationType = OperationType.TRANSACTION;
   chainType = ChainType.EVM;
-  compatibleWallets = '*' as const;
+  needsWallet = [WalletTypes.METAMASK];
 
   parameters = [
     {
@@ -53,9 +57,9 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
       throw new Error('please connect to a compatible wallet');
     }
 
-    if (Array.isArray(this.compatibleWallets)) {
+    if (Array.isArray(this.needsWallet)) {
       if (
-        !this.compatibleWallets.includes(walletStore.getSnapshot().walletType)
+        !this.needsWallet.includes(walletStore.getSnapshot().walletType)
       ) {
         throw new Error('please connect to a compatible wallet');
       }
