@@ -1,4 +1,4 @@
-import { CosmosMessageBase } from '../../base';
+import { CosmosMessageBase } from '../../cosmos/base';
 import { CosmosCoin, CosmosMsg } from '../../../../../types/messages';
 import { MessageTypeUrl } from '../../../../../types/messages';
 
