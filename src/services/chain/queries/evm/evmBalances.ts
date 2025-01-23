@@ -33,10 +33,13 @@ export class EvmBalancesQuery extends QueryBase<AddressQuery> {
     const { address } = params;
     const balanceCalls: (() => Promise<string>)[] = [];
 
+    const { masksToValues } = getStoredMasks();
+    const validatedAddress = masksToValues[address];
+
     // KAVA fetching is a bit different
     balanceCalls.push(async () => {
       try {
-        const rawBalance = await kavaEVMProvider.getBalance(address);
+        const rawBalance = await kavaEVMProvider.getBalance(validatedAddress);
         const formattedBalance = ethers.formatUnits(rawBalance, 18);
         return `KAVA: ${formattedBalance}`;
       } catch (err) {
