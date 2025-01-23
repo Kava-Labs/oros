@@ -1,10 +1,14 @@
 import { MessageParam } from '../../../../types/messages';
-import { ChainOperation } from '../../../../types/chain';
+import {
+  ChainOperation,
+  ChainType,
+  OperationType,
+} from '../../../../types/chain';
 
 export abstract class QueryBase<T> implements ChainOperation {
   abstract name: string;
-  operationType = 'query' as const;
-  chainType = 'evm' as const;
+  operationType = OperationType.QUERY;
+  chainType = ChainType.EVM;
 
   abstract description: string;
   abstract parameters: Array<MessageParam>;
