@@ -3,7 +3,7 @@ import { ethers } from 'ethers';
 import { erc20ABI } from '../../../../tools/erc20ABI';
 import { ASSET_ADDRESSES, kavaEVMProvider } from '../../../../config/evm';
 import { QueryInProgress } from '../../../../components/QueryInProgress';
-import { WalletStore } from '../../../../walletStore';
+import { WalletStore, WalletTypes } from '../../../../walletStore';
 
 export class EvmBalancesQuery implements ChainQuery<void> {
   name = 'evm-balances';
@@ -11,17 +11,16 @@ export class EvmBalancesQuery implements ChainQuery<void> {
   parameters = [];
   operationType = OperationType.QUERY;
   chainType = ChainType.EVM;
-  compatibleWallets = '*' as const;
+
+  needsWallet = [WalletTypes.METAMASK];
 
   validate(_params: void, walletStore: WalletStore): boolean {
     if (!walletStore.getSnapshot().isWalletConnected) {
       throw new Error('please connect to a compatible wallet');
     }
 
-    if (Array.isArray(this.compatibleWallets)) {
-      if (
-        !this.compatibleWallets.includes(walletStore.getSnapshot().walletType)
-      ) {
+    if (Array.isArray(this.needsWallet)) {
+      if (!this.needsWallet.includes(walletStore.getSnapshot().walletType)) {
         throw new Error('please connect to a compatible wallet');
       }
     }

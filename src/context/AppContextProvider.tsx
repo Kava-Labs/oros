@@ -72,6 +72,27 @@ export const AppContextProvider = ({
         throw new Error(`Unknown operation type: ${operationName}`);
       }
 
+      // if operation needs wallet connect
+      // and the current wallet connection isn't one that's included in wantsWallet
+      // we then try to establish that connection
+      if (
+        operation.needsWallet &&
+        Array.isArray(operation.needsWallet) &&
+        !operation.needsWallet.includes(walletStore.getSnapshot().walletType)
+      ) {
+        for (const walletType of operation.needsWallet) {
+          try {
+            await walletStore.connectWallet({
+              walletType,
+              chainId: `0x${Number(2222).toString(16)}`,
+            });
+            break;
+          } catch (err) {
+            console.error(err);
+          }
+        }
+      }
+
       if (!operation.validate(params, walletStore)) {
         throw new Error('Invalid parameters for operation');
       }
