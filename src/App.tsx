@@ -22,10 +22,10 @@ import {
 } from './streamUtils';
 import { TextStreamStore } from './textStreamStore';
 import {
-  memeCoinSystemPrompt,
-  memeCoinGenIntroText,
-  memeCoinGenWarningText,
-} from './config/prompts/systemPrompt';
+  defaultSystemPrompt,
+  defaultIntroText,
+  defaultCautionText,
+} from './config/prompts/defaultPrompts';
 import { memeCoinTools } from './config/tools';
 // import { imagedb } from './imagedb';
 // import { v4 as uuidv4 } from 'uuid';
@@ -67,10 +67,10 @@ export const App = () => {
   }, [connectWallet]);
 
   const [{ tools, systemPrompt, introText, cautionText }] = useState({
-    introText: memeCoinGenIntroText,
-    systemPrompt: memeCoinSystemPrompt,
+    introText: defaultIntroText,
+    systemPrompt: defaultSystemPrompt,
     tools: memeCoinTools,
-    cautionText: memeCoinGenWarningText,
+    cautionText: defaultCautionText,
   });
 
   // TODO: check healthcheck and set error if backend is not availiable

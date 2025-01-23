@@ -7,12 +7,10 @@ test('renders intro message', async ({ page }) => {
 
   expect(chat.messageContainer).not.toBeNull();
 
-  await expect(page.getByText("let's get started")).toBeVisible();
+  await expect(page.getByText('Welcome to Oros!')).toBeVisible();
 
   await expect(
-    page.getByText(
-      "Tell me about your memecoin idea below and we'll generate everything you need to get it launched.",
-    ),
+    page.getByText("I'm here to help you with all things blockchain and DeFi."),
   ).toBeVisible();
 });
 
