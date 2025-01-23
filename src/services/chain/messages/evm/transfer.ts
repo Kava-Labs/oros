@@ -2,7 +2,7 @@ import { EvmMessageBase } from './base';
 import { ethers, TransactionResponse } from 'ethers';
 import { ASSET_ADDRESSES, kavaEVMProvider } from '../../../../config/evm';
 import { erc20ABI } from '../../../../tools/erc20ABI';
-import { getStoredMasks } from '../../../../utils/chat/helpers';
+import { getStoredMasks, isNativeAsset } from '../../../../utils/chat/helpers';
 
 interface SendToolParams {
   fromAddress: string;
@@ -64,20 +64,14 @@ export class EvmTransferMessage extends EvmMessageBase<SendToolParams> {
     const receivingAddress = ethers.getAddress(addressTo);
     const sendingAddress = ethers.getAddress(addressFrom);
 
-    //  todo - better validation?
-    if (denom.toUpperCase() === 'KAVA') {
+    if (isNativeAsset(denom)) {
       return window.ethereum.request({
         method: 'eth_sendTransaction',
         params: [
           {
             to: sendingAddress,
             from: receivingAddress,
-            value: ethers
-              .parseEther(
-                //  might not be necessary with validate method?
-                String(!amount || Number.isNaN(Number(amount)) ? '0' : amount),
-              )
-              .toString(16),
+            value: ethers.parseEther(amount).toString(16),
             gasPrice: '0x4a817c800',
             gas: '0x76c0',
             data: '0x',
