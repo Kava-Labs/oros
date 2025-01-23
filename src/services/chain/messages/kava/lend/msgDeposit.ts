@@ -2,6 +2,7 @@ import {
   ChainMessage,
   ChainType,
   OperationType,
+  WalletConnection,
 } from '../../../../../types/chain';
 import { TransactionDisplay } from '../../../../../components/TransactionDisplay';
 
@@ -47,7 +48,7 @@ export class LendDepositMessage implements ChainMessage<LendToolParams> {
    * @param params - Parameters to validate
    * @returns True if parameters are valid
    */
-  validate(params: LendToolParams): boolean {
+  validate(params: LendToolParams, _wallet: WalletConnection): boolean {
     const { amount, denom } = params;
 
     return Boolean(Number(amount) > 0 && denom.length > 0);
@@ -58,7 +59,10 @@ export class LendDepositMessage implements ChainMessage<LendToolParams> {
    * @param params - Validated parameters for the transaction
    * @returns Transaction object ready for signing
    */
-  async buildTransaction(params: LendToolParams): Promise<string> {
+  async buildTransaction(
+    params: LendToolParams,
+    _wallet: WalletConnection,
+  ): Promise<string> {
     console.log(params);
 
     return 'unimplemented';
