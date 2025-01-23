@@ -79,10 +79,6 @@ export class EvmTransferMessage extends EvmMessageBase<SendToolParams> {
         ],
       });
     } else {
-      const rawTxAmount = String(
-        !amount || Number.isNaN(Number(amount)) ? '0' : amount,
-      );
-
       const contractAddress = ASSET_ADDRESSES[denom.toUpperCase()] ?? '';
 
       const contract = new ethers.Contract(
@@ -93,10 +89,7 @@ export class EvmTransferMessage extends EvmMessageBase<SendToolParams> {
 
       const decimals = await contract.decimals();
 
-      const formattedTxAmount = ethers.parseUnits(
-        rawTxAmount,
-        Number(decimals),
-      );
+      const formattedTxAmount = ethers.parseUnits(amount, Number(decimals));
 
       const txData = contract.interface.encodeFunctionData('transfer', [
         receivingAddress,
