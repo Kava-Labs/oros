@@ -45,9 +45,14 @@ export class EvmTransferMessage extends EvmMessageBase<SendToolParams> {
   validate(params: SendToolParams): boolean {
     const { fromAddress, toAddress, amount, denom } = params;
 
+    const { masksToValues } = getStoredMasks();
+
+    const validFromAddress = masksToValues[fromAddress] ?? '';
+    const validToAddress = masksToValues[toAddress] ?? '';
+
     return Boolean(
-      fromAddress.length > 0 &&
-        toAddress.length > 0 &&
+      validFromAddress.length > 0 &&
+        validToAddress.length > 0 &&
         Number(amount) > 0 &&
         denom.length > 0,
     );
@@ -58,8 +63,9 @@ export class EvmTransferMessage extends EvmMessageBase<SendToolParams> {
 
     const { masksToValues } = getStoredMasks();
 
-    const addressTo = masksToValues[toAddress] ?? '';
-    const addressFrom = masksToValues[fromAddress] ?? '';
+    //  validate method will check that these mask-addresses exist
+    const addressTo = masksToValues[toAddress];
+    const addressFrom = masksToValues[fromAddress];
 
     const receivingAddress = ethers.getAddress(addressTo);
     const sendingAddress = ethers.getAddress(addressFrom);

@@ -1,6 +1,4 @@
 import { CosmosMessageBase } from '../../cosmos/base';
-import { CosmosCoin, CosmosMsg } from '../../../../../types/messages';
-import { MessageTypeUrl } from '../../../../../types/messages';
 
 //  sent to model
 interface LendToolParams {
@@ -60,17 +58,7 @@ export class LendDepositMessage extends CosmosMessageBase<LendToolParams> {
    * @returns Transaction object ready for signing
    */
   async buildTransaction(params: LendToolParams): Promise<string> {
-    // const { depositor, amount, denom } = params;
-    //  {
-    //   typeUrl: MessageTypeUrl.LEND_MSG_DEPOSIT,
-    //   value: {
-    //     depositor,
-    //     amount: {
-    //       amount,
-    //       denom,
-    //     },
-    //   },
-    // };
+    console.log(params);
 
     return 'unimplemented';
   }
