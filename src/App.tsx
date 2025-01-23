@@ -50,15 +50,7 @@ export const App = () => {
     executeOperation,
   } = useAppContext();
 
-  const { walletAddress, walletType, walletChainId, connectWallet } =
-    useWalletContext();
-
-  console.log({
-    walletAddress,
-    walletChainId,
-    walletType,
-    tools: getOpenAITools(),
-  });
+  const { connectWallet } = useWalletContext();
 
   useEffect(() => {
     connectWallet({

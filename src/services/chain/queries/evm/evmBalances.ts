@@ -35,7 +35,6 @@ export class EvmBalancesQuery implements ChainQuery<void> {
     const address = wallet.walletAddress;
     const balanceCalls: (() => Promise<string>)[] = [];
 
-
     // KAVA fetching is a bit different
     balanceCalls.push(async () => {
       try {

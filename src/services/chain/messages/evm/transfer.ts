@@ -33,7 +33,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
     {
       name: 'amount',
       type: 'string',
-      description: 'Amount to send (in base units)',
+      description: 'Amount to send',
       required: true,
     },
     {
@@ -65,7 +65,8 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
 
     const validToAddress = masksToValues[toAddress] ?? '';
 
-    const validDenomWithContract = denom.toUpperCase() in ASSET_ADDRESSES;
+    const validDenomWithContract =
+      denom.toUpperCase() in ASSET_ADDRESSES || isNativeAsset(denom);
 
     return Boolean(
       validToAddress.length > 0 &&
