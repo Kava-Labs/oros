@@ -26,7 +26,6 @@ export const connectMetamask = async (setWallet: WalletSetter) => {
   }
 };
 
-
 export const metamaskSign = async (opts: SignOpts) => {
   if (opts.signatureType === SignatureTypes.EVM) {
     return await window.ethereum.request({

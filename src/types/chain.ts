@@ -28,7 +28,7 @@ export interface ChainMessage extends ChainOperation {
   /** Identifies this as a transaction operation */
   operationType: 'transaction';
   /** Builds the transaction object from the provided parameters */
-  buildTransaction(params: unknown): Promise<unknown>;
+  buildTransaction(params: unknown): Promise<string>;
 }
 
 /**
@@ -39,5 +39,5 @@ export interface ChainQuery extends ChainOperation {
   /** Identifies this as a query operation */
   operationType: 'query';
   /** Executes the query with the provided parameters */
-  executeQuery(params: unknown): Promise<unknown>;
+  executeQuery(params: unknown): Promise<string>;
 }
