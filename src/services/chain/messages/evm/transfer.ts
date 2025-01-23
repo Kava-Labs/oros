@@ -8,7 +8,11 @@ import {
   OperationType,
   ChainType,
 } from '../../../../types/chain';
-import { SignatureTypes, WalletStore } from '../../../../walletStore';
+import {
+  SignatureTypes,
+  WalletStore,
+  WalletTypes,
+} from '../../../../walletStore';
 
 interface SendToolParams {
   toAddress: string;
@@ -22,6 +26,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
   operationType = OperationType.TRANSACTION;
   chainType = ChainType.EVM;
   compatibleWallets = '*' as const;
+  wantsWallet = [WalletTypes.METAMASK];
 
   parameters = [
     {

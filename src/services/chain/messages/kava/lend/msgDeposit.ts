@@ -4,7 +4,7 @@ import {
   OperationType,
 } from '../../../../../types/chain';
 import { TransactionDisplay } from '../../../../../components/TransactionDisplay';
-import { WalletStore } from '../../../../../walletStore';
+import { WalletStore, WalletTypes } from '../../../../../walletStore';
 
 //  sent to model
 interface LendToolParams {
@@ -21,6 +21,8 @@ export class LendDepositMessage implements ChainMessage<LendToolParams> {
   chainType = ChainType.COSMOS;
   operationType = OperationType.TRANSACTION;
   compatibleWallets = '*' as const;
+
+  wantsWallet = [WalletTypes.METAMASK];
 
   /**
    * Parameter definitions for the message.

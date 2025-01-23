@@ -18,7 +18,6 @@ import { ToolCallStreamStore } from './toolCallStreamStore';
 import { MessageHistoryStore } from './messageHistoryStore';
 import { useAppContext } from './context/useAppContext';
 import { ExecuteOperation } from './context/AppContext';
-import { WalletTypes } from './walletStore';
 
 let client: OpenAI | null = null;
 
@@ -60,12 +59,6 @@ export const App = () => {
     tools: getOpenAITools(),
   });
 
-  useEffect(() => {
-    walletStore.connectWallet({
-      chainId: `0x${Number(2222).toString(16)}`,
-      walletType: WalletTypes.METAMASK,
-    });
-  }, [walletStore]);
 
   // TODO: check healthcheck and set error if backend is not availiable
   useEffect(() => {
