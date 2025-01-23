@@ -102,7 +102,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
         };
       } else {
         const contractAddress =
-          ASSET_ADDRESSES[denom.toUpperCase()].contractAddress ?? '';
+          ASSET_ADDRESSES[denom.toUpperCase()].contractAddress;
 
         const contract = new ethers.Contract(
           contractAddress,
