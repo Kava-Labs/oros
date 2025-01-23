@@ -15,7 +15,7 @@ export const ToolCallProgressCards = () => {
     const operation = registry.get(toolCall.function.name ?? '');
     if (operation && operation.inProgressComponent) {
       const Component = operation.inProgressComponent();
-      return <Component {...toolCall} />;
+      return <Component key={toolCall.id} {...toolCall} />;
     }
     return null;
   });
