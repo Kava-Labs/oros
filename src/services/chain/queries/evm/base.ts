@@ -1,5 +1,5 @@
-import { MessageParam } from '../../../types/messages';
-import { ChainOperation } from '../../../types/chain';
+import { MessageParam } from '../../../../types/messages';
+import { ChainOperation } from '../../../../types/chain';
 
 export abstract class QueryBase<T> implements ChainOperation {
   abstract name: string;
