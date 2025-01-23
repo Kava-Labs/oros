@@ -96,8 +96,7 @@ export class WalletStore {
           return window.ethereum.request(opts.payload);
         }
         case SignatureTypes.EIP712: {
-          // todo: implement
-          break;
+          throw new Error('EIP712 Signing not implemented at this moment');
         }
       }
     } else {
