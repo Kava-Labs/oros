@@ -1,4 +1,5 @@
 import { CosmosMessageBase } from '../../cosmos/base';
+import { TransactionDisplay } from '../../../../../components/TransactionDisplay';
 
 //  sent to model
 interface LendToolParams {
@@ -39,6 +40,9 @@ export class LendDepositMessage extends CosmosMessageBase<LendToolParams> {
     },
   ];
 
+  inProgressComponent() {
+    return TransactionDisplay;
+  }
   /**
    * Validates that all required parameters are present and of correct type.
    * @param params - Parameters to validate
