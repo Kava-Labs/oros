@@ -11,19 +11,16 @@ export class EvmBalancesQuery implements ChainQuery<void> {
   parameters = [];
   operationType = OperationType.QUERY;
   chainType = ChainType.EVM;
-  compatibleWallets = '*' as const;
 
-  wantsWallet = [WalletTypes.METAMASK];
+  needsWallet = [WalletTypes.METAMASK];
 
   validate(_params: void, walletStore: WalletStore): boolean {
     if (!walletStore.getSnapshot().isWalletConnected) {
       throw new Error('please connect to a compatible wallet');
     }
 
-    if (Array.isArray(this.compatibleWallets)) {
-      if (
-        !this.compatibleWallets.includes(walletStore.getSnapshot().walletType)
-      ) {
+    if (Array.isArray(this.needsWallet)) {
+      if (!this.needsWallet.includes(walletStore.getSnapshot().walletType)) {
         throw new Error('please connect to a compatible wallet');
       }
     }

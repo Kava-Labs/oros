@@ -72,15 +72,15 @@ export const AppContextProvider = ({
         throw new Error(`Unknown operation type: ${operationName}`);
       }
 
-      // if operation wants wallet connect
+      // if operation needs wallet connect
       // and the current wallet connection isn't one that's included in wantsWallet
       // we then try to establish that connection
       if (
-        operation.wantsWallet &&
-        Array.isArray(operation.wantsWallet) &&
-        !operation.wantsWallet.includes(walletStore.getSnapshot().walletType)
+        operation.needsWallet &&
+        Array.isArray(operation.needsWallet) &&
+        !operation.needsWallet.includes(walletStore.getSnapshot().walletType)
       ) {
-        for (const walletType of operation.wantsWallet) {
+        for (const walletType of operation.needsWallet) {
           try {
             await walletStore.connectWallet({
               walletType,

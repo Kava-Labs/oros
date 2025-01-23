@@ -24,9 +24,7 @@ export interface ChainOperation<T> {
   /** List of parameters this operation accepts */
   parameters: MessageParam[];
 
-  compatibleWallets: '*' | WalletTypes[];
-
-  wantsWallet?: WalletTypes[];
+  needsWallet?: WalletTypes[];
 
   /** Validates the provided parameters match requirements */
   validate(params: T, walletStore: WalletStore): boolean;
