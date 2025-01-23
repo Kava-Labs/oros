@@ -1,16 +1,4 @@
-/**
- * Defines a parameter for chain operations (messages or queries).
- * Used to validate inputs and generate OpenAI tool definitions.
- *
- * This might be too abstracted?
- */
-export interface MessageParam {
-  name: string;
-  type: string;
-  /** Human-readable description of what the operation does, maybe not needed */
-  description: string;
-  required: boolean;
-}
+import { MessageParam } from './messages';
 
 /**
  * Base interface for all chain operations.
