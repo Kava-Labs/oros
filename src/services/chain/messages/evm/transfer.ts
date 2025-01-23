@@ -87,7 +87,6 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
 
       const receivingAddress = ethers.getAddress(addressTo);
       const sendingAddress = ethers.getAddress(addressFrom);
-      console.log(wallet, receivingAddress, sendingAddress);
 
       if (isNativeAsset(denom)) {
         txParams = {
@@ -96,7 +95,9 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
           value: ethers.parseEther(amount).toString(16),
         };
       } else {
-        const contractAddress = ASSET_ADDRESSES[denom.toUpperCase()] ?? '';
+        const contractAddress =
+          ASSET_ADDRESSES[denom.toUpperCase()].contractAddress ?? '';
+
         const contract = new ethers.Contract(
           contractAddress,
           erc20ABI,
