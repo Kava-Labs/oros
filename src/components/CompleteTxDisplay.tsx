@@ -1,15 +1,15 @@
 import styles from './InProgressTxDisplay.module.css';
 import { ExternalLinkIcon } from '../assets/ExternalLinkIcon';
 
-interface TransactionDisplayProps {
+interface CompleteTxDisplayProps {
   toolResponse: any;
   hash: string;
 }
 
-export const TransactionDisplay = ({
+export const CompleteTxDisplay = ({
   toolResponse,
   hash,
-}: TransactionDisplayProps) => {
+}: CompleteTxDisplayProps) => {
   const getPairedParams = () => {
     const { id, ...displayParams } = toolResponse;
     const keys = Object.keys(displayParams);
