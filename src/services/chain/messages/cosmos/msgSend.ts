@@ -1,7 +1,5 @@
-import { CosmosMessageBase } from '../base';
-import { CosmosCoin } from '../../../../types/messages';
+import { CosmosMessageBase } from './base';
 
-//  sent to model
 interface SendToolParams {
   fromAddress: string;
   toAddress: string;
@@ -72,19 +70,7 @@ export class CosmosSendMessage extends CosmosMessageBase<SendToolParams> {
    * @returns Transaction object ready for signing
    */
   async buildTransaction(params: SendToolParams): Promise<string> {
-    // const { fromAddress, toAddress, amount, denom } = params;
-    // {
-    //   typeUrl: MessageTypeUrl.COSMOS_MSG_SEND,
-    //   value: {
-    //     fromAddress,
-    //     toAddress,
-    //     amount: {
-    //       amount,
-    //       denom,
-    //     },
-    //   },
-    // };
-
+    console.log(params);
     return 'Unimplemented';
   }
 }

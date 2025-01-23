@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 import { ChatView, ChatViewProps } from '../components/ChatView';
 import { mockChatMessages } from '../mockdata';
-import { memeCoinGenIntroText } from '../config';
+import { defaultIntroText } from '../config';
 import type { Decorator } from '@storybook/react';
 import { ThemeProvider } from '../theme/themeProvider';
 import { AppContextProvider } from '../context/AppContextProvider';
@@ -46,7 +46,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const args: ChatViewProps = {
-  introText: memeCoinGenIntroText,
+  introText: defaultIntroText,
   messages: mockChatMessages,
   onSubmit: fn(),
   onReset: fn(),

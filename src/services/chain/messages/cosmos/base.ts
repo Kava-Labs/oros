@@ -1,5 +1,5 @@
-import { ChainMessage } from '../../../types/chain';
-import { MessageParam } from '../../../types/messages';
+import { ChainMessage } from '../../../../types/chain';
+import { MessageParam } from '../../../../types/messages';
 
 // Base abstract class for Cosmos messages
 export abstract class CosmosMessageBase<T> implements ChainMessage {
