@@ -7,6 +7,7 @@ import {
   messageStore,
   progressStore,
   toolCallStreamStore,
+  walletStore,
 } from './store';
 import type { ChatCompletionTool } from 'openai/resources/index';
 import {
@@ -23,9 +24,8 @@ import {
 import { ToolCallStreamStore } from './toolCallStreamStore';
 import { MessageHistoryStore } from './messageHistoryStore';
 import { useAppContext } from './context/useAppContext';
-import { useWalletContext } from './context/useWalletContext';
-import { WalletTypes } from './context/WalletContext';
 import { ExecuteOperation } from './context/AppContext';
+import { WalletTypes } from './walletStore';
 
 let client: OpenAI | null = null;
 
@@ -50,14 +50,25 @@ export const App = () => {
     executeOperation,
   } = useAppContext();
 
-  const { connectWallet } = useWalletContext();
+
+  const { walletAddress, walletType, walletChainId } = useSyncExternalStore(
+    walletStore.subscribe,
+    walletStore.getSnapshot,
+  );
+
+  console.log({
+    walletAddress,
+    walletChainId,
+    walletType,
+    tools: getOpenAITools(),
+  });
 
   useEffect(() => {
-    connectWallet({
+    walletStore.connectWallet({
       chainId: `0x${Number(2222).toString(16)}`,
       walletType: WalletTypes.METAMASK,
     });
-  }, [connectWallet]);
+  }, []);
 
   // TODO: check healthcheck and set error if backend is not availiable
   useEffect(() => {
