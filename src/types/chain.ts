@@ -1,6 +1,16 @@
 import { MessageParam } from './messages';
 import { ToolCallStream } from '../toolCallStreamStore';
 
+export enum OperationType {
+  TRANSACTION = 'transaction',
+  QUERY = 'query',
+}
+
+export enum ChainType {
+  COSMOS = 'cosmos',
+  EVM = 'evm',
+}
+
 /**
  * Base interface for all chain operations.
  * Both messages (transactions) and queries extend this interface.
@@ -8,7 +18,7 @@ import { ToolCallStream } from '../toolCallStreamStore';
 export interface ChainOperation {
   /** Unique identifier for the operation name */
   name: string;
-  chainType: 'cosmos' | 'evm';
+  chainType: ChainType;
   /** Human-readable description of what the operation does */
   description: string;
   /** List of parameters this operation accepts */
@@ -26,7 +36,7 @@ export interface ChainOperation {
  */
 export interface ChainMessage extends ChainOperation {
   /** Identifies this as a transaction operation */
-  operationType: 'transaction';
+  operationType: OperationType;
   /** Builds the transaction object from the provided parameters */
   buildTransaction(params: unknown): Promise<string>;
 }
@@ -37,7 +47,7 @@ export interface ChainMessage extends ChainOperation {
  */
 export interface ChainQuery extends ChainOperation {
   /** Identifies this as a query operation */
-  operationType: 'query';
+  operationType: OperationType;
   /** Executes the query with the provided parameters */
   executeQuery(params: unknown): Promise<string>;
 }
