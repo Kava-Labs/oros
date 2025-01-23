@@ -2,45 +2,36 @@ import { FC } from 'react';
 import './TransactionDisplay.css';
 import { ExternalLinkIcon } from '../assets/ExternalLinkIcon';
 import styles from './TransacactionDisplay.module.css';
+import { ToolCallStream } from '../toolCallStreamStore';
 
 interface TransactionDisplayProps {
-  transactionInfo: string;
-  denom: string;
-  amount: string | number;
+  toolCallStreams?: Readonly<ToolCallStream>[];
   hash?: string;
-  hashLink?: string;
 }
 
 export const TransactionDisplay: FC<TransactionDisplayProps> = ({
-  transactionInfo,
-  denom,
-  amount,
+  toolCallStreams,
   hash,
-  hashLink,
 }) => {
   return (
     <div className={styles.transactionContainer}>
       <div className={styles.transactionCard}>
         {/* Transaction Info */}
-        <div className={styles.transactionSection}>
-          <h3 className={styles.sectionLabel}>Transaction Info</h3>
-          <p className={styles.transactionInfo}>{transactionInfo}</p>
-        </div>
-
-        {/* Amount and Denom */}
-        <div className={styles.transactionSection}>
-          <h3 className={styles.sectionLabel}>Amount</h3>
-          <p className={styles.transactionAmount}>
-            {amount} {denom}
-          </p>
-        </div>
+        {toolCallStreams && (
+          <div className={styles.transactionSection}>
+            <h3 className={styles.sectionLabel}>Transaction Info</h3>
+            <p className={styles.transactionInfo}>
+              Transaction process started...
+            </p>
+          </div>
+        )}
 
         {/* Hash Link */}
         {hash && (
           <div className={styles.transactionSection}>
             <h3 className={styles.sectionLabel}>Transaction Hash</h3>
             <a
-              href={hashLink}
+              href={}
               target="_blank"
               rel="noopener noreferrer"
               className={styles.hashLink}
