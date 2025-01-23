@@ -84,8 +84,8 @@ export class OperationRegistry {
           required: operation.parameters
             .filter((param) => param.required)
             .map((param) => param.name),
-           strict: true,
-           additionalProperties: false,
+          strict: true,
+          additionalProperties: false,
         },
       },
     }));
