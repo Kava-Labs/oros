@@ -21,6 +21,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
   description = 'Send erc20 tokens from one address to another';
   operationType = OperationType.TRANSACTION;
   chainType = ChainType.EVM;
+  compatibleWallets = '*' as const;
 
   parameters = [
     {
@@ -49,8 +50,15 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
 
   validate(params: SendToolParams, wallet: WalletConnection): boolean {
     if (!wallet.isWalletConnected) {
-      return false;
+      throw new Error('please connect to a compatible wallet');
     }
+
+    if (Array.isArray(this.compatibleWallets)) {
+      if (!this.compatibleWallets.includes(wallet.walletType)) {
+        throw new Error('please connect to a compatible wallet');
+      }
+    }
+
     const { toAddress, amount, denom } = params;
 
     const { masksToValues } = getStoredMasks();

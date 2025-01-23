@@ -31,6 +31,9 @@ export interface ChainOperation<T> {
   description: string;
   /** List of parameters this operation accepts */
   parameters: MessageParam[];
+
+  compatibleWallets: '*' | WalletTypes[];
+
   /** Validates the provided parameters match requirements */
   validate(params: T, wallet: WalletConnection): boolean;
 

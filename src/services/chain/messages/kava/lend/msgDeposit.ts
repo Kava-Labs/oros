@@ -20,6 +20,7 @@ export class LendDepositMessage implements ChainMessage<LendToolParams> {
   description = 'Deposit tokens from an address into a Lend money market';
   chainType = ChainType.COSMOS;
   operationType = OperationType.TRANSACTION;
+  compatibleWallets = '*' as const;
 
   /**
    * Parameter definitions for the message.
@@ -48,7 +49,17 @@ export class LendDepositMessage implements ChainMessage<LendToolParams> {
    * @param params - Parameters to validate
    * @returns True if parameters are valid
    */
-  validate(params: LendToolParams, _wallet: WalletConnection): boolean {
+  validate(params: LendToolParams, wallet: WalletConnection): boolean {
+    if (!wallet.isWalletConnected) {
+      throw new Error('please connect to a compatible wallet');
+    }
+
+    if (Array.isArray(this.compatibleWallets)) {
+      if (!this.compatibleWallets.includes(wallet.walletType)) {
+        throw new Error('please connect to a compatible wallet');
+      }
+    }
+
     const { amount, denom } = params;
 
     return Boolean(Number(amount) > 0 && denom.length > 0);
