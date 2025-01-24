@@ -14,6 +14,7 @@ export interface MessageParam {
   type: string;
   description: string;
   required: boolean;
+  enum?: string[];
 }
 
 export interface CosmosMsg<T> {
