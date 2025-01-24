@@ -1,7 +1,5 @@
-import { describe, expect, beforeEach, getWalletId } from './fixtures';
+import { describe, expect } from './fixtures';
 import { Chat } from './Chat';
-import { MetaMask } from './Metamask';
-import { EvmWalletID } from './Wallet';
 //  todo - eventually import test from fixtures when integrated with metamask in CI/CD
 import test from '@playwright/test';
 
@@ -46,85 +44,85 @@ describe('chat', () => {
   });
 
   //  todo - integrate with CI/CD
-  describe.skip('wallet tests', () => {
-    let metaMask: MetaMask;
-
-    beforeEach(async ({ context, metaMaskExtensionId }, testInfo) => {
-      expect(metaMaskExtensionId).toBeDefined();
-
-      const walletId = getWalletId(
-        [EvmWalletID.CHAT_TESTING_ACCOUNT_A],
-        testInfo.retry,
-      );
-
-      metaMask = await MetaMask.prepareWallet(
-        context,
-        metaMaskExtensionId,
-        walletId,
-        true,
-      );
-    });
-
-    test('check balances', async ({ page, context }) => {
-      test.setTimeout(90 * 1000);
-
-      const chat = new Chat(page);
-      await chat.goto();
-
-      await metaMask.switchNetwork();
-
-      //  be ready to find the upcoming popup
-      const metamaskPopupPromise = context.waitForEvent('page');
-      await chat.submitMessage('What are my balances');
-
-      await chat.waitForStreamToFinish();
-
-      const metamaskPopup = await metamaskPopupPromise;
-      await metamaskPopup.waitForLoadState();
-      await metamaskPopup.getByTestId('confirm-btn').click();
-
-      await chat.waitForStreamToFinish();
-      await chat.waitForAssistantResponse();
-
-      const messages = await chat.getMessageElementsWithContent();
-      const responseText = await messages[messages.length - 1].innerText();
-
-      //  Verify that the connected wallet has some KAVA balance
-      const kavaMatch = responseText.match(/KAVA: ([\d.]+)/);
-      expect(kavaMatch).toBeTruthy();
-      const kavaBalance = Number(kavaMatch[1]);
-      expect(kavaBalance).toBeGreaterThan(0);
-    });
-
-    test('send tx', async ({ page, context }) => {
-      test.setTimeout(90 * 1000);
-
-      const chat = new Chat(page);
-      await chat.goto();
-
-      await metaMask.switchNetwork();
-
-      //  be ready to find the upcoming popup
-      const metamaskPopupPromise = context.waitForEvent('page');
-
-      await chat.submitMessage(
-        'Send 0.0000001 KAVA to 0xC07918E451Ab77023a16Fa7515Dd60433A3c771D',
-      );
-
-      await chat.waitForStreamToFinish();
-
-      //  Confirm the tx
-      await chat.submitMessage('Yes');
-
-      //  In progress
-      await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
-
-      const metamaskPopup = await metamaskPopupPromise;
-      await metamaskPopup.getByRole('button', { name: 'Connect' }).click();
-      await metamaskPopup.getByRole('button', { name: 'Confirm' }).click();
-
-      //  Completed
-      await expect(page.getByTestId('complete-tx-display')).toBeVisible();
-    });
-  });
+  // describe('wallet tests', () => {
+  //   let metaMask: MetaMask;
+  //
+  //   beforeEach(async ({ context, metaMaskExtensionId }, testInfo) => {
+  //     expect(metaMaskExtensionId).toBeDefined();
+  //
+  //     const walletId = getWalletId(
+  //       [EvmWalletID.CHAT_TESTING_ACCOUNT_A],
+  //       testInfo.retry,
+  //     );
+  //
+  //     metaMask = await MetaMask.prepareWallet(
+  //       context,
+  //       metaMaskExtensionId,
+  //       walletId,
+  //       true,
+  //     );
+  //   });
+  //
+  //   test('check balances', async ({ page, context }) => {
+  //     test.setTimeout(90 * 1000);
+  //
+  //     const chat = new Chat(page);
+  //     await chat.goto();
+  //
+  //     await metaMask.switchNetwork();
+  //
+  //     //  be ready to find the upcoming popup
+  //     const metamaskPopupPromise = context.waitForEvent('page');
+  //     await chat.submitMessage('What are my balances');
+  //
+  //     await chat.waitForStreamToFinish();
+  //
+  //     const metamaskPopup = await metamaskPopupPromise;
+  //     await metamaskPopup.waitForLoadState();
+  //     await metamaskPopup.getByTestId('confirm-btn').click();
+  //
+  //     await chat.waitForStreamToFinish();
+  //     await chat.waitForAssistantResponse();
+  //
+  //     const messages = await chat.getMessageElementsWithContent();
+  //     const responseText = await messages[messages.length - 1].innerText();
+  //
+  //     //  Verify that the connected wallet has some KAVA balance
+  //     const kavaMatch = responseText.match(/KAVA: ([\d.]+)/);
+  //     expect(kavaMatch).toBeTruthy();
+  //     const kavaBalance = Number(kavaMatch[1]);
+  //     expect(kavaBalance).toBeGreaterThan(0);
+  //   });
+  //
+  //   test('send tx', async ({ page, context }) => {
+  //     test.setTimeout(90 * 1000);
+  //
+  //     const chat = new Chat(page);
+  //     await chat.goto();
+  //
+  //     await metaMask.switchNetwork();
+  //
+  //     //  be ready to find the upcoming popup
+  //     const metamaskPopupPromise = context.waitForEvent('page');
+  //
+  //     await chat.submitMessage(
+  //       'Send 0.0000001 KAVA to 0xC07918E451Ab77023a16Fa7515Dd60433A3c771D',
+  //     );
+  //
+  //     await chat.waitForStreamToFinish();
+  //
+  //     //  Confirm the tx
+  //     await chat.submitMessage('Yes');
+  //
+  //     //  In progress
+  //     await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
+  //
+  //     const metamaskPopup = await metamaskPopupPromise;
+  //     await metamaskPopup.getByRole('button', { name: 'Connect' }).click();
+  //     await metamaskPopup.getByRole('button', { name: 'Confirm' }).click();
+  //
+  //     //  Completed
+  //     await expect(page.getByTestId('complete-tx-display')).toBeVisible();
+  //   });
+  // });
 });
