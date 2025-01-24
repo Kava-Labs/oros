@@ -1,7 +1,9 @@
+import styles from '../components/TxDisplay.module.css';
+
 export const ExternalLinkIcon = () => {
   return (
     <svg
-      className="external-link-icon"
+      className={styles.externalLinkIcon}
       width="16"
       height="16"
       viewBox="0 0 24 24"

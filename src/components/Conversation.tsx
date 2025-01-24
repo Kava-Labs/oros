@@ -6,6 +6,7 @@ import { memo } from 'react';
 import { useTheme } from '../theme/useTheme';
 import { useAppContext } from '../context/useAppContext';
 import { ToolCallProgressCards } from './ToolCallProgressCards';
+import { CompleteTxDisplay } from './CompleteTxDisplay';
 
 export interface ConversationProps {
   messages: ChatCompletionMessageParam[];
@@ -49,9 +50,33 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
           );
         }
 
-        // if (message.role === 'tool') {
+        if (message.role === 'tool') {
+          const id = message.tool_call_id;
+          const prevMsg = messages[index - 1];
+          if (
+            !(
+              prevMsg.role === 'assistant' &&
+              prevMsg.content === null &&
+              Array.isArray(prevMsg.tool_calls)
+            )
+          ) {
+            return null;
+          }
 
-        // }
+          const tc = prevMsg.tool_calls.find((tc) => tc.id === id);
+          if (!tc) return null;
+          if (tc.function.name !== 'evm-transfer') {
+            return null;
+          }
+
+          let hash = message.content as string;
+
+          return (
+            <div key={index} className={styles.left}>
+              <CompleteTxDisplay key={index} hash={hash} />
+            </div>
+          );
+        }
 
         return null;
       })}
