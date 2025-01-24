@@ -24,11 +24,13 @@ export interface ChainOperation<T> {
   /** List of parameters this operation accepts */
   parameters: MessageParam[];
 
-  needsWallet?: WalletTypes[];
-  
-  /* when set to true, the operation will attempt to switch the wallet network to the chainID this operation expects */ 
-  walletMustMatchChainID?: boolean;
+  /** Identifies this as a transaction operation */
+  operationType: OperationType;
 
+  needsWallet?: WalletTypes[];
+
+  /* when set to true, the operation will attempt to switch the wallet network to the chainID this operation expects */
+  walletMustMatchChainID?: boolean;
 
   /** Validates the provided parameters match requirements */
   validate(params: T, walletStore: WalletStore): boolean;
@@ -42,8 +44,6 @@ export interface ChainOperation<T> {
  * Extends ChainOperation to add transaction-specific functionality.
  */
 export interface ChainMessage<T> extends ChainOperation<T> {
-  /** Identifies this as a transaction operation */
-  operationType: OperationType;
   /** Builds the transaction object from the provided parameters */
   buildTransaction(params: T, walletStore: WalletStore): Promise<string>;
 }
@@ -53,8 +53,11 @@ export interface ChainMessage<T> extends ChainOperation<T> {
  * Extends ChainOperation to add query-specific functionality.
  */
 export interface ChainQuery<T> extends ChainOperation<T> {
-  /** Identifies this as a query operation */
-  operationType: OperationType;
   /** Executes the query with the provided parameters */
   executeQuery(params: T, walletStore: WalletStore): Promise<string>;
 }
+
+export type OperationResult = {
+  status: 'ok' | 'failed';
+  info: string;
+};
