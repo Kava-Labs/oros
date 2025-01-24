@@ -45,7 +45,8 @@ describe('chat', () => {
     expect(responseText).toMatch(/THIS IS A TEST/i);
   });
 
-  describe('wallet tests', () => {
+  //  todo - integrate with CI/CD
+  describe.skip('wallet tests', () => {
     let metaMask: MetaMask;
 
     beforeEach(async ({ context, metaMaskExtensionId }, testInfo) => {
@@ -64,8 +65,7 @@ describe('chat', () => {
       );
     });
 
-    //  todo - integrate with CI/CD
-    test.skip('check balances', async ({ page, context }) => {
+    test('check balances', async ({ page, context }) => {
       test.setTimeout(90 * 1000);
 
       const chat = new Chat(page);
@@ -96,7 +96,7 @@ describe('chat', () => {
       expect(kavaBalance).toBeGreaterThan(0);
     });
 
-    test.skip('send tx', async ({ page, context }) => {
+    test('send tx', async ({ page, context }) => {
       test.setTimeout(90 * 1000);
 
       const chat = new Chat(page);
