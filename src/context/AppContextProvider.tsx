@@ -113,6 +113,7 @@ export const AppContextProvider = ({
       // if the chain id in metamask doesn't match the chain id we need to be on
       // start the network switching process
       if (
+        operation.walletMustMatchChainID &&
         walletStore.getSnapshot().walletType === WalletTypes.METAMASK &&
         walletStore.getSnapshot().walletChainId !== chainId
       ) {

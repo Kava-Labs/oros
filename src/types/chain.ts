@@ -25,6 +25,10 @@ export interface ChainOperation<T> {
   parameters: MessageParam[];
 
   needsWallet?: WalletTypes[];
+  
+  /* when set to true, the operation will attempt to switch the wallet network to the chainID this operation expects */ 
+  walletMustMatchChainID?: boolean;
+
 
   /** Validates the provided parameters match requirements */
   validate(params: T, walletStore: WalletStore): boolean;

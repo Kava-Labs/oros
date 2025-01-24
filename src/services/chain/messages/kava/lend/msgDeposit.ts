@@ -20,6 +20,7 @@ export class LendDepositMessage implements ChainMessage<LendToolParams> {
   description = 'Deposit tokens from an address into a Lend money market';
   chainType = ChainType.COSMOS;
   operationType = OperationType.TRANSACTION;
+  walletMustMatchChainID = true;
 
   needsWallet = [WalletTypes.METAMASK];
 

@@ -19,6 +19,7 @@ export class EvmBalancesQuery implements ChainQuery<EvmBalanceQueryParams> {
   operationType = OperationType.QUERY;
   chainType = ChainType.EVM;
 
+  walletMustMatchChainID = false;
   needsWallet = [WalletTypes.METAMASK];
 
   validate(params: EvmBalanceQueryParams, walletStore: WalletStore): boolean {
