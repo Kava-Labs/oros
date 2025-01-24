@@ -11,6 +11,7 @@ import {
   chainNameToolCallParam,
   chainRegistry,
 } from '../config/chainsRegistry';
+import { OperationType } from '../types/chain';
 
 export interface ConversationProps {
   messages: ChatCompletionMessageParam[];
@@ -79,11 +80,22 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
             const chainName = params[chainNameToolCallParam.name];
             const operation = registry.get(tc.function.name);
             if (!operation) return null;
+            if (operation.operationType !== OperationType.TRANSACTION)
+              return null;
 
             const chain = chainRegistry[operation.chainType][chainName];
-            const hash = message.content as string;
+            const content = JSON.parse(message.content as string);
+            if (content.status !== 'ok') {
+              return null;
+            }
 
-            return <CompleteTxDisplay key={index} hash={hash} chain={chain} />;
+            return (
+              <CompleteTxDisplay
+                key={index}
+                hash={content.info}
+                chain={chain}
+              />
+            );
           }
 
           return null;

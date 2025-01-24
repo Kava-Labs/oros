@@ -287,9 +287,19 @@ async function callTools(
     if (name) {
       let content = '';
       try {
-        content = await executeOperation(name, toolCall.function.arguments);
+        const result = await executeOperation(
+          name,
+          toolCall.function.arguments,
+        );
+        content = JSON.stringify({
+          status: 'ok',
+          info: result,
+        });
       } catch (err) {
-        content = JSON.stringify(err);
+        content = JSON.stringify({
+          status: 'fail',
+          info: err,
+        });
       }
 
       messageHistoryStore.addMessage({
