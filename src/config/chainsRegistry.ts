@@ -20,12 +20,13 @@ export type ChainRegistry = Record<
 
 export enum ChainNames {
   KAVA_EVM = 'kavaEVM',
+  ETH = 'eth',
 }
 
 export const chainRegistry: ChainRegistry = {
   [ChainType.EVM]: {
     [ChainNames.KAVA_EVM]: {
-      name: 'kavaEVM',
+      name: ChainNames.KAVA_EVM,
       rpcUrls: ['https://evm.kava-rpc.com'],
       chainID: 2222,
       nativeToken: 'KAVA',
@@ -92,6 +93,27 @@ export const chainRegistry: ChainRegistry = {
           contractAddress: '0x59889b7021243dB5B1e065385F918316cD90D46c',
           displayName: 'mBTC',
         },
+      },
+    },
+    [ChainNames.ETH]: {
+      name: ChainNames.ETH,
+      chainID: 1,
+      nativeToken: 'ETH',
+      nativeTokenDecimals: 18,
+      rpcUrls: ['https://eth.drpc.org'],
+      erc20Contracts: {
+        // USDT: {
+        //   contractAddress: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+        //   displayName: 'USD₮',
+        // },
+        // USDC: {
+        //   contractAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+        //   displayName: 'USDC',
+        // },
+        // DAI: {
+        //   contractAddress: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+        //   displayName: 'DAI',
+        // }
       },
     },
   },
