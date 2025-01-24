@@ -68,6 +68,10 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
       }
     }
 
+    if (!chainRegistry[params.chainName]) {
+      throw new Error(`unknown chain name ${params.chainName}`);
+    }
+
     const { toAddress, amount, denom } = params;
 
     const { masksToValues } = getStoredMasks();
