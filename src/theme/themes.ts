@@ -1,5 +1,4 @@
 import OrosLogo from '../../src/assets/orosLogo.svg';
-import HardDotFunLogo from '../../src/assets/hardDotFunDiamond.svg';
 
 export interface ThemeColors {
   bgPrimary: string;
@@ -86,33 +85,10 @@ export const baseTheme: Theme = {
   logo: OrosLogo,
 };
 
-// Theme for hardDotFun, extending the base theme
-export const hardDotFunTheme: Theme = {
-  ...baseTheme,
-  colors: {
-    ...baseTheme.colors,
-    accent: 'rgb(247, 73, 40)',
-    accentTransparent: 'rgba(247, 73, 40, 0.75)',
-    accentBorder: 'rgba(247, 73, 40, 0.2)',
-  },
-  logo: HardDotFunLogo,
-};
-
-// Theme for kavaWebapp, extending the base theme
-export const kavaWebappTheme: Theme = {
-  ...baseTheme,
-  colors: {
-    ...baseTheme.colors,
-    accent: '#0070f3',
-    accentTransparent: 'rgba(0, 112, 243, 0.75)',
-    accentBorder: 'rgba(0, 112, 243, 0.2)',
-  },
-};
-
-// Export all themes
+/** This allows for simple config overrides if we want to build a quick
+ *  reskin theme or allow multiple theme options in the future
+ */
 export const themes = {
-  hardDotFun: hardDotFunTheme,
-  kavaWebapp: kavaWebappTheme,
   base: baseTheme,
 };
 

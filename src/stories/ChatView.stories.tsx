@@ -1,11 +1,21 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
-import { ChatView, ChatViewProps } from '../ChatView';
+import { ChatView, ChatViewProps } from '../components/ChatView';
 import { mockChatMessages } from '../mockdata';
-import { memeCoinGenIntroText } from '../config';
+import { defaultIntroText } from '../config';
 import type { Decorator } from '@storybook/react';
 import { ThemeProvider } from '../theme/themeProvider';
-import { AppContextProvider } from '../AppContext';
+import { AppContextProvider } from '../context/AppContextProvider';
+import { TextStreamStore } from './../textStreamStore';
+import { ToolCallStreamStore } from './../toolCallStreamStore';
+import { MessageHistoryStore } from './../messageHistoryStore';
+import { WalletStore } from './../walletStore';
+
+export const messageStore = new TextStreamStore();
+export const progressStore = new TextStreamStore();
+export const toolCallStreamStore = new ToolCallStreamStore();
+export const messageHistoryStore = new MessageHistoryStore();
+export const walletStore = new WalletStore();
 
 const withProviders =
   (
@@ -17,7 +27,13 @@ const withProviders =
   ): Decorator =>
   (Story) => (
     <ThemeProvider>
-      <AppContextProvider>
+      <AppContextProvider
+        progressStore={progressStore}
+        messageStore={messageStore}
+        toolCallStreamStore={toolCallStreamStore}
+        walletStore={walletStore}
+        messageHistoryStore={messageHistoryStore}
+      >
         <Story />
       </AppContextProvider>
     </ThemeProvider>
@@ -46,10 +62,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const args: ChatViewProps = {
-  introText: memeCoinGenIntroText,
+  introText: defaultIntroText,
   messages: mockChatMessages,
-  address: '',
-  chainID: '',
   onSubmit: fn(),
   onReset: fn(),
   onCancel: fn(),

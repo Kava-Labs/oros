@@ -1,19 +1,7 @@
-import {
-  useRef,
-  useState,
-  useEffect,
-  useCallback,
-  useSyncExternalStore,
-} from 'react';
-import { ChatView } from './ChatView';
+import { useRef, useEffect, useCallback, useSyncExternalStore } from 'react';
+import { ChatView } from './components/ChatView';
 import { getToken } from './utils/token/token';
 import OpenAI from 'openai';
-import {
-  messageHistoryStore,
-  messageStore,
-  progressStore,
-  toolCallStreamStore,
-} from './store';
 import type { ChatCompletionTool } from 'openai/resources/index';
 import {
   isContentChunk,
@@ -22,19 +10,15 @@ import {
 } from './streamUtils';
 import { TextStreamStore } from './textStreamStore';
 import {
-  memeCoinSystemPrompt,
-  memeCoinGenIntroText,
-  memeCoinGenWarningText,
-} from './config/prompts/systemPrompt';
-import { memeCoinTools } from './config/tools';
-import { imagedb } from './imagedb';
-import { v4 as uuidv4 } from 'uuid';
-import { ToolCallStream, ToolCallStreamStore } from './toolCallStreamStore';
-import { ToolFunctions, type GenerateCoinMetadataParams } from './tools/types';
-import type { AnyIFrameMessage } from './types';
+  defaultSystemPrompt,
+  defaultIntroText,
+  defaultCautionText,
+} from './config/prompts/defaultPrompts';
+import { ToolCallStreamStore } from './toolCallStreamStore';
 import { MessageHistoryStore } from './messageHistoryStore';
-import { getStoredMasks } from './utils/chat/helpers';
-import { useAppContext } from './AppContext';
+import { useAppContext } from './context/useAppContext';
+import { ExecuteOperation } from './context/AppContext';
+import { OperationResult } from './types/chain';
 
 let client: OpenAI | null = null;
 
@@ -49,21 +33,31 @@ if (import.meta.env['MODE'] === 'development') {
 }
 
 export const App = () => {
-  const { setErrorText, isReady, setIsReady, isRequesting, setIsRequesting } =
-    useAppContext();
+  const {
+    setErrorText,
+    isReady,
+    setIsReady,
+    isRequesting,
+    setIsRequesting,
+    getOpenAITools,
+    executeOperation,
+    walletStore,
+    messageHistoryStore,
+    toolCallStreamStore,
+    progressStore,
+    messageStore,
+  } = useAppContext();
 
-  const [{ tools, systemPrompt, introText, cautionText }, setConfig] = useState(
-    {
-      introText: memeCoinGenIntroText,
-      systemPrompt: memeCoinSystemPrompt,
-      tools: memeCoinTools,
-      cautionText: memeCoinGenWarningText,
-    },
+  const { walletAddress, walletType, walletChainId } = useSyncExternalStore(
+    walletStore.subscribe,
+    walletStore.getSnapshot,
   );
 
-  const [wallet, setWallet] = useState({
-    address: '',
-    chainID: '',
+  console.log({
+    walletAddress,
+    walletChainId,
+    walletType,
+    tools: getOpenAITools(),
   });
 
   // TODO: check healthcheck and set error if backend is not availiable
@@ -82,119 +76,6 @@ export const App = () => {
     setIsReady(true);
   }, [setIsReady]);
 
-  useEffect(() => {
-    const parentMessageHandler = (event: MessageEvent<AnyIFrameMessage>) => {
-      // Handle the message
-      if (event.data && event.data.namespace === 'KAVA_CHAT') {
-        console.info('event received from parent: ', event);
-        switch (event.data.type) {
-          case 'WALLET_CONNECTION/V1': {
-            console.info('WALLET_CONNECTION/V1', event.data);
-            setWallet({
-              address: event.data.payload.address,
-              chainID: event.data.payload.chainID,
-            });
-            break;
-          }
-          case 'SET_SYSTEM_PROMPT/V1': {
-            console.info('SET_SYSTEM_PROMPT/V1', event.data);
-            const systemPrompt = event.data.payload.systemPrompt;
-            setConfig((prev) => ({ ...prev, systemPrompt }));
-            break;
-          }
-          case 'SET_TOOLS/V1': {
-            console.info('SET_TOOLS/V1', event.data);
-            const tools = event.data.payload.tools;
-            setConfig((prev) => ({ ...prev, tools }));
-            break;
-          }
-          case `SET_INTRO_TEXT/V1`: {
-            console.info('SET_INTRO_TEXT/V1', event.data);
-            const introText = event.data.payload.introText;
-            setConfig((prev) => ({ ...prev, introText }));
-            break;
-          }
-          case `SET_CAUTION_TEXT/V1`: {
-            console.info('SET_CAUTION_TEXT/V1', event.data);
-            const cautionText = event.data.payload.cautionText;
-            setConfig((prev) => ({ ...prev, cautionText }));
-            break;
-          }
-
-          case 'SET_PROGRESS_TEXT/V1': {
-            console.info('SET_PROGRESS_TEXT/V1', event.data);
-            progressStore.setText(event.data.payload.text);
-            break;
-          }
-
-          case `TOOL_CALL_RESPONSE/V1`: {
-            console.info(`TOOL_CALL_RESPONSE/V1`, event.data);
-            const toolCall = event.data.payload.toolCall;
-            const content = event.data.payload.content;
-
-            messageHistoryStore.addMessage({
-              role: 'assistant' as const,
-              function_call: null,
-              content: null,
-              tool_calls: [
-                toolCallStreamStore.toChatCompletionMessageToolCall(toolCall),
-              ],
-            });
-            toolCallStreamStore.deleteToolCallById(toolCall.id);
-            messageHistoryStore.addMessage({
-              role: 'tool' as const,
-              tool_call_id: toolCall.id,
-              content,
-            });
-
-            controllerRef.current = new AbortController();
-            setIsRequesting(true);
-            setErrorText('');
-            // once the tool call response is received from the dapp
-            // call doChat to inform the model
-            doChat(
-              controllerRef.current,
-              client!,
-              messageHistoryStore,
-              tools,
-              progressStore,
-              messageStore,
-            )
-              .catch((error) => {
-                const errorMessage =
-                  typeof error === 'object' &&
-                  error !== null &&
-                  'message' in error
-                    ? (error as { message: string }).message
-                    : 'An error occurred - please try again';
-
-                setErrorText(errorMessage);
-              })
-              .finally(() => {
-                controllerRef.current = null;
-                setIsRequesting(false);
-              });
-
-            break;
-          }
-          default:
-            console.warn('unknown event type', event.type);
-            break;
-        }
-      }
-    };
-
-    // register parentMessageHandler when inside iFrame
-    if (window.top !== window.self) {
-      window.addEventListener('message', parentMessageHandler);
-    }
-    return () => {
-      if (window.top !== window.self) {
-        window.removeEventListener('message', parentMessageHandler);
-      }
-    };
-  }, [setErrorText, setIsRequesting, tools]);
-
   const messages = useSyncExternalStore(
     messageHistoryStore.subscribe,
     messageHistoryStore.getSnapshot,
@@ -203,21 +84,10 @@ export const App = () => {
     if (!messageHistoryStore.getSnapshot().length) {
       messageHistoryStore.addMessage({
         role: 'system' as const,
-        content: systemPrompt,
+        content: defaultSystemPrompt,
       });
     }
-    // we only want this to run once, so don't include [systemPrompt]
-    // eslint-disable-next-line
-  }, []);
-
-  // update system prompt, when it changes
-  useEffect(() => {
-    const remainingMsgs = messageHistoryStore.getSnapshot().slice(1);
-    messageHistoryStore.setMessages([
-      { role: 'system', content: systemPrompt },
-      ...remainingMsgs,
-    ]);
-  }, [systemPrompt]);
+  }, [messageHistoryStore]);
 
   // abort controller for cancelling openai request
   const controllerRef = useRef<AbortController | null>(null);
@@ -254,9 +124,11 @@ export const App = () => {
           controller,
           client,
           messageHistoryStore,
-          tools,
+          getOpenAITools(),
           progressStore,
           messageStore,
+          toolCallStreamStore,
+          executeOperation,
         );
       } catch (error) {
         let errorMessage =
@@ -275,7 +147,17 @@ export const App = () => {
         controllerRef.current = null;
       }
     },
-    [isRequesting, setErrorText, setIsRequesting, tools],
+    [
+      isRequesting,
+      setErrorText,
+      setIsRequesting,
+      executeOperation,
+      getOpenAITools,
+      messageHistoryStore,
+      progressStore,
+      toolCallStreamStore,
+      messageStore,
+    ],
   );
 
   const handleCancel = useCallback(() => {
@@ -284,23 +166,21 @@ export const App = () => {
       controllerRef.current = null;
       toolCallStreamStore.clear();
     }
-  }, []);
+  }, [toolCallStreamStore]);
 
   const handleReset = useCallback(() => {
     handleCancel();
     messageHistoryStore.setMessages([
-      { role: 'system' as const, content: systemPrompt },
+      { role: 'system' as const, content: defaultSystemPrompt },
     ]);
-  }, [handleCancel, systemPrompt]);
+  }, [handleCancel, messageHistoryStore]);
 
   return (
     <>
       {isReady && (
         <ChatView
-          introText={introText}
-          cautionText={cautionText}
-          address={wallet.address}
-          chainID={wallet.chainID}
+          introText={defaultIntroText}
+          cautionText={defaultCautionText}
           messages={messages}
           onSubmit={handleChatCompletion}
           onReset={handleReset}
@@ -318,6 +198,8 @@ async function doChat(
   tools: ChatCompletionTool[],
   progressStore: TextStreamStore,
   messageStore: TextStreamStore,
+  toolCallStreamStore: ToolCallStreamStore,
+  executeOperation: ExecuteOperation,
 ) {
   progressStore.setText('Thinking');
   try {
@@ -334,11 +216,11 @@ async function doChat(
     );
 
     for await (const chunk of stream) {
-      if (isContentChunk(chunk)) {
-        if (progressStore.getSnapshot() !== '') {
-          progressStore.setText('');
-        }
+      if (progressStore.getSnapshot() !== '') {
+        progressStore.setText('');
+      }
 
+      if (isContentChunk(chunk)) {
         messageStore.appendText(chunk.choices[0].delta.content as string);
       } else if (isToolCallChunk(chunk)) {
         assembleToolCallsFromStream(chunk, toolCallStreamStore);
@@ -356,36 +238,24 @@ async function doChat(
     }
 
     if (toolCallStreamStore.getSnapShot().length > 0) {
-      const hasMemeCoinGenToolCall =
-        toolCallStreamStore
-          .getSnapShot()
-          .find(
-            (tc) => tc.function.name === ToolFunctions.GENERATE_COIN_METADATA,
-          ) !== undefined;
-
+      // do the tool calls
       await callTools(
+        toolCallStreamStore,
+        messageHistoryStore,
+        executeOperation,
+      );
+
+      // inform the model of the tool call responses
+      await doChat(
         controller,
         client,
         messageHistoryStore,
-        toolCallStreamStore,
+        tools,
         progressStore,
+        messageStore,
+        toolCallStreamStore,
+        executeOperation,
       );
-
-      // only call doChat for meme coin generation
-      // dapps will send the TOOL_CALL_RESPONSE/V1 event
-      // which is when we can call doChat
-      // calling doChat here for anything other than a memecoin gen will result
-      // in an infinite loop of requests
-      if (hasMemeCoinGenToolCall) {
-        await doChat(
-          controller,
-          client,
-          messageHistoryStore,
-          tools,
-          progressStore,
-          messageStore,
-        );
-      }
     }
   } catch (e) {
     console.error(`An error occurred: ${e} `);
@@ -408,97 +278,45 @@ async function doChat(
 }
 
 async function callTools(
-  controller: AbortController,
-  client: OpenAI,
-  messageHistoryStore: MessageHistoryStore,
   toolCallStreamStore: ToolCallStreamStore,
-  progressStore: TextStreamStore,
+  messageHistoryStore: MessageHistoryStore,
+  executeOperation: ExecuteOperation,
 ): Promise<void> {
-  const isInIframe = window !== window.parent;
   for (const toolCall of toolCallStreamStore.getSnapShot()) {
     const name = toolCall.function?.name;
-    const { masksToValues } = getStoredMasks();
 
-    let payload: {
-      toolCall: Readonly<ToolCallStream>;
-      masksToValues?: Record<string, string>;
-    } = {
-      toolCall,
-    };
-
-    //  send along the masksToValues only if entries exist
-    if (Object.keys(masksToValues).length > 0) {
-      payload = {
-        ...payload,
-        masksToValues,
-      };
-    }
-
-    if (isInIframe) {
-      window.parent.postMessage(
-        {
-          type: 'TOOL_CALL',
-          payload,
-        },
-        '*',
-      );
-    }
-
-    switch (name) {
-      case ToolFunctions.GENERATE_COIN_METADATA: {
-        const args = toolCall.function.arguments as GenerateCoinMetadataParams;
-        const response = client.images.generate(
-          {
-            model: IMAGE_GEN_MODEL,
-            prompt: args['prompt'],
-            quality: 'hd',
-            response_format: 'b64_json',
-          },
-          {
-            signal: controller.signal,
-          },
+    if (name) {
+      let content = '';
+      try {
+        const result = await executeOperation(
+          name,
+          toolCall.function.arguments,
         );
-        const imageId = uuidv4();
-        imagedb.set(
-          imageId,
-          (async () => {
-            const image = await response;
-
-            return `data:image/png;base64,${image.data[0].b64_json!}`;
-          })(),
-        );
-
-        messageHistoryStore.addMessage({
-          role: 'assistant' as const,
-          function_call: null,
-          content: null,
-          tool_calls: [
-            toolCallStreamStore.toChatCompletionMessageToolCall(toolCall),
-          ],
-        });
-
-        toolCallStreamStore.deleteToolCallById(toolCall.id);
-
-        messageHistoryStore.addMessage({
-          role: 'tool' as const,
-          tool_call_id: toolCall.id!,
-          content: JSON.stringify({
-            id: imageId,
-            name: args['name'],
-            about: args['about'],
-            symbol: args['symbol'],
-          }),
-        });
-
-        progressStore.setText('Generating Image');
-        await imagedb.get(imageId);
-
-        break;
+        content = JSON.stringify({
+          status: 'ok',
+          info: result,
+        } as OperationResult);
+      } catch (err) {
+        content = JSON.stringify({
+          status: 'failed',
+          info: err,
+        } as OperationResult);
       }
-      default:
-        console.warn(`unknown tool call: ${name}`);
-        // throw new Error(`unknown tool call: ${name}`);
-        break;
+
+      messageHistoryStore.addMessage({
+        role: 'assistant' as const,
+        function_call: null,
+        content: null,
+        tool_calls: [
+          toolCallStreamStore.toChatCompletionMessageToolCall(toolCall),
+        ],
+      });
+      toolCallStreamStore.deleteToolCallById(toolCall.id);
+      messageHistoryStore.addMessage({
+        role: 'tool' as const,
+        tool_call_id: toolCall.id,
+        content,
+      });
     }
   }
 }
