@@ -1,7 +1,6 @@
 import { ChainQuery, ChainType, OperationType } from '../../../../types/chain';
 import { ethers } from 'ethers';
 import { erc20ABI } from '../../../../tools/erc20ABI';
-import { } from '../../../../config/evm';
 import { QueryInProgress } from '../../../../components/QueryInProgress';
 import { WalletStore, WalletTypes } from '../../../../walletStore';
 import {

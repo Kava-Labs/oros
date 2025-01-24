@@ -1,5 +1,4 @@
 import { ethers } from 'ethers';
-import { ASSET_ADDRESSES, kavaEVMProvider } from '../../../../config/evm';
 import { erc20ABI } from '../../../../tools/erc20ABI';
 import { getStoredMasks, isNativeAsset } from '../../../../utils/chat/helpers';
 import { TransactionDisplay } from '../../../../components/TransactionDisplay';
@@ -13,8 +12,13 @@ import {
   WalletStore,
   WalletTypes,
 } from '../../../../walletStore';
+import {
+  chainNameToolCallParam,
+  chainRegistry,
+} from '../../../../config/chainsRegistry';
 
 interface SendToolParams {
+  chainName: string;
   toAddress: string;
   amount: string;
   denom: string;
@@ -28,6 +32,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
   needsWallet = [WalletTypes.METAMASK];
 
   parameters = [
+    chainNameToolCallParam,
     {
       name: 'toAddress',
       type: 'string',
@@ -58,9 +63,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
     }
 
     if (Array.isArray(this.needsWallet)) {
-      if (
-        !this.needsWallet.includes(walletStore.getSnapshot().walletType)
-      ) {
+      if (!this.needsWallet.includes(walletStore.getSnapshot().walletType)) {
         throw new Error('please connect to a compatible wallet');
       }
     }
@@ -71,8 +74,10 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
 
     const validToAddress = masksToValues[toAddress] ?? '';
 
+    const { erc20Contracts } = chainRegistry[params.chainName];
+
     const validDenomWithContract =
-      denom.toUpperCase() in ASSET_ADDRESSES || isNativeAsset(denom);
+      denom.toUpperCase() in erc20Contracts || isNativeAsset(denom);
 
     return Boolean(
       validToAddress.length > 0 &&
@@ -87,6 +92,9 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
     walletStore: WalletStore,
   ): Promise<string> {
     const { toAddress, amount, denom } = params;
+
+    const { erc20Contracts, evmRpcUrl } = chainRegistry[params.chainName];
+    const rpcProvider = new ethers.JsonRpcProvider(evmRpcUrl);
 
     try {
       let txParams: Record<string, string>;
@@ -108,12 +116,12 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
         };
       } else {
         const contractAddress =
-          ASSET_ADDRESSES[denom.toUpperCase()].contractAddress;
+          erc20Contracts[denom.toUpperCase()].contractAddress;
 
         const contract = new ethers.Contract(
           contractAddress,
           erc20ABI,
-          kavaEVMProvider,
+          rpcProvider,
         );
         const decimals = await contract.decimals();
         const formattedTxAmount = ethers.parseUnits(amount, Number(decimals));
