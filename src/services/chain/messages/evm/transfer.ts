@@ -30,6 +30,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
   operationType = OperationType.TRANSACTION;
   chainType = ChainType.EVM;
   needsWallet = [WalletTypes.METAMASK];
+  walletMustMatchChainID = true;
 
   parameters = [
     chainNameToolCallParam,
