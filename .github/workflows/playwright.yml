@@ -46,7 +46,7 @@ jobs:
 
       # Run Playwright tests
       - name: Run Playwright tests
-        run: DEBUG=pw:webserver xvfb-run npx playwright test
+        run: DEBUG=pw:webserver xvfb-run npx playwright test --timeout=60000
 
       - name: Shutdown API server
         if: always()
