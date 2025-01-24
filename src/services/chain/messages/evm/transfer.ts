@@ -150,7 +150,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
         };
       }
 
-      return walletStore.sign({
+      const hash = await walletStore.sign({
         chainId: `0x${Number(2222).toString(16)}`,
         signatureType: SignatureTypes.EVM,
         payload: {
@@ -165,6 +165,16 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
           ],
         },
       });
+
+      try {
+        const timeout = 20000; // upto 20 seconds
+        const confirmations = 1;
+        await rpcProvider.waitForTransaction(hash, confirmations, timeout);
+      } catch (err) {
+        console.error(err);
+      }
+
+      return hash;
     } catch (e) {
       throw `An error occurred building the transaction: ${JSON.stringify(e)}`;
     }
