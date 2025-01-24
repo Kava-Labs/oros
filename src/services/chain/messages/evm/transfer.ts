@@ -68,7 +68,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
       }
     }
 
-    if (!chainRegistry[params.chainName]) {
+    if (!chainRegistry[this.chainType][params.chainName]) {
       throw new Error(`unknown chain name ${params.chainName}`);
     }
 
@@ -78,7 +78,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
 
     const validToAddress = masksToValues[toAddress] ?? '';
 
-    const { erc20Contracts } = chainRegistry[params.chainName];
+    const { erc20Contracts } = chainRegistry[this.chainType][params.chainName];
 
     const validDenomWithContract =
       denom.toUpperCase() in erc20Contracts || isNativeAsset(denom);
@@ -97,8 +97,9 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
   ): Promise<string> {
     const { toAddress, amount, denom } = params;
 
-    const { erc20Contracts, evmRpcUrl } = chainRegistry[params.chainName];
-    const rpcProvider = new ethers.JsonRpcProvider(evmRpcUrl);
+    const { erc20Contracts, rpcUrl } =
+      chainRegistry[this.chainType][params.chainName];
+    const rpcProvider = new ethers.JsonRpcProvider(rpcUrl);
 
     try {
       let txParams: Record<string, string>;

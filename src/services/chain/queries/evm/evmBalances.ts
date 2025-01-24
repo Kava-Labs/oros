@@ -32,7 +32,7 @@ export class EvmBalancesQuery implements ChainQuery<EvmBalanceQueryParams> {
       }
     }
 
-    if (!chainRegistry[_params.chainName]) {
+    if (!chainRegistry[this.chainType][_params.chainName]) {
       throw new Error(`unknown chain name ${_params.chainName}`);
     }
 
@@ -44,15 +44,13 @@ export class EvmBalancesQuery implements ChainQuery<EvmBalanceQueryParams> {
   }
 
   async executeQuery(
-    _params: EvmBalanceQueryParams,
+    params: EvmBalanceQueryParams,
     walletStore: WalletStore,
   ): Promise<string> {
-    console.log(_params);
 
-    const { evmRpcUrl, erc20Contracts } = chainRegistry[_params.chainName];
-    const rpcProvider = new ethers.JsonRpcProvider(evmRpcUrl);
-
-
+    const { rpcUrl, erc20Contracts } =
+      chainRegistry[this.chainType][params.chainName];
+    const rpcProvider = new ethers.JsonRpcProvider(rpcUrl);
 
     const address = walletStore.getSnapshot().walletAddress;
     const balanceCalls: (() => Promise<string>)[] = [];
