@@ -6,6 +6,11 @@ import { memo } from 'react';
 import { useTheme } from '../theme/useTheme';
 import { useAppContext } from '../context/useAppContext';
 import { ToolCallProgressCards } from './ToolCallProgressCards';
+import { CompleteTxDisplay } from './CompleteTxDisplay';
+import {
+  chainNameToolCallParam,
+  chainRegistry,
+} from '../config/chainsRegistry';
 
 export interface ConversationProps {
   messages: ChatCompletionMessageParam[];
@@ -18,7 +23,7 @@ const StreamingTextContent = (message: string, onRendered: () => void) => {
 
 const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
   const { logo } = useTheme();
-  const { errorText, isRequesting, progressStore, messageStore } =
+  const { errorText, isRequesting, progressStore, messageStore, registry } =
     useAppContext();
 
   return (
@@ -49,10 +54,40 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
           );
         }
 
-        // if (message.role === 'tool') {
+        if (message.role === 'tool') {
+          const id = message.tool_call_id;
+          const prevMsg = messages[index - 1];
+          if (
+            !(
+              prevMsg.role === 'assistant' &&
+              prevMsg.content === null &&
+              Array.isArray(prevMsg.tool_calls)
+            )
+          ) {
+            return null;
+          }
 
-        // }
+          const tc = prevMsg.tool_calls.find((tc) => tc.id === id);
+          if (!tc) return null;
 
+          const params = JSON.parse(tc.function.arguments);
+          if (
+            typeof params === 'object' &&
+            params !== null &&
+            chainNameToolCallParam.name in params
+          ) {
+            const chainName = params[chainNameToolCallParam.name];
+            const operation = registry.get(tc.function.name);
+            if (!operation) return null;
+
+            const chain = chainRegistry[operation.chainType][chainName];
+            const hash = message.content as string;
+
+            return <CompleteTxDisplay key={index} hash={hash} chain={chain} />;
+          }
+
+          return null;
+        }
         return null;
       })}
       {isRequesting && (

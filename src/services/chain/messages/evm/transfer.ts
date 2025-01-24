@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { erc20ABI } from '../../../../tools/erc20ABI';
 import { getStoredMasks } from '../../../../utils/chat/helpers';
-import { TransactionDisplay } from '../../../../components/TransactionDisplay';
+import { InProgressTxDisplay } from '../../../../components/InProgressTxDisplay';
 import {
   ChainMessage,
   OperationType,
@@ -55,7 +55,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
   ];
 
   inProgressComponent() {
-    return TransactionDisplay;
+    return InProgressTxDisplay;
   }
 
   validate(params: SendToolParams, walletStore: WalletStore): boolean {
