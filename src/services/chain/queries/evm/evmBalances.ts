@@ -47,8 +47,7 @@ export class EvmBalancesQuery implements ChainQuery<EvmBalanceQueryParams> {
     params: EvmBalanceQueryParams,
     walletStore: WalletStore,
   ): Promise<string> {
-
-    const { rpcUrl, erc20Contracts } =
+    const { rpcUrl, erc20Contracts, nativeToken, nativeTokenDecimals } =
       chainRegistry[this.chainType][params.chainName];
     const rpcProvider = new ethers.JsonRpcProvider(rpcUrl);
 
@@ -59,8 +58,11 @@ export class EvmBalancesQuery implements ChainQuery<EvmBalanceQueryParams> {
     balanceCalls.push(async () => {
       try {
         const rawBalance = await rpcProvider.getBalance(address);
-        const formattedBalance = ethers.formatUnits(rawBalance, 18);
-        return `KAVA: ${formattedBalance}`;
+        const formattedBalance = ethers.formatUnits(
+          rawBalance,
+          nativeTokenDecimals,
+        );
+        return `${nativeToken}: ${formattedBalance}`;
       } catch (err) {
         console.log(err);
         return `KAVA: failed to fetch balance ${JSON.stringify(err)}`;

@@ -97,7 +97,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
   ): Promise<string> {
     const { toAddress, amount, denom } = params;
 
-    const { erc20Contracts, rpcUrl } =
+    const { erc20Contracts, rpcUrl, nativeToken, nativeTokenDecimals } =
       chainRegistry[this.chainType][params.chainName];
     const rpcProvider = new ethers.JsonRpcProvider(rpcUrl);
 
@@ -113,11 +113,11 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
       const receivingAddress = ethers.getAddress(addressTo);
       const sendingAddress = ethers.getAddress(addressFrom);
 
-      if (isNativeAsset(denom)) {
+      if (denom.toUpperCase() === nativeToken) {
         txParams = {
           to: receivingAddress,
           data: '0x',
-          value: ethers.parseEther(amount).toString(16),
+          value: ethers.parseEther(amount).toString(nativeTokenDecimals),
         };
       } else {
         const contractAddress =
