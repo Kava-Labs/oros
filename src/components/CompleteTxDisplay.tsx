@@ -8,7 +8,7 @@ interface CompleteTxDisplayProps {
 }
 
 export const CompleteTxDisplay = ({ hash, chain }: CompleteTxDisplayProps) => {
-  const explorerUrl = chain.blockExplorerUrls[0] + '/tx/' + hash;
+  const explorerUrl = chain.blockExplorerUrls[0] + 'tx/' + hash;
 
   return (
     <div className={styles.transactionContainer}>
