@@ -60,35 +60,32 @@ describe('chat', () => {
     expect(responseText).toMatch(/THIS IS A TEST/i);
   });
 
-  test('send tx', async ({ page, context }) => {
+  test('check balances', async ({ page, context }) => {
     test.setTimeout(90 * 1000);
 
     const chat = new Chat(page, context, metaMask);
     await chat.goto();
     await metaMask.switchNetwork();
 
-    await chat.submitMessage(
-      'Send 0.1 KAVA to 0xd8e30F7BCB5211E591BBc463cDAb0144e82dFfE5',
-    );
+    //  be ready to find the upcoming popup
+    const metamaskPopupPromise = context.waitForEvent('page');
+    await chat.submitMessage('What are my balances?');
 
     await chat.waitForStreamToFinish();
-    await chat.waitForAssistantResponse();
 
     let messages = await chat.getMessageElementsWithContent();
     expect(messages.length).toBeGreaterThan(0);
 
+    const metamaskPopup = await metamaskPopupPromise;
+    await metamaskPopup.waitForLoadState();
+    await metamaskPopup.getByTestId('confirm-btn').click();
+
     await chat.waitForStreamToFinish();
-
-    const metamaskConnectPagePromise = context.waitForEvent('page');
-
-    const metaMaskPopup = await metamaskConnectPagePromise;
-    await metaMaskPopup.waitForLoadState();
-    await metaMaskPopup.getByRole('button', { name: 'Connect' }).click();
-
     await chat.waitForAssistantResponse();
 
     messages = await chat.getMessageElementsWithContent();
     const responseText = await messages[messages.length - 1].innerText();
-    expect(responseText).toMatch(/THIS IS A TEST/i);
+    expect(responseText).toContain('current balance');
+    expect(responseText).toContain('KAVA: ');
   });
 });
