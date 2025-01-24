@@ -12,7 +12,7 @@ export class Chat {
   public page: Page;
   public messageContainer: Locator;
 
-  constructor(page: Page, ctx: BrowserContext, wallet?: Wallet) {
+  constructor(page: Page) {
     this.page = page;
     this.messageContainer = this.page.locator(
       `[data-testid="conversation"] div div`,

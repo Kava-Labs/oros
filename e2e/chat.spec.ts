@@ -5,7 +5,7 @@ import { EvmWalletID } from './Wallet';
 
 describe('chat', () => {
   test('renders intro message', async ({ page, context }) => {
-    const chat = new Chat(page, context);
+    const chat = new Chat(page);
     await chat.goto();
 
     expect(chat.messageContainer).not.toBeNull();
@@ -22,7 +22,7 @@ describe('chat', () => {
   test('receiving a response from the model', async ({ page, context }) => {
     test.setTimeout(90 * 1000);
 
-    const chat = new Chat(page, context);
+    const chat = new Chat(page);
     await chat.goto();
 
     await chat.submitMessage(
@@ -62,10 +62,10 @@ describe('chat', () => {
       );
     });
 
-    test.skip('check balances', async ({ page, context }) => {
+    test('check balances', async ({ page, context }) => {
       test.setTimeout(90 * 1000);
 
-      const chat = new Chat(page, context, metaMask);
+      const chat = new Chat(page);
       await chat.goto();
 
       await metaMask.switchNetwork();
@@ -93,10 +93,10 @@ describe('chat', () => {
       expect(kavaBalance).toBeGreaterThan(0);
     });
 
-    test.skip('send tx', async ({ page, context }) => {
+    test('send tx', async ({ page, context }) => {
       test.setTimeout(90 * 1000);
 
-      const chat = new Chat(page, context, metaMask);
+      const chat = new Chat(page);
       await chat.goto();
 
       await metaMask.switchNetwork();
