@@ -2,7 +2,7 @@ import { test as base, chromium, BrowserContext, Page } from '@playwright/test';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-// @ts-ignore
+// @ts-expect-error - Cannot find name 'dirname'/'fileURLToPath'
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 async function scanPages(
