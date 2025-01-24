@@ -6,7 +6,7 @@ export type ChainRegistry = Record<
     string,
     {
       name: string;
-      rpcUrl: string;
+      rpcUrls: string[];
       chainID: number;
       nativeToken: string;
       nativeTokenDecimals: number;
@@ -22,7 +22,7 @@ export const chainRegistry: ChainRegistry = {
   [ChainType.EVM]: {
     kavaEVM: {
       name: 'kavaEVM',
-      rpcUrl: 'https://evm.kava-rpc.com',
+      rpcUrls: ['https://evm.kava-rpc.com'],
       chainID: 2222,
       nativeToken: 'KAVA',
       nativeTokenDecimals: 18,

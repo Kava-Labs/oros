@@ -47,9 +47,9 @@ export class EvmBalancesQuery implements ChainQuery<EvmBalanceQueryParams> {
     params: EvmBalanceQueryParams,
     walletStore: WalletStore,
   ): Promise<string> {
-    const { rpcUrl, erc20Contracts, nativeToken, nativeTokenDecimals } =
+    const { rpcUrls, erc20Contracts, nativeToken, nativeTokenDecimals } =
       chainRegistry[this.chainType][params.chainName];
-    const rpcProvider = new ethers.JsonRpcProvider(rpcUrl);
+    const rpcProvider = new ethers.JsonRpcProvider(rpcUrls[0]);
 
     const address = walletStore.getSnapshot().walletAddress;
     const balanceCalls: (() => Promise<string>)[] = [];
