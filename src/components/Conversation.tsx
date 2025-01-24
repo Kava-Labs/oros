@@ -7,6 +7,10 @@ import { useTheme } from '../theme/useTheme';
 import { useAppContext } from '../context/useAppContext';
 import { ToolCallProgressCards } from './ToolCallProgressCards';
 import { CompleteTxDisplay } from './CompleteTxDisplay';
+import {
+  chainNameToolCallParam,
+  chainRegistry,
+} from '../config/chainsRegistry';
 
 export interface ConversationProps {
   messages: ChatCompletionMessageParam[];
@@ -19,7 +23,7 @@ const StreamingTextContent = (message: string, onRendered: () => void) => {
 
 const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
   const { logo } = useTheme();
-  const { errorText, isRequesting, progressStore, messageStore } =
+  const { errorText, isRequesting, progressStore, messageStore, registry } =
     useAppContext();
 
   return (
@@ -65,19 +69,25 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
 
           const tc = prevMsg.tool_calls.find((tc) => tc.id === id);
           if (!tc) return null;
-          if (tc.function.name !== 'evm-transfer') {
-            return null;
+
+          const params = JSON.parse(tc.function.arguments);
+          if (
+            typeof params === 'object' &&
+            params !== null &&
+            chainNameToolCallParam.name in params
+          ) {
+            const chainName = params[chainNameToolCallParam.name];
+            const operation = registry.get(tc.function.name);
+            if (!operation) return null;
+
+            const chain = chainRegistry[operation.chainType][chainName];
+            const hash = message.content as string;
+
+            return <CompleteTxDisplay key={index} hash={hash} chain={chain} />;
           }
 
-          const hash = message.content as string;
-
-          return (
-            <div key={index} className={styles.left}>
-              <CompleteTxDisplay key={index} hash={hash} />
-            </div>
-          );
+          return null;
         }
-
         return null;
       })}
       {isRequesting && (
