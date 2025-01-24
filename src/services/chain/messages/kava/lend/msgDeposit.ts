@@ -56,9 +56,7 @@ export class LendDepositMessage implements ChainMessage<LendToolParams> {
     }
 
     if (Array.isArray(this.needsWallet)) {
-      if (
-        !this.needsWallet.includes(walletStore.getSnapshot().walletType)
-      ) {
+      if (!this.needsWallet.includes(walletStore.getSnapshot().walletType)) {
         throw new Error('please connect to a compatible wallet');
       }
     }

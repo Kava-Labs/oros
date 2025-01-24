@@ -21,4 +21,3 @@ export const updateStoredMasks = (
   localStorage.setItem('masksToValues', JSON.stringify(masksToValues));
   localStorage.setItem('valuesToMasks', JSON.stringify(valuesToMasks));
 };
-

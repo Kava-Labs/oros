@@ -9,7 +9,11 @@ import { WalletStore, WalletTypes } from '../walletStore';
 import { TextStreamStore } from '../textStreamStore';
 import { ToolCallStreamStore } from '../toolCallStreamStore';
 import { MessageHistoryStore } from '../messageHistoryStore';
-import { ChainNames, chainRegistry } from '../config/chainsRegistry';
+import {
+  ChainNames,
+  chainNameToolCallParam,
+  chainRegistry,
+} from '../config/chainsRegistry';
 
 /**
  * Initializes the operation registry with all supported operations.
@@ -89,10 +93,10 @@ export const AppContextProvider = ({
           if (
             typeof params === 'object' &&
             params !== null &&
-            params.hasOwnProperty('chainName')
+            chainNameToolCallParam.name in params
           ) {
             // @ts-expect-error we already checked this
-            chainName = params.chainName;
+            chainName = params[chainNameToolCallParam.name];
             const chain = chainRegistry[operation.chainType][chainName];
             chainId = `0x${Number(chain.chainID).toString(16)}`;
           }
