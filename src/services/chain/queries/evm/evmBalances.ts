@@ -21,7 +21,7 @@ export class EvmBalancesQuery implements ChainQuery<EvmBalanceQueryParams> {
 
   needsWallet = [WalletTypes.METAMASK];
 
-  validate(_params: EvmBalanceQueryParams, walletStore: WalletStore): boolean {
+  validate(params: EvmBalanceQueryParams, walletStore: WalletStore): boolean {
     if (!walletStore.getSnapshot().isWalletConnected) {
       throw new Error('please connect to a compatible wallet');
     }
@@ -32,8 +32,8 @@ export class EvmBalancesQuery implements ChainQuery<EvmBalanceQueryParams> {
       }
     }
 
-    if (!chainRegistry[this.chainType][_params.chainName]) {
-      throw new Error(`unknown chain name ${_params.chainName}`);
+    if (!chainRegistry[this.chainType][params.chainName]) {
+      throw new Error(`unknown chain name ${params.chainName}`);
     }
 
     return true;
@@ -54,7 +54,7 @@ export class EvmBalancesQuery implements ChainQuery<EvmBalanceQueryParams> {
     const address = walletStore.getSnapshot().walletAddress;
     const balanceCalls: (() => Promise<string>)[] = [];
 
-    // KAVA fetching is a bit different
+    // native fetching is a bit different
     balanceCalls.push(async () => {
       try {
         const rawBalance = await rpcProvider.getBalance(address);
