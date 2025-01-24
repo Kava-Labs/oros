@@ -1,20 +1,27 @@
 import { ChainQuery, ChainType, OperationType } from '../../../../types/chain';
 import { ethers } from 'ethers';
 import { erc20ABI } from '../../../../tools/erc20ABI';
-import { ASSET_ADDRESSES, kavaEVMProvider } from '../../../../config/evm';
 import { QueryInProgress } from '../../../../components/QueryInProgress';
 import { WalletStore, WalletTypes } from '../../../../walletStore';
+import {
+  chainNameToolCallParam,
+  chainRegistry,
+} from '../../../../config/chainsRegistry';
 
-export class EvmBalancesQuery implements ChainQuery<void> {
+type EvmBalanceQueryParams = {
+  chainName: string;
+};
+
+export class EvmBalancesQuery implements ChainQuery<EvmBalanceQueryParams> {
   name = 'evm-balances';
   description = 'Returns the erc20 token balances for a given address';
-  parameters = [];
+  parameters = [chainNameToolCallParam];
   operationType = OperationType.QUERY;
   chainType = ChainType.EVM;
 
   needsWallet = [WalletTypes.METAMASK];
 
-  validate(_params: void, walletStore: WalletStore): boolean {
+  validate(params: EvmBalanceQueryParams, walletStore: WalletStore): boolean {
     if (!walletStore.getSnapshot().isWalletConnected) {
       throw new Error('please connect to a compatible wallet');
     }
@@ -25,6 +32,10 @@ export class EvmBalancesQuery implements ChainQuery<void> {
       }
     }
 
+    if (!chainRegistry[this.chainType][params.chainName]) {
+      throw new Error(`unknown chain name ${params.chainName}`);
+    }
+
     return true;
   }
 
@@ -32,16 +43,26 @@ export class EvmBalancesQuery implements ChainQuery<void> {
     return QueryInProgress;
   }
 
-  async executeQuery(_params: void, walletStore: WalletStore): Promise<string> {
+  async executeQuery(
+    params: EvmBalanceQueryParams,
+    walletStore: WalletStore,
+  ): Promise<string> {
+    const { rpcUrls, erc20Contracts, nativeToken, nativeTokenDecimals } =
+      chainRegistry[this.chainType][params.chainName];
+    const rpcProvider = new ethers.JsonRpcProvider(rpcUrls[0]);
+
     const address = walletStore.getSnapshot().walletAddress;
     const balanceCalls: (() => Promise<string>)[] = [];
 
-    // KAVA fetching is a bit different
+    // native fetching is a bit different
     balanceCalls.push(async () => {
       try {
-        const rawBalance = await kavaEVMProvider.getBalance(address);
-        const formattedBalance = ethers.formatUnits(rawBalance, 18);
-        return `KAVA: ${formattedBalance}`;
+        const rawBalance = await rpcProvider.getBalance(address);
+        const formattedBalance = ethers.formatUnits(
+          rawBalance,
+          nativeTokenDecimals,
+        );
+        return `${nativeToken}: ${formattedBalance}`;
       } catch (err) {
         console.log(err);
         return `KAVA: failed to fetch balance ${JSON.stringify(err)}`;
@@ -49,15 +70,15 @@ export class EvmBalancesQuery implements ChainQuery<void> {
     });
 
     // add other assets
-    for (const asset in ASSET_ADDRESSES) {
+    for (const asset in erc20Contracts) {
       balanceCalls.push(async () => {
-        const contractAddress = ASSET_ADDRESSES[asset].contractAddress;
-        const displayName = ASSET_ADDRESSES[asset].displayName;
+        const contractAddress = erc20Contracts[asset].contractAddress;
+        const displayName = erc20Contracts[asset].displayName;
 
         const contract = new ethers.Contract(
           contractAddress,
           erc20ABI,
-          kavaEVMProvider,
+          rpcProvider,
         );
 
         try {
