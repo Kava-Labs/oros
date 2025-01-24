@@ -126,7 +126,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
         txParams = {
           to: receivingAddress,
           data: '0x',
-          value: ethers.parseEther(amount).toString(nativeTokenDecimals),
+          value: ethers.parseEther(amount).toString(16),
         };
       } else {
         // ! because this already passed validation
