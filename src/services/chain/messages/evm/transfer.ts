@@ -106,7 +106,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
   ): Promise<string> {
     const { toAddress, amount, denom } = params;
 
-    const { erc20Contracts, rpcUrls, nativeToken, nativeTokenDecimals } =
+    const { erc20Contracts, rpcUrls, nativeToken } =
       chainRegistry[this.chainType][params.chainName];
     const rpcProvider = new ethers.JsonRpcProvider(rpcUrls[0]);
 
