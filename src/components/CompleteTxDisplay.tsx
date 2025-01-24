@@ -7,9 +7,6 @@ interface CompleteTxDisplayProps {
   chain: ChainConfig;
 }
 
-/**
- * TODO: Bring in currentChain so href can be built with dynamic block explorer
- */
 export const CompleteTxDisplay = ({ hash, chain }: CompleteTxDisplayProps) => {
   const explorerUrl = chain.blockExplorerUrls[0] + '/tx/' + hash;
 
