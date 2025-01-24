@@ -59,7 +59,6 @@ export const App = () => {
     tools: getOpenAITools(),
   });
 
-
   // TODO: check healthcheck and set error if backend is not availiable
   useEffect(() => {
     try {
@@ -290,7 +289,7 @@ async function callTools(
       try {
         content = await executeOperation(name, toolCall.function.arguments);
       } catch (err) {
-        content = err instanceof Error ? err.message : JSON.stringify(err);
+        content = JSON.stringify(err);
       }
 
       messageHistoryStore.addMessage({

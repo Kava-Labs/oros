@@ -18,9 +18,13 @@ export type ChainRegistry = Record<
   >
 >;
 
+export enum ChainNames {
+  KAVA_EVM = 'kavaEVM',
+}
+
 export const chainRegistry: ChainRegistry = {
   [ChainType.EVM]: {
-    kavaEVM: {
+    [ChainNames.KAVA_EVM]: {
       name: 'kavaEVM',
       rpcUrls: ['https://evm.kava-rpc.com'],
       chainID: 2222,

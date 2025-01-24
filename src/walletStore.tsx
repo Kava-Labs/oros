@@ -1,3 +1,6 @@
+import { chainRegistry } from './config/chainsRegistry';
+import { ChainType } from './types/chain';
+
 type Listener = () => void;
 
 export enum WalletTypes {
@@ -33,7 +36,7 @@ export class WalletStore {
 
   constructor() {
     const onChainChange = () => {
-      window.location.reload();
+      this.connectMetamask();
     };
 
     const onAccountChange = () => {
@@ -71,6 +74,38 @@ export class WalletStore {
       }
       default:
         throw new Error(`unknown wallet type: ${opts.walletType}`);
+    }
+  }
+
+  public async metamaskSwitchNetwork(chainName: string) {
+    const chain = chainRegistry[ChainType.EVM][chainName];
+    if (!chain) {
+      throw new Error(`unknown chain ${chainName}`);
+    }
+    const { chainID, rpcUrls, name } = chain;
+
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: `0x${chainID.toString(16)}` }],
+      });
+    } catch (switchError) {
+      // This error code indicates that the chain has not been added to MetaMask.
+      // @ts-expect-error metamask errors have .code property
+      if (switchError.code === 4902) {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [
+            {
+              chainId: `0x${chainID.toString(16)}`,
+              chainName: name,
+              rpcUrls: rpcUrls,
+            },
+          ],
+        });
+      } else {
+        throw switchError;
+      }
     }
   }
 
