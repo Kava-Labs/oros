@@ -8,7 +8,7 @@
   "cosmos": {
     "chainGrpcUrl": "https://grpc.data.internal.testnet.us-east.production.kava.io:443",
     "numberOfAccountsToGenerate": 8,
-    "coinsToSend": "10000000ukava",
+    "coinsToSend": "23000000000ukava",
     "bech32MainPrefix": "kava",
     "Bech32PrefixAccPub": "kavapub",
     "coinType": 459

@@ -9,7 +9,8 @@ import {
 } from './Wallet';
 import { Contract, ethers } from 'ethers';
 import { readFileSync } from 'fs';
-import { meta } from '@eslint/js';
+
+const E2E_WALLET_KEY = process.env.VITE_E2E_WALLET_KEY;
 
 export class MetaMask extends Wallet {
   // eslint-disable-next-line
@@ -199,6 +200,15 @@ export class MetaMask extends Wallet {
     await metaMaskPage.getByTestId('network-display').click();
     await metaMaskPage.getByTestId('Kava').click();
 
+    await metaMaskPage.getByTestId('account-menu-icon').click();
+
+    await metaMaskPage
+      .getByRole('button', { name: 'Add account or hardware wallet' })
+      .click();
+    await metaMaskPage.getByRole('button', { name: 'Import account' }).click();
+
+    await metaMaskPage.locator('#private-key-box').fill(E2E_WALLET_KEY);
+    await metaMaskPage.getByRole('button', { name: 'Import' }).click();
     await metaMaskPage.close();
   }
 }
