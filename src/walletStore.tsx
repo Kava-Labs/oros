@@ -82,7 +82,14 @@ export class WalletStore {
     if (!chain) {
       throw new Error(`unknown chain ${chainName}`);
     }
-    const { chainID, rpcUrls, name, nativeToken, nativeTokenDecimals } = chain;
+    const {
+      chainID,
+      rpcUrls,
+      name,
+      nativeToken,
+      nativeTokenDecimals,
+      blockExplorerUrls,
+    } = chain;
 
     try {
       await window.ethereum.request({
@@ -100,6 +107,7 @@ export class WalletStore {
               chainId: `0x${chainID.toString(16)}`,
               chainName: name === ChainNames.KAVA_EVM ? 'Kava' : name,
               rpcUrls: rpcUrls,
+              blockExplorerUrls,
               nativeCurrency: {
                 name: nativeToken,
                 symbol: nativeToken,

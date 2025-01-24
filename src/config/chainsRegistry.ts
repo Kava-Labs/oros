@@ -7,6 +7,7 @@ export type ChainRegistry = Record<
     {
       name: string;
       rpcUrls: string[];
+      blockExplorerUrls: string[];
       chainID: number;
       nativeToken: string;
       nativeTokenDecimals: number;
@@ -31,6 +32,7 @@ export const chainRegistry: ChainRegistry = {
       chainID: 2222,
       nativeToken: 'KAVA',
       nativeTokenDecimals: 18,
+      blockExplorerUrls: ['https://kavascan.com/'],
 
       erc20Contracts: {
         WHARD: {
@@ -101,6 +103,7 @@ export const chainRegistry: ChainRegistry = {
       nativeToken: 'ETH',
       nativeTokenDecimals: 18,
       rpcUrls: ['https://eth.drpc.org'],
+      blockExplorerUrls: ['https://etherscan.io/'],
       erc20Contracts: {
         // USDT: {
         //   contractAddress: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
