@@ -65,5 +65,4 @@ export { screenshotOnFailure, getWalletId } from './utils';
 export const beforeEach = test.beforeEach;
 export const describe = test.describe;
 export const only = test.only;
-// export const use = test.use;
 export const expect = test.expect;
