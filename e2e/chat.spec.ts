@@ -1,10 +1,12 @@
-import { describe, expect, beforeEach, getWalletId, test } from './fixtures';
+import { describe, expect, beforeEach, getWalletId } from './fixtures';
 import { Chat } from './Chat';
 import { MetaMask } from './Metamask';
 import { EvmWalletID } from './Wallet';
+//  todo - eventually import test from fixtures when integrated with metamask in CI/CD
+import test from '@playwright/test';
 
 describe('chat', () => {
-  test('renders intro message', async ({ page, context }) => {
+  test('renders intro message', async ({ page }) => {
     const chat = new Chat(page);
     await chat.goto();
 
@@ -19,7 +21,7 @@ describe('chat', () => {
     ).toBeVisible();
   });
 
-  test('receiving a response from the model', async ({ page, context }) => {
+  test('receiving a response from the model', async ({ page }) => {
     test.setTimeout(90 * 1000);
 
     const chat = new Chat(page);
