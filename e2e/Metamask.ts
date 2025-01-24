@@ -13,7 +13,6 @@ import { readFileSync } from 'fs';
 const E2E_WALLET_KEY = process.env.VITE_E2E_WALLET_KEY;
 
 export class MetaMask extends Wallet {
-  // eslint-disable-next-line
   constructor(page: Page, opts: WalletOpts) {
     super(page, opts);
   }
