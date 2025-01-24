@@ -14,7 +14,7 @@ jobs:
       OPENAI_BASE_URL: https://api.openai.com/v1
       VITE_OPENAI_BASE_URL: http://localhost:5555/openai/v1
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
         with:
           ssh-key: ${{ secrets.E2E_PROVIDER_REPO_KEY }}
           repository: kava-labs/e2e-account-provider
