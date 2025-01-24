@@ -1,7 +1,6 @@
 import { ethers } from 'ethers';
-import { ASSET_ADDRESSES, kavaEVMProvider } from '../../../../config/evm';
 import { erc20ABI } from '../../../../tools/erc20ABI';
-import { getStoredMasks, isNativeAsset } from '../../../../utils/chat/helpers';
+import { getStoredMasks } from '../../../../utils/chat/helpers';
 import { TransactionDisplay } from '../../../../components/TransactionDisplay';
 import {
   ChainMessage,
@@ -13,8 +12,13 @@ import {
   WalletStore,
   WalletTypes,
 } from '../../../../walletStore';
+import {
+  chainNameToolCallParam,
+  chainRegistry,
+} from '../../../../config/chainsRegistry';
 
 interface SendToolParams {
+  chainName: string;
   toAddress: string;
   amount: string;
   denom: string;
@@ -28,6 +32,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
   needsWallet = [WalletTypes.METAMASK];
 
   parameters = [
+    chainNameToolCallParam,
     {
       name: 'toAddress',
       type: 'string',
@@ -58,11 +63,13 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
     }
 
     if (Array.isArray(this.needsWallet)) {
-      if (
-        !this.needsWallet.includes(walletStore.getSnapshot().walletType)
-      ) {
+      if (!this.needsWallet.includes(walletStore.getSnapshot().walletType)) {
         throw new Error('please connect to a compatible wallet');
       }
+    }
+
+    if (!chainRegistry[this.chainType][params.chainName]) {
+      throw new Error(`unknown chain name ${params.chainName}`);
     }
 
     const { toAddress, amount, denom } = params;
@@ -71,8 +78,12 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
 
     const validToAddress = masksToValues[toAddress] ?? '';
 
+    const { erc20Contracts, nativeToken } =
+      chainRegistry[this.chainType][params.chainName];
+
     const validDenomWithContract =
-      denom.toUpperCase() in ASSET_ADDRESSES || isNativeAsset(denom);
+      denom.toUpperCase() in erc20Contracts ||
+      denom.toUpperCase() === nativeToken;
 
     return Boolean(
       validToAddress.length > 0 &&
@@ -88,6 +99,10 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
   ): Promise<string> {
     const { toAddress, amount, denom } = params;
 
+    const { erc20Contracts, rpcUrls, nativeToken, nativeTokenDecimals } =
+      chainRegistry[this.chainType][params.chainName];
+    const rpcProvider = new ethers.JsonRpcProvider(rpcUrls[0]);
+
     try {
       let txParams: Record<string, string>;
 
@@ -100,20 +115,20 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
       const receivingAddress = ethers.getAddress(addressTo);
       const sendingAddress = ethers.getAddress(addressFrom);
 
-      if (isNativeAsset(denom)) {
+      if (denom.toUpperCase() === nativeToken) {
         txParams = {
           to: receivingAddress,
           data: '0x',
-          value: ethers.parseEther(amount).toString(16),
+          value: ethers.parseEther(amount).toString(nativeTokenDecimals),
         };
       } else {
         const contractAddress =
-          ASSET_ADDRESSES[denom.toUpperCase()].contractAddress;
+          erc20Contracts[denom.toUpperCase()].contractAddress;
 
         const contract = new ethers.Contract(
           contractAddress,
           erc20ABI,
-          kavaEVMProvider,
+          rpcProvider,
         );
         const decimals = await contract.decimals();
         const formattedTxAmount = ethers.parseUnits(amount, Number(decimals));

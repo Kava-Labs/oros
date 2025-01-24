@@ -75,16 +75,22 @@ export class OperationRegistry<T> {
         parameters: {
           type: 'object',
           properties: Object.fromEntries(
-            operation.parameters.map((param) => [
-              /**
-               * TODO: Make sure this can handle the enum configs
-               */
-              param.name,
-              {
-                type: param.type,
-                description: param.description,
-              },
-            ]),
+            operation.parameters.map((param) => {
+              const p = [
+                param.name,
+                {
+                  type: param.type,
+                  description: param.description,
+                },
+              ];
+
+              if (param.enum) {
+                // @ts-expect-error better types needed
+                p[1].enum = param.enum;
+              }
+
+              return p;
+            }),
           ),
           required: operation.parameters
             .filter((param) => param.required)

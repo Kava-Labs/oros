@@ -5,10 +5,15 @@ import { ChainMessage, ChainQuery } from '../types/chain';
 import { LendDepositMessage } from '../services/chain/messages/kava/lend/msgDeposit';
 import { EvmTransferMessage } from '../services/chain/messages/evm/transfer';
 import { EvmBalancesQuery } from '../services/chain/queries/evm/evmBalances';
-import { WalletStore } from '../walletStore';
+import { WalletStore, WalletTypes } from '../walletStore';
 import { TextStreamStore } from '../textStreamStore';
 import { ToolCallStreamStore } from '../toolCallStreamStore';
 import { MessageHistoryStore } from '../messageHistoryStore';
+import {
+  ChainNames,
+  chainNameToolCallParam,
+  chainRegistry,
+} from '../config/chainsRegistry';
 
 /**
  * Initializes the operation registry with all supported operations.
@@ -72,6 +77,9 @@ export const AppContextProvider = ({
         throw new Error(`Unknown operation type: ${operationName}`);
       }
 
+      let chainId = `0x${Number(2222).toString(16)}`; // default
+      let chainName = ChainNames.KAVA_EVM; // default
+
       // if operation needs wallet connect
       // and the current wallet connection isn't one that's included in wantsWallet
       // we then try to establish that connection
@@ -81,16 +89,34 @@ export const AppContextProvider = ({
         !operation.needsWallet.includes(walletStore.getSnapshot().walletType)
       ) {
         for (const walletType of operation.needsWallet) {
-          try {
-            await walletStore.connectWallet({
-              walletType,
-              chainId: `0x${Number(2222).toString(16)}`,
-            });
-            break;
-          } catch (err) {
-            console.error(err);
+          // if chainName exists in params, connect to that chain
+          if (
+            typeof params === 'object' &&
+            params !== null &&
+            chainNameToolCallParam.name in params
+          ) {
+            // @ts-expect-error we already checked this
+            chainName = params[chainNameToolCallParam.name];
+            const chain = chainRegistry[operation.chainType][chainName];
+            chainId = `0x${Number(chain.chainID).toString(16)}`;
           }
+
+          await walletStore.connectWallet({
+            walletType,
+            chainId,
+          });
+
+          break;
         }
+      }
+
+      // if the chain id in metamask doesn't match the chain id we need to be on
+      // start the network switching process
+      if (
+        walletStore.getSnapshot().walletType === WalletTypes.METAMASK &&
+        walletStore.getSnapshot().walletChainId !== chainId
+      ) {
+        await walletStore.metamaskSwitchNetwork(chainName);
       }
 
       if (!operation.validate(params, walletStore)) {
