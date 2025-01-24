@@ -54,6 +54,15 @@ jobs:
       - name: generate and fund accounts
         run: rm -f accounts.json && ./account-provider --mnemonic="${{ secrets.WHALE_MNEMONIC }}" --evm_mnemonic="${{ secrets.EVM_WHALE_MNEMONIC }}" --provider_config="./e2e/provider_config.json"
 
+      # Create api directory and Dockerfile
+      - name: Setup API
+        run: |
+          mkdir -p api
+          echo "FROM node:lts
+          WORKDIR /app
+          COPY . .
+          CMD ['node', 'server.js']" > api/Dockerfile
+
       - name: Start API server
         # Wait for containers to be healthy or fail after 30 seconds
         run: |
