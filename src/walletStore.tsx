@@ -1,4 +1,4 @@
-import { chainRegistry } from './config/chainsRegistry';
+import { ChainNames, chainRegistry } from './config/chainsRegistry';
 import { ChainType } from './types/chain';
 
 type Listener = () => void;
@@ -82,7 +82,7 @@ export class WalletStore {
     if (!chain) {
       throw new Error(`unknown chain ${chainName}`);
     }
-    const { chainID, rpcUrls, name } = chain;
+    const { chainID, rpcUrls, name, nativeToken, nativeTokenDecimals } = chain;
 
     try {
       await window.ethereum.request({
@@ -98,8 +98,13 @@ export class WalletStore {
           params: [
             {
               chainId: `0x${chainID.toString(16)}`,
-              chainName: name,
+              chainName: name === ChainNames.KAVA_EVM ? 'Kava' : name,
               rpcUrls: rpcUrls,
+              nativeCurrency: {
+                name: nativeToken,
+                symbol: nativeToken,
+                decimals: nativeTokenDecimals,
+              },
             },
           ],
         });

@@ -73,6 +73,9 @@ export const AppContextProvider = ({
         throw new Error(`Unknown operation type: ${operationName}`);
       }
 
+      let chainId = `0x${Number(2222).toString(16)}`; // default
+      let chainName = ChainNames.KAVA_EVM; // default
+
       // if operation needs wallet connect
       // and the current wallet connection isn't one that's included in wantsWallet
       // we then try to establish that connection
@@ -82,9 +85,6 @@ export const AppContextProvider = ({
         !operation.needsWallet.includes(walletStore.getSnapshot().walletType)
       ) {
         for (const walletType of operation.needsWallet) {
-          let chainId = `0x${Number(2222).toString(16)}`; // default
-          let chainName = ChainNames.KAVA_EVM; // default
-
           // if chainName exists in params, connect to that chain
           if (
             typeof params === 'object' &&
@@ -101,17 +101,18 @@ export const AppContextProvider = ({
             walletType,
             chainId,
           });
-          // if the chain id in metamask doesn't match the chain id we need to be on
-          // start the network switching process
-          if (
-            walletType === WalletTypes.METAMASK &&
-            walletStore.getSnapshot().walletChainId !== chainId
-          ) {
-            await walletStore.metamaskSwitchNetwork(chainName);
-          }
 
           break;
         }
+      }
+
+      // if the chain id in metamask doesn't match the chain id we need to be on
+      // start the network switching process
+      if (
+        walletStore.getSnapshot().walletType === WalletTypes.METAMASK &&
+        walletStore.getSnapshot().walletChainId !== chainId
+      ) {
+        await walletStore.metamaskSwitchNetwork(chainName);
       }
 
       if (!operation.validate(params, walletStore)) {
