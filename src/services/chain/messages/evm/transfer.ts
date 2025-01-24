@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { erc20ABI } from '../../../../tools/erc20ABI';
-import { getStoredMasks, isNativeAsset } from '../../../../utils/chat/helpers';
+import { getStoredMasks } from '../../../../utils/chat/helpers';
 import { TransactionDisplay } from '../../../../components/TransactionDisplay';
 import {
   ChainMessage,
@@ -78,10 +78,12 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
 
     const validToAddress = masksToValues[toAddress] ?? '';
 
-    const { erc20Contracts } = chainRegistry[this.chainType][params.chainName];
+    const { erc20Contracts, nativeToken } =
+      chainRegistry[this.chainType][params.chainName];
 
     const validDenomWithContract =
-      denom.toUpperCase() in erc20Contracts || isNativeAsset(denom);
+      denom.toUpperCase() in erc20Contracts ||
+      denom.toUpperCase() === nativeToken;
 
     return Boolean(
       validToAddress.length > 0 &&
