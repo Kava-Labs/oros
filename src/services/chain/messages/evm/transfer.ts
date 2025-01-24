@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { erc20ABI } from '../../../../tools/erc20ABI';
-import { getStoredMasks } from '../../../../utils/chat/helpers';
+import { getERC20Record, getStoredMasks } from '../../../../utils/chat/helpers';
 import { InProgressTxDisplay } from '../../../../components/InProgressTxDisplay';
 import {
   ChainMessage,
@@ -90,7 +90,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
       chainRegistry[this.chainType][params.chainName];
 
     const validDenomWithContract =
-      denom.toUpperCase() in erc20Contracts ||
+      getERC20Record(denom, erc20Contracts) !== null ||
       denom.toUpperCase() === nativeToken;
 
     if (!validDenomWithContract) {
@@ -129,8 +129,8 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
           value: ethers.parseEther(amount).toString(nativeTokenDecimals),
         };
       } else {
-        const contractAddress =
-          erc20Contracts[denom.toUpperCase()].contractAddress;
+        // ! because this already passed validation
+        const { contractAddress } = getERC20Record(denom, erc20Contracts)!;
 
         const contract = new ethers.Contract(
           contractAddress,
