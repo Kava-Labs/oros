@@ -11,7 +11,7 @@ import {
   chainNameToolCallParam,
   chainRegistry,
 } from '../config/chainsRegistry';
-import { OperationType } from '../types/chain';
+import { OperationResult, OperationType } from '../types/chain';
 
 export interface ConversationProps {
   messages: ChatCompletionMessageParam[];
@@ -84,7 +84,9 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
               return null;
 
             const chain = chainRegistry[operation.chainType][chainName];
-            const content = JSON.parse(message.content as string);
+            const content: OperationResult = JSON.parse(
+              message.content as string,
+            );
             if (content.status !== 'ok') {
               return null;
             }

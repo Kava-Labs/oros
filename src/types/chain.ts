@@ -56,3 +56,8 @@ export interface ChainQuery<T> extends ChainOperation<T> {
   /** Executes the query with the provided parameters */
   executeQuery(params: T, walletStore: WalletStore): Promise<string>;
 }
+
+export type OperationResult = {
+  status: 'ok' | 'failed';
+  info: string;
+};
