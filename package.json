@@ -20,6 +20,7 @@
   "dependencies": {
     "@fontsource/inter": "^5.1.0",
     "@streamparser/json": "^0.0.21",
+    "@testing-library/jest-dom": "^6.6.3",
     "bech32": "^2.0.0",
     "dompurify": "^3.2.2",
     "dotenv": "^16.4.7",
