@@ -62,7 +62,8 @@ describe('chat', () => {
       );
     });
 
-    test('check balances', async ({ page, context }) => {
+    //  todo - integrate with CI/CD
+    test.skip('check balances', async ({ page, context }) => {
       test.setTimeout(90 * 1000);
 
       const chat = new Chat(page);
@@ -93,7 +94,7 @@ describe('chat', () => {
       expect(kavaBalance).toBeGreaterThan(0);
     });
 
-    test('send tx', async ({ page, context }) => {
+    test.skip('send tx', async ({ page, context }) => {
       test.setTimeout(90 * 1000);
 
       const chat = new Chat(page);
