@@ -15,6 +15,10 @@ jobs:
       VITE_OPENAI_BASE_URL: http://localhost:5555/openai/v1
     steps:
       - uses: actions/checkout@v4
+        with:
+          ssh-key: ${{ secrets.E2E_PROVIDER_REPO_KEY }}
+          repository: kava-labs/e2e-account-provider
+          path: e2e-account-provider
 
       # Setup Node.js
       - uses: actions/setup-node@v4
@@ -29,6 +33,26 @@ jobs:
       # Install Node.js dependencies
       - name: Install dependencies
         run: npm ci
+
+      - name: get account provider cache key
+        id: get-provider-head
+        run: |
+          echo "provider-head=$(cd ./e2e-account-provider && git show -s --format=%H && cd ..)" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: check account provider cache
+        id: providercache
+        uses: actions/cache@v3
+        with:
+          path: ./account-provider
+          key: ${{ steps.get-provider-head.outputs.provider-head }}
+
+      - name: build account provider if cache miss
+        if: steps.providercache.outputs.cache-hit != 'true'
+        run: cd e2e-account-provider && make build && cd .. && mv ./e2e-account-provider/account-provider ./
+
+      - name: generate and fund accounts
+        run: rm -f accounts.json && ./account-provider --mnemonic="${{ secrets.WHALE_MNEMONIC }}" --evm_mnemonic="${{ secrets.EVM_WHALE_MNEMONIC }}" --provider_config="./e2e/provider_config.json"
 
       - name: Start API server
         # Wait for containers to be healthy or fail after 30 seconds
