@@ -78,6 +78,13 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
     const { masksToValues } = getStoredMasks();
 
     const validToAddress = masksToValues[toAddress] ?? '';
+    if (!validToAddress.length) {
+      throw new Error(`please provide a valid address to send to`);
+    }
+
+    if (Number(amount) <= 0) {
+      throw new Error(`amount must be greater than zero`);
+    }
 
     const { erc20Contracts, nativeToken } =
       chainRegistry[this.chainType][params.chainName];
@@ -86,12 +93,11 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
       denom.toUpperCase() in erc20Contracts ||
       denom.toUpperCase() === nativeToken;
 
-    return Boolean(
-      validToAddress.length > 0 &&
-        Number(amount) > 0 &&
-        denom.length > 0 &&
-        validDenomWithContract,
-    );
+    if (!validDenomWithContract) {
+      throw new Error(`failed to find contract address for ${denom}`);
+    }
+
+    return true;
   }
 
   async buildTransaction(

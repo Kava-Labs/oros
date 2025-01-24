@@ -41,6 +41,10 @@ export const chainRegistry: ChainRegistry = {
           contractAddress: '0x919C1c267BC06a7039e03fcc2eF738525769109c',
           displayName: 'USD₮',
         },
+        'USD₮': {
+          contractAddress: '0x919C1c267BC06a7039e03fcc2eF738525769109c',
+          displayName: 'USD₮',
+        },
         WKAVA: {
           contractAddress: '0xc86c7C0eFbd6A49B35E8714C5f59D99De09A225b',
           displayName: 'wKAVA',
