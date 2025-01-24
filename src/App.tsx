@@ -18,6 +18,7 @@ import { ToolCallStreamStore } from './toolCallStreamStore';
 import { MessageHistoryStore } from './messageHistoryStore';
 import { useAppContext } from './context/useAppContext';
 import { ExecuteOperation } from './context/AppContext';
+import { OperationResult } from './types/chain';
 
 let client: OpenAI | null = null;
 
@@ -287,9 +288,19 @@ async function callTools(
     if (name) {
       let content = '';
       try {
-        content = await executeOperation(name, toolCall.function.arguments);
+        const result = await executeOperation(
+          name,
+          toolCall.function.arguments,
+        );
+        content = JSON.stringify({
+          status: 'ok',
+          info: result,
+        } as OperationResult);
       } catch (err) {
-        content = JSON.stringify(err);
+        content = JSON.stringify({
+          status: 'failed',
+          info: err,
+        } as OperationResult);
       }
 
       messageHistoryStore.addMessage({
