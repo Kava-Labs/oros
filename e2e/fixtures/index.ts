@@ -26,7 +26,7 @@ export const test = base.extend<{
 }>({
   // because playwright needs this to operate
   // eslint-disable-next-line
-  context: async ({}, u) => {
+  context: async ({}, testUse) => {
     const metaMaskExtensionPath = path.join(
       __dirname,
       '..',
@@ -42,8 +42,7 @@ export const test = base.extend<{
       bypassCSP: true,
     });
 
-    console.log('context', context);
-    await u(context);
+    await testUse(context);
     await context.close();
   },
 
@@ -55,7 +54,7 @@ export const test = base.extend<{
     const page = await scanPages(context, match);
     if (page) {
       const extensionID = page.url().split('/')[2];
-      testUse(extensionID);
+      await testUse(extensionID);
     } else {
       throw new Error('Metamask Extension was not found');
     }

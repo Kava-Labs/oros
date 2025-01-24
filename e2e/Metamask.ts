@@ -9,6 +9,7 @@ import {
 } from './Wallet';
 import { Contract, ethers } from 'ethers';
 import { readFileSync } from 'fs';
+import { meta } from '@eslint/js';
 
 export class MetaMask extends Wallet {
   // eslint-disable-next-line
@@ -168,6 +169,37 @@ export class MetaMask extends Wallet {
     await signBtn.click();
 
     await page.waitForEvent('close');
+  }
+
+  public async switchNetwork() {
+    const metaMaskPage = await this.registerPage.context().newPage();
+    await metaMaskPage.goto(this.extensionLink + 'home.html');
+    await metaMaskPage.waitForSelector('[data-testid="network-display"]', {
+      timeout: 10000,
+    });
+
+    await metaMaskPage.getByTestId('network-display').click();
+    await metaMaskPage
+      .getByRole('button', { name: 'Add a custom network' })
+      .click();
+
+    await metaMaskPage.getByTestId('network-form-network-name').fill('Kava');
+    await metaMaskPage.getByTestId('test-add-rpc-drop-down').click();
+    await metaMaskPage.getByRole('button', { name: 'Add RPC URL' }).click();
+    await metaMaskPage
+      .getByTestId('rpc-url-input-test')
+      .fill('https://evm.kava.io');
+    await metaMaskPage.getByRole('button', { name: 'Add URL' }).click();
+    await metaMaskPage.getByTestId('network-form-chain-id').fill('2222');
+    await metaMaskPage.getByTestId('network-form-ticker-input').fill('KAVA');
+
+    await metaMaskPage.getByRole('button', { name: 'Save' }).click();
+    await metaMaskPage.waitForTimeout(2000);
+
+    await metaMaskPage.getByTestId('network-display').click();
+    await metaMaskPage.getByTestId('Kava').click();
+
+    await metaMaskPage.close();
   }
 }
 

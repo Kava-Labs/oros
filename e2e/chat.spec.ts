@@ -1,13 +1,12 @@
-import { describe, test, expect } from './fixtures';
+import { describe, expect, beforeEach, getWalletId, test } from './fixtures';
 import { Chat } from './Chat';
 import { MetaMask } from './Metamask';
-import { beforeEach, getWalletId } from './fixtures';
 import { EvmWalletID } from './Wallet';
 
 describe('chat', () => {
   let metaMask: MetaMask;
   // register metamask account to get app ready for testing
-  beforeEach(async ({ metaMaskExtensionId, context }, testInfo) => {
+  beforeEach(async ({ context, metaMaskExtensionId }, testInfo) => {
     expect(metaMaskExtensionId).toBeDefined();
 
     const walletId = getWalletId(
@@ -60,11 +59,13 @@ describe('chat', () => {
     const responseText = await messages[messages.length - 1].innerText();
     expect(responseText).toMatch(/THIS IS A TEST/i);
   });
+
   test('send tx', async ({ page, context }) => {
     test.setTimeout(90 * 1000);
 
     const chat = new Chat(page, context, metaMask);
     await chat.goto();
+    await metaMask.switchNetwork();
 
     await chat.submitMessage(
       'Send 0.1 KAVA to 0xd8e30F7BCB5211E591BBc463cDAb0144e82dFfE5',
@@ -73,13 +74,20 @@ describe('chat', () => {
     await chat.waitForStreamToFinish();
     await chat.waitForAssistantResponse();
 
-    const messages = await chat.getMessageElementsWithContent();
+    let messages = await chat.getMessageElementsWithContent();
     expect(messages.length).toBeGreaterThan(0);
 
-    const attr =
-      await messages[messages.length - 1].getAttribute('data-chat-role');
-    expect(attr).toBe('assistant');
+    await chat.waitForStreamToFinish();
 
+    const metamaskConnectPagePromise = context.waitForEvent('page');
+
+    const metaMaskPopup = await metamaskConnectPagePromise;
+    await metaMaskPopup.waitForLoadState();
+    await metaMaskPopup.getByRole('button', { name: 'Connect' }).click();
+
+    await chat.waitForAssistantResponse();
+
+    messages = await chat.getMessageElementsWithContent();
     const responseText = await messages[messages.length - 1].innerText();
     expect(responseText).toMatch(/THIS IS A TEST/i);
   });
