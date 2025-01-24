@@ -1,0 +1,35 @@
+{
+  "chainId": "kava_2221-17000",
+  "outputFile": "accounts.json",
+  "entropyBitSize": 128,
+  "fund": true,
+  "gasCoin": "1000000ukava",
+  "timeoutMs": 180000,
+  "cosmos": {
+    "chainGrpcUrl": "https://grpc.data.internal.testnet.us-east.production.kava.io:443",
+    "numberOfAccountsToGenerate": 8,
+    "coinsToSend": "23000000000ukava",
+    "bech32MainPrefix": "kava",
+    "Bech32PrefixAccPub": "kavapub",
+    "coinType": 459
+  },
+  "evm": {
+    "evmUrl": "https://evm.data.internal.testnet.us-east.production.kava.io",
+    "numberOfAccountsToGenerate": 1,
+    "coinType": 60,
+    "erc20CoinsToSend": [
+      {
+        "contractAddress": "0x7a5DBf8e6ac1F6aCCF14f5B4E88b21EAA04c983d",
+        "amount": "1000000"
+      },
+      {
+        "contractAddress": "0xaCF81e57CBd9aF95FaBbe53678FcB70B1dD1b7A1",
+        "amount": "10000000"
+      },
+      {
+        "contractAddress": "0x9920E05F1f5B0280fe2Fe32B758F3Dbd534A5480",
+        "amount": "10000000000000000000"
+      }
+    ]
+  }
+}
