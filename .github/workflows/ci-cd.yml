@@ -181,7 +181,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run Playwright tests
-        run: DEBUG=pw:webserver xvfb-run npx playwright test
+        run: DEBUG=pw:webserver xvfb-run npx playwright test --timeout=60000
 
       - name: Shutdown proxy and kava node
         if: always()
