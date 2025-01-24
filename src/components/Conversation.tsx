@@ -69,7 +69,7 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
             return null;
           }
 
-          let hash = message.content as string;
+          const hash = message.content as string;
 
           return (
             <div key={index} className={styles.left}>
