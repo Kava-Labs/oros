@@ -1,3 +1,4 @@
+import { ERC20Record } from '../../config/chainsRegistry';
 //  todo - convert to use interface
 export const getStoredMasks = (): {
   masksToValues: Record<string, string>;
@@ -20,4 +21,20 @@ export const updateStoredMasks = (
 ) => {
   localStorage.setItem('masksToValues', JSON.stringify(masksToValues));
   localStorage.setItem('valuesToMasks', JSON.stringify(valuesToMasks));
+};
+
+export const getERC20Record = (
+  denom: string,
+  records: Record<string, ERC20Record>,
+): ERC20Record | null => {
+  if (records[denom]) return records[denom];
+  if (records[denom.toUpperCase()]) return records[denom.toUpperCase()];
+
+  for (const record of Object.values(records)) {
+    if (record.displayName === denom) return record;
+    if (record.displayName === denom.toUpperCase()) return record;
+    if (record.displayName.toUpperCase() === denom.toUpperCase()) return record;
+  }
+
+  return null;
 };

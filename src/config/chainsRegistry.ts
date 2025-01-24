@@ -1,5 +1,7 @@
 import { ChainType } from '../types/chain';
 
+export type ERC20Record = { contractAddress: string; displayName: string };
+
 type EVMChainConfig = {
   name: string;
   rpcUrls: string[];
@@ -7,10 +9,7 @@ type EVMChainConfig = {
   chainID: number;
   nativeToken: string;
   nativeTokenDecimals: number;
-  erc20Contracts: Record<
-    string,
-    { contractAddress: string; displayName: string }
-  >;
+  erc20Contracts: Record<string, ERC20Record>;
 };
 
 export type ChainConfig = EVMChainConfig;
