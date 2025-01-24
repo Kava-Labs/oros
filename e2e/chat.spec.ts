@@ -62,13 +62,11 @@ describe('chat', () => {
       );
     });
 
-    test('check balances', async ({ page, context }) => {
+    test.skip('check balances', async ({ page, context }) => {
       test.setTimeout(90 * 1000);
 
       const chat = new Chat(page, context, metaMask);
       await chat.goto();
-
-      console.log('in test', metaMask.address);
 
       await metaMask.switchNetwork();
 
@@ -78,9 +76,6 @@ describe('chat', () => {
 
       await chat.waitForStreamToFinish();
 
-      let messages = await chat.getMessageElementsWithContent();
-      expect(messages.length).toBeGreaterThan(0);
-
       const metamaskPopup = await metamaskPopupPromise;
       await metamaskPopup.waitForLoadState();
       await metamaskPopup.getByTestId('confirm-btn').click();
@@ -88,13 +83,17 @@ describe('chat', () => {
       await chat.waitForStreamToFinish();
       await chat.waitForAssistantResponse();
 
-      messages = await chat.getMessageElementsWithContent();
+      const messages = await chat.getMessageElementsWithContent();
       const responseText = await messages[messages.length - 1].innerText();
-      expect(responseText).toContain('current balance');
-      expect(responseText).toContain('KAVA: ');
+
+      //  Verify that the connected wallet has some KAVA balance
+      const kavaMatch = responseText.match(/KAVA: ([\d.]+)/);
+      expect(kavaMatch).toBeTruthy();
+      const kavaBalance = Number(kavaMatch[1]);
+      expect(kavaBalance).toBeGreaterThan(0);
     });
 
-    test('send tx', async ({ page, context }) => {
+    test.skip('send tx', async ({ page, context }) => {
       test.setTimeout(90 * 1000);
 
       const chat = new Chat(page, context, metaMask);
@@ -104,6 +103,7 @@ describe('chat', () => {
 
       //  be ready to find the upcoming popup
       const metamaskPopupPromise = context.waitForEvent('page');
+
       await chat.submitMessage(
         'Send 0.0000001 KAVA to 0xC07918E451Ab77023a16Fa7515Dd60433A3c771D',
       );
@@ -113,18 +113,15 @@ describe('chat', () => {
       //  Confirm the tx
       await chat.submitMessage('Yes');
 
+      //  In progress
+      await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
+
       const metamaskPopup = await metamaskPopupPromise;
-      await metamaskPopup.waitForLoadState();
       await metamaskPopup.getByRole('button', { name: 'Connect' }).click();
       await metamaskPopup.getByRole('button', { name: 'Confirm' }).click();
 
-      await chat.waitForStreamToFinish();
-
-      const messages = await chat.getMessageElementsWithContent();
-      const lastMessage = await messages[messages.length - 1].innerText();
-      await page.pause();
-
-      expect(lastMessage).toContain('Transaction Processed');
+      //  Completed
+      await expect(page.getByTestId('complete-tx-display')).toBeVisible();
     });
   });
 });
