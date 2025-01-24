@@ -1,9 +1,9 @@
+import { InProgressTxDisplay } from '../../../../../components/InProgressTxDisplay';
 import {
   ChainMessage,
   ChainType,
   OperationType,
 } from '../../../../../types/chain';
-import { TransactionDisplay } from '../../../../../components/TransactionDisplay';
 import { WalletStore, WalletTypes } from '../../../../../walletStore';
 
 //  sent to model
@@ -44,7 +44,7 @@ export class LendDepositMessage implements ChainMessage<LendToolParams> {
   ];
 
   inProgressComponent() {
-    return TransactionDisplay;
+    return InProgressTxDisplay;
   }
   /**
    * Validates that all required parameters are present and of correct type.

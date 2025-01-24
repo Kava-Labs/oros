@@ -1,23 +1,21 @@
 import { ChainType } from '../types/chain';
 
-export type ChainRegistry = Record<
-  ChainType,
-  Record<
+type EVMChainConfig = {
+  name: string;
+  rpcUrls: string[];
+  blockExplorerUrls: string[];
+  chainID: number;
+  nativeToken: string;
+  nativeTokenDecimals: number;
+  erc20Contracts: Record<
     string,
-    {
-      name: string;
-      rpcUrls: string[];
-      blockExplorerUrls: string[];
-      chainID: number;
-      nativeToken: string;
-      nativeTokenDecimals: number;
-      erc20Contracts: Record<
-        string,
-        { contractAddress: string; displayName: string }
-      >;
-    }
-  >
->;
+    { contractAddress: string; displayName: string }
+  >;
+};
+
+export type ChainConfig = EVMChainConfig;
+
+export type ChainRegistry = Record<ChainType, Record<string, ChainConfig>>;
 
 export enum ChainNames {
   KAVA_EVM = 'kavaEVM',
