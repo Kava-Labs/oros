@@ -95,6 +95,9 @@ export const chainNameToolCallParam = {
   type: 'string',
   description:
     'name of the chain the user is interacting with, if not specified by the user assume kavaEVM',
-  enum: Object.keys(chainRegistry),
+  enum: [
+    ...Object.keys(chainRegistry[ChainType.EVM]),
+    ...Object.keys(chainRegistry[ChainType.COSMOS]),
+  ],
   required: true,
 };
