@@ -1,12 +1,5 @@
-import {
-  BrowserContext,
-  ElementHandle,
-  expect,
-  Locator,
-  Page,
-} from '@playwright/test';
+import { ElementHandle, expect, Locator, Page } from '@playwright/test';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
-import { Wallet } from './Wallet';
 
 export class Chat {
   public page: Page;
