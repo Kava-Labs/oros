@@ -1,6 +1,7 @@
 import { useAppContext } from '../context/useAppContext';
 import { ToolCallStream } from '../toolCallStreamStore';
 import { useEffect, useSyncExternalStore } from 'react';
+import { useScrollToBottom } from '../useScrollToBottom';
 
 export const QueryInProgress = ({
   onRendered,
@@ -22,11 +23,7 @@ export const QueryInProgress = ({
     };
   }, [progressStore, progressText]);
 
-  useEffect(() => {
-    if (onRendered) {
-      requestAnimationFrame(onRendered);
-    }
-  }, [onRendered]);
+  useScrollToBottom(onRendered);
 
   return null;
 };

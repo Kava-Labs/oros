@@ -1,7 +1,7 @@
 import styles from './TxDisplay.module.css';
 import { ExternalLinkIcon } from '../assets/ExternalLinkIcon';
 import { ChainConfig } from '../config/chainsRegistry';
-import { useEffect } from 'react';
+import { useScrollToBottom } from '../useScrollToBottom';
 
 interface CompleteTxDisplayProps {
   hash: string;
@@ -16,11 +16,7 @@ export const CompleteTxDisplay = ({
 }: CompleteTxDisplayProps) => {
   const explorerUrl = chain.blockExplorerUrls[0] + 'tx/' + hash;
 
-  useEffect(() => {
-    if (onRendered) {
-      requestAnimationFrame(onRendered);
-    }
-  }, [onRendered]);
+  useScrollToBottom(onRendered);
 
   return (
     <div

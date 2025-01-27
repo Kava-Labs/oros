@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
 import { ToolCallStream } from '../toolCallStreamStore';
 import styles from './TxDisplay.module.css';
+import { useScrollToBottom } from '../useScrollToBottom';
 
 export const InProgressTxDisplay = ({
   onRendered,
@@ -8,11 +8,7 @@ export const InProgressTxDisplay = ({
   toolCall: ToolCallStream;
   onRendered?: () => void;
 }) => {
-  useEffect(() => {
-    if (onRendered) {
-      requestAnimationFrame(onRendered);
-    }
-  }, [onRendered]);
+  useScrollToBottom(onRendered);
 
   return (
     <div
