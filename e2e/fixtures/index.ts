@@ -1,40 +1,15 @@
-import { test as base, chromium, BrowserContext, Page } from '@playwright/test';
+import {
+  test as base,
+  chromium,
+  BrowserContext,
+  Page,
+  Frame,
+} from '@playwright/test';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 // @ts-expect-error - Cannot find name 'dirname'/'fileURLToPath'
 const __dirname = dirname(fileURLToPath(import.meta.url));
-
-async function getBackgroundPage(
-  ctx: BrowserContext,
-  match: (title: string) => boolean,
-  timeout = 5000,
-): Promise<Page | null> {
-  try {
-    const backgroundPages = ctx.backgroundPages();
-    if (!backgroundPages.length) {
-      await ctx.waitForEvent('backgroundpage', {
-        timeout,
-      });
-    }
-
-    const page = await scanPages(ctx, match);
-    if (page) return page;
-  } catch (err) {
-    console.error(err);
-  }
-
-  try {
-    await ctx.waitForEvent('page', { timeout });
-
-    const page = await scanPages(ctx, match);
-    if (page) return page;
-  } catch (err) {
-    console.error(err);
-  }
-
-  return null;
-}
 
 async function scanPages(
   ctx: BrowserContext,
@@ -78,22 +53,16 @@ export const test = base.extend<{
   },
 
   metaMaskExtensionId: async ({ context }, testUse) => {
-    const max = 3;
-    let retry = 0;
+    const match = (title: string) => {
+      return title === 'MetaMask';
+    };
 
-    while (++retry <= max) {
-      const metaMaskPage = await getBackgroundPage(context, (title) => {
-        return title === 'MetaMask';
-      });
-      if (metaMaskPage) {
-        const metaMaskExtensionId = metaMaskPage.url().split('/')[2];
-        await testUse(metaMaskExtensionId);
-        return;
-      } else {
-        if (retry === max) {
-          throw new Error('MetaMask Extension was not found');
-        }
-      }
+    const page = await scanPages(context, match);
+    if (page) {
+      const extensionID = page.url().split('/')[2];
+      await testUse(extensionID);
+    } else {
+      throw new Error('Metamask Extension was not found');
     }
   },
 });
@@ -103,3 +72,63 @@ export const beforeEach = test.beforeEach;
 export const describe = test.describe;
 export const only = test.only;
 export const expect = test.expect;
+
+const DEFAULT_INTERVAL = 1000; // 1 second
+
+export async function retryClick(
+  page: Page | Frame,
+  buttonOptions: { role: string; name: string },
+  options: { timeout?: number; interval?: number } = {},
+): Promise<void> {
+  const MAX_RETRIES = 5;
+  const interval = options.interval || DEFAULT_INTERVAL;
+
+  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    try {
+      const button = await page.getByRole('button', buttonOptions);
+      await button.click({ timeout: interval });
+      return;
+    } catch (error) {
+      if (attempt === MAX_RETRIES - 1) {
+        throw new Error(
+          `Failed to click button "${buttonOptions.name}" after ${MAX_RETRIES} attempts: ${error.message}`,
+        );
+      }
+      await page.waitForTimeout(interval);
+    }
+  }
+}
+
+/**
+ * Helper function to handle MetaMask popup interactions with retries
+ */
+export async function confirmMetamaskTransaction(
+  metamaskPopup: Page | Frame,
+  { timeout = 60000, interval = 500 } = {},
+): Promise<void> {
+  // Click Connect button with retries
+  await retryClick(
+    metamaskPopup,
+    { role: 'button', name: 'Connect' },
+    { timeout, interval },
+  );
+
+  // Click Confirm button with retries
+  await retryClick(
+    metamaskPopup,
+    { role: 'button', name: 'Confirm' },
+    { timeout, interval },
+  );
+}
+
+export async function confirmMetamaskConnect(
+  metamaskPopup: Page | Frame,
+  { timeout = 60000, interval = 500 } = {},
+): Promise<void> {
+  // Click Connect button with retries
+  await retryClick(
+    metamaskPopup,
+    { role: 'button', name: 'Connect' },
+    { timeout, interval },
+  );
+}

@@ -1,4 +1,10 @@
-import { describe, expect, test } from './fixtures';
+import {
+  describe,
+  expect,
+  test,
+  confirmMetamaskTransaction,
+  confirmMetamaskConnect,
+} from './fixtures';
 import { Chat } from './Chat';
 import { MetaMask } from './Metamask';
 import { ethers } from 'ethers';
@@ -60,13 +66,13 @@ describe('chat', () => {
 
     //  be ready to find the upcoming popup
     const metamaskPopupPromise = context.waitForEvent('page');
+
     await chat.submitMessage('What are my balances on Kava Internal Testnet?');
 
     await chat.waitForStreamToFinish();
 
     const metamaskPopup = await metamaskPopupPromise;
-    await metamaskPopup.waitForLoadState();
-    await metamaskPopup.getByTestId('confirm-btn').click();
+    await confirmMetamaskConnect(metamaskPopup);
 
     await chat.waitForStreamToFinish();
     await chat.waitForAssistantResponse();
@@ -74,8 +80,8 @@ describe('chat', () => {
     const messages = await chat.getMessageElementsWithContent();
     const responseText = await messages[messages.length - 1].innerText();
 
-    //  Verify that the connected wallet has a balance of >1000 KAVA
-    const kavaMatch = responseText.match(/KAVA: ([^\n]+)/);
+    //  Verify that the connected wallet has a balance of >1000 TKAVA
+    const kavaMatch = responseText.match(/TKAVA: ([^\n]+)/);
     expect(kavaMatch).toBeTruthy();
     const kavaBalance = Number(kavaMatch[1].replace(/,/g, ''));
     expect(kavaBalance).toBeGreaterThan(1000);
@@ -104,7 +110,7 @@ describe('chat', () => {
     const metamaskPopupPromise = context.waitForEvent('page');
 
     await chat.submitMessage(
-      'Send 0.12345 KAVA to 0xC07918E451Ab77023a16Fa7515Dd60433A3c771D on Kava Internal Testnet',
+      'Send 0.12345 TKAVA to 0xC07918E451Ab77023a16Fa7515Dd60433A3c771D on Kava Internal Testnet',
     );
 
     await chat.waitForStreamToFinish();
@@ -116,8 +122,9 @@ describe('chat', () => {
     await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
 
     const metamaskPopup = await metamaskPopupPromise;
-    await metamaskPopup.getByRole('button', { name: 'Connect' }).click();
-    await metamaskPopup.getByRole('button', { name: 'Confirm' }).click();
+    await confirmMetamaskTransaction(metamaskPopup);
+    // await metamaskPopup.getByRole('button', { name: 'Connect' }).click();
+    // await metamaskPopup.getByRole('button', { name: 'Confirm' }).click();
 
     const provider = new ethers.JsonRpcProvider(
       'https://evm.data.internal.testnet.us-east.production.kava.io',
