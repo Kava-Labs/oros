@@ -11,4 +11,4 @@ fi
 echo "Proxy server is ready."
 
 # Start the webapp dev server
-npm run dev
+bash ./e2e/pre-e2e.bash && npm run dev

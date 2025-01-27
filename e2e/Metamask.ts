@@ -1,14 +1,6 @@
 import { expect } from './fixtures';
 import { BrowserContext, Page } from '@playwright/test';
-import {
-  EvmWalletID,
-  SigningOptions,
-  TxType,
-  Wallet,
-  WalletOpts,
-} from './Wallet';
-import { Contract, ethers } from 'ethers';
-import { readFileSync } from 'fs';
+import { SigningOptions, TxType, Wallet, WalletOpts } from './Wallet';
 
 const E2E_WALLET_KEY = process.env.VITE_E2E_WALLET_KEY;
 
@@ -25,17 +17,12 @@ export class MetaMask extends Wallet {
   static async prepareWallet(
     context: BrowserContext,
     extensionId: string,
-    walletId: EvmWalletID,
     register: boolean = true,
   ) {
     console.info('preparing MetaMask wallet');
-    const { address, mnemonic } = this.loadWalletKeys({
-      walletKeysFilePath: 'accounts.json',
-      accountType: 'kavaEvm',
-      walletID: walletId,
-    });
 
-    await getERC20BalancesForContracts('./e2e/provider_config.json', address);
+    const address = process.env.VITE_E2E_WALLET_ADDRESS;
+    const mnemonic = process.env.VITE_E2E_WALLET_MNEMONIC.split(' ');
 
     let metaMaskPage;
 
@@ -57,13 +44,13 @@ export class MetaMask extends Wallet {
     });
 
     if (register) {
-      await metaMask.register();
+      await metaMask.register(mnemonic);
     }
 
     return metaMask;
   }
 
-  public async register() {
+  public async register(mnemonic: string[]) {
     if ((await this.registerPage.title()) !== 'MetaMask') {
       await this.registerPage.goto(
         this.extensionLink + 'home.html#onboarding/welcome',
@@ -81,7 +68,7 @@ export class MetaMask extends Wallet {
     const signUpInputGroup = this.registerPage.getByRole('textbox');
 
     for (let i = 0; i < 12; i++) {
-      await signUpInputGroup.nth(i).fill(this.mnemonic[i]);
+      await signUpInputGroup.nth(i).fill(mnemonic[i]);
     }
 
     await this.registerPage
@@ -183,21 +170,23 @@ export class MetaMask extends Wallet {
       .getByRole('button', { name: 'Add a custom network' })
       .click();
 
-    await metaMaskPage.getByTestId('network-form-network-name').fill('Kava');
+    await metaMaskPage
+      .getByTestId('network-form-network-name')
+      .fill('Kava Internal Testnet');
     await metaMaskPage.getByTestId('test-add-rpc-drop-down').click();
     await metaMaskPage.getByRole('button', { name: 'Add RPC URL' }).click();
     await metaMaskPage
       .getByTestId('rpc-url-input-test')
-      .fill('https://evm.kava.io');
+      .fill('https://evm.data.internal.testnet.us-east.production.kava.io');
     await metaMaskPage.getByRole('button', { name: 'Add URL' }).click();
-    await metaMaskPage.getByTestId('network-form-chain-id').fill('2222');
-    await metaMaskPage.getByTestId('network-form-ticker-input').fill('KAVA');
+    await metaMaskPage.getByTestId('network-form-chain-id').fill('2221');
+    await metaMaskPage.getByTestId('network-form-ticker-input').fill('TKAVA');
 
     await metaMaskPage.getByRole('button', { name: 'Save' }).click();
     await metaMaskPage.waitForTimeout(2000);
 
     await metaMaskPage.getByTestId('network-display').click();
-    await metaMaskPage.getByTestId('Kava').click();
+    await metaMaskPage.getByTestId('Kava Internal Testnet').click();
 
     await metaMaskPage.getByTestId('account-menu-icon').click();
 
@@ -209,79 +198,5 @@ export class MetaMask extends Wallet {
     await metaMaskPage.locator('#private-key-box').fill(E2E_WALLET_KEY);
     await metaMaskPage.getByRole('button', { name: 'Import' }).click();
     await metaMaskPage.close();
-  }
-}
-
-async function getERC20BalancesForContracts(
-  configPath: string,
-  address: string,
-) {
-  const providerConf = JSON.parse(readFileSync(configPath).toString());
-
-  expect(providerConf.evm.evmUrl).toBeDefined();
-  expect(providerConf).toBeDefined();
-  expect(providerConf.evm).toBeDefined();
-  expect(providerConf.evm.erc20CoinsToSend);
-  expect(providerConf.evm.erc20CoinsToSend.length).not.toBe(0);
-
-  const balanceOfABI = [
-    {
-      constant: true,
-      inputs: [
-        {
-          name: '_owner',
-          type: 'address',
-        },
-      ],
-      name: 'balanceOf',
-      outputs: [
-        {
-          name: 'balance',
-          type: 'uint256',
-        },
-      ],
-      payable: false,
-      stateMutability: 'view',
-      type: 'function',
-    },
-  ];
-
-  for (const { contractAddress, amount } of providerConf.evm.erc20CoinsToSend) {
-    expect(contractAddress).toBeDefined();
-    expect(amount).toBeDefined();
-
-    let balance;
-
-    let tryCount = 0;
-    while (tryCount < 3) {
-      try {
-        balance = await new Contract(
-          contractAddress,
-          balanceOfABI,
-          new ethers.JsonRpcProvider(providerConf.evm.evmUrl),
-        ).balanceOf(address);
-
-        balance = balance.toString();
-
-        if (balance === 0) {
-          throw new Error('Zero balance - tx will fail');
-        }
-
-        break;
-      } catch (err) {
-        tryCount++;
-        console.log(err);
-        console.log(
-          `retrying fetching erc20 balance for asset with contract: ${contractAddress} `,
-        );
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-      }
-    }
-
-    expect(Number(amount)).toBeGreaterThan(0);
-
-    console.info(
-      `metamask account with address ${address} has ${balance.toString()} in asset with contract ${contractAddress}`,
-    );
   }
 }
