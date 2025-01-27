@@ -5,6 +5,37 @@ import { dirname } from 'path';
 // @ts-expect-error - Cannot find name 'dirname'/'fileURLToPath'
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+async function getBackgroundPage(
+  ctx: BrowserContext,
+  match: (title: string) => boolean,
+  timeout = 5000,
+): Promise<Page | null> {
+  try {
+    const backgroundPages = ctx.backgroundPages();
+    if (!backgroundPages.length) {
+      await ctx.waitForEvent('backgroundpage', {
+        timeout,
+      });
+    }
+
+    const page = await scanPages(ctx, match);
+    if (page) return page;
+  } catch (err) {
+    console.error(err);
+  }
+
+  try {
+    await ctx.waitForEvent('page', { timeout });
+
+    const page = await scanPages(ctx, match);
+    if (page) return page;
+  } catch (err) {
+    console.error(err);
+  }
+
+  return null;
+}
+
 async function scanPages(
   ctx: BrowserContext,
   match: (title: string) => boolean,
@@ -47,16 +78,22 @@ export const test = base.extend<{
   },
 
   metaMaskExtensionId: async ({ context }, testUse) => {
-    const match = (title: string) => {
-      return title === 'MetaMask';
-    };
+    const max = 3;
+    let retry = 0;
 
-    const page = await scanPages(context, match);
-    if (page) {
-      const extensionID = page.url().split('/')[2];
-      await testUse(extensionID);
-    } else {
-      throw new Error('Metamask Extension was not found');
+    while (++retry <= max) {
+      const metaMaskPage = await getBackgroundPage(context, (title) => {
+        return title === 'MetaMask';
+      });
+      if (metaMaskPage) {
+        const metaMaskExtensionId = metaMaskPage.url().split('/')[2];
+        await testUse(metaMaskExtensionId);
+        return;
+      } else {
+        if (retry === max) {
+          throw new Error('MetaMask Extension was not found');
+        }
+      }
     }
   },
 });
