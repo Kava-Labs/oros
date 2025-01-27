@@ -1,14 +1,26 @@
 import styles from './TxDisplay.module.css';
 import { ExternalLinkIcon } from '../assets/ExternalLinkIcon';
 import { ChainConfig } from '../config/chainsRegistry';
+import { useEffect } from 'react';
 
 interface CompleteTxDisplayProps {
   hash: string;
   chain: ChainConfig;
+  onRendered?: () => void;
 }
 
-export const CompleteTxDisplay = ({ hash, chain }: CompleteTxDisplayProps) => {
+export const CompleteTxDisplay = ({
+  hash,
+  chain,
+  onRendered,
+}: CompleteTxDisplayProps) => {
   const explorerUrl = chain.blockExplorerUrls[0] + 'tx/' + hash;
+
+  useEffect(() => {
+    if (onRendered) {
+      requestAnimationFrame(onRendered);
+    }
+  }, [onRendered]);
 
   return (
     <div

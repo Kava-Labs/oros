@@ -2,7 +2,12 @@ import { useAppContext } from '../context/useAppContext';
 import { ToolCallStream } from '../toolCallStreamStore';
 import { useEffect, useSyncExternalStore } from 'react';
 
-export const QueryInProgress = (_props: ToolCallStream) => {
+export const QueryInProgress = ({
+  onRendered,
+}: {
+  toolCall: ToolCallStream;
+  onRendered?: () => void;
+}) => {
   const { progressStore } = useAppContext();
 
   const progressText = useSyncExternalStore(
@@ -16,6 +21,12 @@ export const QueryInProgress = (_props: ToolCallStream) => {
       progressStore.setText('');
     };
   }, [progressStore, progressText]);
+
+  useEffect(() => {
+    if (onRendered) {
+      requestAnimationFrame(onRendered);
+    }
+  }, [onRendered]);
 
   return null;
 };

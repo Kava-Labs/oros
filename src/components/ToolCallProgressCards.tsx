@@ -1,7 +1,11 @@
 import { useSyncExternalStore } from 'react';
 import { useAppContext } from '../context/useAppContext';
 
-export const ToolCallProgressCards = () => {
+export const ToolCallProgressCards = ({
+  onRendered,
+}: {
+  onRendered: () => void;
+}) => {
   const { toolCallStreamStore } = useAppContext();
 
   const toolCallStreams = useSyncExternalStore(
@@ -16,7 +20,13 @@ export const ToolCallProgressCards = () => {
     const operation = registry.get(toolCall.function.name ?? '');
     if (operation && operation.inProgressComponent) {
       const Component = operation.inProgressComponent();
-      return <Component key={toolCall.id} {...toolCall} />;
+      return (
+        <Component
+          key={toolCall.id}
+          toolCall={toolCall}
+          onRendered={onRendered}
+        />
+      );
     }
     return null;
   });

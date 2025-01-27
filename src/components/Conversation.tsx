@@ -135,7 +135,7 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
         </div>
       )}
 
-      <ToolCallProgressCards />
+      <ToolCallProgressCards onRendered={onRendered} />
     </div>
   );
 };

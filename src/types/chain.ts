@@ -36,7 +36,10 @@ export interface ChainOperation<T> {
   validate(params: T, walletStore: WalletStore): boolean;
 
   /** Optional React component that displays as the model is streaming the tool call arguments */
-  inProgressComponent?: () => React.FunctionComponent<ToolCallStream>;
+  inProgressComponent?: () => React.FunctionComponent<{
+    toolCall: ToolCallStream;
+    onRendered?: () => void;
+  }>;
 }
 
 /**
