@@ -1,8 +1,14 @@
 import { useAppContext } from '../context/useAppContext';
 import { ToolCallStream } from '../toolCallStreamStore';
 import { useEffect, useSyncExternalStore } from 'react';
+import { useScrollToBottom } from '../useScrollToBottom';
 
-export const QueryInProgress = (_props: ToolCallStream) => {
+export const QueryInProgress = ({
+  onRendered,
+}: {
+  toolCall: ToolCallStream;
+  onRendered?: () => void;
+}) => {
   const { progressStore } = useAppContext();
 
   const progressText = useSyncExternalStore(
@@ -16,6 +22,8 @@ export const QueryInProgress = (_props: ToolCallStream) => {
       progressStore.setText('');
     };
   }, [progressStore, progressText]);
+
+  useScrollToBottom(onRendered);
 
   return null;
 };

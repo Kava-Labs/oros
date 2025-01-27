@@ -1,14 +1,22 @@
 import styles from './TxDisplay.module.css';
 import { ExternalLinkIcon } from '../assets/ExternalLinkIcon';
 import { ChainConfig } from '../config/chainsRegistry';
+import { useScrollToBottom } from '../useScrollToBottom';
 
 interface CompleteTxDisplayProps {
   hash: string;
   chain: ChainConfig;
+  onRendered?: () => void;
 }
 
-export const CompleteTxDisplay = ({ hash, chain }: CompleteTxDisplayProps) => {
+export const CompleteTxDisplay = ({
+  hash,
+  chain,
+  onRendered,
+}: CompleteTxDisplayProps) => {
   const explorerUrl = chain.blockExplorerUrls[0] + 'tx/' + hash;
+
+  useScrollToBottom(onRendered);
 
   return (
     <div
