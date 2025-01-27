@@ -1,7 +1,7 @@
-import { describe, expect } from './fixtures';
+import { describe, expect, test } from './fixtures';
 import { Chat } from './Chat';
-//  todo - eventually import test from fixtures when integrated with metamask in CI/CD
-import test from '@playwright/test';
+import { MetaMask } from './Metamask';
+import { ethers } from 'ethers';
 
 describe('chat', () => {
   test('renders intro message', async ({ page }) => {
@@ -43,88 +43,91 @@ describe('chat', () => {
     expect(responseText).toMatch(/THIS IS A TEST/i);
   });
 
-  // todo - integrate with CI/CD
-  // test('check balances', async ({ page, context, metaMaskExtensionId }) => {
-  //   test.setTimeout(90 * 1000);
-  //
-  //   const chat = new Chat(page);
-  //   await chat.goto();
-  //
-  //   const metaMask = await MetaMask.prepareWallet(
-  //     context,
-  //     metaMaskExtensionId,
-  //     0,
-  //     true,
-  //   );
-  //
-  //   await metaMask.switchNetwork();
-  //
-  //   //  be ready to find the upcoming popup
-  //   const metamaskPopupPromise = context.waitForEvent('page');
-  //   await chat.submitMessage('What are my balances on Kava Internal Testnet?');
-  //
-  //   await chat.waitForStreamToFinish();
-  //
-  //   const metamaskPopup = await metamaskPopupPromise;
-  //   await metamaskPopup.waitForLoadState();
-  //   await metamaskPopup.getByTestId('confirm-btn').click();
-  //
-  //   await chat.waitForStreamToFinish();
-  //   await chat.waitForAssistantResponse();
-  //
-  //   const messages = await chat.getMessageElementsWithContent();
-  //   const responseText = await messages[messages.length - 1].innerText();
-  //
-  //   //  Verify that the connected wallet has a balance of >1000 KAVA
-  //   const kavaMatch = responseText.match(/KAVA: ([^\n]+)/);
-  //   expect(kavaMatch).toBeTruthy();
-  //   const kavaBalance = Number(kavaMatch[1].replace(/,/g, ''));
-  //   expect(kavaBalance).toBeGreaterThan(1000);
-  // });
-  //
-  // test('send tx', async ({ page, context, metaMaskExtensionId }) => {
-  //   test.setTimeout(90 * 1000);
-  //
-  //   const chat = new Chat(page);
-  //   await chat.goto();
-  //
-  //   const metaMask = await MetaMask.prepareWallet(
-  //     context,
-  //     metaMaskExtensionId,
-  //     0,
-  //     true,
-  //   );
-  //
-  //   await metaMask.switchNetwork();
-  //
-  //   //  be ready to find the upcoming popup
-  //   const metamaskPopupPromise = context.waitForEvent('page');
-  //
-  //   await chat.submitMessage(
-  //     'Send 0.12345 KAVA to 0xC07918E451Ab77023a16Fa7515Dd60433A3c771D on Kava Internal Testnet',
-  //   );
-  //
-  //   await chat.waitForStreamToFinish();
-  //
-  //   //  Confirm the tx
-  //   await chat.submitMessage('Yes');
-  //
-  //   //  In progress
-  //   await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
-  //
-  //   const metamaskPopup = await metamaskPopupPromise;
-  //   await metamaskPopup.getByRole('button', { name: 'Connect' }).click();
-  //   await metamaskPopup.getByRole('button', { name: 'Confirm' }).click();
-  //
-  //   const provider = new ethers.JsonRpcProvider(
-  //     'https://evm.data.internal.testnet.us-east.production.kava.io',
-  //   );
-  //   const txHash = await page.getByTestId('tx-hash').innerText();
-  //   const txInfo = await provider.getTransaction(txHash);
-  //
-  //   //  Verify that the tx value is the amount from the user input
-  //   const txValue: bigint = txInfo.value;
-  //
-  //   expect(Number(txValue) / 10 ** 18).toBe(0.12345);
-  // });
+  test('check balances', async ({ page, context, metaMaskExtensionId }) => {
+    test.setTimeout(90 * 1000);
+
+    const chat = new Chat(page);
+    await chat.goto();
+
+    const metaMask = await MetaMask.prepareWallet(
+      context,
+      metaMaskExtensionId,
+      0,
+      true,
+    );
+
+    await metaMask.switchNetwork();
+
+    //  be ready to find the upcoming popup
+    const metamaskPopupPromise = context.waitForEvent('page');
+    await chat.submitMessage('What are my balances on Kava Internal Testnet?');
+
+    await chat.waitForStreamToFinish();
+
+    const metamaskPopup = await metamaskPopupPromise;
+    await metamaskPopup.waitForLoadState();
+    await metamaskPopup.getByTestId('confirm-btn').click();
+
+    await chat.waitForStreamToFinish();
+    await chat.waitForAssistantResponse();
+
+    const messages = await chat.getMessageElementsWithContent();
+    const responseText = await messages[messages.length - 1].innerText();
+
+    //  Verify that the connected wallet has a balance of >1000 KAVA
+    const kavaMatch = responseText.match(/KAVA: ([^\n]+)/);
+    expect(kavaMatch).toBeTruthy();
+    const kavaBalance = Number(kavaMatch[1].replace(/,/g, ''));
+    expect(kavaBalance).toBeGreaterThan(1000);
+  });
+
+  test('send tx (native asset)', async ({
+    page,
+    context,
+    metaMaskExtensionId,
+  }) => {
+    test.setTimeout(90 * 1000);
+
+    const chat = new Chat(page);
+    await chat.goto();
+
+    const metaMask = await MetaMask.prepareWallet(
+      context,
+      metaMaskExtensionId,
+      0,
+      true,
+    );
+
+    await metaMask.switchNetwork();
+
+    //  be ready to find the upcoming popup
+    const metamaskPopupPromise = context.waitForEvent('page');
+
+    await chat.submitMessage(
+      'Send 0.12345 KAVA to 0xC07918E451Ab77023a16Fa7515Dd60433A3c771D on Kava Internal Testnet',
+    );
+
+    await chat.waitForStreamToFinish();
+
+    //  Confirm the tx
+    await chat.submitMessage('Yes');
+
+    //  In progress
+    await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
+
+    const metamaskPopup = await metamaskPopupPromise;
+    await metamaskPopup.getByRole('button', { name: 'Connect' }).click();
+    await metamaskPopup.getByRole('button', { name: 'Confirm' }).click();
+
+    const provider = new ethers.JsonRpcProvider(
+      'https://evm.data.internal.testnet.us-east.production.kava.io',
+    );
+    const txHash = await page.getByTestId('tx-hash').innerText();
+    const txInfo = await provider.getTransaction(txHash);
+
+    //  Verify that the tx value is the amount from the user input
+    const txValue: bigint = txInfo.value;
+
+    expect(Number(txValue) / 10 ** 18).toBe(0.12345);
+  });
 });
