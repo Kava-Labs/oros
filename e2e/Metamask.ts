@@ -32,7 +32,6 @@ export class MetaMask extends Wallet {
 
     const address = process.env.VITE_E2E_WALLET_ADDRESS;
     const mnemonic = process.env.VITE_E2E_WALLET_MNEMONIC.split(' ');
-    console.info('preparing MetaMask wallet', address, mnemonic);
 
     let metaMaskPage;
 
