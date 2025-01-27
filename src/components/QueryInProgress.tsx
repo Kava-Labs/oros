@@ -11,7 +11,7 @@ export const QueryInProgress = (_props: ToolCallStream) => {
   );
 
   useEffect(() => {
-    progressStore.setText('query in Progress');
+    progressStore.setText('Query in Progress');
     return () => {
       progressStore.setText('');
     };

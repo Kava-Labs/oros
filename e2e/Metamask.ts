@@ -1,14 +1,6 @@
 import { expect } from './fixtures';
 import { BrowserContext, Page } from '@playwright/test';
-import {
-  EvmWalletID,
-  SigningOptions,
-  TxType,
-  Wallet,
-  WalletOpts,
-} from './Wallet';
-import { Contract, ethers } from 'ethers';
-import { readFileSync } from 'fs';
+import { SigningOptions, TxType, Wallet, WalletOpts } from './Wallet';
 
 const E2E_WALLET_KEY = process.env.VITE_E2E_WALLET_KEY;
 
@@ -25,7 +17,6 @@ export class MetaMask extends Wallet {
   static async prepareWallet(
     context: BrowserContext,
     extensionId: string,
-    walletId: EvmWalletID,
     register: boolean = true,
   ) {
     console.info('preparing MetaMask wallet');
@@ -207,79 +198,5 @@ export class MetaMask extends Wallet {
     await metaMaskPage.locator('#private-key-box').fill(E2E_WALLET_KEY);
     await metaMaskPage.getByRole('button', { name: 'Import' }).click();
     await metaMaskPage.close();
-  }
-}
-
-async function getERC20BalancesForContracts(
-  configPath: string,
-  address: string,
-) {
-  const providerConf = JSON.parse(readFileSync(configPath).toString());
-
-  expect(providerConf.evm.evmUrl).toBeDefined();
-  expect(providerConf).toBeDefined();
-  expect(providerConf.evm).toBeDefined();
-  expect(providerConf.evm.erc20CoinsToSend);
-  expect(providerConf.evm.erc20CoinsToSend.length).not.toBe(0);
-
-  const balanceOfABI = [
-    {
-      constant: true,
-      inputs: [
-        {
-          name: '_owner',
-          type: 'address',
-        },
-      ],
-      name: 'balanceOf',
-      outputs: [
-        {
-          name: 'balance',
-          type: 'uint256',
-        },
-      ],
-      payable: false,
-      stateMutability: 'view',
-      type: 'function',
-    },
-  ];
-
-  for (const { contractAddress, amount } of providerConf.evm.erc20CoinsToSend) {
-    expect(contractAddress).toBeDefined();
-    expect(amount).toBeDefined();
-
-    let balance;
-
-    let tryCount = 0;
-    while (tryCount < 3) {
-      try {
-        balance = await new Contract(
-          contractAddress,
-          balanceOfABI,
-          new ethers.JsonRpcProvider(providerConf.evm.evmUrl),
-        ).balanceOf(address);
-
-        balance = balance.toString();
-
-        if (balance === 0) {
-          throw new Error('Zero balance - tx will fail');
-        }
-
-        break;
-      } catch (err) {
-        tryCount++;
-        console.log(err);
-        console.log(
-          `retrying fetching erc20 balance for asset with contract: ${contractAddress} `,
-        );
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-      }
-    }
-
-    expect(Number(amount)).toBeGreaterThan(0);
-
-    console.info(
-      `metamask account with address ${address} has ${balance.toString()} in asset with contract ${contractAddress}`,
-    );
   }
 }

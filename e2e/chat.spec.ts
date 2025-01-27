@@ -3,7 +3,7 @@ import {
   expect,
   test,
   confirmMetamaskTransaction,
-  confirmMetamaskConnect,
+  confirmMetamaskConnection,
 } from './fixtures';
 import { Chat } from './Chat';
 import { MetaMask } from './Metamask';
@@ -55,12 +55,7 @@ describe('chat', () => {
     const chat = new Chat(page);
     await chat.goto();
 
-    const metaMask = await MetaMask.prepareWallet(
-      context,
-      metaMaskExtensionId,
-      0,
-      true,
-    );
+    const metaMask = await MetaMask.prepareWallet(context, metaMaskExtensionId);
 
     await metaMask.switchNetwork();
 
@@ -72,7 +67,7 @@ describe('chat', () => {
     await chat.waitForStreamToFinish();
 
     const metamaskPopup = await metamaskPopupPromise;
-    await confirmMetamaskConnect(metamaskPopup);
+    await confirmMetamaskConnection(metamaskPopup);
 
     await chat.waitForStreamToFinish();
     await chat.waitForAssistantResponse();
@@ -97,12 +92,7 @@ describe('chat', () => {
     const chat = new Chat(page);
     await chat.goto();
 
-    const metaMask = await MetaMask.prepareWallet(
-      context,
-      metaMaskExtensionId,
-      0,
-      true,
-    );
+    const metaMask = await MetaMask.prepareWallet(context, metaMaskExtensionId);
 
     await metaMask.switchNetwork();
 
@@ -123,8 +113,6 @@ describe('chat', () => {
 
     const metamaskPopup = await metamaskPopupPromise;
     await confirmMetamaskTransaction(metamaskPopup);
-    // await metamaskPopup.getByRole('button', { name: 'Connect' }).click();
-    // await metamaskPopup.getByRole('button', { name: 'Confirm' }).click();
 
     const provider = new ethers.JsonRpcProvider(
       'https://evm.data.internal.testnet.us-east.production.kava.io',

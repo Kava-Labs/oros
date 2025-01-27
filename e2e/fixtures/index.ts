@@ -68,7 +68,6 @@ export const test = base.extend<{
 });
 
 export { screenshotOnFailure, getWalletId } from './utils';
-export const beforeEach = test.beforeEach;
 export const describe = test.describe;
 export const only = test.only;
 export const expect = test.expect;
@@ -99,36 +98,26 @@ export async function retryClick(
   }
 }
 
-/**
- * Helper function to handle MetaMask popup interactions with retries
- */
-export async function confirmMetamaskTransaction(
+export async function confirmMetamaskConnection(
   metamaskPopup: Page | Frame,
   { timeout = 60000, interval = 500 } = {},
 ): Promise<void> {
-  // Click Connect button with retries
   await retryClick(
     metamaskPopup,
     { role: 'button', name: 'Connect' },
-    { timeout, interval },
-  );
-
-  // Click Confirm button with retries
-  await retryClick(
-    metamaskPopup,
-    { role: 'button', name: 'Confirm' },
     { timeout, interval },
   );
 }
 
-export async function confirmMetamaskConnect(
+export async function confirmMetamaskTransaction(
   metamaskPopup: Page | Frame,
   { timeout = 60000, interval = 500 } = {},
 ): Promise<void> {
-  // Click Connect button with retries
+  await confirmMetamaskConnection(metamaskPopup, { timeout, interval });
+
   await retryClick(
     metamaskPopup,
-    { role: 'button', name: 'Connect' },
+    { role: 'button', name: 'Confirm' },
     { timeout, interval },
   );
 }
