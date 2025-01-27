@@ -5,9 +5,19 @@
 
 ## Architecture
 
+- We register the tools necessary to turn natural language into specific actions
 - Tools are grouped into messages and queries
-    - Message: "Send 100 USDt to ...."
-    - Query: "What is my USDt balance?"
+    - Messages execute transactions: "Send 100 USDt to ...."
+    - Queries return on-chain information: "What is my USDt balance on Kava EVM?"
+- When a user prompt corresponds to a tool call definition: , receive a response (list of token balances, transaction
+  hash, etc.)
+    - Execute that tool call's function
+    - Receive a response
+        - Transaction status (in progress, completed)
+        - List of account balances
+        - Transaction hash
+        - Error code (if user cancels in wallet for instance)
+    - Display this information to the user with nice UX
 
 ## Currently Supported Workflows
 
