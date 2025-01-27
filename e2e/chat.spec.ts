@@ -157,7 +157,6 @@ describe('chat', () => {
     await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
 
     const metamaskPopup = await metamaskPopupPromise;
-    await metamaskPopup.pause();
     await confirmMetamaskTransaction(metamaskPopup);
 
     const provider = new ethers.JsonRpcProvider(
@@ -165,20 +164,16 @@ describe('chat', () => {
     );
     const txHash = await page.getByTestId('tx-hash').innerText();
     const txInfo = await provider.getTransaction(txHash);
-    //
-    // //  Verify that the tx data is the amount from the user input
-    const txData = txInfo.data;
-    const amountHex = txData.slice(-64);
-    const amountBigInt = BigInt('0x' + amountHex);
-    const formattedAmount = Number(amountBigInt) / USDT_DECIMALS;
 
-    console.log({
-      txData: txInfo.data,
-      amountHex,
-      rawAmount: amountBigInt.toString(),
-      formattedAmount,
-      USDT_DECIMALS,
-    });
+    // Get the parsed transaction data using ethers interface
+    const ethersInterface = new ethers.Interface([
+      'function transfer(address to, uint256 amount)',
+    ]);
+    const decodedData = ethersInterface.parseTransaction({ data: txInfo.data });
+
+    const amount = decodedData.args[1]; // Second argument is the amount
+    const formattedAmount = Number(amount) / USDT_DECIMALS;
+
     expect(formattedAmount).toBe(0.2345);
   });
 });
