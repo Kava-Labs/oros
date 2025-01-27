@@ -17,9 +17,9 @@ export type ChainConfig = EVMChainConfig;
 export type ChainRegistry = Record<ChainType, Record<string, ChainConfig>>;
 
 export enum ChainNames {
-  KAVA_EVM = 'kavaEVM',
-  ETH = 'eth',
-  KAVA_EVM_INTERNAL_TESTNET = 'kavaEVMInternalTestnet',
+  KAVA_EVM = 'Kava EVM',
+  ETH = 'Ethereum',
+  KAVA_EVM_INTERNAL_TESTNET = 'Kava EVM Internal Testnet',
 }
 
 export const chainRegistry: ChainRegistry = {
