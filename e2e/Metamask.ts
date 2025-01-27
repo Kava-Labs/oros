@@ -183,21 +183,23 @@ export class MetaMask extends Wallet {
       .getByRole('button', { name: 'Add a custom network' })
       .click();
 
-    await metaMaskPage.getByTestId('network-form-network-name').fill('Kava');
+    await metaMaskPage
+      .getByTestId('network-form-network-name')
+      .fill('Kava Internal Testnet');
     await metaMaskPage.getByTestId('test-add-rpc-drop-down').click();
     await metaMaskPage.getByRole('button', { name: 'Add RPC URL' }).click();
     await metaMaskPage
       .getByTestId('rpc-url-input-test')
-      .fill('https://evm.kava.io');
+      .fill('https://evm.data.internal.testnet.us-east.production.kava.io');
     await metaMaskPage.getByRole('button', { name: 'Add URL' }).click();
-    await metaMaskPage.getByTestId('network-form-chain-id').fill('2222');
-    await metaMaskPage.getByTestId('network-form-ticker-input').fill('KAVA');
+    await metaMaskPage.getByTestId('network-form-chain-id').fill('2221');
+    await metaMaskPage.getByTestId('network-form-ticker-input').fill('TKAVA');
 
     await metaMaskPage.getByRole('button', { name: 'Save' }).click();
     await metaMaskPage.waitForTimeout(2000);
 
     await metaMaskPage.getByTestId('network-display').click();
-    await metaMaskPage.getByTestId('Kava').click();
+    await metaMaskPage.getByTestId('Kava Internal Testnet').click();
 
     await metaMaskPage.getByTestId('account-menu-icon').click();
 

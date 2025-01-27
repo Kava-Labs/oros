@@ -43,7 +43,7 @@ describe('chat', () => {
     expect(responseText).toMatch(/THIS IS A TEST/i);
   });
 
-  //  todo - integrate with CI/CD
+  // todo - integrate with CI/CD
   // describe('wallet tests', () => {
   //   let metaMask: MetaMask;
   //
@@ -73,7 +73,9 @@ describe('chat', () => {
   //
   //     //  be ready to find the upcoming popup
   //     const metamaskPopupPromise = context.waitForEvent('page');
-  //     await chat.submitMessage('What are my balances');
+  //     await chat.submitMessage(
+  //       'What are my balances on Kava Internal Testnet?',
+  //     );
   //
   //     await chat.waitForStreamToFinish();
   //
@@ -87,11 +89,11 @@ describe('chat', () => {
   //     const messages = await chat.getMessageElementsWithContent();
   //     const responseText = await messages[messages.length - 1].innerText();
   //
-  //     //  Verify that the connected wallet has some KAVA balance
-  //     const kavaMatch = responseText.match(/KAVA: ([\d.]+)/);
+  //     //  Verify that the connected wallet has a balance of >1000 KAVA
+  //     const kavaMatch = responseText.match(/KAVA: ([^\n]+)/);
   //     expect(kavaMatch).toBeTruthy();
-  //     const kavaBalance = Number(kavaMatch[1]);
-  //     expect(kavaBalance).toBeGreaterThan(0);
+  //     const kavaBalance = Number(kavaMatch[1].replace(/,/g, ''));
+  //     expect(kavaBalance).toBeGreaterThan(1000);
   //   });
   //
   //   test('send tx', async ({ page, context }) => {
@@ -106,7 +108,7 @@ describe('chat', () => {
   //     const metamaskPopupPromise = context.waitForEvent('page');
   //
   //     await chat.submitMessage(
-  //       'Send 0.0000001 KAVA to 0xC07918E451Ab77023a16Fa7515Dd60433A3c771D',
+  //       'Send 0.12345 KAVA to 0xC07918E451Ab77023a16Fa7515Dd60433A3c771D on Kava Internal Testnet',
   //     );
   //
   //     await chat.waitForStreamToFinish();
@@ -121,8 +123,16 @@ describe('chat', () => {
   //     await metamaskPopup.getByRole('button', { name: 'Connect' }).click();
   //     await metamaskPopup.getByRole('button', { name: 'Confirm' }).click();
   //
-  //     //  Completed
-  //     await expect(page.getByTestId('complete-tx-display')).toBeVisible();
+  //     const provider = new ethers.JsonRpcProvider(
+  //       'https://evm.data.internal.testnet.us-east.production.kava.io',
+  //     );
+  //     const txHash = await page.getByTestId('tx-hash').innerText();
+  //     const txInfo = await provider.getTransaction(txHash);
+  //
+  //     //  Verify that the tx value is the amount from the user input
+  //     const txValue: bigint = txInfo.value;
+  //
+  //     expect(Number(txValue) / 10 ** 18).toBe(0.12345);
   //   });
   // });
 });

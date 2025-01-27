@@ -19,6 +19,7 @@ export type ChainRegistry = Record<ChainType, Record<string, ChainConfig>>;
 export enum ChainNames {
   KAVA_EVM = 'kavaEVM',
   ETH = 'eth',
+  KAVA_EVM_TESTNET = 'kavaEvmTestnet',
 }
 
 export const chainRegistry: ChainRegistry = {
@@ -86,6 +87,76 @@ export const chainRegistry: ChainRegistry = {
         },
         WBTC: {
           contractAddress: '0xb5c4423a65B953905949548276654C96fcaE6992',
+          displayName: 'wBTC',
+        },
+        MBTC: {
+          contractAddress: '0x59889b7021243dB5B1e065385F918316cD90D46c',
+          displayName: 'mBTC',
+        },
+      },
+    },
+    [ChainNames.KAVA_EVM_TESTNET]: {
+      name: ChainNames.KAVA_EVM_TESTNET,
+      rpcUrls: ['https://evm.data.internal.testnet.us-east.production.kava.io'],
+      chainID: 2221,
+      nativeToken: 'KAVA',
+      nativeTokenDecimals: 18,
+      blockExplorerUrls: ['https://kavascan.com/'],
+      erc20Contracts: {
+        WHARD: {
+          contractAddress: '0x25e9171C98Fc1924Fa9415CF50750274F0664764',
+          displayName: 'wHARD',
+        },
+        USDT: {
+          contractAddress: '0xaCF81e57CBd9aF95FaBbe53678FcB70B1dD1b7A1',
+          displayName: 'USD₮',
+        },
+        WKAVA: {
+          contractAddress: '0x70C79B608aBBC502c2F61f38E04190fB407BefCF',
+          displayName: 'wKAVA',
+        },
+        AXLETH: {
+          contractAddress: '0x5d6D67a665C9F169B0f9436E05B11108C1606043',
+          displayName: 'axlETH',
+        },
+        AXLWBTC: {
+          contractAddress: '0x7d2Ee2914324d5D4dC33A5c295E720659D5F3fA7',
+          displayName: 'axlwBTC',
+        },
+        AXLUSDC: {
+          contractAddress: '0x7a5DBf8e6ac1F6aCCF14f5B4E88b21EAA04c983d',
+          displayName: 'axlUSDC',
+        },
+        AXLDAI: {
+          contractAddress: '0xAa03872057AD496Bd6f3eE85b85e1e4DABdb1a5d',
+          displayName: 'axlDAI',
+        },
+        AXLUSDT: {
+          contractAddress: '0xA637F4CECbA91Ad19075bA3d330cd95f694B1707',
+          displayName: 'axlUSDT',
+        },
+        WATOM: {
+          contractAddress: '0x15932E26f5BD4923d46a2b205191C4b5d5f43FE3',
+          displayName: 'wATOM',
+        },
+        AXLBNB: {
+          contractAddress: '0x102dF7764fe9F0eFa850A07e25D5171d19bC7862',
+          displayName: 'axlBNB',
+        },
+        AXLBUSD: {
+          contractAddress: '0xB1f5FC6633BC2d67EC9B072FB1570Ea8adE02A22',
+          displayName: 'axlBUSD',
+        },
+        AXLXRPB: {
+          contractAddress: '0xd8DaCA0CA6F88a3a3B7dF15A26483254d80E8726',
+          displayName: 'axlXRPB',
+        },
+        AXLBTCB: {
+          contractAddress: '0x9920E05F1f5B0280fe2Fe32B758F3Dbd534A5480',
+          displayName: 'axlBTCB',
+        },
+        WBTC: {
+          contractAddress: '0x4ef4e7b4281e813Bf0FED39728E025D01c3e76AC',
           displayName: 'wBTC',
         },
         MBTC: {
