@@ -44,95 +44,87 @@ describe('chat', () => {
   });
 
   // todo - integrate with CI/CD
-  // describe('wallet tests', () => {
-  //   let metaMask: MetaMask;
+  // test('check balances', async ({ page, context, metaMaskExtensionId }) => {
+  //   test.setTimeout(90 * 1000);
   //
-  //   beforeEach(async ({ context, metaMaskExtensionId }, testInfo) => {
-  //     expect(metaMaskExtensionId).toBeDefined();
+  //   const chat = new Chat(page);
+  //   await chat.goto();
   //
-  //     const walletId = getWalletId(
-  //       [EvmWalletID.CHAT_TESTING_ACCOUNT_A],
-  //       testInfo.retry,
-  //     );
+  //   const metaMask = await MetaMask.prepareWallet(
+  //     context,
+  //     metaMaskExtensionId,
+  //     0,
+  //     true,
+  //   );
   //
-  //     metaMask = await MetaMask.prepareWallet(
-  //       context,
-  //       metaMaskExtensionId,
-  //       walletId,
-  //       true,
-  //     );
-  //   });
+  //   await metaMask.switchNetwork();
   //
-  //   test('check balances', async ({ page, context }) => {
-  //     test.setTimeout(90 * 1000);
+  //   //  be ready to find the upcoming popup
+  //   const metamaskPopupPromise = context.waitForEvent('page');
+  //   await chat.submitMessage('What are my balances on Kava Internal Testnet?');
   //
-  //     const chat = new Chat(page);
-  //     await chat.goto();
+  //   await chat.waitForStreamToFinish();
   //
-  //     await metaMask.switchNetwork();
+  //   const metamaskPopup = await metamaskPopupPromise;
+  //   await metamaskPopup.waitForLoadState();
+  //   await metamaskPopup.getByTestId('confirm-btn').click();
   //
-  //     //  be ready to find the upcoming popup
-  //     const metamaskPopupPromise = context.waitForEvent('page');
-  //     await chat.submitMessage(
-  //       'What are my balances on Kava Internal Testnet?',
-  //     );
+  //   await chat.waitForStreamToFinish();
+  //   await chat.waitForAssistantResponse();
   //
-  //     await chat.waitForStreamToFinish();
+  //   const messages = await chat.getMessageElementsWithContent();
+  //   const responseText = await messages[messages.length - 1].innerText();
   //
-  //     const metamaskPopup = await metamaskPopupPromise;
-  //     await metamaskPopup.waitForLoadState();
-  //     await metamaskPopup.getByTestId('confirm-btn').click();
+  //   //  Verify that the connected wallet has a balance of >1000 KAVA
+  //   const kavaMatch = responseText.match(/KAVA: ([^\n]+)/);
+  //   expect(kavaMatch).toBeTruthy();
+  //   const kavaBalance = Number(kavaMatch[1].replace(/,/g, ''));
+  //   expect(kavaBalance).toBeGreaterThan(1000);
+  // });
   //
-  //     await chat.waitForStreamToFinish();
-  //     await chat.waitForAssistantResponse();
+  // test('send tx', async ({ page, context, metaMaskExtensionId }) => {
+  //   test.setTimeout(90 * 1000);
   //
-  //     const messages = await chat.getMessageElementsWithContent();
-  //     const responseText = await messages[messages.length - 1].innerText();
+  //   const chat = new Chat(page);
+  //   await chat.goto();
   //
-  //     //  Verify that the connected wallet has a balance of >1000 KAVA
-  //     const kavaMatch = responseText.match(/KAVA: ([^\n]+)/);
-  //     expect(kavaMatch).toBeTruthy();
-  //     const kavaBalance = Number(kavaMatch[1].replace(/,/g, ''));
-  //     expect(kavaBalance).toBeGreaterThan(1000);
-  //   });
+  //   const metaMask = await MetaMask.prepareWallet(
+  //     context,
+  //     metaMaskExtensionId,
+  //     0,
+  //     true,
+  //   );
   //
-  //   test('send tx', async ({ page, context }) => {
-  //     test.setTimeout(90 * 1000);
+  //   await metaMask.switchNetwork();
   //
-  //     const chat = new Chat(page);
-  //     await chat.goto();
+  //   //  be ready to find the upcoming popup
+  //   const metamaskPopupPromise = context.waitForEvent('page');
   //
-  //     await metaMask.switchNetwork();
+  //   await chat.submitMessage(
+  //     'Send 0.12345 KAVA to 0xC07918E451Ab77023a16Fa7515Dd60433A3c771D on Kava Internal Testnet',
+  //   );
   //
-  //     //  be ready to find the upcoming popup
-  //     const metamaskPopupPromise = context.waitForEvent('page');
+  //   await chat.waitForStreamToFinish();
   //
-  //     await chat.submitMessage(
-  //       'Send 0.12345 KAVA to 0xC07918E451Ab77023a16Fa7515Dd60433A3c771D on Kava Internal Testnet',
-  //     );
+  //   //  Confirm the tx
+  //   await chat.submitMessage('Yes');
   //
-  //     await chat.waitForStreamToFinish();
+  //   //  In progress
+  //   await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
   //
-  //     //  Confirm the tx
-  //     await chat.submitMessage('Yes');
+  //   const metamaskPopup = await metamaskPopupPromise;
+  //   await metamaskPopup.getByRole('button', { name: 'Connect' }).click();
+  //   await metamaskPopup.getByRole('button', { name: 'Confirm' }).click();
   //
-  //     //  In progress
-  //     await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
+  //   const provider = new ethers.JsonRpcProvider(
+  //     'https://evm.data.internal.testnet.us-east.production.kava.io',
+  //   );
+  //   const txHash = await page.getByTestId('tx-hash').innerText();
+  //   const txInfo = await provider.getTransaction(txHash);
   //
-  //     const metamaskPopup = await metamaskPopupPromise;
-  //     await metamaskPopup.getByRole('button', { name: 'Connect' }).click();
-  //     await metamaskPopup.getByRole('button', { name: 'Confirm' }).click();
+  //   //  Verify that the tx value is the amount from the user input
+  //   const txValue: bigint = txInfo.value;
   //
-  //     const provider = new ethers.JsonRpcProvider(
-  //       'https://evm.data.internal.testnet.us-east.production.kava.io',
-  //     );
-  //     const txHash = await page.getByTestId('tx-hash').innerText();
-  //     const txInfo = await provider.getTransaction(txHash);
-  //
-  //     //  Verify that the tx value is the amount from the user input
-  //     const txValue: bigint = txInfo.value;
-  //
-  //     expect(Number(txValue) / 10 ** 18).toBe(0.12345);
-  //   });
+  //   expect(Number(txValue) / 10 ** 18).toBe(0.12345);
   // });
 });

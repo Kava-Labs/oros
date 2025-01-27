@@ -29,13 +29,10 @@ export class MetaMask extends Wallet {
     register: boolean = true,
   ) {
     console.info('preparing MetaMask wallet');
-    const { address, mnemonic } = this.loadWalletKeys({
-      walletKeysFilePath: 'accounts.json',
-      accountType: 'kavaEvm',
-      walletID: walletId,
-    });
 
-    await getERC20BalancesForContracts('./e2e/provider_config.json', address);
+    const address = process.env.VITE_E2E_WALLET_ADDRESS;
+    const mnemonic = process.env.VITE_E2E_WALLET_MNEMONIC.split(' ');
+    console.info('preparing MetaMask wallet', address, mnemonic);
 
     let metaMaskPage;
 
@@ -57,13 +54,13 @@ export class MetaMask extends Wallet {
     });
 
     if (register) {
-      await metaMask.register();
+      await metaMask.register(mnemonic);
     }
 
     return metaMask;
   }
 
-  public async register() {
+  public async register(mnemonic: string[]) {
     if ((await this.registerPage.title()) !== 'MetaMask') {
       await this.registerPage.goto(
         this.extensionLink + 'home.html#onboarding/welcome',
@@ -81,7 +78,7 @@ export class MetaMask extends Wallet {
     const signUpInputGroup = this.registerPage.getByRole('textbox');
 
     for (let i = 0; i < 12; i++) {
-      await signUpInputGroup.nth(i).fill(this.mnemonic[i]);
+      await signUpInputGroup.nth(i).fill(mnemonic[i]);
     }
 
     await this.registerPage

@@ -19,7 +19,7 @@ export type ChainRegistry = Record<ChainType, Record<string, ChainConfig>>;
 export enum ChainNames {
   KAVA_EVM = 'kavaEVM',
   ETH = 'eth',
-  KAVA_EVM_TESTNET = 'kavaEvmTestnet',
+  KAVA_EVM_INTERNAL_TESTNET = 'kavaEVMInternalTestnet',
 }
 
 export const chainRegistry: ChainRegistry = {
@@ -95,11 +95,11 @@ export const chainRegistry: ChainRegistry = {
         },
       },
     },
-    [ChainNames.KAVA_EVM_TESTNET]: {
-      name: ChainNames.KAVA_EVM_TESTNET,
+    [ChainNames.KAVA_EVM_INTERNAL_TESTNET]: {
+      name: ChainNames.KAVA_EVM_INTERNAL_TESTNET,
       rpcUrls: ['https://evm.data.internal.testnet.us-east.production.kava.io'],
       chainID: 2221,
-      nativeToken: 'KAVA',
+      nativeToken: 'TKAVA',
       nativeTokenDecimals: 18,
       blockExplorerUrls: ['https://kavascan.com/'],
       erc20Contracts: {
