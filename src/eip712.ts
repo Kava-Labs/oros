@@ -20,7 +20,10 @@ import {
   metamaskMessageTypes,
   MetamaskSupportedMessageTypes,
 } from './messageTypes';
-import { ethToKavaAddress } from './tools/toolFunctions';
+import { chainRegistry, CosmosChainConfig } from './config/chainsRegistry';
+import { ChainType } from './types/chain';
+import { bech32 } from 'bech32';
+import { ethers } from 'ethers';
 
 const msgConvertERC20ToCoinType = {
   MsgValueEVMConvertERC20ToCoin: [
@@ -513,13 +516,19 @@ export const msgsToEIP712 = (msg: any[]) => {
 
 export type SignerParams = {
   messages: any[];
-  gas: string;
-  fee: { denom: string; amount: string }[];
-  chainId: string;
+  gas?: string;
+  fee?: { denom: string; amount: string }[];
+  chainConfig: CosmosChainConfig;
   memo: string;
 };
 
 export const metaMaskSigner = async (opts: SignerParams) => {
+  if (!chainRegistry[ChainType.EVM][opts.chainConfig.evmChainName ?? '']) {
+    throw new Error(
+      `cosmos ${opts.chainConfig.name} chain must be linked to an evm chain`,
+    );
+  }
+
   if (Array.isArray(opts.messages)) {
     // todo: uncomment this once we get IBC set up and fillIbcMsgHeight implemented
     // const transfer = opts.messages.find(
@@ -534,7 +543,10 @@ export const metaMaskSigner = async (opts: SignerParams) => {
     // }
   }
 
-  const { messages, gas, fee, chainId, memo } = opts;
+  const { messages, memo, chainConfig } = opts;
+
+  const gas = opts.gas ? opts.gas : chainConfig.defaultGasWanted;
+  const fee = opts.fee ? opts.fee : [];
 
   let rawTx: TxRaw = TxRaw.fromPartial({});
 
@@ -550,7 +562,14 @@ export const metaMaskSigner = async (opts: SignerParams) => {
   });
 
   const metamaskAddress = accounts[0];
-  const signerAddress = ethToKavaAddress(metamaskAddress); // todo: should be able to convert to not only kava bec32 addresses
+  const signerAddress = bech32.encode(
+    chainConfig.bech32Prefix,
+    bech32.toWords(
+      ethers.getBytes(ethers.toQuantity(ethers.getAddress(metamaskAddress))),
+    ),
+  );
+
+  // todo: should be able to convert to not only kava bec32 addresses
 
   // if the user has already completed a transaction, we no longer need to
   // send their pub_key across. If it is their first transaction with the wallet
@@ -562,7 +581,7 @@ export const metaMaskSigner = async (opts: SignerParams) => {
   let accountNumber = '0';
 
   try {
-    let baseURL = 'https://api2.kava.io'; // todo: config for cosmos chains and remove the hard-coded baseURL
+    let baseURL = chainConfig.rpcUrls[0];
 
     const res = await fetch(
       `${baseURL}/cosmos/auth/v1beta1/account_info/${signerAddress}`,
@@ -635,15 +654,15 @@ export const metaMaskSigner = async (opts: SignerParams) => {
     types,
     primaryType: 'Tx',
     domain: {
-      name: 'Kava Cosmos',
+      name: chainConfig.name,
       version: '1.0.0',
-      chainId: 2222, // todo: make this dynamic from config
+      chainId: chainRegistry[ChainType.EVM][chainConfig.evmChainName!].chainID, // todo: make this dynamic from config
       verifyingContract: '',
       salt: '',
     },
     message: {
       account_number: accountNumber,
-      chain_id: chainId, // cosmos chain id
+      chain_id: chainConfig.chainID,
       fee: {
         amount: fee,
         feePayer: signerAddress,
@@ -686,7 +705,7 @@ export const metaMaskSigner = async (opts: SignerParams) => {
   const signDoc = makeSignDocAmino(
     messages,
     { amount: fee, gas },
-    chainId,
+    chainConfig.chainID,
     memo,
     accountNumber,
     sequence,

@@ -82,6 +82,7 @@ export class WalletStore {
     if (!chain) {
       throw new Error(`unknown chain ${chainName}`);
     }
+
     const {
       chainID,
       rpcUrls,

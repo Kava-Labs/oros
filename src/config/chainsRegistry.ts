@@ -2,7 +2,8 @@ import { ChainType } from '../types/chain';
 
 export type ERC20Record = { contractAddress: string; displayName: string };
 
-type EVMChainConfig = {
+export type EVMChainConfig = {
+  chainType: ChainType.EVM;
   name: string;
   rpcUrls: string[];
   blockExplorerUrls: string[];
@@ -12,19 +13,39 @@ type EVMChainConfig = {
   erc20Contracts: Record<string, ERC20Record>;
 };
 
-export type ChainConfig = EVMChainConfig;
+export enum ChainNames {
+  KAVA_COSMOS = 'Kava Cosmos',
+
+  KAVA_EVM = 'kavaEVM',
+  ETH = 'eth',
+  KAVA_EVM_INTERNAL_TESTNET = 'kavaEVMInternalTestnet',
+}
+
+export type CosmosChainConfig = {
+  chainType: ChainType.COSMOS;
+  name: string;
+  rpcUrls: string[];
+  blockExplorerUrls: string[];
+
+  chainID: string;
+  evmChainName?: ChainNames;
+
+  bech32Prefix: string;
+
+  nativeToken: string;
+  nativeTokenDecimals: number;
+
+  defaultGasWanted: string;
+};
+
+export type ChainConfig = EVMChainConfig | CosmosChainConfig;
 
 export type ChainRegistry = Record<ChainType, Record<string, ChainConfig>>;
-
-export enum ChainNames {
-  KAVA_EVM = 'Kava EVM',
-  ETH = 'Ethereum',
-  KAVA_EVM_INTERNAL_TESTNET = 'Kava EVM Internal Testnet',
-}
 
 export const chainRegistry: ChainRegistry = {
   [ChainType.EVM]: {
     [ChainNames.KAVA_EVM]: {
+      chainType: ChainType.EVM,
       name: ChainNames.KAVA_EVM,
       rpcUrls: ['https://evm.kava-rpc.com'],
       chainID: 2222,
@@ -96,6 +117,7 @@ export const chainRegistry: ChainRegistry = {
       },
     },
     [ChainNames.KAVA_EVM_INTERNAL_TESTNET]: {
+      chainType: ChainType.EVM,
       name: ChainNames.KAVA_EVM_INTERNAL_TESTNET,
       rpcUrls: ['https://evm.data.internal.testnet.us-east.production.kava.io'],
       chainID: 2221,
@@ -166,6 +188,7 @@ export const chainRegistry: ChainRegistry = {
       },
     },
     [ChainNames.ETH]: {
+      chainType: ChainType.EVM,
       name: ChainNames.ETH,
       chainID: 1,
       nativeToken: 'ETH',
@@ -188,7 +211,22 @@ export const chainRegistry: ChainRegistry = {
       },
     },
   },
-  [ChainType.COSMOS]: {},
+  [ChainType.COSMOS]: {
+    [ChainNames.KAVA_COSMOS]: {
+      chainType: ChainType.COSMOS,
+      name: 'Kava Cosmos',
+      rpcUrls: ['https://api2.kava.io'],
+      blockExplorerUrls: [], // todo: add
+      chainID: 'kava_2222-10',
+      evmChainName: ChainNames.KAVA_EVM, // reference to the evm chain config, needed for eip712 signing
+
+      nativeToken: 'ukava',
+      nativeTokenDecimals: 6,
+
+      bech32Prefix: 'kava',
+      defaultGasWanted: '1000000',
+    },
+  },
 };
 
 export const chainNameToolCallParam = {
