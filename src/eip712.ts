@@ -686,7 +686,7 @@ export const metaMaskSigner = async (opts: SignerParams) => {
   // extension options are used with metamask EIP related data. Build the
   // extension options and encode them using the registry
   const encodedPartial = ExtensionOptionsWeb3Tx.fromPartial({
-    typedDataChainId: String(2222), // todo: make this dynamic from config
+    typedDataChainId: String(chainRegistry[ChainType.EVM][chainConfig.evmChainName!].chainID),
     feePayer: signerAddress,
     feePayerSig: Uint8Array.from(atob(feePayerSignature), (c) =>
       c.charCodeAt(0),
