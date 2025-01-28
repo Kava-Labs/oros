@@ -3,7 +3,8 @@
 - Oros queries EVM chain balances on multiple chains.
 - Oros executes erc20 transfers on multiple chains.
 - Oros operates independent of any 3rd party dApp support/integration.
-- Oros is architected to make extending chain support & functionality more streamlined (and eventually automated when
+- Oros is architected to make supporting additional chains and adding new transactions more streamlined (and eventually
+  automated when
   possible).
 
 ## Architecture
@@ -57,12 +58,14 @@ export class EvmBalancesQuery implements ChainQuery<EvmBalanceQueryParams> {
 3. When a user prompt corresponds to a tool call definition:
 
 - Execute that tool call's function
+    - Messages call `validate` method, then `buildTransaction`
+    - Queries call `executeQuery`
 - Model returns the output of the function (currently a string or an error)
     - Transaction status (in progress, completed)
     - List of account balances
-    - Transaction hash
+  - Transaction hash
     - Error code (if user cancels in wallet for instance)
-- Display this information to the user with nice UX
+- Display this information to the user with nice UX (use the tx hash to build an explorer link, etc.)
 
 ## Currently Supported Workflows
 
@@ -93,15 +96,8 @@ A user asks to transfer funds
 - Is the user asking to transfer a supported denom?
 - Is the user asking to use a supported chain?
 
-```javascript
-  validate(params
-:
-SendToolParams, walletStore
-:
-WalletStore
-):
-boolean
-{
+```
+validate(params: SendToolParams, walletStore: WalletStore): boolean {
   if (!walletStore.getSnapshot().isWalletConnected) {
     throw new Error('please connect to a compatible wallet');
   }
@@ -109,8 +105,6 @@ boolean
   if (!chainRegistry[this.chainType][params.chainName]) {
     throw new Error(`unknown chain name ${params.chainName}`);
   }
-
-...
 
   if (!validDenomWithContract) {
     throw new Error(`failed to find contract address for ${denom}`);
@@ -138,42 +132,36 @@ Tool call is made with the address mask
 
 When the transaction is built, we unmask the address just before signing
 
-```javascript
-  async
-buildTransaction(
-  params
-:
-SendToolParams,
-  walletStore
-:
-WalletStore,
-):
-Promise < string > {
+```
+async buildTransaction(params: SendToolParams, walletStore: WalletStore): Promise<string> {
   const { toAddress, amount, denom } = params;
-  ...
-    let txParams: Record < string, string >;
 
-const { masksToValues } = getStoredMasks();
+  const { masksToValues } = getStoredMasks();
 
-//  validate method will check that these mask-addresses exist
-const addressTo = masksToValues[toAddress];
-const addressFrom = walletStore.getSnapshot().walletAddress;
-...
-const hash = await walletStore.sign({
-  chainId: `0x${Number(2222).toString(16)}`,
-  signatureType: SignatureTypes.EVM,
-  payload: {
-    method: 'eth_sendTransaction',
-    params: [
-      {
-        ...txParams,
-        from: sendingAddress,
-        gasPrice: '0x4a817c800',
-        gas: '0x16120',
-      },
-    ],
-  },
-});
+  const addressTo = masksToValues[toAddress];
+  const addressFrom = walletStore.getSnapshot().walletAddress;
+  const txParams = {
+    to: receivingAddress,
+    data: '0x',
+    value: ethers.parseEther(amount).toString(16),
+  };
+
+  const hash = await walletStore.sign({
+    chainId: `0x${Number(2222).toString(16)}`,
+    signatureType: SignatureTypes.EVM,
+    payload: {
+      method: 'eth_sendTransaction',
+      params: [
+        {
+          ...txParams,
+          from: sendingAddress,
+          gasPrice: '0x4a817c800',
+          gas: '0x16120',
+        },
+      ],
+    },
+  });
+}
 
 
 return hash;
@@ -197,14 +185,11 @@ User can execute a send tx on another chain
 
 - We are currently manually writing tool calls for queries and transaction tools per chain, per message type. While
   we've built this in a way that's easily extensible (supporting new EVM chains, additional Cosmos functionality, etc.),
-  but automation is the goal
+  automation is the goal
     - Ideally, we just need an ERC20 ABI and/or JSON endpoint to derive the necessary tool functions
-    - Goal is to simplify 3rd party integrations (similar to Keplr's process - simply make a pull request with a JSON
+  - Goal is to simplify 3rd party integrations (similar to Keplr's process - simply make a pull request to a JSON
       file with necessary config)
 - Extending functionality to include
-    - Add in EIP712 signing (Metamask support for Cosmos transactions, like staking, rewards, Lend, etc.)
-    - Add in `newMsgConvertCoinToERC20` and `newMsgConvertERC20ToCoin` to bridge between EVM and SDK.
-    - Add in
+    - Add in `newMsgConvertCoinToERC20` and `newMsgConvertERC20ToCoin` to bridge USDt between EVM and SDK.
+    - Add in EIP712 signing (Metamask support for Cosmos transactions, like Lend, staking, rewards, etc.)
     - Add in cosmos chain configuration
-    - TODO: What remaining configuration is needed to support evm to sdk transfer of USDT
-    - Add in `msgSend`
