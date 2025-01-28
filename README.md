@@ -172,8 +172,15 @@ return hash;
 User confirms the transaction details
 ![In Progress](demo/images/inProgress.png)
 
-User signs the transaction in metmask
+User is notified that the tx is in progress and signs in metamask
 ![Completed](demo/images/completed.png)
+
+If a user cancels the transaction in metamask, that info is returned to Oros
+![Cancel](demo/images/cancel.png)
+
+If a user signs in metamask, they will see when the transaction is completed
+The tool call returns a tx hash, which is turned into an explorer link
+![explorer](demo/images/success.png)
 
 User views the transactions details on explorer
 ![explorer](demo/images/explorer.png)
