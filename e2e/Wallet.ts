@@ -56,7 +56,7 @@ export abstract class Wallet {
 
   // all Wallets must implement their own unique register & sign methods
 
-  abstract register(): Promise<void>;
+  abstract register(mnemonic: string[]): Promise<void>;
 
   abstract sign(opts: SigningOptions): Promise<void>;
 

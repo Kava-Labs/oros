@@ -19,10 +19,7 @@ export const CompleteTxDisplay = ({
   useScrollToBottom(onRendered);
 
   return (
-    <div
-      data-testid="complete-tx-display"
-      className={styles.transactionContainer}
-    >
+    <div className={styles.transactionContainer}>
       <div className={styles.transactionCard}>
         <div className={styles.statusSection}>
           <h3 className={styles.sectionLabel}>Status</h3>
@@ -42,7 +39,9 @@ export const CompleteTxDisplay = ({
             rel="noopener noreferrer"
             className={styles.hashLink}
           >
-            <span className={styles.hashText}>{hash}</span>
+            <span data-testid="tx-hash" className={styles.hashText}>
+              {hash}
+            </span>
             <ExternalLinkIcon />
           </a>
         </div>
