@@ -655,7 +655,7 @@ export const metaMaskSigner = async (opts: SignerParams) => {
     domain: {
       name: chainConfig.name,
       version: '1.0.0',
-      chainId: chainRegistry[ChainType.EVM][chainConfig.evmChainName!].chainID, // todo: make this dynamic from config
+      chainId: chainRegistry[ChainType.EVM][chainConfig.evmChainName!].chainID,
       verifyingContract: '',
       salt: '',
     },
