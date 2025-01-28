@@ -96,7 +96,7 @@ A user asks to transfer funds
 - Is the user asking to transfer a supported denom?
 - Is the user asking to use a supported chain?
 
-```
+```typescript
 validate(params: SendToolParams, walletStore: WalletStore): boolean {
   if (!walletStore.getSnapshot().isWalletConnected) {
     throw new Error('please connect to a compatible wallet');
@@ -132,7 +132,7 @@ Tool call is made with the address mask
 
 When the transaction is built, we unmask the address just before signing
 
-```
+```typescript
 async buildTransaction(params: SendToolParams, walletStore: WalletStore): Promise<string> {
   const { toAddress, amount, denom } = params;
 
@@ -168,7 +168,6 @@ return hash;
 
 }
 ```
-
 User confirms the transaction details
 ![In Progress](demo/images/inProgress.png)
 
