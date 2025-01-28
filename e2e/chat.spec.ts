@@ -2,8 +2,9 @@ import {
   describe,
   expect,
   test,
-  confirmMetamaskTransaction,
-  confirmMetamaskConnection,
+  retryConnectAndConfirm,
+  retryConnectClick,
+  retryConnectAndApprove,
 } from './fixtures';
 import { Chat } from './Chat';
 import { MetaMask } from './Metamask';
@@ -67,7 +68,7 @@ describe('chat', () => {
     await chat.waitForStreamToFinish();
 
     const metamaskPopup = await metamaskPopupPromise;
-    await confirmMetamaskConnection(metamaskPopup);
+    await retryConnectClick(metamaskPopup);
 
     await chat.waitForStreamToFinish();
     await chat.waitForAssistantResponse();
@@ -113,7 +114,7 @@ describe('chat', () => {
     await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
 
     const metamaskPopup = await metamaskPopupPromise;
-    await confirmMetamaskTransaction(metamaskPopup);
+    await retryConnectAndConfirm(metamaskPopup);
 
     const provider = new ethers.JsonRpcProvider(
       'https://evm.data.internal.testnet.us-east.production.kava.io',
@@ -157,7 +158,7 @@ describe('chat', () => {
     await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
 
     const metamaskPopup = await metamaskPopupPromise;
-    await confirmMetamaskTransaction(metamaskPopup);
+    await retryConnectAndConfirm(metamaskPopup);
 
     const provider = new ethers.JsonRpcProvider(
       'https://evm.data.internal.testnet.us-east.production.kava.io',
@@ -175,5 +176,49 @@ describe('chat', () => {
     const formattedAmount = Number(amount) / USDT_DECIMALS;
 
     expect(formattedAmount).toBe(0.2345);
+  });
+
+  test('returns expected error in transaction message (unsupported denom/contract address)', async ({
+    page,
+    context,
+    metaMaskExtensionId,
+  }) => {
+    test.setTimeout(90 * 1000);
+
+    const chat = new Chat(page);
+    await chat.goto();
+
+    const metaMask = await MetaMask.prepareWallet(context, metaMaskExtensionId);
+
+    await metaMask.switchNetwork();
+
+    //  be ready to find the upcoming popup
+    const metamaskPopupPromise = context.waitForEvent('page');
+
+    await chat.submitMessage(
+      'Send 0.2345 bKAVA to 0xC07918E451Ab77023a16Fa7515Dd60433A3c771D',
+    );
+
+    await chat.waitForStreamToFinish();
+
+    //  Confirm the tx
+    await chat.submitMessage('Yes');
+
+    const metamaskPopup = await metamaskPopupPromise;
+    await retryConnectAndApprove(metamaskPopup);
+
+    await chat.waitForAssistantResponse();
+
+    const messages = await chat.getMessageElementsWithContent();
+    expect(messages.length).toBeGreaterThan(0);
+
+    const attr =
+      await messages[messages.length - 1].getAttribute('data-chat-role');
+    expect(attr).toBe('assistant');
+
+    const responseText = await messages[messages.length - 1].innerText();
+    expect(responseText).toMatch(
+      /An error occured: failed to find contract address for bKAVA/i,
+    );
   });
 });

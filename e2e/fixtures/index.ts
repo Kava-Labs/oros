@@ -98,7 +98,7 @@ export async function retryClick(
   }
 }
 
-export async function confirmMetamaskConnection(
+export async function retryConnectClick(
   metamaskPopup: Page | Frame,
   { timeout = 60000, interval = 500 } = {},
 ): Promise<void> {
@@ -109,15 +109,28 @@ export async function confirmMetamaskConnection(
   );
 }
 
-export async function confirmMetamaskTransaction(
+export async function retryConnectAndConfirm(
   metamaskPopup: Page | Frame,
   { timeout = 60000, interval = 500 } = {},
 ): Promise<void> {
-  await confirmMetamaskConnection(metamaskPopup, { timeout, interval });
+  await retryConnectClick(metamaskPopup, { timeout, interval });
 
   await retryClick(
     metamaskPopup,
     { role: 'button', name: 'Confirm' },
+    { timeout, interval },
+  );
+}
+
+export async function retryConnectAndApprove(
+  metamaskPopup: Page | Frame,
+  { timeout = 60000, interval = 500 } = {},
+): Promise<void> {
+  await retryConnectClick(metamaskPopup, { timeout, interval });
+
+  await retryClick(
+    metamaskPopup,
+    { role: 'button', name: 'Approve' },
     { timeout, interval },
   );
 }
