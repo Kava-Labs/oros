@@ -536,9 +536,6 @@ export const metaMaskSigner = async (opts: SignerParams) => {
 
   const { messages, gas, fee, chainId, memo } = opts;
 
-  const sequence = ''; // todo: get account sequence
-  const accountNumber = ''; // todo: get account number
-
   let rawTx: TxRaw = TxRaw.fromPartial({});
 
   const registry = new Registry(defaultRegistryTypes);
@@ -561,6 +558,8 @@ export const metaMaskSigner = async (opts: SignerParams) => {
   // to generate a public key and send it with the data
   let anyPubKey: any;
   let pubkey: string = '';
+  let sequence = '0';
+  let accountNumber = '0';
 
   try {
     let baseURL = 'https://api2.kava.io'; // todo: config for cosmos chains and remove the hard-coded baseURL
@@ -569,8 +568,16 @@ export const metaMaskSigner = async (opts: SignerParams) => {
       `${baseURL}/cosmos/auth/v1beta1/account_info/${signerAddress}`,
     );
     const account = await res.json();
-    if (account.info && account.info.pub_key) {
-      pubkey = account.info.pub_key.key;
+    if (account.info) {
+      if (account.info.pub_key) {
+        pubkey = account.info.pub_key.key;
+      }
+      if (account.info.sequence) {
+        sequence = account.info.sequence;
+      }
+      if (account.info.account_number) {
+        accountNumber = account.info.account_number;
+      }
     }
   } catch (err) {
     console.error(err);
