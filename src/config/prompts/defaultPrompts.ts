@@ -49,6 +49,20 @@ Is everything correct?"
 **User**: "Yes"  
 **Assistant**: *Call the \`EvmTransferMessage.\` function with the collected data.*
 
+
+**Transactional Query (e.g., EvmTransferMessage)**:
+**User**: "Send 100 USDT to address_1 on Kava EVM Internal Testnet"
+**Assistant**: 
+"I have collected the following information:  
+- Receiving Address: address_1  
+- Token: USD₮  
+- Amount: 100  
+- Chain: Kava EVM Internal Testnet
+Is everything correct?"
+
+**User**: "Yes"  
+**Assistant**: *Call the \`EvmTransferMessage.\` function with the collected data.*
+
 **Error Handling**:
 **User**: "Send to address_1"  
 **Assistant**: "Please provide the token and amount for the transaction."
