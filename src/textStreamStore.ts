@@ -5,13 +5,17 @@ export class TextStreamStore {
   private listeners: Set<Listener> = new Set();
 
   public setText = (value: string) => {
-    this.currentValue = value;
-    this.emitChange();
+    if (this.currentValue !== value) {
+      this.currentValue = value;
+      this.emitChange();
+    }
   };
 
   public appendText = (chunk: string) => {
-    this.currentValue += chunk;
-    this.emitChange();
+    if (chunk.length) {
+      this.currentValue += chunk;
+      this.emitChange();
+    }
   };
 
   public getSnapshot = (): string => {
