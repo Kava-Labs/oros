@@ -30,6 +30,64 @@
         - Is the user connected with a supported wallet?
         - Is the user asking to transfer a supported denom?
         - Is the user asking to use a supported chain?
-    - If valid, take these parameters and build the transaction data to send to metamask
+
+```
+  validate(params: SendToolParams, walletStore: WalletStore): boolean {
+    if (!walletStore.getSnapshot().isWalletConnected) {
+      throw new Error('please connect to a compatible wallet');
+    }
+
+    if (!chainRegistry[this.chainType][params.chainName]) {
+      throw new Error(`unknown chain name ${params.chainName}`);
+    }
+
+    ...
+
+    if (!validDenomWithContract) {
+      throw new Error(`failed to find contract address for ${denom}`);
+    }
+
+    return true;
+  }
+```
+
+- If valid, take these parameters and build the transaction data to send to metamask
         - This step includes the "unmasking" of the user's
-          address `address_1 => 0xc07918e451ab77023a16fa7515dd60433a3c771d` 
+          address `address_1 => 0xc07918e451ab77023a16fa7515dd60433a3c771d`
+
+```
+  async buildTransaction(
+    params: SendToolParams,
+    walletStore: WalletStore,
+  ): Promise<string> {
+    const { toAddress, amount, denom } = params;
+    ...
+      let txParams: Record<string, string>;
+
+      const { masksToValues } = getStoredMasks();
+
+      //  validate method will check that these mask-addresses exist
+      const addressTo = masksToValues[toAddress];
+      const addressFrom = walletStore.getSnapshot().walletAddress;
+    ...
+      const hash = await walletStore.sign({
+        chainId: `0x${Number(2222).toString(16)}`,
+        signatureType: SignatureTypes.EVM,
+        payload: {
+          method: 'eth_sendTransaction',
+          params: [
+            {
+              ...txParams,
+              from: sendingAddress,
+              gasPrice: '0x4a817c800',
+              gas: '0x16120',
+            },
+          ],
+        },
+      });
+
+
+      return hash;
+ 
+  }
+```
