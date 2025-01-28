@@ -65,30 +65,27 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
       chainName: string;
     },
     walletStore: WalletStore,
-  ): Promise<void> {
-    const { denom, amount, chainName } = params;
-    const { erc20Contracts, nativeToken, rpcUrls, nativeTokenDecimals } =
-      chainRegistry[this.chainType][chainName];
+  ): Promise<boolean> {
+    try {
+      const { denom, amount, chainName } = params;
+      const { erc20Contracts, nativeToken, rpcUrls, nativeTokenDecimals } =
+        chainRegistry[this.chainType][chainName];
 
-    const rpcProvider = new ethers.JsonRpcProvider(rpcUrls[0]);
-    const address = walletStore.getSnapshot().walletAddress;
+      const rpcProvider = new ethers.JsonRpcProvider(rpcUrls[0]);
+      const address = walletStore.getSnapshot().walletAddress;
 
-    if (denom.toUpperCase() === nativeToken) {
-      const rawBalance = await rpcProvider.getBalance(address);
-      const formattedBalance = ethers.formatUnits(
-        rawBalance,
-        nativeTokenDecimals,
-      );
-
-      if (Number(formattedBalance) < Number(amount)) {
-        throw new Error(
-          `insufficient ${nativeToken} balance: have ${formattedBalance}, need ${amount}`,
+      if (denom.toUpperCase() === nativeToken) {
+        const rawBalance = await rpcProvider.getBalance(address);
+        const formattedBalance = ethers.formatUnits(
+          rawBalance,
+          nativeTokenDecimals,
         );
+        return Number(formattedBalance) >= Number(amount);
       }
-    } else {
+
       const erc20Record = getERC20Record(denom, erc20Contracts);
       if (!erc20Record) {
-        throw new Error(`invalid token ${denom}`);
+        return false;
       }
 
       const contract = new ethers.Contract(
@@ -97,21 +94,18 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
         rpcProvider,
       );
 
-      try {
-        const decimals = await contract.decimals();
-        const rawBalance = await contract.balanceOf(address);
-        const formattedBalance = ethers.formatUnits(rawBalance, decimals);
+      const decimals = await contract.decimals();
+      const rawBalance = await contract.balanceOf(address);
+      const formattedBalance = ethers.formatUnits(rawBalance, decimals);
 
-        if (Number(formattedBalance) < Number(amount)) {
-          throw new Error(
-            `insufficient ${denom} balance: have ${formattedBalance}, need ${amount}`,
-          );
-        }
-      } catch (err) {
-        throw new Error(
-          `failed to fetch ${denom} balance: ${JSON.stringify(err)}`,
-        );
-      }
+      console.log(
+        formattedBalance,
+        amount,
+        Number(formattedBalance) >= Number(amount),
+      );
+      return Number(formattedBalance) >= Number(amount);
+    } catch (e) {
+      return false;
     }
   }
 
@@ -157,7 +151,9 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
       throw new Error(`failed to find contract address for ${denom}`);
     }
 
-    await this.validateBalance(params, walletStore);
+    if (!(await this.validateBalance(params, walletStore))) {
+      throw new Error('Invalid balances for transaction');
+    }
 
     return true;
   }
@@ -165,6 +161,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
     params: SendToolParams,
     walletStore: WalletStore,
   ): Promise<string> {
+    console.log('calling build transaction');
     const { toAddress, amount, denom } = params;
 
     const { erc20Contracts, rpcUrls, nativeToken } =

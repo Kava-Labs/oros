@@ -121,6 +121,7 @@ export const AppContextProvider = ({
       }
 
       const validatedParams = await operation.validate(params, walletStore);
+
       if (!validatedParams) {
         throw new Error('Invalid parameters for operation');
       }
