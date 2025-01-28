@@ -1,19 +1,27 @@
+# Oros Demo (1/28/2025)
+
 ## What's New
 
-- Oros queries EVM chain balances on multiple chains.
-- Oros executes erc20 transfers on multiple chains.
-- Oros operates independent of any 3rd party dApp support/integration.
-- Oros is architected to make supporting additional chains and adding new transactions more streamlined (and eventually
-  automated when
-  possible).
+- **Multi-Chain Balance Queries:** Oros now supports querying EVM chain balances across multiple chains.
+- **Multi-Chain ERC20 Transfers:** Execute ERC20 token transfers seamlessly on multiple chains.
+- **Independent Operation:** Oros operates independently of third-party dApp support or integrations.
+- **Streamlined Architecture:** Built to support additional chains and transactions with ease, paving the way for
+  automation when possible.
+
+---
 
 ## Architecture
 
-1. We register the tools necessary to turn natural language into specific actions
-2. Tools are grouped into messages and queries
-    - Messages execute transactions: "Send 100 USDt to ...."
+### Overview
 
-```javascript
+1. **Tool Registration:**  
+   Tools are registered to translate natural language prompts into specific actions.
+
+2. **Tool Categories:**
+
+   **Messages:** Execute transactions. Example: *"Send 100 USDt to ..."*
+
+```typescript
 export class EvmTransferMessage implements ChainMessage<SendToolParams> {
   name = 'evm-transfer';
   description = 'Send erc20 tokens from one address to another';
@@ -44,7 +52,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
   ];
 ```
 
-- Queries return on-chain information: "What is my USDt balance on Kava EVM?"
+**Queries:** Retrieve on-chain information. Example: *"What is my USDt balance on Kava EVM?"*
 
 ```javascript
 export class EvmBalancesQuery implements ChainQuery<EvmBalanceQueryParams> {
@@ -67,6 +75,7 @@ export class EvmBalancesQuery implements ChainQuery<EvmBalanceQueryParams> {
     - Error code (if user cancels in wallet for instance)
 - Display this information to the user with nice UX (use the tx hash to build an explorer link, etc.)
 
+---
 ## Currently Supported Workflows
 
 ### Balances Query
@@ -96,7 +105,7 @@ A user asks to transfer funds
 - Is the user asking to transfer a supported denom?
 - Is the user asking to use a supported chain?
 
-```typescript
+```
 validate(params: SendToolParams, walletStore: WalletStore): boolean {
   if (!walletStore.getSnapshot().isWalletConnected) {
     throw new Error('please connect to a compatible wallet');
@@ -168,6 +177,7 @@ return hash;
 
 }
 ```
+
 User confirms the transaction details
 ![In Progress](demo/images/inProgress.png)
 
