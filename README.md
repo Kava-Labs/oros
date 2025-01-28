@@ -3,7 +3,7 @@
 ## What's New
 
 - **Multi-Chain Balance Queries:** Oros now supports querying EVM chain balances across multiple chains.
-- **Multi-Chain ERC20 Transfers:** Execute ERC20 token transfers seamlessly on multiple chains.
+- **Multi-Chain ERC20 Transfers:** Execute ERC20 token transfers on multiple chains.
 - **Independent Operation:** Oros operates independently of third-party dApp support or integrations.
 - **Streamlined Architecture:** Built to support additional chains and transactions with ease, paving the way for
   automation when possible.
@@ -178,11 +178,8 @@ return hash;
 }
 ```
 
-User confirms the transaction details
+User confirms the transaction details in the chat and is notified the tx is in progress
 ![In Progress](demo/images/inProgress.png)
-
-User is notified that the tx is in progress and signs in metamask
-![Completed](demo/images/completed.png)
 
 If a user cancels the transaction in metamask, that info is returned to Oros
 ![Cancel](demo/images/cancel.png)
@@ -197,6 +194,9 @@ User views the transactions details on explorer
 User can execute a send tx on another chain
 ![Internal](demo/images/internal.png)
 
+User can use Oros embedded within a dApp
+![Internal](demo/images/dapp.png)
+
 ## What's Next
 
 - We are currently manually writing tool calls for queries and transaction tools per chain, per message type. While
@@ -209,3 +209,5 @@ User can execute a send tx on another chain
     - Add in `newMsgConvertCoinToERC20` and `newMsgConvertERC20ToCoin` to bridge USDt between EVM and SDK.
     - Add in EIP712 signing (Metamask support for Cosmos transactions, like Lend, staking, rewards, etc.)
     - Add in cosmos chain configuration
+- We've configured this as an iFrame integration and as a standalone URL. What adjustments need to be made to make this
+  a browser extension? 
