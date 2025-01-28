@@ -569,7 +569,6 @@ export const metaMaskSigner = async (opts: SignerParams) => {
     ),
   );
 
-  // todo: should be able to convert to not only kava bec32 addresses
 
   // if the user has already completed a transaction, we no longer need to
   // send their pub_key across. If it is their first transaction with the wallet
