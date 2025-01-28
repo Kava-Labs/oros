@@ -1,178 +1,210 @@
-# Oros AI: Empowering Decentralized Applications with Intelligent Agents
+## What's New
 
-![Oros Logo](https://raw.githubusercontent.com/Kava-Labs/oros/refs/heads/main/src/assets/orosLogo256.svg)
+- Oros queries EVM chain balances on multiple chains.
+- Oros executes erc20 transfers on multiple chains.
+- Oros operates independent of any 3rd party dApp support/integration.
+- Oros is architected to make extending chain support & functionality more streamlined (and eventually automated when
+  possible).
 
-[![Build Status](https://img.shields.io/github/actions/workflow/status/kava-labs/oros/ci-cd.yml?branch=main&label=CI)](https://github.com/kava-labs/oros/actions)
+## Architecture
 
-[![License](https://img.shields.io/github/license/Kava-Labs/oros)](https://github.com/Kava-Labs/oros/blob/main/LICENSE)
+1. We register the tools necessary to turn natural language into specific actions
+2. Tools are grouped into messages and queries
+    - Messages execute transactions: "Send 100 USDt to ...."
 
-[![Dependencies](https://img.shields.io/badge/dependencies-up%20to%20date-brightgreen)](https://github.com/Kava-Labs/oros/network/dependencies)
-
-Oros brings AI-driven interactions to any dApp. Designed as an intuitive agent layer, Oros transforms how users interact with blockchain ecosystems by bridging advanced AI with on-chain capabilities. Imagine managing your assets, executing complex DeFi strategies, or exploring new dApps—all with a simple conversation. That’s the vision of Oros.
-
----
-
-## Oros: AI for Everyone, Everywhere
-
-Overcoming technical complexity and fragmented user experiences is a key unlock for web3 adoption. Oros simplifies blockchain interaction, introducing a consistent, approachable AI persona—your trusted guide across dApps.
-
-- **Natural Language → On-Chain Actions**: Oros translates user queries and prompts into blockchain function calls, letting your users “speak” directly to DeFi, NFTs, governance, or any on-chain logic.
-- **Smart Context**: Oros provides a unified, intelligent presence that feels personalized and seamless across web3, whether you’re staking tokens or exploring yield strategies.
-- **Universal Access**: By integrating with decentralized applications, Oros democratizes access to blockchain intelligence, making Web3 easier for everyone.
-
-### Why It Matters
-
-**For Users**  
-Blockchain interactions often feel complex. With Oros, you can simply say:
-
-- _“Stake my KAVA rewards”_
-- _“Send 100 USDT to Alice”_  
-  Oros understands your intent, navigates the technicalities, and executes securely.
-
-**For Developers**  
-Integrating Oros means less time spent building custom AI tools and more time focusing on what your dApp does best. A straightforward SDK enables any dApp to embed the Oros experience effortlessly.
-
----
-
-## Technical Architecture
-
-```markdown
-    +------------------------------+
-    |     Oros UI (Front-End)      |
-    |     (React/Typescript)       |
-    +---------------+--------------+
-                    |
-                    ▼
-+---------------------------------------+
-|  Oros Agent (Chat + Tools Orchestr.)  |
-|    - Core AI logic (LLM-based)        |
-|    - Tool registry (function specs)   |
-|    - Session & memory layer           |
-+-------------------+-------------------+
-                    |
-                    ▼
-+---------------------------------------+
-|            Tools / Skills             |
-|  - Contract calls, off-chain APIs     |
-|  e.g., stakeTokens(), transferERC20() |
-+-------------------+-------------------+
-                    |
-                    ▼
-          +--------------------+
-          |    Blockchain(s)   |
-          |  (Kava, EVM, etc.) |
-          +--------------------+
+```javascript
+export class EvmTransferMessage implements ChainMessage<SendToolParams> {
+  name = 'evm-transfer';
+  description = 'Send erc20 tokens from one address to another';
+  operationType = OperationType.TRANSACTION;
+  chainType = ChainType.EVM;
+  needsWallet = [WalletTypes.METAMASK];
+  walletMustMatchChainID = true;
+  parameters = [
+    chainNameToolCallParam,
+    {
+      name: 'toAddress',
+      type: 'string',
+      description: 'Recipient address',
+      required: true,
+    },
+    {
+      name: 'amount',
+      type: 'string',
+      description: 'Amount to send',
+      required: true,
+    },
+    {
+      name: 'denom',
+      type: 'string',
+      description: 'Token denomination',
+      required: true,
+    },
+  ];
 ```
 
-1. **Front-End**: The user-facing interface (React) that embeds an Oros chat widget.
-2. **Oros Agent**: Receives user prompts, uses LLM logic & memory, decides which tool(s) to call.
-3. **Tool Registry**: A set of typed “function calls.” Each function can be a contract method or off-chain API.
-4. **Blockchain**: Actual transaction logic — Kava chain, EVM, or custom protocols.
+- Queries return on-chain information: "What is my USDt balance on Kava EVM?"
 
----
-
-## How It Works
-
-At its core, Oros is a bridge between natural language and blockchain actions, leveraging cutting-edge AI to interpret user requests and perform on-chain operations.
-
-1. **Understanding Intent**  
-   Oros processes user input using advanced language models, breaking down requests into actionable components. Whether it’s staking tokens or bridging assets, Oros knows what needs to be done.
-
-2. **Executing Actions**  
-   Oros translates user intents into on-chain function calls, working within the frameworks of supported dApps. Every action is verified and secure.
-
-3. **Building Relationships (Next Steps)**  
-   Over time, Oros learns user preferences and habits (securely and with consent), providing a richer, more tailored experience.
-
----
-
-## Key Features
-
-- **Conversational Simplicity**  
-   Interact with blockchain assets as if you’re chatting with a knowledgeable friend.
-- **Universal Compatibility**  
-   Works across multiple dApps and ecosystems, starting with the Kava blockchain.
-
-- **User-Centric Security**  
-   Every transaction requires user approval, ensuring complete control over actions.
-
-- **Developer-Friendly Integration**  
-   An easy-to-use SDK makes embedding Oros into any dApp a breeze.
-
----
-
-## Product Roadmap
-
-| Milestone                  | Description                                          | Status         |
-| -------------------------- | ---------------------------------------------------- | -------------- |
-| **Oros MVP**               | Basic chat + tool bridging, single dApp integration  | ✅ Done        |
-| **Multi-dApp Integration** | Expand Oros to multiple Kava dApps                   | 🚧 In progress |
-| **Cross-Chain Support**    | EVM bridging (ERC20 transfers, bridging logic)       | 🚧 In progress |
-| **Advanced Memory**        | Persistent user context across sessions              | 📅 Planned     |
-| **TEE / Security**         | Integrate secure enclaves for private data + signing | 📅 Planned     |
-| **deModel Integration**    | Connection to community-trained LLMs                 | 📅 Planned     |
-
----
-
-## Getting Started
-
-#### 1. **Prerequisites**
-
-Before you begin, ensure you have the following tools installed:
-
-- **Go**: [Install Go](https://go.dev/doc/install) (version 1.19 or higher recommended)
-- **Node.js and npm**: [Install Node.js](https://nodejs.org/) (version 18.x or higher recommended)
-
-To verify installations, run:
-
-```bash
-go version
-node -v
-npm -v
+```javascript
+export class EvmBalancesQuery implements ChainQuery<EvmBalanceQueryParams> {
+  name = 'evm-balances';
+  description = 'Returns the erc20 token balances for a given address';
+  parameters = [chainNameToolCallParam];
+  operationType = OperationType.QUERY;
+  chainType = ChainType.EVM;
 ```
 
-#### 2. **Clone the Repository**
+3. When a user prompt corresponds to a tool call definition:
 
-Clone the Oros project to your local machine:
+- Execute that tool call's function
+- Model returns the output of the function (currently a string or an error)
+    - Transaction status (in progress, completed)
+    - List of account balances
+    - Transaction hash
+    - Error code (if user cancels in wallet for instance)
+- Display this information to the user with nice UX
 
-```bash
-git clone https://github.com/Kava-Labs/oros.git
-cd oros
+## Currently Supported Workflows
+
+### Balances Query
+
+1. A user asks for their balances
+
+- If they don't specify which chain, we default to Kava EVM
+
+![Balances Query](demo/images/balances-query.png)
+
+- If they specify the chain, fetch balances for that chain
+    - Kava EVM
+    - Kava EVM Internal Testnet (environment used for automated testing)
+    - Ethereum Mainnet
+
+![Internal Testnet](demo/images/balances-query-internal.png)
+
+![Ethereum](demo/images/eth-balances.png)
+
+### Transfer ERC20
+
+A user asks to transfer funds
+
+- Again, if no chain specified, assume Kava EVM
+- First, validate the transaction parameters
+- Is the user connected with a supported wallet?
+- Is the user asking to transfer a supported denom?
+- Is the user asking to use a supported chain?
+
+```javascript
+  validate(params
+:
+SendToolParams, walletStore
+:
+WalletStore
+):
+boolean
+{
+  if (!walletStore.getSnapshot().isWalletConnected) {
+    throw new Error('please connect to a compatible wallet');
+  }
+
+  if (!chainRegistry[this.chainType][params.chainName]) {
+    throw new Error(`unknown chain name ${params.chainName}`);
+  }
+
+...
+
+  if (!validDenomWithContract) {
+    throw new Error(`failed to find contract address for ${denom}`);
+  }
+
+  return true;
+}
 ```
 
-#### 3. **Set Up the Backend**
+- If valid, take these parameters and build the transaction data to send to metamask
+    - This step includes the "unmasking" of the user's
+      address `address_1 => 0x1874c3e9d6e5f7e4f3f22c3e260c8b25ed1433f2`
 
-Oros requires an OpenAI API key for its backend. Obtain your key from [OpenAI's API portal](https://platform.openai.com/account/api-keys).
+The UI always shows the address
+![Confirmation](demo/images/confirmation.png)
 
-Run the following command to start the backend API:
+But notice that the model receives a prompt with the mask
+![User](demo/images/userPrompt.png)
 
-```bash
-OPENAI_API_KEY=<your_key> OPENAI_BASE_URL=https://api.openai.com/v1 go run ./api/cmd/api/main.go
+Masks are keyed to addresses in local storage
+![Masks](demo/images/masksToAddresses.png)
+
+Tool call is made with the address mask
+![ToolCall](demo/images/toolCall.png)
+
+When the transaction is built, we unmask the address just before signing
+
+```javascript
+  async
+buildTransaction(
+  params
+:
+SendToolParams,
+  walletStore
+:
+WalletStore,
+):
+Promise < string > {
+  const { toAddress, amount, denom } = params;
+  ...
+    let txParams: Record < string, string >;
+
+const { masksToValues } = getStoredMasks();
+
+//  validate method will check that these mask-addresses exist
+const addressTo = masksToValues[toAddress];
+const addressFrom = walletStore.getSnapshot().walletAddress;
+...
+const hash = await walletStore.sign({
+  chainId: `0x${Number(2222).toString(16)}`,
+  signatureType: SignatureTypes.EVM,
+  payload: {
+    method: 'eth_sendTransaction',
+    params: [
+      {
+        ...txParams,
+        from: sendingAddress,
+        gasPrice: '0x4a817c800',
+        gas: '0x16120',
+      },
+    ],
+  },
+});
+
+
+return hash;
+
+}
 ```
 
-#### 4. **Set Up the Frontend**
+User confirms the transaction details
+![In Progress](demo/images/inProgress.png)
 
-Before starting the frontend, create a `.env` file in the root of the project to configure the necessary environment variable. The file should contain the following:
+User signs the transaction in metmask
+![Completed](demo/images/completed.png)
 
-```bash
-VITE_OPENAI_BASE_URL=http://localhost:5555/openai/v1
-```
+User views the transactions details on explorer
+![explorer](demo/images/explorer.png)
 
-After creating the `.env` file, install the required dependencies by running:
+User can execute a send tx on another chain
+![Internal](demo/images/internal.png)
 
-```bash
-npm install
-npm run dev
-```
+## What's Next
 
-#### 5. **Access the Application**
-
-The frontend should now be running on `http://localhost:3000`. Open your browser and interact with Oros locally!
-
-#### 6. **Troubleshooting**
-
-If you encounter issues:
-
-- Ensure your OpenAI API key is valid.
-- Verify all required tools (Go, Node.js, npm) are installed and up-to-date.
-- Check for detailed error logs in the backend or frontend terminal output.
+- We are currently manually writing tool calls for queries and transaction tools per chain, per message type. While
+  we've built this in a way that's easily extensible (supporting new EVM chains, additional Cosmos functionality, etc.),
+  but automation is the goal
+    - Ideally, we just need an ERC20 ABI and/or JSON endpoint to derive the necessary tool functions
+    - Goal is to simplify 3rd party integrations (similar to Keplr's process - simply make a pull request with a JSON
+      file with necessary config)
+- Extending functionality to include
+    - Add in EIP712 signing (Metamask support for Cosmos transactions, like staking, rewards, Lend, etc.)
+    - Add in `newMsgConvertCoinToERC20` and `newMsgConvertERC20ToCoin` to bridge between EVM and SDK.
+    - Add in
+    - Add in cosmos chain configuration
+    - TODO: What remaining configuration is needed to support evm to sdk transfer of USDT
+    - Add in `msgSend`
