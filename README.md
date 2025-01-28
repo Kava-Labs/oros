@@ -3,7 +3,7 @@
 ## What's New
 
 - **Multi-Chain Balance Queries:** Oros now supports querying EVM chain balances across multiple chains.
-- **Multi-Chain ERC20 Transfers:** Execute ERC20 token transfers on multiple chains.
+- **ERC20 Transfers:** Execute ERC20 token transfers on multiple chains.
 - **Independent Operation:** Oros operates independently of third-party dApp support or integrations.
 - **Streamlined Architecture:** Built to support additional chains and transactions with ease, paving the way for
   automation when possible.
