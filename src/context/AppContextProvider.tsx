@@ -72,75 +72,86 @@ export const AppContextProvider = ({
    */
   const executeOperation = useCallback(
     async (operationName: string, params: unknown) => {
-      const operation = registry.get(operationName);
-      if (!operation) {
-        throw new Error(`Unknown operation type: ${operationName}`);
-      }
-
-      let chainId = `0x${Number(2222).toString(16)}`; // default
-      let chainName = ChainNames.KAVA_EVM; // default
-
-      // if operation needs wallet connect
-      // and the current wallet connection isn't one that's included in wantsWallet
-      // we then try to establish that connection
-      if (
-        operation.needsWallet &&
-        Array.isArray(operation.needsWallet) &&
-        !operation.needsWallet.includes(walletStore.getSnapshot().walletType)
-      ) {
-        for (const walletType of operation.needsWallet) {
-          // if chainName exists in params, connect to that chain
-          if (
-            typeof params === 'object' &&
-            params !== null &&
-            chainNameToolCallParam.name in params
-          ) {
-            // @ts-expect-error we already checked this
-            chainName = params[chainNameToolCallParam.name];
-            const chain = chainRegistry[operation.chainType][chainName];
-            chainId = `0x${Number(chain.chainID).toString(16)}`;
-          }
-
-          await walletStore.connectWallet({
-            walletType,
-            chainId,
-          });
-
-          break;
+      try {
+        const operation = registry.get(operationName);
+        if (!operation) {
+          throw new Error(`Unknown operation type: ${operationName}`);
         }
-      }
 
-      // if the chain id in metamask doesn't match the chain id we need to be on
-      // start the network switching process
-      if (
-        operation.walletMustMatchChainID &&
-        walletStore.getSnapshot().walletType === WalletTypes.METAMASK &&
-        walletStore.getSnapshot().walletChainId !== chainId
-      ) {
-        await walletStore.metamaskSwitchNetwork(chainName);
-      }
+        let chainId = `0x${Number(2222).toString(16)}`; // default
+        let chainName = ChainNames.KAVA_EVM; // default
 
-      if (!operation.validate(params, walletStore)) {
-        throw new Error('Invalid parameters for operation');
-      }
+        // if operation needs wallet connect
+        // and the current wallet connection isn't one that's included in wantsWallet
+        // we then try to establish that connection
+        if (
+          operation.needsWallet &&
+          Array.isArray(operation.needsWallet) &&
+          !operation.needsWallet.includes(walletStore.getSnapshot().walletType)
+        ) {
+          for (const walletType of operation.needsWallet) {
+            // if chainName exists in params, connect to that chain
+            if (
+              typeof params === 'object' &&
+              params !== null &&
+              chainNameToolCallParam.name in params
+            ) {
+              // @ts-expect-error we already checked this
+              chainName = params[chainNameToolCallParam.name];
+              const chain = chainRegistry[operation.chainType][chainName];
+              chainId = `0x${Number(chain.chainID).toString(16)}`;
+            }
 
-      if ('buildTransaction' in operation) {
-        return (operation as ChainMessage<unknown>).buildTransaction(
-          params,
-          walletStore,
+            await walletStore.connectWallet({
+              walletType,
+              chainId,
+            });
+
+            break;
+          }
+        }
+
+        // if the chain id in metamask doesn't match the chain id we need to be on
+        // start the network switching process
+        if (
+          operation.walletMustMatchChainID &&
+          walletStore.getSnapshot().walletType === WalletTypes.METAMASK &&
+          walletStore.getSnapshot().walletChainId !== chainId
+        ) {
+          await walletStore.metamaskSwitchNetwork(chainName);
+        }
+
+        if (!operation.validate(params, walletStore)) {
+          throw new Error('Invalid parameters for operation');
+        }
+
+        if ('buildTransaction' in operation) {
+          return (operation as ChainMessage<unknown>).buildTransaction(
+            params,
+            walletStore,
+          );
+        } else if ('executeQuery' in operation) {
+          return (operation as ChainQuery<unknown>).executeQuery(
+            params,
+            walletStore,
+          );
+        }
+
+        throw new Error('Invalid operation type');
+      } catch (error) {
+        setErrorText(
+          'An error occured: '.concat(
+            error instanceof Error
+              ? error.message
+              : 'An unknown error occurred',
+          ),
         );
-      } else if ('executeQuery' in operation) {
-        return (operation as ChainQuery<unknown>).executeQuery(
-          params,
-          walletStore,
-        );
+        // Re-throw the error so calling code can handle it if needed
+        throw error;
       }
-
-      throw new Error('Invalid operation type');
     },
-    [registry, walletStore],
+    [registry, walletStore, setErrorText],
   );
-
   return (
     <AppContext.Provider
       value={{

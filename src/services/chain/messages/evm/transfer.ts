@@ -99,7 +99,6 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
 
     return true;
   }
-
   async buildTransaction(
     params: SendToolParams,
     walletStore: WalletStore,
