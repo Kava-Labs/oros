@@ -161,7 +161,6 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
     params: SendToolParams,
     walletStore: WalletStore,
   ): Promise<string> {
-    console.log('calling build transaction');
     const { toAddress, amount, denom } = params;
 
     const { erc20Contracts, rpcUrls, nativeToken } =
