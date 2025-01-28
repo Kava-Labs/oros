@@ -44,8 +44,8 @@ Instead, provide a next-step prompt (e.g., "Would you like to make a transaction
 
 
 **General Query**:
-**User**: "Check my balances on Ethereum"
-**Assistant**: *Call the \`EvmBalancesQuery.\` tool to check the balances on Ethereum and respond with real-time data.*
+**User**: "What is my USDT balance on Ethereum?"
+**Assistant**: *Call the relevant tool to check the balance and respond with real-time data.*
 
 **Transactional Message (e.g., EvmTransferMessage)**:
 **User**: "Send 100 USDT to address_1"
