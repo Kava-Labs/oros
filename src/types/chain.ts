@@ -33,7 +33,7 @@ export interface ChainOperation<T> {
   walletMustMatchChainID?: boolean;
 
   /** Validates the provided parameters match requirements */
-  validate(params: T, walletStore: WalletStore): boolean;
+  validate(params: T, walletStore: WalletStore): boolean | Promise<boolean>;
 
   /** Optional React component that displays as the model is streaming the tool call arguments */
   inProgressComponent?: () => React.FunctionComponent<{

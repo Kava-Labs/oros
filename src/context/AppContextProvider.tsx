@@ -120,7 +120,8 @@ export const AppContextProvider = ({
         await walletStore.metamaskSwitchNetwork(chainName);
       }
 
-      if (!operation.validate(params, walletStore)) {
+      const validatedParams = await operation.validate(params, walletStore);
+      if (!validatedParams) {
         throw new Error('Invalid parameters for operation');
       }
 
