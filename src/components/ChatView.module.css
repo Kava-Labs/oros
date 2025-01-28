@@ -66,7 +66,7 @@
   padding: var(--spacing-md);
   margin-left: auto;
   margin-top: var(--borderRadius-sm);
-  max-width: 90%;
+  max-width: 80%;
 }
 
 .left {
@@ -81,6 +81,7 @@
 
 .assistantContainer {
   margin-top: var(--spacing-md);
+  max-width: 80%;
 }
 
 #progressStream {
