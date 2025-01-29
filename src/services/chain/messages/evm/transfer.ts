@@ -66,47 +66,38 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
     },
     walletStore: WalletStore,
   ): Promise<boolean> {
-    try {
-      const { denom, amount, chainName } = params;
-      const { erc20Contracts, nativeToken, rpcUrls, nativeTokenDecimals } =
-        chainRegistry[this.chainType][chainName];
+    const { denom, amount, chainName } = params;
+    const { erc20Contracts, nativeToken, rpcUrls, nativeTokenDecimals } =
+      chainRegistry[this.chainType][chainName];
 
-      const rpcProvider = new ethers.JsonRpcProvider(rpcUrls[0]);
-      const address = walletStore.getSnapshot().walletAddress;
+    const rpcProvider = new ethers.JsonRpcProvider(rpcUrls[0]);
+    const address = walletStore.getSnapshot().walletAddress;
 
-      if (denom.toUpperCase() === nativeToken) {
-        const rawBalance = await rpcProvider.getBalance(address);
-        const formattedBalance = ethers.formatUnits(
-          rawBalance,
-          nativeTokenDecimals,
-        );
-        return Number(formattedBalance) >= Number(amount);
-      }
-
-      const erc20Record = getERC20Record(denom, erc20Contracts);
-      if (!erc20Record) {
-        return false;
-      }
-
-      const contract = new ethers.Contract(
-        erc20Record.contractAddress,
-        erc20ABI,
-        rpcProvider,
-      );
-
-      const decimals = await contract.decimals();
-      const rawBalance = await contract.balanceOf(address);
-      const formattedBalance = ethers.formatUnits(rawBalance, decimals);
-
-      console.log(
-        formattedBalance,
-        amount,
-        Number(formattedBalance) >= Number(amount),
+    if (denom.toUpperCase() === nativeToken) {
+      const rawBalance = await rpcProvider.getBalance(address);
+      const formattedBalance = ethers.formatUnits(
+        rawBalance,
+        nativeTokenDecimals,
       );
       return Number(formattedBalance) >= Number(amount);
-    } catch (e) {
+    }
+
+    const erc20Record = getERC20Record(denom, erc20Contracts);
+    if (!erc20Record) {
       return false;
     }
+
+    const contract = new ethers.Contract(
+      erc20Record.contractAddress,
+      erc20ABI,
+      rpcProvider,
+    );
+
+    const decimals = await contract.decimals();
+    const rawBalance = await contract.balanceOf(address);
+    const formattedBalance = ethers.formatUnits(rawBalance, decimals);
+
+    return Number(formattedBalance) >= Number(amount);
   }
 
   async validate(
@@ -157,6 +148,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
 
     return true;
   }
+
   async buildTransaction(
     params: SendToolParams,
     walletStore: WalletStore,
