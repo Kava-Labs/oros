@@ -106,7 +106,7 @@ export interface AminoHardMsgDeposit extends AminoMsg {
   };
 }
 export function isAminoHardMsgDeposit(
-  msg: AminoMsg
+  msg: AminoMsg,
 ): msg is AminoHardMsgDeposit {
   return msg.type === 'hard/MsgDeposit';
 }
@@ -119,7 +119,7 @@ export interface AminoHardMsgWithdraw extends AminoMsg {
   };
 }
 export function isAminoHardMsgWithdraw(
-  msg: AminoMsg
+  msg: AminoMsg,
 ): msg is AminoHardMsgWithdraw {
   return msg.type === 'hard/MsgWithdraw';
 }
@@ -363,7 +363,7 @@ export interface AminoMsgConvertCosmosCoinToERC20 extends AminoMsg {
 }
 
 export function isBridgeMessageWithStringAmount(
-  msg: AminoMsg
+  msg: AminoMsg,
 ): msg is AminoMsgDelegate | AminoMsgUndelegate {
   const erc20ConvertMessages = [
     'evmutil/MsgConvertCosmosCoinToERC20',
@@ -429,7 +429,7 @@ export interface AminoMsgUndelegate extends AminoMsg {
 }
 
 export function isStakingMessage(
-  msg: AminoMsg
+  msg: AminoMsg,
 ): msg is AminoMsgDelegate | AminoMsgUndelegate {
   const stakingMessages = [
     'cosmos-sdk/MsgDelegate',
@@ -440,13 +440,13 @@ export function isStakingMessage(
 }
 
 export const isAminoMsgConvertCoinToERC20 = (
-  msg: AminoMsg
+  msg: AminoMsg,
 ): msg is AminoMsgConvertCoinToERC20 => {
   return msg.type === 'evmutil/MsgConvertCoinToERC20';
 };
 
 export const isAminoMsgConvertERC20ToCoin = (
-  msg: AminoMsg
+  msg: AminoMsg,
 ): msg is AminoMsgConvertERC20ToCoin => {
   return msg.type === 'evmutil/MsgConvertERC20ToCoin';
 };
