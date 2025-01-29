@@ -73,11 +73,12 @@ export const AppContextProvider = ({
    */
   const executeOperation = useCallback(
     async (operationName: string, params: unknown) => {
+      setIsOperationValidated(false);
+
       const operation = registry.get(operationName);
       if (!operation) {
         throw new Error(`Unknown operation type: ${operationName}`);
       }
-      setIsOperationValidated(false);
 
       let chainId = `0x${Number(2222).toString(16)}`; // default
       let chainName = ChainNames.KAVA_EVM; // default
