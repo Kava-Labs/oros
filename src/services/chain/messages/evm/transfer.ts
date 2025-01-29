@@ -58,7 +58,52 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
     return InProgressTxDisplay;
   }
 
-  validate(params: SendToolParams, walletStore: WalletStore): boolean {
+  private async validateBalance(
+    params: {
+      denom: string;
+      amount: string;
+      chainName: string;
+    },
+    walletStore: WalletStore,
+  ): Promise<boolean> {
+    const { denom, amount, chainName } = params;
+    const { erc20Contracts, nativeToken, rpcUrls, nativeTokenDecimals } =
+      chainRegistry[this.chainType][chainName];
+
+    const rpcProvider = new ethers.JsonRpcProvider(rpcUrls[0]);
+    const address = walletStore.getSnapshot().walletAddress;
+
+    if (denom.toUpperCase() === nativeToken) {
+      const rawBalance = await rpcProvider.getBalance(address);
+      const formattedBalance = ethers.formatUnits(
+        rawBalance,
+        nativeTokenDecimals,
+      );
+      return Number(formattedBalance) >= Number(amount);
+    }
+
+    const erc20Record = getERC20Record(denom, erc20Contracts);
+    if (!erc20Record) {
+      return false;
+    }
+
+    const contract = new ethers.Contract(
+      erc20Record.contractAddress,
+      erc20ABI,
+      rpcProvider,
+    );
+
+    const decimals = await contract.decimals();
+    const rawBalance = await contract.balanceOf(address);
+    const formattedBalance = ethers.formatUnits(rawBalance, decimals);
+
+    return Number(formattedBalance) >= Number(amount);
+  }
+
+  async validate(
+    params: SendToolParams,
+    walletStore: WalletStore,
+  ): Promise<boolean> {
     if (!walletStore.getSnapshot().isWalletConnected) {
       throw new Error('please connect to a compatible wallet');
     }
@@ -95,6 +140,10 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
 
     if (!validDenomWithContract) {
       throw new Error(`failed to find contract address for ${denom}`);
+    }
+
+    if (!(await this.validateBalance(params, walletStore))) {
+      throw new Error('Invalid balances for transaction');
     }
 
     return true;
