@@ -191,6 +191,60 @@ export const App = () => {
   );
 };
 
+const SUPPRESS_FOLLOWUP_TOOLS = new Set(['evm-balances']);
+
+async function callTools(
+  toolCallStreamStore: ToolCallStreamStore,
+  messageHistoryStore: MessageHistoryStore,
+  executeOperation: ExecuteOperation,
+): Promise<boolean> {
+  let suppressFollowup = false;
+
+  for (const toolCall of toolCallStreamStore.getSnapShot()) {
+    const name = toolCall.function?.name;
+
+    if (name) {
+      if (SUPPRESS_FOLLOWUP_TOOLS.has(name)) {
+        suppressFollowup = true;
+      }
+
+      let content = '';
+      try {
+        const result = await executeOperation(
+          name,
+          toolCall.function.arguments,
+        );
+        content = JSON.stringify({
+          status: 'ok',
+          info: result,
+        } as OperationResult);
+      } catch (err) {
+        content = JSON.stringify({
+          status: 'failed',
+          info: err instanceof Error ? err.message : err,
+        } as OperationResult);
+      }
+
+      messageHistoryStore.addMessage({
+        role: 'assistant' as const,
+        function_call: null,
+        content: null,
+        tool_calls: [
+          toolCallStreamStore.toChatCompletionMessageToolCall(toolCall),
+        ],
+      });
+      toolCallStreamStore.deleteToolCallById(toolCall.id);
+      messageHistoryStore.addMessage({
+        role: 'tool' as const,
+        tool_call_id: toolCall.id,
+        content,
+      });
+    }
+  }
+
+  return suppressFollowup;
+}
+
 async function doChat(
   controller: AbortController,
   client: OpenAI,
@@ -200,7 +254,6 @@ async function doChat(
   messageStore: TextStreamStore,
   toolCallStreamStore: ToolCallStreamStore,
   executeOperation: ExecuteOperation,
-  shouldSuppressResponse: boolean = false, // Tracks if evm-balances suppressed follow-up
 ) {
   progressStore.setText('Thinking');
   try {
@@ -239,16 +292,15 @@ async function doChat(
     }
 
     if (toolCallStreamStore.getSnapShot().length > 0) {
-      // Execute the tool calls and check if evm-balances suppresses response
-      const nextShouldSuppressResponse = await callTools(
+      // Call tools and check if we should suppress follow-up
+      const suppressFollowup = await callTools(
         toolCallStreamStore,
         messageHistoryStore,
         executeOperation,
-        shouldSuppressResponse,
       );
 
-      // Allow chat to continue only if no evm-balances suppression OR a reset occurred
-      if (!nextShouldSuppressResponse) {
+      // Only do follow-up chat if not suppressed
+      if (!suppressFollowup) {
         await doChat(
           controller,
           client,
@@ -258,7 +310,6 @@ async function doChat(
           messageStore,
           toolCallStreamStore,
           executeOperation,
-          false, // Reset suppression if a new tool is called
         );
       }
     }
@@ -280,59 +331,4 @@ async function doChat(
       messageStore.setText('');
     }
   }
-}
-
-async function callTools(
-  toolCallStreamStore: ToolCallStreamStore,
-  messageHistoryStore: MessageHistoryStore,
-  executeOperation: ExecuteOperation,
-  shouldSuppressResponse: boolean, // Tracks if evm-balances suppressed follow-up
-): Promise<boolean> {
-  let suppressResponse = shouldSuppressResponse;
-
-  for (const toolCall of toolCallStreamStore.getSnapShot()) {
-    const name = toolCall.function?.name;
-
-    if (name) {
-      if (name === 'evm-balances') {
-        suppressResponse = true;
-      }
-      let content = '';
-
-      try {
-        const result = await executeOperation(
-          name,
-          toolCall.function.arguments,
-        );
-
-        content = JSON.stringify({
-          status: 'ok',
-          info: result,
-        } as OperationResult);
-      } catch (err) {
-        content = JSON.stringify({
-          status: 'failed',
-          info: err,
-        } as OperationResult);
-      }
-
-      messageHistoryStore.addMessage({
-        role: 'assistant' as const,
-        function_call: null,
-        content: null,
-        tool_calls: [
-          toolCallStreamStore.toChatCompletionMessageToolCall(toolCall),
-        ],
-      });
-
-      toolCallStreamStore.deleteToolCallById(toolCall.id);
-      messageHistoryStore.addMessage({
-        role: 'tool' as const,
-        tool_call_id: toolCall.id,
-        content,
-      });
-    }
-  }
-
-  return suppressResponse;
 }
