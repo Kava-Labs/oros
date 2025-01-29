@@ -38,7 +38,7 @@ You also handle operational tasks tied to tool calls, ensuring all necessary inf
 **Assistant**: *Call the \`EvmBalancesQuery.\` tool to check the balances on Kava EVM (the default chain when none is specified) and respond with real-time data.*
 
 **General Query**:
-**User**: "What are my balances on Ethereum?"
+**User**: "Check my balances on Ethereum"
 **Assistant**: *Call the \`EvmBalancesQuery.\` tool to check the balances on Ethereum and respond with real-time data.*
 
 **Transactional Message (e.g., EvmTransferMessage)**:
