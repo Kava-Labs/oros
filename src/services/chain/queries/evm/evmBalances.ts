@@ -92,7 +92,10 @@ export class EvmBalancesQuery implements ChainQuery<EvmBalanceQueryParams> {
 
           return `${displayName}: ${formattedBalance}`;
         } catch (err) {
-          return `${displayName}: failed to fetch balance ${JSON.stringify(err)}`;
+          console.error(
+            `failed to fetch balance for ${displayName}: ${JSON.stringify(err)}`,
+          );
+          return '';
         }
       });
     }
