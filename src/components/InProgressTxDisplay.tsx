@@ -1,6 +1,7 @@
 import { ToolCallStream } from '../toolCallStreamStore';
 import styles from './TxDisplay.module.css';
 import { useScrollToBottom } from '../useScrollToBottom';
+import { useAppContext } from '../context/useAppContext';
 
 export const InProgressTxDisplay = ({
   onRendered,
@@ -8,7 +9,13 @@ export const InProgressTxDisplay = ({
   toolCall: ToolCallStream;
   onRendered?: () => void;
 }) => {
-  useScrollToBottom(onRendered);
+  const { isOperationValidated } = useAppContext();
+
+  useScrollToBottom(onRendered, isOperationValidated);
+
+  if (!isOperationValidated) {
+    return null;
+  }
 
   return (
     <div

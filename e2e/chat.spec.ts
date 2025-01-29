@@ -109,11 +109,11 @@ describe('chat', () => {
     //  Confirm the tx
     await chat.submitMessage('Yes');
 
-    //  In progress
-    await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
-
     const metamaskPopup = await metamaskPopupPromise;
     await confirmMetamaskTransaction(metamaskPopup);
+
+    //  In progress
+    await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
 
     const provider = new ethers.JsonRpcProvider(
       'https://evm.data.internal.testnet.us-east.production.kava.io',
@@ -153,11 +153,11 @@ describe('chat', () => {
     //  Confirm the tx
     await chat.submitMessage('Yes');
 
-    //  In progress
-    await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
-
     const metamaskPopup = await metamaskPopupPromise;
     await confirmMetamaskTransaction(metamaskPopup);
+
+    //  In progress
+    await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
 
     const provider = new ethers.JsonRpcProvider(
       'https://evm.data.internal.testnet.us-east.production.kava.io',

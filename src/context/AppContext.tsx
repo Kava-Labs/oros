@@ -19,15 +19,14 @@ export type AppContextType = {
   isRequesting: boolean;
   setIsRequesting: React.Dispatch<React.SetStateAction<boolean>>;
   registry: OperationRegistry<unknown>;
-
   getOpenAITools: () => ChatCompletionTool[];
   executeOperation: ExecuteOperation;
-
   walletStore: WalletStore;
   messageStore: TextStreamStore;
   toolCallStreamStore: ToolCallStreamStore;
   progressStore: TextStreamStore;
   messageHistoryStore: MessageHistoryStore;
+  isOperationValidated: boolean;
 };
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);

@@ -46,6 +46,7 @@ export const AppContextProvider = ({
   progressStore: TextStreamStore;
   messageHistoryStore: MessageHistoryStore;
 }) => {
+  const [isOperationValidated, setIsOperationValidated] = useState(false);
   const [errorText, setErrorText] = useState('');
   // use is sending request to signify to the chat view that
   // a request is in progress so it can disable inputs
@@ -72,6 +73,8 @@ export const AppContextProvider = ({
    */
   const executeOperation = useCallback(
     async (operationName: string, params: unknown) => {
+      setIsOperationValidated(false);
+
       const operation = registry.get(operationName);
       if (!operation) {
         throw new Error(`Unknown operation type: ${operationName}`);
@@ -125,7 +128,7 @@ export const AppContextProvider = ({
       if (!validatedParams) {
         throw new Error('Invalid parameters for operation');
       }
-
+      setIsOperationValidated(true);
       if ('buildTransaction' in operation) {
         return (operation as ChainMessage<unknown>).buildTransaction(
           params,
@@ -151,17 +154,16 @@ export const AppContextProvider = ({
         progressStore,
         walletStore,
         toolCallStreamStore,
-
         getOpenAITools,
         executeOperation,
         registry,
-
         errorText,
         setErrorText,
         isReady,
         setIsReady,
         isRequesting,
         setIsRequesting,
+        isOperationValidated,
       }}
     >
       {children}
