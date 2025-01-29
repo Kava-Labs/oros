@@ -26,7 +26,7 @@ export type AppContextType = {
   toolCallStreamStore: ToolCallStreamStore;
   progressStore: TextStreamStore;
   messageHistoryStore: MessageHistoryStore;
-  isValidated: boolean;
+  isOperationValidated: boolean;
 };
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);

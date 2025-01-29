@@ -11,9 +11,9 @@ export const InProgressTxDisplay = ({
 }) => {
   useScrollToBottom(onRendered);
 
-  const { isValidated } = useAppContext();
+  const { isOperationValidated } = useAppContext();
 
-  if (!isValidated) {
+  if (!isOperationValidated) {
     return null;
   }
 
