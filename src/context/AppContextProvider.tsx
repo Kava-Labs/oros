@@ -46,6 +46,7 @@ export const AppContextProvider = ({
   progressStore: TextStreamStore;
   messageHistoryStore: MessageHistoryStore;
 }) => {
+  const [isValidated, setIsValidated] = useState(false);
   const [errorText, setErrorText] = useState('');
   // use is sending request to signify to the chat view that
   // a request is in progress so it can disable inputs
@@ -76,6 +77,7 @@ export const AppContextProvider = ({
       if (!operation) {
         throw new Error(`Unknown operation type: ${operationName}`);
       }
+      setIsValidated(false);
 
       let chainId = `0x${Number(2222).toString(16)}`; // default
       let chainName = ChainNames.KAVA_EVM; // default
@@ -125,7 +127,7 @@ export const AppContextProvider = ({
       if (!validatedParams) {
         throw new Error('Invalid parameters for operation');
       }
-
+      setIsValidated(true);
       if ('buildTransaction' in operation) {
         return (operation as ChainMessage<unknown>).buildTransaction(
           params,
@@ -151,17 +153,16 @@ export const AppContextProvider = ({
         progressStore,
         walletStore,
         toolCallStreamStore,
-
         getOpenAITools,
         executeOperation,
         registry,
-
         errorText,
         setErrorText,
         isReady,
         setIsReady,
         isRequesting,
         setIsRequesting,
+        isValidated,
       }}
     >
       {children}
