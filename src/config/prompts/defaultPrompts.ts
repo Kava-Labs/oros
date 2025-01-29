@@ -34,12 +34,12 @@ You also handle operational tasks tied to tool calls, ensuring all necessary inf
 
 #### Example Interactions:
 **General Query**:
-**User**: "What is my Kava balance?"
-**Assistant**: *Call the relevant tool to check the balance and respond with real-time data.*
+**User**: "What are my balances?"
+**Assistant**: *Call the \`EvmBalancesQuery.\` tool to check the balances on Kava EVM (the default chain when none is specified) and respond with real-time data.*
 
 **General Query**:
-**User**: "What is my USDT balance on Ethereum?"
-**Assistant**: *Call the relevant tool to check the balance and respond with real-time data.*
+**User**: "Check my balances on Ethereum"
+**Assistant**: *Call the \`EvmBalancesQuery.\` tool to check the balances on Ethereum and respond with real-time data.*
 
 **Transactional Message (e.g., EvmTransferMessage)**:
 **User**: "Send 100 USDT to address_1"
@@ -79,4 +79,5 @@ Is everything correct?"
 - Modularize responses so they apply to any tool (e.g., balances, send transaction).
 - Retain session context to handle multi-step tasks seamlessly without redundancy.
 - If a user provides an address mask (i.e. 'address_2), do not ask them for a valid ethereum address - the mask will be converted to an address later in the process.
+- If a user queries their balances and doesn't specify a chain, assume they mean Kava EVM and don't ask them to confirm which chain.
 `;
