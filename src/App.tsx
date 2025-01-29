@@ -200,6 +200,7 @@ async function doChat(
   messageStore: TextStreamStore,
   toolCallStreamStore: ToolCallStreamStore,
   executeOperation: ExecuteOperation,
+  shouldSuppressResponse: boolean = false, // Tracks if evm-balances suppressed follow-up
 ) {
   progressStore.setText('Thinking');
   try {
@@ -238,24 +239,28 @@ async function doChat(
     }
 
     if (toolCallStreamStore.getSnapShot().length > 0) {
-      // do the tool calls
-      await callTools(
+      // Execute the tool calls and check if evm-balances suppresses response
+      const nextShouldSuppressResponse = await callTools(
         toolCallStreamStore,
         messageHistoryStore,
         executeOperation,
+        shouldSuppressResponse,
       );
 
-      // inform the model of the tool call responses
-      await doChat(
-        controller,
-        client,
-        messageHistoryStore,
-        tools,
-        progressStore,
-        messageStore,
-        toolCallStreamStore,
-        executeOperation,
-      );
+      // Allow chat to continue only if no evm-balances suppression OR a reset occurred
+      if (!nextShouldSuppressResponse) {
+        await doChat(
+          controller,
+          client,
+          messageHistoryStore,
+          tools,
+          progressStore,
+          messageStore,
+          toolCallStreamStore,
+          executeOperation,
+          false, // Reset suppression if a new tool is called
+        );
+      }
     }
   } catch (e) {
     console.error(`An error occurred: ${e} `);
@@ -281,17 +286,25 @@ async function callTools(
   toolCallStreamStore: ToolCallStreamStore,
   messageHistoryStore: MessageHistoryStore,
   executeOperation: ExecuteOperation,
-): Promise<void> {
+  shouldSuppressResponse: boolean, // Tracks if evm-balances suppressed follow-up
+): Promise<boolean> {
+  let suppressResponse = shouldSuppressResponse;
+
   for (const toolCall of toolCallStreamStore.getSnapShot()) {
     const name = toolCall.function?.name;
 
     if (name) {
+      if (name === 'evm-balances') {
+        suppressResponse = true;
+      }
       let content = '';
+
       try {
         const result = await executeOperation(
           name,
           toolCall.function.arguments,
         );
+
         content = JSON.stringify({
           status: 'ok',
           info: result,
@@ -311,6 +324,7 @@ async function callTools(
           toolCallStreamStore.toChatCompletionMessageToolCall(toolCall),
         ],
       });
+
       toolCallStreamStore.deleteToolCallById(toolCall.id);
       messageHistoryStore.addMessage({
         role: 'tool' as const,
@@ -319,4 +333,6 @@ async function callTools(
       });
     }
   }
+
+  return suppressResponse;
 }
