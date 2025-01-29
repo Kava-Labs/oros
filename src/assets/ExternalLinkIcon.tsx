@@ -1,4 +1,4 @@
-import styles from '../components/displayCards/TxDisplay.module.css';
+import styles from '../components/displayCards/DisplayCards.module.css';
 
 export const ExternalLinkIcon = () => {
   return (
