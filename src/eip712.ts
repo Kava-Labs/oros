@@ -2,7 +2,7 @@ import { SignMode } from 'cosmjs-types/cosmos/tx/signing/v1beta1/signing';
 import { ExtensionOptionsWeb3Tx } from '@kava-labs/javascript-sdk/lib/proto/ethermint/types/v1/web3';
 import { PubKey } from '@kava-labs/javascript-sdk/lib/proto/ethermint/crypto/v1/ethsecp256k1/keys';
 import { signatureToPubkey } from '@hanchon/signature-to-pubkey';
-import { AuthInfo, TxBody, TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
+import { TxBody, TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
 import Long from 'long';
 import { makeSignDoc as makeSignDocAmino } from '@cosmjs/amino';
 import { fromBase64 } from '@cosmjs/encoding';
@@ -569,7 +569,6 @@ export const metaMaskSigner = async (opts: SignerParams) => {
     ),
   );
 
-
   // if the user has already completed a transaction, we no longer need to
   // send their pub_key across. If it is their first transaction with the wallet
   // on the kava chain then we need to send a dummy tx to their metamask in order
@@ -578,10 +577,9 @@ export const metaMaskSigner = async (opts: SignerParams) => {
   let pubkey: string = '';
   let sequence = '0';
   let accountNumber = '0';
+  let baseURL = chainConfig.rpcUrls[0];
 
   try {
-    let baseURL = chainConfig.rpcUrls[0];
-
     const res = await fetch(
       `${baseURL}/cosmos/auth/v1beta1/account_info/${signerAddress}`,
     );
@@ -674,7 +672,7 @@ export const metaMaskSigner = async (opts: SignerParams) => {
   };
   // have user sign with stringified json here and return it to a variable
   // this triggers the actual metamask window to open
-  let signature = await (window as any).ethereum.request({
+  let signature = await window.ethereum.request({
     method: 'eth_signTypedData_v4',
     params: [metamaskAddress, JSON.stringify(eipToSign)],
   });
@@ -686,7 +684,9 @@ export const metaMaskSigner = async (opts: SignerParams) => {
   // extension options are used with metamask EIP related data. Build the
   // extension options and encode them using the registry
   const encodedPartial = ExtensionOptionsWeb3Tx.fromPartial({
-    typedDataChainId: String(chainRegistry[ChainType.EVM][chainConfig.evmChainName!].chainID),
+    typedDataChainId: String(
+      chainRegistry[ChainType.EVM][chainConfig.evmChainName!].chainID,
+    ),
     feePayer: signerAddress,
     feePayerSig: Uint8Array.from(atob(feePayerSignature), (c) =>
       c.charCodeAt(0),
@@ -737,15 +737,32 @@ export const metaMaskSigner = async (opts: SignerParams) => {
     signatures: [new Uint8Array()],
   });
 
-  const authInfo = AuthInfo.decode(rawTx.authInfoBytes);
-  const feeAmount = authInfo.fee?.amount ? authInfo.fee.amount : fee;
-  const gasLimit = authInfo.fee?.gasLimit?.low
-    ? authInfo.fee.gasLimit.low
-    : gas;
+  // const authInfo = AuthInfo.decode(rawTx.authInfoBytes);
+  // const feeAmount = authInfo.fee?.amount ? authInfo.fee.amount : fee;
+  // const gasLimit = authInfo.fee?.gasLimit?.low
+  //   ? authInfo.fee.gasLimit.low
+  //   : gas;
 
-  return {
-    rawTx,
-    fee: feeAmount,
-    gas: String(gasLimit),
-  };
+  const tx_bytes = TxRaw.encode(rawTx).finish();
+  const mode = 'BROADCAST_MODE_SYNC';
+
+  const res = await fetch(baseURL + '/cosmos/tx/v1beta1/txs', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+
+    body: JSON.stringify({
+      tx_bytes,
+      mode,
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`failed to broadcast transaction`);
+  }
+
+  const txData = await res.json();
+
+  return txData.tx_response.txhash;
 };
