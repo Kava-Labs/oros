@@ -1,0 +1,133 @@
+.transactionContainer {
+  width: 100%;
+  max-width: 600px;
+  margin: var(--spacing-lg) auto 0;
+  padding-bottom: var(--spacing-md);
+}
+
+.transactionCard {
+  background-color: var(--colors-bgSecondary);
+  border: 1px solid var(--colors-bgQuaternary);
+  border-radius: var(--borderRadius-md);
+  padding: var(--spacing-lg);
+  color: var(--colors-textPrimary);
+}
+
+.statusSection {
+  margin-bottom: var(--spacing-lg);
+}
+
+.statusSection:last-child {
+  margin-bottom: 0;
+}
+
+.sectionLabel {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 12px;
+  color: var(--colors-textMuted);
+  margin: 0 0 var(--spacing-sm) 0;
+  font-weight: var(--typography-fontWeightRegular);
+}
+
+.statusIndicator {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.statusDot {
+  width: var(--spacing-sm);
+  height: var(--spacing-sm);
+  border-radius: 50%;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.statusDot.inProgress {
+  background-color: #d97706;
+}
+
+.statusDot.complete {
+  background-color: var(--colors-accent);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+.statusText {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.statusText.inProgress {
+  color: #fb923c;
+}
+
+.statusText.complete {
+  color: var(--colors-accent);
+}
+
+.hashLink {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 14px;
+  color: var(--colors-accent);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.hashLink:hover {
+  color: var(--colors-accent);
+}
+
+.hashText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.externalLinkIcon {
+  width: var(--spacing-md);
+  height: var(--spacing-md);
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.hashLink:hover .externalLinkIcon {
+  transform: translate(2px, -2px);
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.balanceGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.balanceRow {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--colors-bgSecondary);
+  border-radius: var(--borderRadius-sm);
+  border: 1px solid var(--colors-bgQuaternary);
+}
+
+.assetName {
+  font-weight: var(--typography-fontWeightBold);
+  color: var(--colors-textMuted);
+}
+
+.assetAmount {
+  color: var(--color-textPrimary);
+  margin-top: var(--spacing-xs);
+  word-break: break-all;
+}

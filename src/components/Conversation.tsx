@@ -6,12 +6,13 @@ import { memo } from 'react';
 import { useTheme } from '../theme/useTheme';
 import { useAppContext } from '../context/useAppContext';
 import { ToolCallProgressCards } from './ToolCallProgressCards';
-import { CompleteTxDisplay } from './CompleteTxDisplay';
+import { CompleteTxDisplay } from './displayCards/CompleteTxDisplay';
 import {
   chainNameToolCallParam,
   chainRegistry,
 } from '../config/chainsRegistry';
 import { OperationResult, OperationType } from '../types/chain';
+import { CompleteQueryDisplay } from './displayCards/CompleteQueryDisplay';
 
 export interface ConversationProps {
   messages: ChatCompletionMessageParam[];
@@ -80,8 +81,6 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
             const chainName = params[chainNameToolCallParam.name];
             const operation = registry.get(tc.function.name);
             if (!operation) return null;
-            if (operation.operationType !== OperationType.TRANSACTION)
-              return null;
 
             const chain = chainRegistry[operation.chainType][chainName];
             const content: OperationResult = JSON.parse(
@@ -91,13 +90,23 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
               return null;
             }
 
-            return (
-              <CompleteTxDisplay
-                key={index}
-                hash={content.info}
-                chain={chain}
-              />
-            );
+            if (operation.operationType !== OperationType.TRANSACTION) {
+              return (
+                <CompleteQueryDisplay
+                  key={index}
+                  content={content.info}
+                  onRendered={onRendered}
+                />
+              );
+            } else {
+              return (
+                <CompleteTxDisplay
+                  key={index}
+                  hash={content.info}
+                  chain={chain}
+                />
+              );
+            }
           }
 
           return null;
