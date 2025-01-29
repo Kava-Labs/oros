@@ -1,7 +1,7 @@
 import { ChainQuery, ChainType, OperationType } from '../../../../types/chain';
 import { ethers } from 'ethers';
 import { erc20ABI } from '../../../../tools/erc20ABI';
-import { QueryInProgress } from '../../../../components/QueryInProgress';
+import { QueryInProgress } from '../../../../components/displayCards/InProgressQueryDisplay';
 import { WalletStore, WalletTypes } from '../../../../walletStore';
 import {
   chainNameToolCallParam,
