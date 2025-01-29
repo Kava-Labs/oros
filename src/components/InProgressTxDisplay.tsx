@@ -9,9 +9,9 @@ export const InProgressTxDisplay = ({
   toolCall: ToolCallStream;
   onRendered?: () => void;
 }) => {
-  useScrollToBottom(onRendered);
-
   const { isOperationValidated } = useAppContext();
+
+  useScrollToBottom(onRendered, isOperationValidated);
 
   if (!isOperationValidated) {
     return null;
