@@ -27,7 +27,6 @@ import { EIP712SignerParams } from '../../../../../eip712';
 import { walletStore } from '../../../../../stores';
 import { Message } from '@kava-labs/javascript-sdk/lib/types/Message';
 
-//  sent to model
 interface ERC20ConvertParams {
   chainName: string;
   amount: string;
@@ -35,9 +34,6 @@ interface ERC20ConvertParams {
   direction: 'coinToERC20' | 'ERC20ToCoin';
 }
 
-/**
- * Implementation of the Kava Lend MsgDeposit message type.
- */
 export class ERC20ConversionMessage
   implements ChainMessage<ERC20ConvertParams>
 {
