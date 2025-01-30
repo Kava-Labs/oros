@@ -70,8 +70,13 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
     walletStore: WalletStore,
   ): Promise<boolean> {
     const { denom, amount, chainName } = params;
-    const { erc20Contracts, nativeToken, rpcUrls, nativeTokenDecimals } =
-      chainRegistry[this.chainType][chainName];
+
+    const chain = chainRegistry[this.chainType][chainName];
+    if (chain.chainType !== ChainType.EVM) {
+      throw new Error(`chain Type must be ${ChainType.EVM} for this operation`);
+    }
+
+    const { erc20Contracts, nativeToken, rpcUrls, nativeTokenDecimals } = chain;
 
     const rpcProvider = new ethers.JsonRpcProvider(rpcUrls[0]);
     const address = walletStore.getSnapshot().walletAddress;
