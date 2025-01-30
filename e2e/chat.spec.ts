@@ -73,13 +73,14 @@ describe('chat', () => {
     await chat.waitForAssistantResponse();
 
     //  Verify that the connected wallet has a balance of >1000 TKAVA
-    const nativeAssetBalanceRow = await page.getByTestId('TKAVA-balance-row');
-    const amountText = await nativeAssetBalanceRow
-      .locator('.assetAmount')
-      .textContent();
+    const nativeAssetBalanceRow = page.getByTestId('TKAVA-balance-row');
+    await nativeAssetBalanceRow.waitFor({ state: 'visible' });
 
-    const amount = Number(amountText.replace(/,/g, ''));
+    const amountElement = nativeAssetBalanceRow.locator('.assetAmount');
+    await amountElement.waitFor({ state: 'visible' });
+    const amountText = await amountElement.textContent();
 
+    const amount = parseFloat(amountText.replace(/,/g, ''));
     expect(amount).toBeGreaterThan(1000);
   });
 
