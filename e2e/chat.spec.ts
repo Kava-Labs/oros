@@ -106,9 +106,6 @@ describe('chat', () => {
 
     await chat.waitForStreamToFinish();
 
-    //  Confirm the tx
-    await chat.submitMessage('Yes');
-
     const metamaskPopup = await metamaskPopupPromise;
     await confirmMetamaskTransaction(metamaskPopup);
 
@@ -149,9 +146,6 @@ describe('chat', () => {
     );
 
     await chat.waitForStreamToFinish();
-
-    //  Confirm the tx
-    await chat.submitMessage('Yes');
 
     const metamaskPopup = await metamaskPopupPromise;
     await confirmMetamaskTransaction(metamaskPopup);
