@@ -5,6 +5,7 @@ import { signatureToPubkey } from '@hanchon/signature-to-pubkey';
 import { TxBody, TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
 import Long from 'long';
 import { makeSignDoc as makeSignDocAmino } from '@cosmjs/amino';
+import { toBase64 } from '@cosmjs/encoding';
 import { fromBase64 } from '@cosmjs/encoding';
 import {
   EncodeObject,
@@ -743,7 +744,7 @@ export const eip712SignAndBroadcast = async (opts: EIP712SignerParams) => {
   //   ? authInfo.fee.gasLimit.low
   //   : gas;
 
-  const tx_bytes = TxRaw.encode(rawTx).finish();
+  const tx_bytes = toBase64(TxRaw.encode(rawTx).finish());
   const mode = 'BROADCAST_MODE_SYNC';
 
   const res = await fetch(baseURL + '/cosmos/tx/v1beta1/txs', {
@@ -759,10 +760,23 @@ export const eip712SignAndBroadcast = async (opts: EIP712SignerParams) => {
   });
 
   if (!res.ok) {
+    const error = await res.text();
+    if (error.length) {
+      throw new Error(error);
+    }
+
     throw new Error(`failed to broadcast transaction`);
   }
 
   const txData = await res.json();
+
+  if (txData.tx_response.code !== 0) {
+    if (txData.tx_response.raw_log) {
+      throw new Error(txData.tx_response.raw_log);
+    } else {
+      throw new Error(`failed to broadcast transaction`);
+    }
+  }
 
   return txData.tx_response.txhash;
 };

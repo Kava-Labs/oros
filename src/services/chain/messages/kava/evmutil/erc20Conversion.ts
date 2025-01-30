@@ -191,6 +191,14 @@ export class ERC20ConversionMessage
           messages: [msg],
           chainConfig: cosmosChainConfig,
           memo: '',
+          fee: [
+            {
+              denom: cosmosChainConfig.nativeToken,
+              amount: String(
+                Number(cosmosChainConfig.defaultGasWanted) * 0.025,
+              ),
+            },
+          ],
         };
 
         const hash = await walletStore.sign({

@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { AppContext } from './AppContext';
 import { OperationRegistry } from '../services/chain/registry';
-import { ChainMessage, ChainQuery } from '../types/chain';
+import { ChainMessage, ChainQuery, ChainType } from '../types/chain';
 import { LendDepositMessage } from '../services/chain/messages/kava/lend/msgDeposit';
 import { EvmTransferMessage } from '../services/chain/messages/evm/transfer';
 import { EvmBalancesQuery } from '../services/chain/queries/evm/evmBalances';
@@ -13,6 +13,7 @@ import {
   ChainNames,
   chainNameToolCallParam,
   chainRegistry,
+  CosmosChainConfig,
 } from '../config/chainsRegistry';
 import { ERC20ConversionMessage } from '../services/chain/messages/kava/evmutil/erc20Conversion';
 
@@ -85,6 +86,20 @@ export const AppContextProvider = ({
       let chainId = `0x${Number(2222).toString(16)}`; // default
       let chainName = ChainNames.KAVA_EVM; // default
 
+      if (
+        typeof params === 'object' &&
+        params !== null &&
+        chainNameToolCallParam.name in params
+      ) {
+        // @ts-expect-error we already checked this
+        chainName = params[chainNameToolCallParam.name];
+        const chain = chainRegistry[operation.chainType][chainName];
+        chainId =
+          operation.chainType === ChainType.EVM
+            ? `0x${Number(chain.chainID).toString(16)}`
+            : String(chain.chainID);
+      }
+
       // if operation needs wallet connect
       // and the current wallet connection isn't one that's included in wantsWallet
       // we then try to establish that connection
@@ -94,18 +109,6 @@ export const AppContextProvider = ({
         !operation.needsWallet.includes(walletStore.getSnapshot().walletType)
       ) {
         for (const walletType of operation.needsWallet) {
-          // if chainName exists in params, connect to that chain
-          if (
-            typeof params === 'object' &&
-            params !== null &&
-            chainNameToolCallParam.name in params
-          ) {
-            // @ts-expect-error we already checked this
-            chainName = params[chainNameToolCallParam.name];
-            const chain = chainRegistry[operation.chainType][chainName];
-            chainId = `0x${Number(chain.chainID).toString(16)}`;
-          }
-
           await walletStore.connectWallet({
             walletType,
             chainId,
@@ -122,7 +125,28 @@ export const AppContextProvider = ({
         walletStore.getSnapshot().walletType === WalletTypes.METAMASK &&
         walletStore.getSnapshot().walletChainId !== chainId
       ) {
-        await walletStore.metamaskSwitchNetwork(chainName);
+        switch (operation.chainType) {
+          case ChainType.COSMOS: {
+            // for cosmos chains using metamask
+            // get the evmChainName and use that to find the chainID we are supposed to be on
+            // if those don't match we can then switch to the correct evm network
+            const { evmChainName } = chainRegistry[operation.chainType][
+              chainName
+            ] as CosmosChainConfig;
+            if (evmChainName) {
+              if (
+                `0x${chainRegistry[ChainType.EVM][evmChainName].chainID.toString(16)}` !==
+                walletStore.getSnapshot().walletChainId
+              ) {
+                await walletStore.metamaskSwitchNetwork(evmChainName);
+              }
+            }
+            break;
+          }
+          default: {
+            await walletStore.metamaskSwitchNetwork(chainName);
+          }
+        }
       }
 
       const validatedParams = await operation.validate(params, walletStore);

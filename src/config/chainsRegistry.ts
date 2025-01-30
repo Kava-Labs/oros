@@ -216,7 +216,7 @@ export const chainRegistry: ChainRegistry = {
       chainType: ChainType.COSMOS,
       name: 'Kava Cosmos',
       rpcUrls: ['https://api2.kava.io'],
-      blockExplorerUrls: [], // todo: add
+      blockExplorerUrls: ['https://www.mintscan.io/kava/'],
       chainID: 'kava_2222-10',
       evmChainName: ChainNames.KAVA_EVM, // reference to the evm chain config, needed for eip712 signing
 
