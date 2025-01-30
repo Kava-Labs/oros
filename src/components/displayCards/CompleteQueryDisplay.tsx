@@ -32,7 +32,11 @@ export const CompleteQueryDisplay = ({
           <h3 className={styles.sectionLabel}>Balances</h3>
           <div className={styles.balanceGrid}>
             {balances.map(({ denom, amount }, index) => (
-              <div key={index} className={styles.balanceRow}>
+              <div
+                data-testid={`${denom}-balance-row`}
+                key={index}
+                className={styles.balanceRow}
+              >
                 <span className={styles.assetName}>{denom}</span>
                 <span className={styles.assetAmount}>{amount}</span>
               </div>

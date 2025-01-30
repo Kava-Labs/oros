@@ -72,14 +72,15 @@ describe('chat', () => {
     await chat.waitForStreamToFinish();
     await chat.waitForAssistantResponse();
 
-    const messages = await chat.getMessageElementsWithContent();
-    const responseText = await messages[messages.length - 1].innerText();
-
     //  Verify that the connected wallet has a balance of >1000 TKAVA
-    const kavaMatch = responseText.match(/TKAVA: ([^\n]+)/);
-    expect(kavaMatch).toBeTruthy();
-    const kavaBalance = Number(kavaMatch[1].replace(/,/g, ''));
-    expect(kavaBalance).toBeGreaterThan(1000);
+    const nativeAssetBalanceRow = await page.getByTestId('TKAVA-balance-row');
+    const amountText = await nativeAssetBalanceRow
+      .locator('.assetAmount')
+      .textContent();
+
+    const amount = Number(amountText.replace(/,/g, ''));
+
+    expect(amount).toBeGreaterThan(1000);
   });
 
   test('send tx (native asset)', async ({
