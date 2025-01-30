@@ -1,3 +1,4 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 import { Big } from 'big.js';
 import { AminoConverter } from '@cosmjs/stargate';
 import Long from 'long';
@@ -1263,7 +1264,7 @@ export function createDefaultTypes(): Record<string, AminoConverter> {
           timeout_timestamp: omitDefault(timeoutTimestamp)?.toString(),
         };
         if (memo && memo.length) {
-          // @ts-ignore
+          // @ts-expect-error memo is a string
           msg.memo = memo;
         }
 
@@ -1301,7 +1302,7 @@ export function createDefaultTypes(): Record<string, AminoConverter> {
         };
 
         if (memo && memo.length) {
-          // @ts-ignore
+          // @ts-expect-error memo is a string
           msg.memo = memo;
         }
         return msg;

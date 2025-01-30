@@ -80,9 +80,9 @@ const msgTransferFromPartial = MsgTransfer.fromPartial;
 
 MsgTransfer.encode = function (msg, protoWriter) {
   const writer = msgTransferEncoder.apply(this, [msg, protoWriter]);
-  // @ts-ignore
+  // @ts-expect-error memo is a string
   if (msg.memo && msg.memo.length) {
-    // @ts-ignore
+    // @ts-expect-error memo is a string
     writer.uint32(66).string(msg.memo);
   }
 
@@ -91,9 +91,9 @@ MsgTransfer.encode = function (msg, protoWriter) {
 
 MsgTransfer.fromPartial = function (obj) {
   const msg = msgTransferFromPartial.apply(this, [obj]);
-  // @ts-ignore
+  // @ts-expect-error memo is a string
   if (obj.memo && obj.memo.length) {
-    // @ts-ignore
+    // @ts-expect-error memo is a string
     msg.memo = obj.memo;
   }
   return msg;

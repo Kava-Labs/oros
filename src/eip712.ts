@@ -1,3 +1,4 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 import { SignMode } from 'cosmjs-types/cosmos/tx/signing/v1beta1/signing';
 import { ExtensionOptionsWeb3Tx } from '@kava-labs/javascript-sdk/lib/proto/ethermint/types/v1/web3';
 import { PubKey } from '@kava-labs/javascript-sdk/lib/proto/ethermint/crypto/v1/ethsecp256k1/keys';
@@ -439,10 +440,10 @@ function shouldIncludeNestedTypes(messageType: any) {
 
 export const msgsToEIP712 = (msg: any[]) => {
   // get the message types that the user is trying to do transactions with
-  let EIP712Types: any = {};
+  const EIP712Types: any = {};
   let msgTypes: any = {};
-  let txTypes: any = [];
-  let eipFormmatedMessages: any = {};
+  const txTypes: any = [];
+  const eipFormmatedMessages: any = {};
   let includeIncentiveSelection = false;
   let includeHeight = false;
 
@@ -574,11 +575,10 @@ export const eip712SignAndBroadcast = async (opts: EIP712SignerParams) => {
   // send their pub_key across. If it is their first transaction with the wallet
   // on the kava chain then we need to send a dummy tx to their metamask in order
   // to generate a public key and send it with the data
-  let anyPubKey: any;
   let pubkey: string = '';
   let sequence = '0';
   let accountNumber = '0';
-  let baseURL = chainConfig.rpcUrls[0];
+  const baseURL = chainConfig.rpcUrls[0];
 
   try {
     const res = await fetch(
@@ -603,12 +603,12 @@ export const eip712SignAndBroadcast = async (opts: EIP712SignerParams) => {
   if (!pubkey.length) {
     // get the pubkey from mm for the given address if the user doens't have
     // and existing pub_key on their kava account
-    let pubKeySignature = await window.ethereum.request({
+    const pubKeySignature = await window.ethereum.request({
       method: 'personal_sign',
       params: [metamaskAddress, 'generate_pubkey'],
     });
 
-    let pubKeyMessage = Buffer.from([
+    const pubKeyMessage = Buffer.from([
       50, 215, 18, 245, 169, 63, 252, 16, 225, 169, 71, 95, 254, 165, 146, 216,
       40, 162, 115, 78, 147, 125, 80, 182, 25, 69, 136, 250, 65, 200, 94, 178,
     ]);
@@ -616,7 +616,7 @@ export const eip712SignAndBroadcast = async (opts: EIP712SignerParams) => {
     pubkey = signatureToPubkey(pubKeySignature as string, pubKeyMessage);
   }
 
-  let pubkeyfromPartial = PubKey.fromPartial({
+  const pubkeyfromPartial = PubKey.fromPartial({
     key: fromBase64(pubkey),
   });
 
@@ -626,7 +626,7 @@ export const eip712SignAndBroadcast = async (opts: EIP712SignerParams) => {
     value: pubkeyfromPartial,
   };
 
-  anyPubKey = registry.encodeAsAny(pubkeyOptions);
+  const anyPubKey = registry.encodeAsAny(pubkeyOptions);
 
   // set the signmode
   const signMode = SignMode.SIGN_MODE_LEGACY_AMINO_JSON;
