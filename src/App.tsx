@@ -41,26 +41,12 @@ export const App = () => {
     setIsRequesting,
     getOpenAITools,
     executeOperation,
-    walletStore,
     messageHistoryStore,
     toolCallStreamStore,
     progressStore,
     messageStore,
   } = useAppContext();
 
-  const { walletAddress, walletType, walletChainId } = useSyncExternalStore(
-    walletStore.subscribe,
-    walletStore.getSnapshot,
-  );
-
-  console.log({
-    walletAddress,
-    walletChainId,
-    walletType,
-    tools: getOpenAITools(),
-  });
-
-  // TODO: check healthcheck and set error if backend is not availiable
   useEffect(() => {
     try {
       client = new OpenAI({
