@@ -17,11 +17,11 @@ import {
   WalletStore,
   WalletTypes,
 } from '../../../../../walletStore';
-import { walletStore } from '../../../../../components/ChatView.test';
 import { ethers } from 'ethers';
 import { bech32 } from 'bech32';
 import { erc20ABI } from '../../../../../tools/erc20ABI';
 import { EIP712SignerParams } from '../../../../../eip712';
+import { walletStore } from '../../../../../stores';
 
 //  sent to model
 interface ERC20ConvertParams {

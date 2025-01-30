@@ -36,17 +36,13 @@ import '@fontsource/inter/700-italic.css';
 import { App } from './App.tsx';
 import { ThemeProvider } from './theme/themeProvider.tsx';
 import { AppContextProvider } from './context/AppContextProvider.tsx';
-
-import { TextStreamStore } from './textStreamStore';
-import { ToolCallStreamStore } from './toolCallStreamStore';
-import { MessageHistoryStore } from './messageHistoryStore';
-import { WalletStore } from './walletStore';
-
-const messageStore = new TextStreamStore();
-const progressStore = new TextStreamStore();
-const toolCallStreamStore = new ToolCallStreamStore();
-const messageHistoryStore = new MessageHistoryStore();
-const walletStore = new WalletStore();
+import {
+  progressStore,
+  messageHistoryStore,
+  messageStore,
+  walletStore,
+  toolCallStreamStore,
+} from './stores.ts';
 
 //
 // Render!
