@@ -6,6 +6,7 @@ import { WalletStore, WalletTypes } from '../../../../walletStore';
 import {
   chainNameToolCallParam,
   chainRegistry,
+  EVMChainConfig,
 } from '../../../../config/chainsRegistry';
 
 type EvmBalanceQueryParams = {
@@ -49,7 +50,7 @@ export class EvmBalancesQuery implements ChainQuery<EvmBalanceQueryParams> {
     walletStore: WalletStore,
   ): Promise<string> {
     const { rpcUrls, erc20Contracts, nativeToken, nativeTokenDecimals } =
-      chainRegistry[this.chainType][params.chainName];
+      chainRegistry[this.chainType][params.chainName] as EVMChainConfig;
     const rpcProvider = new ethers.JsonRpcProvider(rpcUrls[0]);
 
     const address = walletStore.getSnapshot().walletAddress;

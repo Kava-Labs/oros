@@ -15,6 +15,7 @@ import {
 import {
   chainNameToolCallParam,
   chainRegistry,
+  EVMChainConfig,
 } from '../../../../config/chainsRegistry';
 import { ConnectWalletPrompt } from '../../../../components/ConnectWalletPrompt';
 
@@ -136,8 +137,9 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
       throw new Error(`amount must be greater than zero`);
     }
 
-    const { erc20Contracts, nativeToken } =
-      chainRegistry[this.chainType][params.chainName];
+    const { erc20Contracts, nativeToken } = chainRegistry[this.chainType][
+      params.chainName
+    ] as EVMChainConfig;
 
     const validDenomWithContract =
       getERC20Record(denom, erc20Contracts) !== null ||
@@ -160,8 +162,9 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
   ): Promise<string> {
     const { toAddress, amount, denom } = params;
 
-    const { erc20Contracts, rpcUrls, nativeToken } =
-      chainRegistry[this.chainType][params.chainName];
+    const { erc20Contracts, rpcUrls, nativeToken, chainID } = chainRegistry[
+      this.chainType
+    ][params.chainName] as EVMChainConfig;
     const rpcProvider = new ethers.JsonRpcProvider(rpcUrls[0]);
 
     try {
@@ -205,7 +208,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
       }
 
       const hash = await walletStore.sign({
-        chainId: `0x${Number(2222).toString(16)}`,
+        chainId: `0x${Number(chainID).toString(16)}`,
         signatureType: SignatureTypes.EVM,
         payload: {
           method: 'eth_sendTransaction',

@@ -14,6 +14,7 @@ import {
   chainNameToolCallParam,
   chainRegistry,
 } from '../config/chainsRegistry';
+import { ERC20ConversionMessage } from '../services/chain/messages/kava/evmutil/erc20Conversion';
 
 /**
  * Initializes the operation registry with all supported operations.
@@ -28,6 +29,7 @@ function initializeRegistry(): OperationRegistry<unknown> {
   registry.register(new LendDepositMessage());
   registry.register(new EvmTransferMessage());
   registry.register(new EvmBalancesQuery());
+  registry.register(new ERC20ConversionMessage());
   return registry;
 }
 

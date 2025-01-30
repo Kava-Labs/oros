@@ -514,7 +514,7 @@ export const msgsToEIP712 = (msg: any[]) => {
   };
 };
 
-export type SignerParams = {
+export type EIP712SignerParams = {
   messages: any[];
   gas?: string;
   fee?: { denom: string; amount: string }[];
@@ -522,7 +522,7 @@ export type SignerParams = {
   memo: string;
 };
 
-export const metaMaskSigner = async (opts: SignerParams) => {
+export const eip712SignAndBroadcast = async (opts: EIP712SignerParams) => {
   if (!chainRegistry[ChainType.EVM][opts.chainConfig.evmChainName ?? '']) {
     throw new Error(
       `cosmos ${opts.chainConfig.name} chain must be linked to an evm chain`,

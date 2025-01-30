@@ -1,4 +1,5 @@
 import { ChainNames, chainRegistry } from './config/chainsRegistry';
+import { eip712SignAndBroadcast, EIP712SignerParams } from './eip712';
 import { ChainType } from './types/chain';
 
 type Listener = () => void;
@@ -145,7 +146,7 @@ export class WalletStore {
           return window.ethereum.request(opts.payload);
         }
         case SignatureTypes.EIP712: {
-          throw new Error('EIP712 Signing not implemented at this moment');
+          return eip712SignAndBroadcast(opts.payload as EIP712SignerParams);
         }
       }
     } else {
