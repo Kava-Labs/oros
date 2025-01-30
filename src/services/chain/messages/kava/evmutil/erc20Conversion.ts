@@ -11,7 +11,10 @@ import {
   ChainType,
   OperationType,
 } from '../../../../../types/chain';
-import { getERC20Record } from '../../../../../utils/chat/helpers';
+import {
+  getCoinRecord,
+  getERC20Record,
+} from '../../../../../utils/chat/helpers';
 import {
   SignatureTypes,
   WalletStore,
@@ -22,6 +25,7 @@ import { bech32 } from 'bech32';
 import { erc20ABI } from '../../../../../tools/erc20ABI';
 import { EIP712SignerParams } from '../../../../../eip712';
 import { walletStore } from '../../../../../stores';
+import { Message } from '@kava-labs/javascript-sdk/lib/types/Message';
 
 //  sent to model
 interface ERC20ConvertParams {
@@ -124,10 +128,13 @@ export class ERC20ConversionMessage
       chainInfo.evmChainName
     ] as EVMChainConfig;
 
-    const validDenomWithContract = getERC20Record(denom, erc20Contracts);
-
-    if (!validDenomWithContract) {
-      throw new Error(`failed to find contract address for ${denom}`);
+    if (
+      !getERC20Record(denom, erc20Contracts) ||
+      !getCoinRecord(denom, chainInfo.denoms)
+    ) {
+      throw new Error(
+        `failed to find contract address or coin record for ${denom}`,
+      );
     }
 
     if (
@@ -152,7 +159,7 @@ export class ERC20ConversionMessage
       cosmosChainConfig.evmChainName!
     ] as EVMChainConfig;
 
-    const { contractAddress, displayName } = getERC20Record(
+    const { contractAddress } = getERC20Record(
       params.denom,
       evmChainConfig.erc20Contracts,
     )!;
@@ -178,47 +185,58 @@ export class ERC20ConversionMessage
       .parseUnits(params.amount, await contract.decimals())
       .toString();
 
+    const messages: Message<unknown>[] = [];
+
     switch (params.direction) {
       case 'ERC20ToCoin': {
-        const msg = Kava.msg.evmutil.newMsgConvertERC20ToCoin(
-          signerAddress,
-          bech32Address,
-          contractAddress,
-          microAmount,
+        messages.push(
+          Kava.msg.evmutil.newMsgConvertERC20ToCoin(
+            signerAddress,
+            bech32Address,
+            contractAddress,
+            microAmount,
+          ),
         );
-
-        const payload: EIP712SignerParams = {
-          messages: [msg],
-          chainConfig: cosmosChainConfig,
-          memo: '',
-          fee: [
-            {
-              denom: cosmosChainConfig.nativeToken,
-              amount: String(
-                Number(cosmosChainConfig.defaultGasWanted) * 0.025,
-              ),
-            },
-          ],
-        };
-
-        const hash = await walletStore.sign({
-          signatureType: SignatureTypes.EIP712,
-          payload,
-          chainId: `0x${Number(evmChainConfig.chainID).toString(16)}`,
-        });
-
-        return hash;
+        break;
       }
       case 'coinToERC20': {
-        return `Unimplemented :coinToERC20 support is coming soon`;
+        messages.push(
+          Kava.msg.evmutil.newMsgConvertCoinToERC20(
+            bech32Address,
+            signerAddress,
+            {
+              denom: getCoinRecord(params.denom, cosmosChainConfig.denoms)!
+                .denom,
+              amount: microAmount,
+            },
+          ),
+        );
+
+        break;
       }
       default: {
         throw new Error(`unknown conversion direction ${params.direction}`);
       }
     }
 
-    // todo: implement
+    const payload: EIP712SignerParams = {
+      messages,
+      chainConfig: cosmosChainConfig,
+      memo: '',
+      fee: [
+        {
+          denom: cosmosChainConfig.nativeToken,
+          amount: String(Number(cosmosChainConfig.defaultGasWanted) * 0.025),
+        },
+      ],
+    };
 
-    return 'unimplemented';
+    const hash = await walletStore.sign({
+      signatureType: SignatureTypes.EIP712,
+      payload,
+      chainId: `0x${Number(evmChainConfig.chainID).toString(16)}`,
+    });
+
+    return hash;
   }
 }

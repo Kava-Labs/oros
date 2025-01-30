@@ -2,6 +2,8 @@ import { ChainType } from '../types/chain';
 
 export type ERC20Record = { contractAddress: string; displayName: string };
 
+export type CoinRecord = { denom: string; displayName: string };
+
 export type EVMChainConfig = {
   chainType: ChainType.EVM;
   name: string;
@@ -29,6 +31,8 @@ export type CosmosChainConfig = {
 
   chainID: string;
   evmChainName?: ChainNames;
+
+  denoms: Record<string, CoinRecord>;
 
   bech32Prefix: string;
 
@@ -225,6 +229,45 @@ export const chainRegistry: ChainRegistry = {
 
       bech32Prefix: 'kava',
       defaultGasWanted: '1000000',
+
+      denoms: {
+        WHARD: {
+          denom: 'whard',
+          displayName: 'wHARD',
+        },
+        USDT: {
+          denom: 'erc20/tether/usdt',
+          displayName: 'USD₮',
+        },
+        AXLETH: {
+          denom: 'erc20/axelar/eth',
+          displayName: 'axlETH',
+        },
+        AXLWBTC: {
+          denom: 'erc20/axelar/wbtc',
+          displayName: 'axlwBTC',
+        },
+        AXLUSDC: {
+          denom: 'erc20/axelar/usdc',
+          displayName: 'axlUSDC',
+        },
+        AXLDAI: {
+          denom: 'erc20/axelar/dai',
+          displayName: 'axlDAI',
+        },
+        AXLUSDT: {
+          denom: 'erc20/axelar/usdt',
+          displayName: 'axlUSDT',
+        },
+        WATOM: {
+          denom: '0x15932E26f5BD4923d46a2b205191C4b5d5f43FE3',
+          displayName: 'wATOM',
+        },
+        MBTC: {
+          denom: 'erc20/meson/mbtc',
+          displayName: 'mBTC',
+        },
+      },
     },
   },
 };
