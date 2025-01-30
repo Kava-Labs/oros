@@ -34,7 +34,12 @@ export const CompleteQueryDisplay = ({
             {balances.map(({ denom, amount }, index) => (
               <div key={index} className={styles.balanceRow}>
                 <span className={styles.assetName}>{denom}</span>
-                <span className={styles.assetAmount}>{amount}</span>
+                <span
+                  data-testid={`${denom}-query-amount`}
+                  className={styles.assetAmount}
+                >
+                  {amount}
+                </span>
               </div>
             ))}
           </div>
