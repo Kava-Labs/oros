@@ -90,7 +90,7 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
               return null;
             }
 
-            if (operation.operationType !== OperationType.TRANSACTION) {
+            if (operation.operationType === OperationType.QUERY) {
               return (
                 <CompleteQueryDisplay
                   key={index}
