@@ -72,14 +72,14 @@ export const describe = test.describe;
 export const only = test.only;
 export const expect = test.expect;
 
-type ButtonLocator = { role: string; name: string } | { 'data-testid': string };
+type ButtonLocator = { name: string } | { 'data-testid': string };
 
 /**
  * Retries clicking a button that may be flaky in tests
  * @param page - Playwright Page or Frame
- * @param locator - Either a role/name combo or test ID to find the button
+ * @param locator - Either a name or test ID to find the button
  */
-export async function retryClick(
+export async function retryButtonClick(
   page: Page | Frame,
   locator: ButtonLocator,
 ): Promise<void> {

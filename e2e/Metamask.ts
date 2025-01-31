@@ -1,4 +1,4 @@
-import { expect } from './fixtures';
+import { expect, retryButtonClick } from './fixtures';
 import { BrowserContext, Page } from '@playwright/test';
 import { SigningOptions, TxType, Wallet, WalletOpts } from './Wallet';
 
@@ -165,38 +165,49 @@ export class MetaMask extends Wallet {
       timeout: 10000,
     });
 
-    await metaMaskPage.getByTestId('network-display').click();
-    await metaMaskPage
-      .getByRole('button', { name: 'Add a custom network' })
-      .click();
+    await retryButtonClick(metaMaskPage, { 'data-testid': 'network-display' });
+    await retryButtonClick(metaMaskPage, {
+      name: 'Add a custom network',
+    });
 
     await metaMaskPage
       .getByTestId('network-form-network-name')
       .fill('Kava Internal Testnet');
-    await metaMaskPage.getByTestId('test-add-rpc-drop-down').click();
-    await metaMaskPage.getByRole('button', { name: 'Add RPC URL' }).click();
+
+    await retryButtonClick(metaMaskPage, {
+      'data-testid': 'test-add-rpc-drop-down',
+    });
+    await retryButtonClick(metaMaskPage, { name: 'Add RPC URL' });
+
     await metaMaskPage
       .getByTestId('rpc-url-input-test')
       .fill('https://evm.data.internal.testnet.us-east.production.kava.io');
-    await metaMaskPage.getByRole('button', { name: 'Add URL' }).click();
+
+    await retryButtonClick(metaMaskPage, { name: 'Add URL' });
     await metaMaskPage.getByTestId('network-form-chain-id').fill('2221');
     await metaMaskPage.getByTestId('network-form-ticker-input').fill('TKAVA');
-
-    await metaMaskPage.getByRole('button', { name: 'Save' }).click();
+    await retryButtonClick(metaMaskPage, { name: 'Save' });
     await metaMaskPage.waitForTimeout(2000);
 
-    await metaMaskPage.getByTestId('network-display').click();
-    await metaMaskPage.getByTestId('Kava Internal Testnet').click();
+    await retryButtonClick(metaMaskPage, { 'data-testid': 'network-display' });
+    await retryButtonClick(metaMaskPage, {
+      'data-testid': 'Kava Internal Testnet',
+    });
 
-    await metaMaskPage.getByTestId('account-menu-icon').click();
+    await retryButtonClick(metaMaskPage, {
+      'data-testid': 'account-menu-icon',
+    });
 
-    await metaMaskPage
-      .getByRole('button', { name: 'Add account or hardware wallet' })
-      .click();
-    await metaMaskPage.getByRole('button', { name: 'Import account' }).click();
+    await retryButtonClick(metaMaskPage, {
+      name: 'Add account or hardware wallet',
+    });
+
+    await retryButtonClick(metaMaskPage, { name: 'Import account' });
 
     await metaMaskPage.locator('#private-key-box').fill(E2E_WALLET_KEY);
-    await metaMaskPage.getByRole('button', { name: 'Import' }).click();
+
+    await retryButtonClick(metaMaskPage, { name: 'Import' });
+
     await metaMaskPage.close();
   }
 }
