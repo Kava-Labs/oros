@@ -20,12 +20,12 @@ import {
   WalletStore,
   WalletTypes,
 } from '../../../../../walletStore';
-import { ethers } from 'ethers';
+import { Contract, ethers } from 'ethers';
 import { bech32 } from 'bech32';
 import { erc20ABI } from '../../../../../tools/erc20ABI';
 import { EIP712SignerParams } from '../../../../../eip712';
-import { walletStore } from '../../../../../stores';
 import { Message } from '@kava-labs/javascript-sdk/lib/types/Message';
+import { ConnectWalletPrompt } from '../../../../../components/ConnectWalletPrompt';
 
 interface ERC20ConvertParams {
   chainName: string;
@@ -45,6 +45,7 @@ export class ERC20ConversionMessage
   walletMustMatchChainID = true;
 
   needsWallet = [WalletTypes.METAMASK];
+  private hasValidWallet = false;
 
   /**
    * Parameter definitions for the message.
@@ -81,10 +82,14 @@ export class ERC20ConversionMessage
   ];
 
   inProgressComponent() {
-    return InProgressTxDisplay;
+    return this.hasValidWallet ? InProgressTxDisplay : ConnectWalletPrompt;
   }
 
-  validate(params: ERC20ConvertParams, walletStore: WalletStore): boolean {
+  async validate(
+    params: ERC20ConvertParams,
+    walletStore: WalletStore,
+  ): Promise<boolean> {
+    this.hasValidWallet = false;
     if (!walletStore.getSnapshot().isWalletConnected) {
       throw new Error('please connect to a compatible wallet');
     }
@@ -98,6 +103,8 @@ export class ERC20ConversionMessage
     if (!chainRegistry[this.chainType][params.chainName]) {
       throw new Error(`unknown chain name ${params.chainName}`);
     }
+
+    this.hasValidWallet = true;
 
     const { amount, denom } = params;
 
@@ -120,7 +127,7 @@ export class ERC20ConversionMessage
       );
     }
 
-    const { erc20Contracts } = chainRegistry[ChainType.EVM][
+    const { erc20Contracts, rpcUrls } = chainRegistry[ChainType.EVM][
       chainInfo.evmChainName
     ] as EVMChainConfig;
 
@@ -140,12 +147,59 @@ export class ERC20ConversionMessage
       throw new Error(`unknown conversion direction ${params.direction}`);
     }
 
+    const { contractAddress } = getERC20Record(denom, erc20Contracts)!;
+    const rpcProvider = new ethers.JsonRpcProvider(rpcUrls[0]);
+
+    const contract = new Contract(contractAddress, erc20ABI, rpcProvider);
+
+    const decimals = await contract.decimals();
+
+    if (params.direction === 'ERC20ToCoin') {
+      const rawBalance = await contract.balanceOf(
+        walletStore.getSnapshot().walletAddress,
+      );
+      const formattedBalance = ethers.formatUnits(rawBalance, decimals);
+
+      if (Number(formattedBalance) < Number(amount)) {
+        throw new Error(
+          `not enough ${denom} to convert, user only has ${formattedBalance}`,
+        );
+      }
+    } else {
+      const res = await fetch(
+        chainInfo.rpcUrls[0] +
+          '/cosmos/bank/v1beta1/balances/kava1cpu33ez34dmsywsklf63thtqgvarcacal7hkk4',
+      );
+      if (res.ok) {
+        const data = await res.json();
+        if (data.balances) {
+          let found = false;
+          for (const coin of data.balances) {
+            if (coin.denom === getCoinRecord(denom, chainInfo.denoms)?.denom) {
+              found = true;
+              const microAmount = ethers
+                .parseUnits(params.amount, decimals)
+                .toString();
+
+              if (BigInt(microAmount) > BigInt(coin.amount)) {
+                throw new Error(`not enough ${denom} to convert`);
+              }
+            }
+
+            if (!found) {
+              throw new Error(`not enough ${denom} to convert`);
+            }
+          }
+        }
+      }
+    }
+
     return true;
   }
 
   async buildTransaction(
     params: ERC20ConvertParams,
-    _walletStore: WalletStore,
+    walletStore: WalletStore,
   ): Promise<string> {
     const cosmosChainConfig = chainRegistry[this.chainType][
       params.chainName
