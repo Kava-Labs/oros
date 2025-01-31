@@ -1,4 +1,4 @@
-import { InProgressTxDisplay } from '../../../../../components/InProgressTxDisplay';
+import { InProgressTxDisplay } from '../../../../../components/displayCards/InProgressTxDisplay';
 import {
   ChainMessage,
   ChainType,

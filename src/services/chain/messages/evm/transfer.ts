@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { erc20ABI } from '../../../../tools/erc20ABI';
 import { getERC20Record, getStoredMasks } from '../../../../utils/chat/helpers';
-import { InProgressTxDisplay } from '../../../../components/InProgressTxDisplay';
+import { InProgressTxDisplay } from '../../../../components/displayCards/InProgressTxDisplay';
 import {
   ChainMessage,
   OperationType,
