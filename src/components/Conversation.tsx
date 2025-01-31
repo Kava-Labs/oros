@@ -6,13 +6,15 @@ import { memo } from 'react';
 import { useTheme } from '../theme/useTheme';
 import { useAppContext } from '../context/useAppContext';
 import { ToolCallProgressCards } from './ToolCallProgressCards';
-import { CompleteTxDisplay } from './displayCards/CompleteTxDisplay';
+import {
+  CompleteTxDisplay,
+  CompleteQueryDisplay,
+} from '../features/blockchain/components/displayCards';
 import {
   chainNameToolCallParam,
   chainRegistry,
 } from '../config/chainsRegistry';
 import { OperationResult, OperationType } from '../types/chain';
-import { CompleteQueryDisplay } from './displayCards/CompleteQueryDisplay';
 
 export interface ConversationProps {
   messages: ChatCompletionMessageParam[];

@@ -1,7 +1,7 @@
-import { ToolCallStream } from '../../toolCallStreamStore';
+import { ToolCallStream } from '../../../../toolCallStreamStore';
 import styles from './DisplayCards.module.css';
-import { useScrollToBottom } from '../../useScrollToBottom';
-import { useAppContext } from '../../context/useAppContext';
+import { useScrollToBottom } from '../../../../useScrollToBottom';
+import { useAppContext } from '../../../../context/useAppContext';
 
 export const InProgressTxDisplay = ({
   onRendered,

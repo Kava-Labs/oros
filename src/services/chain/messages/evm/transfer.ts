@@ -1,6 +1,6 @@
 import { erc20ABI } from '../../../../tools/erc20ABI';
 import { getERC20Record, getStoredMasks } from '../../../../utils/chat/helpers';
-import { InProgressTxDisplay } from '../../../../components/displayCards/InProgressTxDisplay';
+import { InProgressTxDisplay } from '../../../../features/blockchain/components/displayCards';
 import {
   ChainMessage,
   OperationType,

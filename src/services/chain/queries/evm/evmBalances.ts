@@ -1,6 +1,6 @@
 import { ChainQuery, ChainType, OperationType } from '../../../../types/chain';
 import { erc20ABI } from '../../../../tools/erc20ABI';
-import { QueryInProgress } from '../../../../components/displayCards/InProgressQueryDisplay';
+import { InProgressQueryDisplay } from '../../../../features/blockchain/components/displayCards';
 import { WalletStore, WalletTypes } from '../../../../walletStore';
 import {
   chainNameToolCallParam,
@@ -41,7 +41,7 @@ export class EvmBalancesQuery implements ChainQuery<EvmBalanceQueryParams> {
   }
 
   inProgressComponent() {
-    return QueryInProgress;
+    return InProgressQueryDisplay;
   }
 
   async executeQuery(

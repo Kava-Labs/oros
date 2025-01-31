@@ -21,7 +21,7 @@ import {
 import { erc20ABI } from '../../../../../tools/erc20ABI';
 import type { EIP712SignerParams } from '../../../../../eip712';
 import { ConnectWalletPrompt } from '../../../../../components/ConnectWalletPrompt';
-import { InProgressTxDisplay } from '../../../../../components/displayCards/InProgressTxDisplay';
+import { InProgressTxDisplay } from '../../../../../features/blockchain/components/displayCards';
 
 interface ERC20ConvertParams {
   chainName: string;

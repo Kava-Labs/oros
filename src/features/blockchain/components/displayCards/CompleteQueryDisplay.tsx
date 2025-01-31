@@ -1,5 +1,5 @@
-import { Coin } from '../../tools/api';
-import { useScrollToBottom } from '../../useScrollToBottom';
+import { Coin } from '../../../../tools/api';
+import { useScrollToBottom } from '../../../../useScrollToBottom';
 import styles from './DisplayCards.module.css';
 
 interface CompleteQueryDisplayProps {
