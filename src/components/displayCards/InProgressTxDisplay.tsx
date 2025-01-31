@@ -20,7 +20,7 @@ export const InProgressTxDisplay = ({
   return (
     <div
       data-testid="in-progress-tx-display"
-      className={styles.transactionContainer}
+      className={styles.inprogressContainer}
     >
       <div className={styles.transactionCard}>
         <div className={styles.statusSection}>

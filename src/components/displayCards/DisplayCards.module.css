@@ -1,8 +1,25 @@
 .transactionContainer {
   width: 100%;
   max-width: 600px;
-  margin: var(--spacing-lg) auto 0;
-  padding-bottom: var(--spacing-md);
+  margin: 15px auto 0;
+  font-family: system-ui,
+  -apple-system,
+  BlinkMacSystemFont,
+  sans-serif;
+  padding-bottom: 10px;
+}
+
+
+.inprogressContainer {
+  width: 100%;
+  max-width: 600px;
+  margin: -100px auto 0;
+  font-family:
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+  padding-bottom: 10px;
 }
 
 .transactionCard {
