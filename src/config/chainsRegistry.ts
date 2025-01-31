@@ -18,9 +18,9 @@ export type EVMChainConfig = {
 export enum ChainNames {
   KAVA_COSMOS = 'Kava Cosmos',
 
-  KAVA_EVM = 'kavaEVM',
-  ETH = 'eth',
-  KAVA_EVM_INTERNAL_TESTNET = 'kavaEVMInternalTestnet',
+  KAVA_EVM = 'Kava EVM',
+  ETH = 'Ethereum',
+  KAVA_EVM_INTERNAL_TESTNET = 'Kava EVM Internal Testnet'
 }
 
 export type CosmosChainConfig = {
