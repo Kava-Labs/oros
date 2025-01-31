@@ -1,5 +1,4 @@
 import Kava from '@kava-labs/javascript-sdk';
-import { InProgressTxDisplay } from '../../../../../components/InProgressTxDisplay';
 import {
   ChainNames,
   chainRegistry,
@@ -26,6 +25,7 @@ import { erc20ABI } from '../../../../../tools/erc20ABI';
 import { EIP712SignerParams } from '../../../../../eip712';
 import { Message } from '@kava-labs/javascript-sdk/lib/types/Message';
 import { ConnectWalletPrompt } from '../../../../../components/ConnectWalletPrompt';
+import { InProgressTxDisplay } from '../../../../../components/displayCards/InProgressTxDisplay';
 
 interface ERC20ConvertParams {
   chainName: string;
