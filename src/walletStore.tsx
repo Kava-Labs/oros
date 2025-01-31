@@ -1,4 +1,5 @@
 import { ChainNames, chainRegistry } from './config/chainsRegistry';
+import type { EIP712SignerParams } from './eip712';
 import { ChainType } from './types/chain';
 
 type Listener = () => void;
@@ -82,6 +83,7 @@ export class WalletStore {
     if (!chain) {
       throw new Error(`unknown chain ${chainName}`);
     }
+
     const {
       chainID,
       rpcUrls,
@@ -132,7 +134,7 @@ export class WalletStore {
     this.emitChange();
   }
 
-  public sign(opts: SignOpts) {
+  public async sign(opts: SignOpts) {
     if (!this.getSnapshot().isWalletConnected) {
       throw new Error('no wallet connection detected');
     }
@@ -144,7 +146,9 @@ export class WalletStore {
           return window.ethereum.request(opts.payload);
         }
         case SignatureTypes.EIP712: {
-          throw new Error('EIP712 Signing not implemented at this moment');
+          const { eip712SignAndBroadcast } = await import('./eip712');
+
+          return eip712SignAndBroadcast(opts.payload as EIP712SignerParams);
         }
       }
     } else {

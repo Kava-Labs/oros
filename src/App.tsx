@@ -283,6 +283,7 @@ async function callTools(
           info: result,
         } as OperationResult);
       } catch (err) {
+        console.error(err);
         content = JSON.stringify({
           status: 'failed',
           info: err instanceof Error ? err.message : err,

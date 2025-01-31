@@ -1,4 +1,3 @@
-import { ethers } from 'ethers';
 import { erc20ABI } from '../../../../tools/erc20ABI';
 import { getERC20Record, getStoredMasks } from '../../../../utils/chat/helpers';
 import { InProgressTxDisplay } from '../../../../components/displayCards/InProgressTxDisplay';
@@ -15,6 +14,7 @@ import {
 import {
   chainNameToolCallParam,
   chainRegistry,
+  EVMChainConfig,
 } from '../../../../config/chainsRegistry';
 import { ConnectWalletPrompt } from '../../../../components/ConnectWalletPrompt';
 
@@ -69,8 +69,15 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
     walletStore: WalletStore,
   ): Promise<boolean> {
     const { denom, amount, chainName } = params;
-    const { erc20Contracts, nativeToken, rpcUrls, nativeTokenDecimals } =
-      chainRegistry[this.chainType][chainName];
+
+    const chain = chainRegistry[this.chainType][chainName];
+    if (chain.chainType !== ChainType.EVM) {
+      throw new Error(`chain Type must be ${ChainType.EVM} for this operation`);
+    }
+
+    const { erc20Contracts, nativeToken, rpcUrls, nativeTokenDecimals } = chain;
+
+    const { ethers } = await import('ethers');
 
     const rpcProvider = new ethers.JsonRpcProvider(rpcUrls[0]);
     const address = walletStore.getSnapshot().walletAddress;
@@ -106,6 +113,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
     params: SendToolParams,
     walletStore: WalletStore,
   ): Promise<boolean> {
+    this.hasValidWallet = false;
     if (!walletStore.getSnapshot().isWalletConnected) {
       throw new Error('please connect to a compatible wallet');
     }
@@ -136,8 +144,9 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
       throw new Error(`amount must be greater than zero`);
     }
 
-    const { erc20Contracts, nativeToken } =
-      chainRegistry[this.chainType][params.chainName];
+    const { erc20Contracts, nativeToken } = chainRegistry[this.chainType][
+      params.chainName
+    ] as EVMChainConfig;
 
     const validDenomWithContract =
       getERC20Record(denom, erc20Contracts) !== null ||
@@ -158,10 +167,12 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
     params: SendToolParams,
     walletStore: WalletStore,
   ): Promise<string> {
+    const { ethers } = await import('ethers');
     const { toAddress, amount, denom } = params;
 
-    const { erc20Contracts, rpcUrls, nativeToken } =
-      chainRegistry[this.chainType][params.chainName];
+    const { erc20Contracts, rpcUrls, nativeToken, chainID } = chainRegistry[
+      this.chainType
+    ][params.chainName] as EVMChainConfig;
     const rpcProvider = new ethers.JsonRpcProvider(rpcUrls[0]);
 
     try {
@@ -205,7 +216,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
       }
 
       const hash = await walletStore.sign({
-        chainId: `0x${Number(2222).toString(16)}`,
+        chainId: `0x${Number(chainID).toString(16)}`,
         signatureType: SignatureTypes.EVM,
         payload: {
           method: 'eth_sendTransaction',
