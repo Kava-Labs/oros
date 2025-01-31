@@ -1,10 +1,4 @@
-import {
-  describe,
-  expect,
-  test,
-  confirmMetamaskTransaction,
-  confirmMetamaskConnection,
-} from './fixtures';
+import { describe, expect, test, retryClick } from './fixtures';
 import { Chat } from './Chat';
 import { MetaMask } from './Metamask';
 import { ethers } from 'ethers';
@@ -67,7 +61,8 @@ describe('chat', () => {
     await chat.waitForStreamToFinish();
 
     const metamaskPopup = await metamaskPopupPromise;
-    await confirmMetamaskConnection(metamaskPopup);
+
+    await retryClick(metamaskPopup, { role: 'button', name: 'Connect' });
 
     await chat.waitForStreamToFinish();
     await chat.waitForAssistantResponse();
@@ -104,7 +99,8 @@ describe('chat', () => {
     await chat.waitForStreamToFinish();
 
     const metamaskPopup = await metamaskPopupPromise;
-    await confirmMetamaskTransaction(metamaskPopup);
+    await retryClick(metamaskPopup, { role: 'button', name: 'Connect' });
+    await retryClick(metamaskPopup, { role: 'button', name: 'Confirm' });
 
     //  In progress
     await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
@@ -145,7 +141,8 @@ describe('chat', () => {
     await chat.waitForStreamToFinish();
 
     const metamaskPopup = await metamaskPopupPromise;
-    await confirmMetamaskTransaction(metamaskPopup);
+    await retryClick(metamaskPopup, { role: 'button', name: 'Connect' });
+    await retryClick(metamaskPopup, { role: 'button', name: 'Confirm' });
 
     //  In progress
     await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
