@@ -43,26 +43,25 @@ Integrating Oros means less time spent building custom AI tools and more time fo
     +---------------+--------------+
                     |
                     ▼
-
 +---------------------------------------+
-| Oros Agent (Chat + Tools Orchestr.) |
-| - Core AI logic (LLM-based) |
-| - Tool registry (function specs) |
-| - Session & memory layer |
+|  Oros Agent (Chat + Tools Orchestr.)  |
+|    - Core AI logic (LLM-based)        |
+|    - Tool registry (function specs)   |
+|    - Session & memory layer           |
 +-------------------+-------------------+
-|
-▼
+                    |
+                    ▼
 +---------------------------------------+
-| Tools / Skills |
-| - Contract calls, off-chain APIs |
-| e.g., stakeTokens(), transferERC20() |
+|            Tools / Skills             |
+|  - Contract calls, off-chain APIs     |
+|  e.g., stakeTokens(), transferERC20() |
 +-------------------+-------------------+
-|
-▼
-+--------------------+
-| Blockchain(s) |
-| (Kava, EVM, etc.) |
-+--------------------+
+                    |
+                    ▼
+          +--------------------+
+          |    Blockchain(s)   |
+          |  (Kava, EVM, etc.) |
+          +--------------------+
 ```
 
 1. **Front-End**: The user-facing interface (React) that embeds an Oros chat widget.
