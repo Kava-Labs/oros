@@ -1,5 +1,5 @@
 import styles from './DisplayCards.module.css';
-import { ExternalLinkIcon } from '../../../../shared/assets/ExternalLinkIcon';
+import { ExternalLinkIcon } from '../../assets/ExternalLinkIcon';
 import { ChainConfig } from '../../../../config/chainsRegistry';
 import { useScrollToBottom } from '../../../../useScrollToBottom';
 
