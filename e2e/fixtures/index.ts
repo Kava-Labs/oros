@@ -72,52 +72,38 @@ export const describe = test.describe;
 export const only = test.only;
 export const expect = test.expect;
 
-const DEFAULT_INTERVAL = 1000; // 1 second
+type ButtonLocator = { name: string } | { 'data-testid': string };
 
-export async function retryClick(
+/**
+ * Retries clicking a button that may be flaky in tests
+ * @param page - Playwright Page or Frame
+ * @param locator - Either a name or test ID to find the button
+ */
+export async function retryButtonClick(
   page: Page | Frame,
-  buttonOptions: { role: string; name: string },
-  options: { timeout?: number; interval?: number } = {},
+  locator: ButtonLocator,
 ): Promise<void> {
   const MAX_RETRIES = 5;
-  const interval = options.interval || DEFAULT_INTERVAL;
+  const DEFAULT_INTERVAL = 1000;
 
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     try {
-      const button = await page.getByRole('button', buttonOptions);
-      await button.click({ timeout: interval });
+      const button =
+        'data-testid' in locator
+          ? page.getByTestId(locator['data-testid'])
+          : page.getByRole('button', locator);
+
+      await button.click({ timeout: DEFAULT_INTERVAL });
       return;
     } catch (error) {
       if (attempt === MAX_RETRIES - 1) {
+        const identifier =
+          'data-testid' in locator ? locator['data-testid'] : locator.name;
         throw new Error(
-          `Failed to click button "${buttonOptions.name}" after ${MAX_RETRIES} attempts: ${error.message}`,
+          `Failed to click button "${identifier}" after ${MAX_RETRIES} attempts: ${error.message}`,
         );
       }
-      await page.waitForTimeout(interval);
+      await page.waitForTimeout(DEFAULT_INTERVAL);
     }
   }
-}
-
-export async function confirmMetamaskConnection(
-  metamaskPopup: Page | Frame,
-  { timeout = 60000, interval = 500 } = {},
-): Promise<void> {
-  await retryClick(
-    metamaskPopup,
-    { role: 'button', name: 'Connect' },
-    { timeout, interval },
-  );
-}
-
-export async function confirmMetamaskTransaction(
-  metamaskPopup: Page | Frame,
-  { timeout = 60000, interval = 500 } = {},
-): Promise<void> {
-  await confirmMetamaskConnection(metamaskPopup, { timeout, interval });
-
-  await retryClick(
-    metamaskPopup,
-    { role: 'button', name: 'Confirm' },
-    { timeout, interval },
-  );
 }
