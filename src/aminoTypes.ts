@@ -1,8 +1,8 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 import { Big } from 'big.js';
-import { AminoConverter } from '@cosmjs/stargate';
 import Long from 'long';
-import {
+import type { AminoConverter } from '@cosmjs/stargate';
+import type {
   AminoAuctionMsgPlaceBid,
   AminoCdpMsgCreateCDP,
   AminoCdpMsgDeposit,
@@ -47,28 +47,29 @@ import {
   AminoMsgDelegate,
   AminoMsgUndelegate,
 } from './aminoMsgs';
-import { MsgPlaceBid } from '@kava-labs/javascript-sdk/lib/proto/kava/auction/v1beta1/tx';
-import {
+
+import type { MsgPlaceBid } from '@kava-labs/javascript-sdk/lib/proto/kava/auction/v1beta1/tx';
+import type {
   MsgCreateAtomicSwap,
   MsgClaimAtomicSwap,
   MsgRefundAtomicSwap,
 } from '@kava-labs/javascript-sdk/lib/proto/kava/bep3/v1beta1/tx';
-import {
+import type {
   MsgCreateCDP,
   MsgDeposit,
   MsgWithdraw,
   MsgDrawDebt,
   MsgRepayDebt,
 } from '@kava-labs/javascript-sdk/lib/proto/kava/cdp/v1beta1/tx';
-import { MsgVote } from '@kava-labs/javascript-sdk/lib/proto/kava/committee/v1beta1/tx';
-import {
+import type { MsgVote } from '@kava-labs/javascript-sdk/lib/proto/kava/committee/v1beta1/tx';
+import type {
   MsgDeposit as HardMsgDeposit,
   MsgWithdraw as HardMsgWithdraw,
   MsgBorrow,
   MsgRepay,
   MsgLiquidate as HardMsgLiquidate,
 } from '@kava-labs/javascript-sdk/lib/proto/kava/hard/v1beta1/tx';
-import {
+import type {
   MsgClaimUSDXMintingReward,
   MsgClaimHardReward,
   MsgClaimDelegatorReward,
@@ -76,50 +77,40 @@ import {
   MsgClaimEarnReward,
   MsgClaimSavingsReward,
 } from '@kava-labs/javascript-sdk/lib/proto/kava/incentive/v1beta1/tx';
-import {
+import type {
   MsgIssueTokens,
   MsgRedeemTokens,
   MsgBlockAddress,
   MsgUnblockAddress,
   MsgSetPauseStatus,
 } from '@kava-labs/javascript-sdk/lib/proto/kava/issuance/v1beta1/tx';
-import {
+import type {
   MsgDeposit as SwapMsgDeposit,
   MsgWithdraw as SwapMsgWithdraw,
   MsgSwapExactForTokens,
   MsgSwapForExactTokens,
 } from '@kava-labs/javascript-sdk/lib/proto/kava/swap/v1beta1/tx';
-import { MsgWithdrawDelegatorReward } from 'cosmjs-types/cosmos/distribution/v1beta1/tx';
-import {
+import type { MsgWithdrawDelegatorReward } from 'cosmjs-types/cosmos/distribution/v1beta1/tx';
+import type {
   MsgDeposit as EarnMsgDeposit,
   MsgWithdraw as EarnMsgWithdraw,
 } from '@kava-labs/javascript-sdk/lib/proto/kava/earn/v1beta1/tx';
-import {
+import type {
   MsgConvertERC20ToCoin,
   MsgConvertCoinToERC20,
   MsgConvertCosmosCoinToERC20,
   MsgConvertCosmosCoinFromERC20,
 } from '@kava-labs/javascript-sdk/lib/proto/kava/evmutil/v1beta1/tx';
-import {
+import type {
   MsgDelegateMintDeposit,
   MsgMintDeposit,
   MsgWithdrawBurn,
   MsgWithdrawBurnUndelegate,
 } from '@kava-labs/javascript-sdk/lib/proto/kava/router/v1beta1/tx';
-import {
+import type {
   MsgDelegate,
   MsgUndelegate,
 } from '@kava-labs/javascript-sdk/lib/proto/cosmos/staking/v1beta1/tx';
-import {
-  CdpMessages,
-  CommitteeMessages,
-  CosmosSdkMessages,
-  EarnMessages,
-  EvmUtilMessages,
-  HardMessages,
-  IncentiveMessages,
-  RouterMessages,
-} from './messageTypes';
 
 export function convertAminoDecToProtoDec(aminoDec: string): string {
   return new Big(aminoDec).times('1e18').toFixed(0);
@@ -147,7 +138,20 @@ function omitDefault<T extends string | number | Long>(
   throw new Error(`Got unsupported type '${typeof input}'`);
 }
 
-export function createDefaultTypes(): Record<string, AminoConverter> {
+export async function createDefaultTypes(): Promise<
+  Record<string, AminoConverter>
+> {
+  const {
+    CdpMessages,
+    CommitteeMessages,
+    CosmosSdkMessages,
+    EarnMessages,
+    EvmUtilMessages,
+    HardMessages,
+    IncentiveMessages,
+    RouterMessages,
+  } = await import('./messageTypes');
+
   return {
     '/kava.auction.v1beta1.MsgPlaceBid': {
       aminoType: 'auction/MsgPlaceBid',

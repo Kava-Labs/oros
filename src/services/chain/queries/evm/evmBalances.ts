@@ -1,5 +1,4 @@
 import { ChainQuery, ChainType, OperationType } from '../../../../types/chain';
-import { ethers } from 'ethers';
 import { erc20ABI } from '../../../../tools/erc20ABI';
 import { QueryInProgress } from '../../../../components/displayCards/InProgressQueryDisplay';
 import { WalletStore, WalletTypes } from '../../../../walletStore';
@@ -49,6 +48,7 @@ export class EvmBalancesQuery implements ChainQuery<EvmBalanceQueryParams> {
     params: EvmBalanceQueryParams,
     walletStore: WalletStore,
   ): Promise<string> {
+    const { ethers } = await import('ethers');
     const { rpcUrls, erc20Contracts, nativeToken, nativeTokenDecimals } =
       chainRegistry[this.chainType][params.chainName] as EVMChainConfig;
     const rpcProvider = new ethers.JsonRpcProvider(rpcUrls[0]);

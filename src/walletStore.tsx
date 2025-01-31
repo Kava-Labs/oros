@@ -1,5 +1,5 @@
 import { ChainNames, chainRegistry } from './config/chainsRegistry';
-import { eip712SignAndBroadcast, EIP712SignerParams } from './eip712';
+import type { EIP712SignerParams } from './eip712';
 import { ChainType } from './types/chain';
 
 type Listener = () => void;
@@ -134,7 +134,7 @@ export class WalletStore {
     this.emitChange();
   }
 
-  public sign(opts: SignOpts) {
+  public async sign(opts: SignOpts) {
     if (!this.getSnapshot().isWalletConnected) {
       throw new Error('no wallet connection detected');
     }
@@ -146,6 +146,8 @@ export class WalletStore {
           return window.ethereum.request(opts.payload);
         }
         case SignatureTypes.EIP712: {
+          const { eip712SignAndBroadcast } = await import('./eip712');
+
           return eip712SignAndBroadcast(opts.payload as EIP712SignerParams);
         }
       }

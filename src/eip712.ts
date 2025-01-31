@@ -1,31 +1,6 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
-import { SignMode } from 'cosmjs-types/cosmos/tx/signing/v1beta1/signing';
-import { ExtensionOptionsWeb3Tx } from '@kava-labs/javascript-sdk/lib/proto/ethermint/types/v1/web3';
-import { PubKey } from '@kava-labs/javascript-sdk/lib/proto/ethermint/crypto/v1/ethsecp256k1/keys';
-import { signatureToPubkey } from '@hanchon/signature-to-pubkey';
-import { TxBody, TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
-import Long from 'long';
-import { makeSignDoc as makeSignDocAmino } from '@cosmjs/amino';
-import { toBase64 } from '@cosmjs/encoding';
-import { fromBase64 } from '@cosmjs/encoding';
-import {
-  EncodeObject,
-  makeAuthInfoBytes,
-  Registry,
-  TxBodyEncodeObject,
-} from '@cosmjs/proto-signing';
-import { AminoTypes } from '@cosmjs/stargate';
-import { createDefaultTypes } from './aminoTypes';
-import { defaultRegistryTypes } from './registry';
-
-import {
-  metamaskMessageTypes,
-  MetamaskSupportedMessageTypes,
-} from './messageTypes';
-import { chainRegistry, CosmosChainConfig } from './config/chainsRegistry';
-import { ChainType } from './types/chain';
-import { bech32 } from 'bech32';
-import { ethers } from 'ethers';
+import type { MetamaskSupportedMessageTypes } from './messageTypes';
+import type { CosmosChainConfig } from './config/chainsRegistry';
 
 const msgConvertERC20ToCoinType = {
   MsgValueEVMConvertERC20ToCoin: [
@@ -340,7 +315,11 @@ const EIP712TxType = {
   ],
 };
 
-function getEIP712TypeFromMsgType(msgType: MetamaskSupportedMessageTypes) {
+async function getEIP712TypeFromMsgType(
+  msgType: MetamaskSupportedMessageTypes,
+) {
+  const { metamaskMessageTypes } = await import('./messageTypes');
+
   const {
     incentive,
     earn,
@@ -425,7 +404,8 @@ function getEIP712TypeFromMsgType(msgType: MetamaskSupportedMessageTypes) {
   }
 }
 
-function shouldIncludeNestedTypes(messageType: any) {
+async function shouldIncludeNestedTypes(messageType: any) {
+  const { metamaskMessageTypes } = await import('./messageTypes');
   const { incentive, cosmosSdk } = metamaskMessageTypes;
   const nestedAttributeMessageType = [
     incentive.msgClaimHardReward,
@@ -438,7 +418,7 @@ function shouldIncludeNestedTypes(messageType: any) {
   return nestedAttributeMessageType.includes(messageType);
 }
 
-export const msgsToEIP712 = (msg: any[]) => {
+export const msgsToEIP712 = async (msg: any[]) => {
   // get the message types that the user is trying to do transactions with
   const EIP712Types: any = {};
   let msgTypes: any = {};
@@ -447,12 +427,13 @@ export const msgsToEIP712 = (msg: any[]) => {
   let includeIncentiveSelection = false;
   let includeHeight = false;
 
-  msg.forEach(function (message, index) {
+  for (let i = 0; i < msg.length; i++) {
+    const message = msg[i];
     const messageType = message.type;
 
-    const eip712MsgType = getEIP712TypeFromMsgType(messageType);
+    const eip712MsgType = await getEIP712TypeFromMsgType(messageType);
 
-    if (shouldIncludeNestedTypes(messageType)) {
+    if (await shouldIncludeNestedTypes(messageType)) {
       if (!includeIncentiveSelection) {
         includeIncentiveSelection = true;
       }
@@ -463,7 +444,7 @@ export const msgsToEIP712 = (msg: any[]) => {
     }
 
     const eip712MsgTypeName = Object.keys(eip712MsgType)[0];
-    const msgKey = `Msg${index + 1}`;
+    const msgKey = `Msg${i + 1}`;
     const msgName = msgKey.toLowerCase();
 
     EIP712Types[msgKey] = [
@@ -476,7 +457,7 @@ export const msgsToEIP712 = (msg: any[]) => {
     txTypes.push({ name: msgName, type: msgKey });
 
     eipFormmatedMessages[msgName] = message;
-  });
+  }
 
   let types = {
     Coin: [
@@ -525,6 +506,30 @@ export type EIP712SignerParams = {
 };
 
 export const eip712SignAndBroadcast = async (opts: EIP712SignerParams) => {
+  const { SignMode } = await import(
+    'cosmjs-types/cosmos/tx/signing/v1beta1/signing'
+  );
+  const { ExtensionOptionsWeb3Tx } = await import(
+    '@kava-labs/javascript-sdk/lib/proto/ethermint/types/v1/web3'
+  );
+  const { PubKey } = await import(
+    '@kava-labs/javascript-sdk/lib/proto/ethermint/crypto/v1/ethsecp256k1/keys'
+  );
+  const { signatureToPubkey } = await import('@hanchon/signature-to-pubkey');
+  const { TxRaw } = await import('cosmjs-types/cosmos/tx/v1beta1/tx');
+  const { default: Long } = await import('long');
+  const { makeSignDoc: makeSignDocAmino } = await import('@cosmjs/amino');
+  const { toBase64, fromBase64 } = await import('@cosmjs/encoding');
+  const { makeAuthInfoBytes, Registry } = await import('@cosmjs/proto-signing');
+  const { AminoTypes } = await import('@cosmjs/stargate');
+  const { createDefaultTypes } = await import('./aminoTypes');
+  const { defaultRegistryTypes } = await import('./registry');
+
+  const { chainRegistry } = await import('./config/chainsRegistry');
+  const { ChainType } = await import('./types/chain');
+  const { bech32 } = await import('bech32');
+  const { ethers } = await import('ethers');
+
   if (!chainRegistry[ChainType.EVM][opts.chainConfig.evmChainName ?? '']) {
     throw new Error(
       `cosmos ${opts.chainConfig.name} chain must be linked to an evm chain`,
@@ -550,12 +555,12 @@ export const eip712SignAndBroadcast = async (opts: EIP712SignerParams) => {
   const gas = opts.gas ? opts.gas : chainConfig.defaultGasWanted;
   const fee = opts.fee ? opts.fee : [];
 
-  let rawTx: TxRaw = TxRaw.fromPartial({});
+  let rawTx = TxRaw.fromPartial({});
 
-  const registry = new Registry(defaultRegistryTypes);
+  const registry = new Registry(await defaultRegistryTypes());
 
   const aminoTypes = new AminoTypes({
-    additions: createDefaultTypes(),
+    additions: await createDefaultTypes(),
   });
 
   // get the Eth address from metamask
@@ -621,7 +626,7 @@ export const eip712SignAndBroadcast = async (opts: EIP712SignerParams) => {
   });
 
   // encode it and turn it into proto ready format
-  const pubkeyOptions: EncodeObject = {
+  const pubkeyOptions = {
     typeUrl: '/ethermint.crypto.v1.ethsecp256k1.PubKey',
     value: pubkeyfromPartial,
   };
@@ -646,7 +651,7 @@ export const eip712SignAndBroadcast = async (opts: EIP712SignerParams) => {
 
   // build the types for signing so metamask knows how to parse
   // render, and sign the messages
-  const { types, eipFormmatedMessages } = msgsToEIP712(messages);
+  const { types, eipFormmatedMessages } = await msgsToEIP712(messages);
   // build the data structure for metamask to sign
   const eipToSign = {
     types,
@@ -694,7 +699,7 @@ export const eip712SignAndBroadcast = async (opts: EIP712SignerParams) => {
     ),
   });
 
-  const extensionOptions: EncodeObject = {
+  const extensionOptions = {
     typeUrl: '/ethermint.types.v1.ExtensionOptionsWeb3Tx',
     value: encodedPartial,
   };
@@ -716,7 +721,7 @@ export const eip712SignAndBroadcast = async (opts: EIP712SignerParams) => {
   const protoMessages = bodyMsgs.map((msg: any) => aminoTypes.fromAmino(msg));
 
   // use the proto messages and extension options to build the transaction body
-  const body: TxBody = {
+  const body = {
     messages: protoMessages,
     memo,
     extensionOptions: encodedExtensionOptions,
@@ -725,7 +730,7 @@ export const eip712SignAndBroadcast = async (opts: EIP712SignerParams) => {
   };
 
   // sign the transaction body and return proto bytes
-  const signedTxBodyEncodeObject: TxBodyEncodeObject = {
+  const signedTxBodyEncodeObject = {
     typeUrl: '/cosmos.tx.v1beta1.TxBody',
     value: body,
   };

@@ -1,5 +1,5 @@
-import { AminoMsg, Coin } from '@cosmjs/amino';
-import { VoteType } from '@kava-labs/javascript-sdk/lib/proto/kava/committee/v1beta1/genesis';
+import type { AminoMsg, Coin } from '@cosmjs/amino';
+import type { VoteType } from '@kava-labs/javascript-sdk/lib/proto/kava/committee/v1beta1/genesis';
 
 export interface AminoAuctionMsgPlaceBid extends AminoMsg {
   readonly type: 'auction/MsgPlaceBid';

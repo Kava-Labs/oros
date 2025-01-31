@@ -1,4 +1,3 @@
-import Kava from '@kava-labs/javascript-sdk';
 import {
   ChainNames,
   chainRegistry,
@@ -19,11 +18,8 @@ import {
   WalletStore,
   WalletTypes,
 } from '../../../../../walletStore';
-import { Contract, ethers } from 'ethers';
-import { bech32 } from 'bech32';
 import { erc20ABI } from '../../../../../tools/erc20ABI';
-import { EIP712SignerParams } from '../../../../../eip712';
-import { Message } from '@kava-labs/javascript-sdk/lib/types/Message';
+import type { EIP712SignerParams } from '../../../../../eip712';
 import { ConnectWalletPrompt } from '../../../../../components/ConnectWalletPrompt';
 import { InProgressTxDisplay } from '../../../../../components/displayCards/InProgressTxDisplay';
 
@@ -89,6 +85,8 @@ export class ERC20ConversionMessage
     params: ERC20ConvertParams,
     walletStore: WalletStore,
   ): Promise<boolean> {
+    const { ethers, Contract } = await import('ethers');
+
     this.hasValidWallet = false;
     if (!walletStore.getSnapshot().isWalletConnected) {
       throw new Error('please connect to a compatible wallet');
@@ -166,9 +164,18 @@ export class ERC20ConversionMessage
         );
       }
     } else {
+      const { bech32 } = await import('bech32');
+      const bech32Address = bech32.encode(
+        chainInfo.bech32Prefix,
+        bech32.toWords(
+          ethers.getBytes(
+            ethers.toQuantity(walletStore.getSnapshot().walletAddress),
+          ),
+        ),
+      );
+
       const res = await fetch(
-        chainInfo.rpcUrls[0] +
-          '/cosmos/bank/v1beta1/balances/kava1cpu33ez34dmsywsklf63thtqgvarcacal7hkk4',
+        chainInfo.rpcUrls[0] + '/cosmos/bank/v1beta1/balances/' + bech32Address,
       );
       if (res.ok) {
         const data = await res.json();
@@ -201,6 +208,7 @@ export class ERC20ConversionMessage
     params: ERC20ConvertParams,
     walletStore: WalletStore,
   ): Promise<string> {
+    const { ethers } = await import('ethers');
     const cosmosChainConfig = chainRegistry[this.chainType][
       params.chainName
     ] as CosmosChainConfig;
@@ -220,6 +228,8 @@ export class ERC20ConversionMessage
       walletStore.getSnapshot().walletAddress,
     );
 
+    const { bech32 } = await import('bech32');
+
     const bech32Address = bech32.encode(
       cosmosChainConfig.bech32Prefix,
       bech32.toWords(ethers.getBytes(ethers.toQuantity(signerAddress))),
@@ -235,12 +245,15 @@ export class ERC20ConversionMessage
       .parseUnits(params.amount, await contract.decimals())
       .toString();
 
-    const messages: Message<unknown>[] = [];
+    const {
+      msg: { evmutil },
+    } = await import('@kava-labs/javascript-sdk');
+    const messages: unknown[] = [];
 
     switch (params.direction) {
       case 'ERC20ToCoin': {
         messages.push(
-          Kava.msg.evmutil.newMsgConvertERC20ToCoin(
+          evmutil.newMsgConvertERC20ToCoin(
             signerAddress,
             bech32Address,
             contractAddress,
@@ -251,15 +264,10 @@ export class ERC20ConversionMessage
       }
       case 'coinToERC20': {
         messages.push(
-          Kava.msg.evmutil.newMsgConvertCoinToERC20(
-            bech32Address,
-            signerAddress,
-            {
-              denom: getCoinRecord(params.denom, cosmosChainConfig.denoms)!
-                .denom,
-              amount: microAmount,
-            },
-          ),
+          evmutil.newMsgConvertCoinToERC20(bech32Address, signerAddress, {
+            denom: getCoinRecord(params.denom, cosmosChainConfig.denoms)!.denom,
+            amount: microAmount,
+          }),
         );
 
         break;

@@ -1,4 +1,3 @@
-import { ethers } from 'ethers';
 import { erc20ABI } from '../../../../tools/erc20ABI';
 import { getERC20Record, getStoredMasks } from '../../../../utils/chat/helpers';
 import { InProgressTxDisplay } from '../../../../components/displayCards/InProgressTxDisplay';
@@ -77,6 +76,8 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
     }
 
     const { erc20Contracts, nativeToken, rpcUrls, nativeTokenDecimals } = chain;
+
+    const { ethers } = await import('ethers');
 
     const rpcProvider = new ethers.JsonRpcProvider(rpcUrls[0]);
     const address = walletStore.getSnapshot().walletAddress;
@@ -166,6 +167,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
     params: SendToolParams,
     walletStore: WalletStore,
   ): Promise<string> {
+    const { ethers } = await import('ethers');
     const { toAddress, amount, denom } = params;
 
     const { erc20Contracts, rpcUrls, nativeToken, chainID } = chainRegistry[
