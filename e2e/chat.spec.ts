@@ -62,7 +62,7 @@ describe('chat', () => {
 
     const metamaskPopup = await metamaskPopupPromise;
 
-    await retryButtonClick(metamaskPopup, { role: 'button', name: 'Connect' });
+    await retryButtonClick(metamaskPopup, { name: 'Connect' });
 
     await chat.waitForStreamToFinish();
     await chat.waitForAssistantResponse();
@@ -99,8 +99,8 @@ describe('chat', () => {
     await chat.waitForStreamToFinish();
 
     const metamaskPopup = await metamaskPopupPromise;
-    await retryButtonClick(metamaskPopup, { role: 'button', name: 'Connect' });
-    await retryButtonClick(metamaskPopup, { role: 'button', name: 'Confirm' });
+    await retryButtonClick(metamaskPopup, { name: 'Connect' });
+    await retryButtonClick(metamaskPopup, { name: 'Confirm' });
 
     //  In progress
     await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
@@ -141,8 +141,8 @@ describe('chat', () => {
     await chat.waitForStreamToFinish();
 
     const metamaskPopup = await metamaskPopupPromise;
-    await retryButtonClick(metamaskPopup, { role: 'button', name: 'Connect' });
-    await retryButtonClick(metamaskPopup, { role: 'button', name: 'Confirm' });
+    await retryButtonClick(metamaskPopup, { name: 'Connect' });
+    await retryButtonClick(metamaskPopup, { name: 'Confirm' });
 
     //  In progress
     await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
