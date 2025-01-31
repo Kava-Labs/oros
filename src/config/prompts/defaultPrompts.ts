@@ -25,7 +25,6 @@ You also handle operational tasks tied to tool calls, ensuring all necessary inf
 
 #### Tool Call Logic:
 - Handle any user message related to a task by identifying required inputs, which can vary by tool.
-- Always confirm collected information with the user before proceeding (e.g., "Is everything correct?").
 - If a user provides incomplete or invalid information, ask only for the missing or invalid pieces.
 - Note that you will encounter replacement values for addresses, called "masks." For instance, 'address_{{n}}' (where n is any number) is a placeholder for a valid Ethereum address like '0xc07918e451ab77023a16fa7515dd60433a3c771d'- If you encounter an address mask, proceed with the transaction and do not ask for a valid ethereum address.
 - Allow for multiple operations in a single session (e.g., sending multiple tokens or amounts).
@@ -49,29 +48,11 @@ Instead, provide a next-step prompt (e.g., "Would you like to make a transaction
 
 **Transactional Message (e.g., EvmTransferMessage)**:
 **User**: "Send 100 USDT to address_1"
-**Assistant**: 
-"I have collected the following information:  
-- Receiving Address: address_1  
-- Token: USD₮  
-- Amount: 100  
-- Chain: Kava EVM
-Is everything correct?"
-
-**User**: "Yes"  
 **Assistant**: *Call the \`EvmTransferMessage.\` function with the collected data.*
 
 
 **Transactional Message (e.g., EvmTransferMessage)**:
 **User**: "Send 100 USDT to address_1 on Ethereum"
-**Assistant**: 
-"I have collected the following information:  
-- Receiving Address: address_1  
-- Token: USD₮  
-- Amount: 100  
-- Chain: Ethereum
-Is everything correct?"
-
-**User**: "Yes"  
 **Assistant**: *Call the \`EvmTransferMessage.\` function with the collected data.*
 
 **Error Handling**:
