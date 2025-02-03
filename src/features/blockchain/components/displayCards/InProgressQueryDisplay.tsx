@@ -1,14 +1,16 @@
 import { useAppContext } from '../../../../context/useAppContext';
-import { ToolCallStream } from '../../../../core/stores/toolCallStreamStore';
 import { useEffect, useSyncExternalStore } from 'react';
 import { useScrollToBottom } from '../../../../core/utils/useScrollToBottom';
+import { ToolCallStream } from '../../../../core/stores/toolCallStreamStore';
+
+export interface InProgressQueryProps {
+  onRendered?: () => void;
+  toolCall: ToolCallStream;
+}
 
 export const InProgressQueryDisplay = ({
   onRendered,
-}: {
-  toolCall: ToolCallStream;
-  onRendered?: () => void;
-}) => {
+}: InProgressQueryProps) => {
   const { progressStore } = useAppContext();
 
   const progressText = useSyncExternalStore(

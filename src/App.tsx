@@ -2,35 +2,20 @@ import { useRef, useEffect, useCallback, useSyncExternalStore } from 'react';
 import { ChatView } from './components/ChatView';
 import { getToken } from './utils/token/token';
 import OpenAI from 'openai';
-import type { ChatCompletionTool } from 'openai/resources/index';
 import {
   isContentChunk,
   isToolCallChunk,
   assembleToolCallsFromStream,
 } from './core/utils/streamUtils';
 import { TextStreamStore } from './core/stores/textStreamStore';
-import {
-  defaultSystemPrompt,
-  defaultIntroText,
-  defaultCautionText,
-} from './features/blockchain/config/prompts/defaultPrompts';
+import { defaultCautionText } from './features/blockchain/config/prompts/defaultPrompts';
 import { ToolCallStreamStore } from './core/stores/toolCallStreamStore';
 import { MessageHistoryStore } from './core/stores/messageHistoryStore';
 import { useAppContext } from './context/useAppContext';
-import { ExecuteOperation } from './context/AppContext';
 import { OperationResult } from './features/blockchain/types/chain';
+import { ExecuteOperation, ModelConfig } from './context/types';
 
 let client: OpenAI | null = null;
-
-const CHAT_MODEL = import.meta.env['VITE_CHAT_MODEL'] ?? 'gpt-4o-mini';
-const IMAGE_GEN_MODEL = import.meta.env['VITE_IMAGE_GEN_MODEL'] ?? 'dall-e-3';
-
-if (import.meta.env['MODE'] === 'development') {
-  console.info({
-    CHAT_MODEL,
-    IMAGE_GEN_MODEL,
-  });
-}
 
 export const App = () => {
   const {
@@ -39,7 +24,7 @@ export const App = () => {
     setIsReady,
     isRequesting,
     setIsRequesting,
-    getOpenAITools,
+    modelConfig,
     executeOperation,
     messageHistoryStore,
     toolCallStreamStore,
@@ -70,10 +55,10 @@ export const App = () => {
     if (!messageHistoryStore.getSnapshot().length) {
       messageHistoryStore.addMessage({
         role: 'system' as const,
-        content: defaultSystemPrompt,
+        content: modelConfig.systemPrompt,
       });
     }
-  }, [messageHistoryStore]);
+  }, [messageHistoryStore, modelConfig.systemPrompt]);
 
   // abort controller for cancelling openai request
   const controllerRef = useRef<AbortController | null>(null);
@@ -110,7 +95,7 @@ export const App = () => {
           controller,
           client,
           messageHistoryStore,
-          getOpenAITools(),
+          modelConfig,
           progressStore,
           messageStore,
           toolCallStreamStore,
@@ -138,7 +123,7 @@ export const App = () => {
       setErrorText,
       setIsRequesting,
       executeOperation,
-      getOpenAITools,
+      modelConfig,
       messageHistoryStore,
       progressStore,
       toolCallStreamStore,
@@ -157,15 +142,15 @@ export const App = () => {
   const handleReset = useCallback(() => {
     handleCancel();
     messageHistoryStore.setMessages([
-      { role: 'system' as const, content: defaultSystemPrompt },
+      { role: 'system' as const, content: modelConfig.systemPrompt },
     ]);
-  }, [handleCancel, messageHistoryStore]);
+  }, [handleCancel, messageHistoryStore, modelConfig.systemPrompt]);
 
   return (
     <>
       {isReady && (
         <ChatView
-          introText={defaultIntroText}
+          introText={modelConfig.introText}
           cautionText={defaultCautionText}
           messages={messages}
           onSubmit={handleChatCompletion}
@@ -181,17 +166,18 @@ async function doChat(
   controller: AbortController,
   client: OpenAI,
   messageHistoryStore: MessageHistoryStore,
-  tools: ChatCompletionTool[],
+  modelConfig: ModelConfig,
   progressStore: TextStreamStore,
   messageStore: TextStreamStore,
   toolCallStreamStore: ToolCallStreamStore,
   executeOperation: ExecuteOperation,
 ) {
   progressStore.setText('Thinking');
+  const { name, tools } = modelConfig;
   try {
     const stream = await client.chat.completions.create(
       {
-        model: CHAT_MODEL,
+        model: name,
         messages: messageHistoryStore.getSnapshot(),
         tools: tools,
         stream: true,
@@ -236,7 +222,7 @@ async function doChat(
         controller,
         client,
         messageHistoryStore,
-        tools,
+        modelConfig,
         progressStore,
         messageStore,
         toolCallStreamStore,

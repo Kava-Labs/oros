@@ -2,7 +2,7 @@ import { Coin } from '../../types/api';
 import { useScrollToBottom } from '../../../../core/utils/useScrollToBottom';
 import styles from './DisplayCards.module.css';
 
-interface CompleteQueryDisplayProps {
+export interface CompleteQueryDisplayProps {
   content: string;
   onRendered: () => void;
 }
