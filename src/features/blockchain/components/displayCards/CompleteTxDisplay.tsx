@@ -3,7 +3,7 @@ import { ExternalLinkIcon } from '../../assets/ExternalLinkIcon';
 import { ChainConfig } from '../../config/chainsRegistry';
 import { useScrollToBottom } from '../../../../core/utils/useScrollToBottom';
 
-interface CompleteTxDisplayProps {
+export interface CompleteTxDisplayProps {
   hash: string;
   chain: ChainConfig;
   onRendered?: () => void;

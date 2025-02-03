@@ -3,12 +3,14 @@ import styles from './DisplayCards.module.css';
 import { useScrollToBottom } from '../../../../core/utils/useScrollToBottom';
 import { useAppContext } from '../../../../context/useAppContext';
 
-export const InProgressTxDisplay = ({
-  onRendered,
-}: {
+export interface InProgressTxDisplayProps {
   toolCall: ToolCallStream;
   onRendered?: () => void;
-}) => {
+}
+
+export const InProgressTxDisplay = ({
+  onRendered,
+}: InProgressTxDisplayProps) => {
   const { isOperationValidated } = useAppContext();
 
   useScrollToBottom(onRendered, isOperationValidated);
