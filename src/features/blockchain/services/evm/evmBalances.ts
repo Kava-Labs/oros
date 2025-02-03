@@ -1,12 +1,12 @@
-import { ChainQuery, ChainType, OperationType } from '../../../../types/chain';
-import { erc20ABI } from '../../../../tools/erc20ABI';
-import { InProgressQueryDisplay } from '../../../../features/blockchain/components/displayCards';
+import { ChainQuery, ChainType, OperationType } from '../../types/chain';
+import { erc20ABI } from '../../utils/erc20ABI';
+import { InProgressQueryDisplay } from '../../components/displayCards';
 import { WalletStore, WalletTypes } from '../../../../walletStore';
 import {
   chainNameToolCallParam,
   chainRegistry,
   EVMChainConfig,
-} from '../../../../config/chainsRegistry';
+} from '../../config/chainsRegistry';
 
 type EvmBalanceQueryParams = {
   chainName: string;

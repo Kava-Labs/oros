@@ -1,5 +1,5 @@
 import type { ChatCompletionChunk } from 'openai/resources/index';
-import { ToolCallStreamStore } from './toolCallStreamStore';
+import { ToolCallStreamStore } from '../stores/toolCallStreamStore';
 
 /**
  * Checks if the given ChatCompletionChunk is a content chunk.

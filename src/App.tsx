@@ -7,18 +7,18 @@ import {
   isContentChunk,
   isToolCallChunk,
   assembleToolCallsFromStream,
-} from './streamUtils';
-import { TextStreamStore } from './textStreamStore';
+} from './core/utils/streamUtils';
+import { TextStreamStore } from './core/stores/textStreamStore';
 import {
   defaultSystemPrompt,
   defaultIntroText,
   defaultCautionText,
-} from './config/prompts/defaultPrompts';
-import { ToolCallStreamStore } from './toolCallStreamStore';
-import { MessageHistoryStore } from './messageHistoryStore';
+} from './features/blockchain/config/prompts/defaultPrompts';
+import { ToolCallStreamStore } from './core/stores/toolCallStreamStore';
+import { MessageHistoryStore } from './core/stores/messageHistoryStore';
 import { useAppContext } from './context/useAppContext';
 import { ExecuteOperation } from './context/AppContext';
-import { OperationResult } from './types/chain';
+import { OperationResult } from './features/blockchain/types/chain';
 
 let client: OpenAI | null = null;
 

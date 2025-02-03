@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react';
-import { useAppContext } from '../context/useAppContext';
+import { useAppContext } from '../../context/useAppContext';
 
 export const ToolCallProgressCards = ({
   onRendered,

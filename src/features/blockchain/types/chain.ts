@@ -1,6 +1,6 @@
 import { MessageParam } from './messages';
-import { ToolCallStream } from '../toolCallStreamStore';
-import { WalletTypes, WalletStore } from '../walletStore';
+import { ToolCallStream } from '../../../core/stores/toolCallStreamStore';
+import { WalletTypes, WalletStore } from '../stores/walletStore';
 
 export enum OperationType {
   TRANSACTION = 'transaction',

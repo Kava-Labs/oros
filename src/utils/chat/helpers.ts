@@ -1,4 +1,7 @@
-import { CoinRecord, ERC20Record } from '../../config/chainsRegistry';
+import {
+  CoinRecord,
+  ERC20Record,
+} from '../../features/blockchain/config/chainsRegistry';
 //  todo - convert to use interface
 export const getStoredMasks = (): {
   masksToValues: Record<string, string>;

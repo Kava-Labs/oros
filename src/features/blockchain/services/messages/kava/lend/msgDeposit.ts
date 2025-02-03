@@ -1,10 +1,10 @@
-import { InProgressTxDisplay } from '../../../../../features/blockchain/components/displayCards';
+import { InProgressTxDisplay } from '../../../../components/displayCards';
 import {
   ChainMessage,
   ChainType,
   OperationType,
-} from '../../../../../types/chain';
-import { WalletStore, WalletTypes } from '../../../../../walletStore';
+} from '../../../../types/chain';
+import { WalletStore, WalletTypes } from '../../../../../../walletStore';
 
 //  sent to model
 interface LendToolParams {

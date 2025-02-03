@@ -1,22 +1,21 @@
-import { erc20ABI } from '../../../../tools/erc20ABI';
-import { getERC20Record, getStoredMasks } from '../../../../utils/chat/helpers';
-import { InProgressTxDisplay } from '../../../../features/blockchain/components/displayCards';
+import { erc20ABI } from '../../../utils/erc20ABI';
 import {
-  ChainMessage,
-  OperationType,
-  ChainType,
-} from '../../../../types/chain';
+  getERC20Record,
+  getStoredMasks,
+} from '../../../../../utils/chat/helpers';
+import { InProgressTxDisplay } from '../../../components/displayCards';
+import { ChainMessage, OperationType, ChainType } from '../../../types/chain';
 import {
   SignatureTypes,
   WalletStore,
   WalletTypes,
-} from '../../../../walletStore';
+} from '../../../stores/walletStore';
 import {
   chainNameToolCallParam,
   chainRegistry,
   EVMChainConfig,
-} from '../../../../config/chainsRegistry';
-import { ConnectWalletPrompt } from '../../../../components/ConnectWalletPrompt';
+} from '../../../config/chainsRegistry';
+import { ConnectWalletPrompt } from '../../../components/ConnectWalletPrompt';
 
 interface SendToolParams {
   chainName: string;

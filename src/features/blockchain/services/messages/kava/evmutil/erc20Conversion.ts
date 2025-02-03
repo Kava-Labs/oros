@@ -3,25 +3,25 @@ import {
   chainRegistry,
   CosmosChainConfig,
   EVMChainConfig,
-} from '../../../../../config/chainsRegistry';
+} from '../../../../config/chainsRegistry';
 import {
   ChainMessage,
   ChainType,
   OperationType,
-} from '../../../../../types/chain';
+} from '../../../../types/chain';
 import {
   getCoinRecord,
   getERC20Record,
-} from '../../../../../utils/chat/helpers';
+} from '../../../../../../utils/chat/helpers';
 import {
   SignatureTypes,
   WalletStore,
   WalletTypes,
-} from '../../../../../walletStore';
-import { erc20ABI } from '../../../../../tools/erc20ABI';
-import type { EIP712SignerParams } from '../../../../../eip712';
-import { ConnectWalletPrompt } from '../../../../../components/ConnectWalletPrompt';
-import { InProgressTxDisplay } from '../../../../../features/blockchain/components/displayCards';
+} from '../../../../stores/walletStore';
+import { erc20ABI } from '../../../../utils/erc20ABI';
+import type { EIP712SignerParams } from '../../../../types/eip712';
+import { ConnectWalletPrompt } from '../../../../components/ConnectWalletPrompt';
+import { InProgressTxDisplay } from '../../../../components/displayCards';
 
 interface ERC20ConvertParams {
   chainName: string;

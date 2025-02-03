@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 import { ChatView, ChatViewProps } from '../components/ChatView';
-import { mockChatMessages } from '../mockdata';
-import { defaultIntroText } from '../config';
+import { mockChatMessages } from './mockdata';
+import { defaultIntroText } from '../features/blockchain/config';
 import type { Decorator } from '@storybook/react';
-import { ThemeProvider } from '../theme/themeProvider';
+import { ThemeProvider } from '../shared/theme/themeProvider';
 import { AppContextProvider } from '../context/AppContextProvider';
-import { TextStreamStore } from './../textStreamStore';
-import { ToolCallStreamStore } from './../toolCallStreamStore';
-import { MessageHistoryStore } from './../messageHistoryStore';
-import { WalletStore } from './../walletStore';
+import { TextStreamStore } from '../core/stores/textStreamStore';
+import { ToolCallStreamStore } from '../core/stores/toolCallStreamStore';
+import { MessageHistoryStore } from '../core/stores/messageHistoryStore';
+import { WalletStore } from '../features/blockchain/stores/walletStore';
 
 export const messageStore = new TextStreamStore();
 export const progressStore = new TextStreamStore();

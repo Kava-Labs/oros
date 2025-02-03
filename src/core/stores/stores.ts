@@ -1,7 +1,7 @@
 import { MessageHistoryStore } from './messageHistoryStore';
 import { TextStreamStore } from './textStreamStore';
 import { ToolCallStreamStore } from './toolCallStreamStore';
-import { WalletStore } from './walletStore';
+import { WalletStore } from '../../features/blockchain/stores/walletStore';
 
 export const messageStore = new TextStreamStore();
 export const progressStore = new TextStreamStore();

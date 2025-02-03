@@ -1,10 +1,10 @@
 import { createContext } from 'react';
 import { OperationRegistry } from '../services/chain/registry';
 import { ChatCompletionTool } from 'openai/resources/index.mjs';
-import { WalletStore } from '../walletStore';
-import { TextStreamStore } from '../textStreamStore';
-import { ToolCallStreamStore } from '../toolCallStreamStore';
-import { MessageHistoryStore } from '../messageHistoryStore';
+import { WalletStore } from '../features/blockchain/stores/walletStore';
+import { TextStreamStore } from '../core/stores/textStreamStore';
+import { ToolCallStreamStore } from '../core/stores/toolCallStreamStore';
+import { MessageHistoryStore } from '../core/stores/messageHistoryStore';
 
 export type ExecuteOperation = (
   operationName: string,

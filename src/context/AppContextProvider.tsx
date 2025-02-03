@@ -1,21 +1,28 @@
 import React, { useCallback, useState } from 'react';
 import { AppContext } from './AppContext';
 import { OperationRegistry } from '../services/chain/registry';
-import { ChainMessage, ChainQuery, ChainType } from '../types/chain';
-import { LendDepositMessage } from '../services/chain/messages/kava/lend/msgDeposit';
-import { EvmTransferMessage } from '../services/chain/messages/evm/transfer';
-import { EvmBalancesQuery } from '../services/chain/queries/evm/evmBalances';
-import { WalletStore, WalletTypes } from '../walletStore';
-import { TextStreamStore } from '../textStreamStore';
-import { ToolCallStreamStore } from '../toolCallStreamStore';
-import { MessageHistoryStore } from '../messageHistoryStore';
+import {
+  ChainMessage,
+  ChainQuery,
+  ChainType,
+} from '../features/blockchain/types/chain';
+import { LendDepositMessage } from '../features/blockchain/services/messages/kava/lend/msgDeposit';
+import { EvmTransferMessage } from '../features/blockchain/services/messages/evm/transfer';
+import { EvmBalancesQuery } from '../features/blockchain/services/evm/evmBalances';
+import {
+  WalletStore,
+  WalletTypes,
+} from '../features/blockchain/stores/walletStore';
+import { TextStreamStore } from '../core/stores/textStreamStore';
+import { ToolCallStreamStore } from '../core/stores/toolCallStreamStore';
+import { MessageHistoryStore } from '../core/stores/messageHistoryStore';
 import {
   ChainNames,
   chainNameToolCallParam,
   chainRegistry,
   CosmosChainConfig,
-} from '../config/chainsRegistry';
-import { ERC20ConversionMessage } from '../services/chain/messages/kava/evmutil/erc20Conversion';
+} from '../features/blockchain/config/chainsRegistry';
+import { ERC20ConversionMessage } from '../features/blockchain/services/messages/kava/evmutil/erc20Conversion';
 
 /**
  * Initializes the operation registry with all supported operations.

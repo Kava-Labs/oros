@@ -1,6 +1,6 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
-import type { MetamaskSupportedMessageTypes } from './messageTypes';
-import type { CosmosChainConfig } from './config/chainsRegistry';
+import type { MetamaskSupportedMessageTypes } from '../utils/messageTypes';
+import type { CosmosChainConfig } from '../config/chainsRegistry';
 
 const msgConvertERC20ToCoinType = {
   MsgValueEVMConvertERC20ToCoin: [
@@ -318,7 +318,7 @@ const EIP712TxType = {
 async function getEIP712TypeFromMsgType(
   msgType: MetamaskSupportedMessageTypes,
 ) {
-  const { metamaskMessageTypes } = await import('./messageTypes');
+  const { metamaskMessageTypes } = await import('../utils/messageTypes');
 
   const {
     incentive,
@@ -405,7 +405,7 @@ async function getEIP712TypeFromMsgType(
 }
 
 async function shouldIncludeNestedTypes(messageType: any) {
-  const { metamaskMessageTypes } = await import('./messageTypes');
+  const { metamaskMessageTypes } = await import('../utils/messageTypes');
   const { incentive, cosmosSdk } = metamaskMessageTypes;
   const nestedAttributeMessageType = [
     incentive.msgClaimHardReward,
@@ -522,11 +522,11 @@ export const eip712SignAndBroadcast = async (opts: EIP712SignerParams) => {
   const { toBase64, fromBase64 } = await import('@cosmjs/encoding');
   const { makeAuthInfoBytes, Registry } = await import('@cosmjs/proto-signing');
   const { AminoTypes } = await import('@cosmjs/stargate');
-  const { createDefaultTypes } = await import('./aminoTypes');
-  const { defaultRegistryTypes } = await import('./registry');
+  const { createDefaultTypes } = await import('../utils/aminoTypes');
+  const { defaultRegistryTypes } = await import('../utils/registry');
 
-  const { chainRegistry } = await import('./config/chainsRegistry');
-  const { ChainType } = await import('./types/chain');
+  const { chainRegistry } = await import('../config/chainsRegistry');
+  const { ChainType } = await import('./chain');
   const { bech32 } = await import('bech32');
   const { ethers } = await import('ethers');
 

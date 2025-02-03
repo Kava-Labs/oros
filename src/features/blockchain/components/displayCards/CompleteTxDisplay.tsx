@@ -1,7 +1,7 @@
 import styles from './DisplayCards.module.css';
 import { ExternalLinkIcon } from '../../assets/ExternalLinkIcon';
-import { ChainConfig } from '../../../../config/chainsRegistry';
-import { useScrollToBottom } from '../../../../useScrollToBottom';
+import { ChainConfig } from '../../config/chainsRegistry';
+import { useScrollToBottom } from '../../../../core/utils/useScrollToBottom';
 
 interface CompleteTxDisplayProps {
   hash: string;

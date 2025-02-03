@@ -1,7 +1,7 @@
 import { useEffect, useSyncExternalStore } from 'react';
-import { ToolCallStream } from '../toolCallStreamStore';
-import { useAppContext } from '../context/useAppContext';
-import { useScrollToBottom } from '../useScrollToBottom';
+import { ToolCallStream } from '../../../core/stores/toolCallStreamStore';
+import { useAppContext } from '../../../context/useAppContext';
+import { useScrollToBottom } from '../../../core/utils/useScrollToBottom';
 
 export const ConnectWalletPrompt = ({
   onRendered,
