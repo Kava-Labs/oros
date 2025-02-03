@@ -28,7 +28,10 @@ import { ERC20ConversionMessage } from '../features/blockchain/services/messages
 
 export interface ModelConfig {
   name: string;
+  description: string;
   tools: ChatCompletionTool[];
+  systemPrompt: string;
+  introText: string;
 }
 
 /**
@@ -75,6 +78,9 @@ export const AppContextProvider = ({
   const modelConfig: ModelConfig = {
     name: MODEL_REGISTRY.blockchain['gpt-4o-mini'].name,
     tools: MODEL_REGISTRY.blockchain['gpt-4o-mini'].tools,
+    introText: MODEL_REGISTRY.blockchain['gpt-4o-mini'].introText,
+    systemPrompt: MODEL_REGISTRY.blockchain['gpt-4o-mini'].systemPrompt,
+    description: MODEL_REGISTRY.blockchain['gpt-4o-mini'].description,
   };
   /**
    * Executes a chain operation with the provided parameters.

@@ -8,11 +8,7 @@ import {
   assembleToolCallsFromStream,
 } from './core/utils/streamUtils';
 import { TextStreamStore } from './core/stores/textStreamStore';
-import {
-  defaultSystemPrompt,
-  defaultIntroText,
-  defaultCautionText,
-} from './features/blockchain/config/prompts/defaultPrompts';
+import { defaultCautionText } from './features/blockchain/config/prompts/defaultPrompts';
 import { ToolCallStreamStore } from './core/stores/toolCallStreamStore';
 import { MessageHistoryStore } from './core/stores/messageHistoryStore';
 import { useAppContext } from './context/useAppContext';
@@ -60,10 +56,10 @@ export const App = () => {
     if (!messageHistoryStore.getSnapshot().length) {
       messageHistoryStore.addMessage({
         role: 'system' as const,
-        content: defaultSystemPrompt,
+        content: modelConfig.systemPrompt,
       });
     }
-  }, [messageHistoryStore]);
+  }, [messageHistoryStore, modelConfig.systemPrompt]);
 
   // abort controller for cancelling openai request
   const controllerRef = useRef<AbortController | null>(null);
@@ -147,15 +143,15 @@ export const App = () => {
   const handleReset = useCallback(() => {
     handleCancel();
     messageHistoryStore.setMessages([
-      { role: 'system' as const, content: defaultSystemPrompt },
+      { role: 'system' as const, content: modelConfig.systemPrompt },
     ]);
-  }, [handleCancel, messageHistoryStore]);
+  }, [handleCancel, messageHistoryStore, modelConfig.systemPrompt]);
 
   return (
     <>
       {isReady && (
         <ChatView
-          introText={defaultIntroText}
+          introText={modelConfig.introText}
           cautionText={defaultCautionText}
           messages={messages}
           onSubmit={handleChatCompletion}

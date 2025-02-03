@@ -5,6 +5,11 @@ import {
   OperationType,
 } from '../types/chain';
 import type { ChatCompletionTool } from 'openai/resources/index';
+import {
+  defaultCautionText,
+  defaultIntroText,
+  defaultSystemPrompt,
+} from '../config';
 /**
  * Central registry for all chain operations (messages and queries).
  * Manages the registration and retrieval of operations, and generates
@@ -37,6 +42,27 @@ export class OperationRegistry<T> {
    */
   getAllOperations(): ChainOperation<T>[] {
     return Array.from(this.operations.values());
+  }
+
+  /**
+   * @returns String value for the system prompt
+   */
+  getSystemPrompt() {
+    return defaultSystemPrompt;
+  }
+
+  /**
+   * @returns String value for the intro text a user sees before interacting with the chat
+   */
+  getIntroText() {
+    return defaultIntroText;
+  }
+
+  /**
+   * @returns String value for the caution text a user sees below the chat input
+   */
+  getCautionText() {
+    return defaultCautionText;
   }
 
   /**
