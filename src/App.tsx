@@ -29,12 +29,12 @@ export const App = () => {
     setIsReady,
     isRequesting,
     setIsRequesting,
+    modelConfig,
     executeOperation,
     messageHistoryStore,
     toolCallStreamStore,
     progressStore,
     messageStore,
-    modelConfig,
   } = useAppContext();
 
   useEffect(() => {
@@ -125,13 +125,14 @@ export const App = () => {
     },
     [
       isRequesting,
-      setErrorText,
-      setIsRequesting,
-      executeOperation,
-      messageHistoryStore,
-      progressStore,
       toolCallStreamStore,
+      setIsRequesting,
+      messageHistoryStore,
+      setErrorText,
+      modelConfig,
+      progressStore,
       messageStore,
+      executeOperation,
     ],
   );
 

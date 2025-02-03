@@ -19,8 +19,8 @@ export type AppContextType = {
   isRequesting: boolean;
   setIsRequesting: React.Dispatch<React.SetStateAction<boolean>>;
   registry: OperationRegistry<unknown>;
-  executeOperation: ExecuteOperation;
   modelConfig: ModelConfig;
+  executeOperation: ExecuteOperation;
   walletStore: WalletStore;
   messageStore: TextStreamStore;
   toolCallStreamStore: ToolCallStreamStore;
