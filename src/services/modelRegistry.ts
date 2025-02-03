@@ -44,17 +44,15 @@ interface ModelRegistry {
 
 const messageRegistry = initializeMessageRegistry();
 
-const { getToolDefinitions, getSystemPrompt, getIntroText } = messageRegistry;
-
 export const MODEL_REGISTRY: ModelRegistry = {
   blockchain: {
     'gpt-4o': {
       name: 'gpt-4o',
       description:
         'A robust and powerful model for executing blockchain-specific actions',
-      tools: getToolDefinitions(),
-      systemPrompt: getSystemPrompt(),
-      introText: getIntroText(),
+      tools: messageRegistry.getToolDefinitions(),
+      systemPrompt: messageRegistry.getSystemPrompt(),
+      introText: messageRegistry.getIntroText(),
       components: {
         transaction: {
           inProgress: InProgressTxDisplay,
@@ -69,9 +67,9 @@ export const MODEL_REGISTRY: ModelRegistry = {
     'gpt-4o-mini': {
       name: 'gpt-4o-mini',
       description: 'A slightly leaner model (can be used in automated testing)',
-      tools: getToolDefinitions(),
-      systemPrompt: getSystemPrompt(),
-      introText: getIntroText(),
+      tools: messageRegistry.getToolDefinitions(),
+      systemPrompt: messageRegistry.getSystemPrompt(),
+      introText: messageRegistry.getIntroText(),
       components: {
         transaction: {
           inProgress: InProgressTxDisplay,
@@ -91,8 +89,8 @@ export const MODEL_REGISTRY: ModelRegistry = {
         'Specialized model for logical analysis and problem-solving in non-blockchain contexts',
       tools: [],
       //  todo - create reasoning-specific prompts
-      systemPrompt: getSystemPrompt(),
-      introText: getIntroText(),
+      systemPrompt: messageRegistry.getSystemPrompt(),
+      introText: messageRegistry.getIntroText(),
     },
   },
 };

@@ -14,8 +14,8 @@ const walletStore = new WalletStore();
 
 vi.mock(
   import('../features/blockchain/services/registry'),
-  async (initializeRegistry) => {
-    return await initializeRegistry();
+  async (messageRegistry) => {
+    return await messageRegistry();
   },
 );
 
