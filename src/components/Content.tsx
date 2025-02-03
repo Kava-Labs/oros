@@ -1,5 +1,5 @@
 import { useState, useEffect, memo } from 'react';
-import { sanitizeContent } from '../sanitize';
+import { sanitizeContent } from '../core/utils/sanitize';
 import styles from './ChatView.module.css';
 import { unmaskAddresses } from '../utils/chat/unmaskAddresses';
 import { getStoredMasks } from '../utils/chat/helpers';

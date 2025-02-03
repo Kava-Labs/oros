@@ -1,9 +1,9 @@
-import { useAppContext } from '../../../../context/useAppContext';
-import { ToolCallStream } from '../../../../core/stores/toolCallStreamStore';
 import { useEffect, useSyncExternalStore } from 'react';
-import { useScrollToBottom } from '../../../../core/utils/useScrollToBottom';
+import { ToolCallStream } from '../../../core/stores/toolCallStreamStore';
+import { useAppContext } from '../../../context/useAppContext';
+import { useScrollToBottom } from '../../../core/utils/useScrollToBottom';
 
-export const InProgressQueryDisplay = ({
+export const ConnectWalletPrompt = ({
   onRendered,
 }: {
   toolCall: ToolCallStream;
@@ -17,7 +17,7 @@ export const InProgressQueryDisplay = ({
   );
 
   useEffect(() => {
-    progressStore.setText('Query in Progress');
+    progressStore.setText('Connect your wallet to continue');
     return () => {
       progressStore.setText('');
     };
