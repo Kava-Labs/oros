@@ -23,6 +23,8 @@ import {
   CosmosChainConfig,
 } from '../features/blockchain/config/chainsRegistry';
 import { ERC20ConversionMessage } from '../features/blockchain/services/messages/kava/evmutil/erc20Conversion';
+import { MODEL_REGISTRY } from '../services/modelRegistry';
+import type { ChatCompletionTool } from 'openai/resources/index';
 
 /**
  * Initializes the operation registry with all supported operations.
@@ -41,6 +43,12 @@ export function initializeRegistry(): OperationRegistry<unknown> {
   return registry;
 }
 
+export interface ModelConfig {
+  name: string;
+  tools: ChatCompletionTool[];
+}
+
+// Update the AppContextProvider
 export const AppContextProvider = ({
   children,
   walletStore,
@@ -58,17 +66,17 @@ export const AppContextProvider = ({
 }) => {
   const [isOperationValidated, setIsOperationValidated] = useState(false);
   const [errorText, setErrorText] = useState('');
-  // use is sending request to signify to the chat view that
-  // a request is in progress so it can disable inputs
-  // use is sending request to signify to the chat view that
-  // a request is in progress so it can disable inputs
   const [isRequesting, setIsRequesting] = useState(false);
   const [isReady, setIsReady] = useState(false);
-
   const [registry] = useState<OperationRegistry<unknown>>(() =>
     initializeRegistry(),
   );
 
+  // Get model config from registry
+  const modelConfig: ModelConfig = {
+    name: MODEL_REGISTRY.blockchain['gpt-4o-mini'].name,
+    tools: MODEL_REGISTRY.blockchain['gpt-4o-mini'].tools,
+  };
   /**
    * Executes a chain operation with the provided parameters.
    * Handles both transaction and query operations.
@@ -183,6 +191,7 @@ export const AppContextProvider = ({
         walletStore,
         toolCallStreamStore,
         executeOperation,
+        modelConfig,
         registry,
         errorText,
         setErrorText,

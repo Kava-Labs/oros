@@ -2,7 +2,6 @@ import { useRef, useEffect, useCallback, useSyncExternalStore } from 'react';
 import { ChatView } from './components/ChatView';
 import { getToken } from './utils/token/token';
 import OpenAI from 'openai';
-import type { ChatCompletionTool } from 'openai/resources/index';
 import {
   isContentChunk,
   isToolCallChunk,
@@ -19,20 +18,9 @@ import { MessageHistoryStore } from './core/stores/messageHistoryStore';
 import { useAppContext } from './context/useAppContext';
 import { ExecuteOperation } from './context/AppContext';
 import { OperationResult } from './features/blockchain/types/chain';
-import { MODEL_REGISTRY } from './services/modelRegistry';
+import { ModelConfig } from './context/AppContextProvider';
 
 let client: OpenAI | null = null;
-
-const CHAT_MODEL_NAME =
-  import.meta.env['VITE_CHAT_MODEL'] ??
-  MODEL_REGISTRY.blockchain['gpt-4o-mini'].name;
-const CHAT_TOOLS = MODEL_REGISTRY.blockchain['gpt-4o-mini'].tools;
-
-if (import.meta.env['MODE'] === 'development') {
-  console.info({
-    CHAT_MODEL_NAME,
-  });
-}
 
 export const App = () => {
   const {
@@ -46,6 +34,7 @@ export const App = () => {
     toolCallStreamStore,
     progressStore,
     messageStore,
+    modelConfig,
   } = useAppContext();
 
   useEffect(() => {
@@ -111,7 +100,7 @@ export const App = () => {
           controller,
           client,
           messageHistoryStore,
-          CHAT_TOOLS,
+          modelConfig,
           progressStore,
           messageStore,
           toolCallStreamStore,
@@ -181,17 +170,18 @@ async function doChat(
   controller: AbortController,
   client: OpenAI,
   messageHistoryStore: MessageHistoryStore,
-  tools: ChatCompletionTool[],
+  modelConfig: ModelConfig,
   progressStore: TextStreamStore,
   messageStore: TextStreamStore,
   toolCallStreamStore: ToolCallStreamStore,
   executeOperation: ExecuteOperation,
 ) {
   progressStore.setText('Thinking');
+  const { name, tools } = modelConfig;
   try {
     const stream = await client.chat.completions.create(
       {
-        model: CHAT_MODEL_NAME,
+        model: name,
         messages: messageHistoryStore.getSnapshot(),
         tools: tools,
         stream: true,
@@ -236,7 +226,7 @@ async function doChat(
         controller,
         client,
         messageHistoryStore,
-        tools,
+        modelConfig,
         progressStore,
         messageStore,
         toolCallStreamStore,

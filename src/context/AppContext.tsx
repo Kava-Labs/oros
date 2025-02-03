@@ -4,6 +4,7 @@ import { WalletStore } from '../features/blockchain/stores/walletStore';
 import { TextStreamStore } from '../core/stores/textStreamStore';
 import { ToolCallStreamStore } from '../core/stores/toolCallStreamStore';
 import { MessageHistoryStore } from '../core/stores/messageHistoryStore';
+import { ModelConfig } from './AppContextProvider';
 
 export type ExecuteOperation = (
   operationName: string,
@@ -19,6 +20,7 @@ export type AppContextType = {
   setIsRequesting: React.Dispatch<React.SetStateAction<boolean>>;
   registry: OperationRegistry<unknown>;
   executeOperation: ExecuteOperation;
+  modelConfig: ModelConfig;
   walletStore: WalletStore;
   messageStore: TextStreamStore;
   toolCallStreamStore: ToolCallStreamStore;
