@@ -4,7 +4,7 @@ import {
   ChainType,
   OperationType,
 } from '../../../../types/chain';
-import { WalletStore, WalletTypes } from '../../../../../../walletStore';
+import { WalletStore, WalletTypes } from '../../../../stores/walletStore';
 
 //  sent to model
 interface LendToolParams {
