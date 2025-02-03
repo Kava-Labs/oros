@@ -1,27 +1,18 @@
 import React, { useCallback, useState } from 'react';
 import { AppContext } from './AppContext';
 import { OperationRegistry } from '../features/blockchain/services/registry';
-import {
-  ChainMessage,
-  ChainQuery,
-  ChainType,
-} from '../features/blockchain/types/chain';
-import {
-  WalletStore,
-  WalletTypes,
-} from '../features/blockchain/stores/walletStore';
+import { WalletStore } from '../features/blockchain/stores/walletStore';
 import { TextStreamStore } from '../core/stores/textStreamStore';
 import { ToolCallStreamStore } from '../core/stores/toolCallStreamStore';
 import { MessageHistoryStore } from '../core/stores/messageHistoryStore';
 import {
-  ChainNames,
-  chainNameToolCallParam,
-  chainRegistry,
-  CosmosChainConfig,
-} from '../features/blockchain/config/chainsRegistry';
-import { MODEL_REGISTRY } from '../services/modelRegistry';
+  MODEL_REGISTRY,
+  SupportedBlockchainModels,
+  SupportedReasoningModels,
+} from '../services/modelRegistry';
 import { ModelConfig } from './types';
 import { initializeMessageRegistry } from './initializeMessageRegistry';
+import { useExecuteOperation } from './useExecuteOperation';
 
 export const AppContextProvider = ({
   children,
@@ -38,7 +29,6 @@ export const AppContextProvider = ({
   progressStore: TextStreamStore;
   messageHistoryStore: MessageHistoryStore;
 }) => {
-  const [isOperationValidated, setIsOperationValidated] = useState(false);
   const [errorText, setErrorText] = useState('');
   const [isRequesting, setIsRequesting] = useState(false);
   const [isReady, setIsReady] = useState(false);
@@ -46,117 +36,40 @@ export const AppContextProvider = ({
     initializeMessageRegistry(),
   );
 
-  // Get model config from registry
-  const modelConfig: ModelConfig = {
+  const [modelConfig, setModelConfig] = useState<ModelConfig>({
     name: MODEL_REGISTRY.blockchain['gpt-4o-mini'].name,
     tools: MODEL_REGISTRY.blockchain['gpt-4o-mini'].tools,
     introText: MODEL_REGISTRY.blockchain['gpt-4o-mini'].introText,
     systemPrompt: MODEL_REGISTRY.blockchain['gpt-4o-mini'].systemPrompt,
     description: MODEL_REGISTRY.blockchain['gpt-4o-mini'].description,
-  };
-  /**
-   * Executes a chain operation with the provided parameters.
-   * Handles both transaction and query operations.
-   * @param operationType - Type identifier for the operation
-   * @param params - Parameters for the operation
-   * @returns Result of the operation (transaction or query result)
-   */
-  const executeOperation = useCallback(
-    async (operationName: string, params: unknown) => {
-      setIsOperationValidated(false);
+  });
 
-      const operation = registry.get(operationName);
-      if (!operation) {
-        throw new Error(`Unknown operation type: ${operationName}`);
+  const setModel = useCallback(
+    (modelName: SupportedBlockchainModels | SupportedReasoningModels) => {
+      if (modelName === 'deepseek-chat') {
+        setModelConfig({
+          name: MODEL_REGISTRY.reasoning[modelName].name,
+          tools: MODEL_REGISTRY.reasoning[modelName].tools,
+          introText: MODEL_REGISTRY.reasoning[modelName].introText,
+          systemPrompt: MODEL_REGISTRY.reasoning[modelName].systemPrompt,
+          description: MODEL_REGISTRY.reasoning[modelName].description,
+        });
+      } else {
+        setModelConfig({
+          name: MODEL_REGISTRY.blockchain[modelName].name,
+          tools: MODEL_REGISTRY.blockchain[modelName].tools,
+          introText: MODEL_REGISTRY.blockchain[modelName].introText,
+          systemPrompt: MODEL_REGISTRY.blockchain[modelName].systemPrompt,
+          description: MODEL_REGISTRY.blockchain[modelName].description,
+        });
       }
-
-      let chainId = `0x${Number(2222).toString(16)}`; // default
-      let chainName = ChainNames.KAVA_EVM; // default
-
-      if (
-        typeof params === 'object' &&
-        params !== null &&
-        chainNameToolCallParam.name in params
-      ) {
-        // @ts-expect-error we already checked this
-        chainName = params[chainNameToolCallParam.name];
-        const chain = chainRegistry[operation.chainType][chainName];
-        chainId =
-          operation.chainType === ChainType.EVM
-            ? `0x${Number(chain.chainID).toString(16)}`
-            : String(chain.chainID);
-      }
-
-      // if operation needs wallet connect
-      // and the current wallet connection isn't one that's included in wantsWallet
-      // we then try to establish that connection
-      if (
-        operation.needsWallet &&
-        Array.isArray(operation.needsWallet) &&
-        !operation.needsWallet.includes(walletStore.getSnapshot().walletType)
-      ) {
-        for (const walletType of operation.needsWallet) {
-          await walletStore.connectWallet({
-            walletType,
-            chainId,
-          });
-
-          break;
-        }
-      }
-
-      // if the chain id in metamask doesn't match the chain id we need to be on
-      // start the network switching process
-      if (
-        operation.walletMustMatchChainID &&
-        walletStore.getSnapshot().walletType === WalletTypes.METAMASK &&
-        walletStore.getSnapshot().walletChainId !== chainId
-      ) {
-        switch (operation.chainType) {
-          case ChainType.COSMOS: {
-            // for cosmos chains using metamask
-            // get the evmChainName and use that to find the chainID we are supposed to be on
-            // if those don't match we can then switch to the correct evm network
-            const { evmChainName } = chainRegistry[operation.chainType][
-              chainName
-            ] as CosmosChainConfig;
-            if (evmChainName) {
-              if (
-                `0x${chainRegistry[ChainType.EVM][evmChainName].chainID.toString(16)}` !==
-                walletStore.getSnapshot().walletChainId
-              ) {
-                await walletStore.metamaskSwitchNetwork(evmChainName);
-              }
-            }
-            break;
-          }
-          default: {
-            await walletStore.metamaskSwitchNetwork(chainName);
-          }
-        }
-      }
-
-      const validatedParams = await operation.validate(params, walletStore);
-
-      if (!validatedParams) {
-        throw new Error('Invalid parameters for operation');
-      }
-      setIsOperationValidated(true);
-      if ('buildTransaction' in operation) {
-        return (operation as ChainMessage<unknown>).buildTransaction(
-          params,
-          walletStore,
-        );
-      } else if ('executeQuery' in operation) {
-        return (operation as ChainQuery<unknown>).executeQuery(
-          params,
-          walletStore,
-        );
-      }
-
-      throw new Error('Invalid operation type');
     },
-    [registry, walletStore],
+    [],
+  );
+
+  const { executeOperation, isOperationValidated } = useExecuteOperation(
+    registry,
+    walletStore,
   );
 
   return (
@@ -168,6 +81,7 @@ export const AppContextProvider = ({
         walletStore,
         toolCallStreamStore,
         modelConfig,
+        setModel,
         executeOperation,
         registry,
         errorText,
