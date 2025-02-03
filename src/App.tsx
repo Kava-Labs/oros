@@ -24,8 +24,9 @@ import { MODEL_REGISTRY } from './services/modelRegistry';
 let client: OpenAI | null = null;
 
 const CHAT_MODEL_NAME =
-  import.meta.env['VITE_CHAT_MODEL'] ?? MODEL_REGISTRY['gpt-4o-mini'].name;
-const CHAT_TOOLS = MODEL_REGISTRY['gpt-4o-mini'].tools;
+  import.meta.env['VITE_CHAT_MODEL'] ??
+  MODEL_REGISTRY.blockchain['gpt-4o-mini'].name;
+const CHAT_TOOLS = MODEL_REGISTRY.blockchain['gpt-4o-mini'].tools;
 
 if (import.meta.env['MODE'] === 'development') {
   console.info({
