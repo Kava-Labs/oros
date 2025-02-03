@@ -1,18 +1,23 @@
 import styles from './ChatView.module.css';
 import { Content } from './Content';
-import { StreamingText } from './StreamingText';
+import { StreamingText } from '../core/components/StreamingText';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { memo } from 'react';
-import { useTheme } from '../theme/useTheme';
+import { useTheme } from '../shared/theme/useTheme';
 import { useAppContext } from '../context/useAppContext';
-import { ToolCallProgressCards } from './ToolCallProgressCards';
-import { CompleteTxDisplay } from './displayCards/CompleteTxDisplay';
+import { ToolCallProgressCards } from '../core/components/ToolCallProgressCards';
+import {
+  CompleteTxDisplay,
+  CompleteQueryDisplay,
+} from '../features/blockchain/components/displayCards';
 import {
   chainNameToolCallParam,
   chainRegistry,
-} from '../config/chainsRegistry';
-import { OperationResult, OperationType } from '../types/chain';
-import { CompleteQueryDisplay } from './displayCards/CompleteQueryDisplay';
+} from '../features/blockchain/config/chainsRegistry';
+import {
+  OperationResult,
+  OperationType,
+} from '../features/blockchain/types/chain';
 
 export interface ConversationProps {
   messages: ChatCompletionMessageParam[];

@@ -34,7 +34,7 @@ import '@fontsource/inter/700-italic.css';
 // Components & Context
 //
 import { App } from './App.tsx';
-import { ThemeProvider } from './theme/themeProvider.tsx';
+import { ThemeProvider } from './shared/theme/themeProvider.tsx';
 import { AppContextProvider } from './context/AppContextProvider.tsx';
 import {
   progressStore,
@@ -42,7 +42,7 @@ import {
   messageStore,
   walletStore,
   toolCallStreamStore,
-} from './stores.ts';
+} from './core/stores/stores.ts';
 
 //
 // Render!

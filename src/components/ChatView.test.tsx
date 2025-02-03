@@ -1,12 +1,12 @@
 import { render } from '@testing-library/react';
 import { ChatView, ChatViewProps } from './ChatView';
-import { ThemeProvider } from '../theme/themeProvider';
+import { ThemeProvider } from '../shared/theme/themeProvider';
 import { AppContextProvider } from '../context/AppContextProvider';
 
-import { TextStreamStore } from './../textStreamStore';
-import { ToolCallStreamStore } from './../toolCallStreamStore';
-import { MessageHistoryStore } from './../messageHistoryStore';
-import { WalletStore } from './../walletStore';
+import { TextStreamStore } from '../core/stores/textStreamStore';
+import { ToolCallStreamStore } from '../core/stores/toolCallStreamStore';
+import { MessageHistoryStore } from '../core/stores/messageHistoryStore';
+import { WalletStore } from '../features/blockchain/stores//walletStore';
 
 const messageStore = new TextStreamStore();
 const progressStore = new TextStreamStore();

@@ -1,6 +1,6 @@
 # Oros AI: Empowering Decentralized Applications with Intelligent Agents
 
-![Oros Logo](https://raw.githubusercontent.com/Kava-Labs/oros/refs/heads/main/src/assets/orosLogo256.svg)
+![Oros Logo](https://raw.githubusercontent.com/Kava-Labs/oros/refs/heads/main/src/features/blockchain/assets/orosLogo256.svg)
 
 [![Build Status](https://img.shields.io/github/actions/workflow/status/kava-labs/oros/ci-cd.yml?branch=main&label=CI)](https://github.com/kava-labs/oros/actions)
 
