@@ -9,7 +9,7 @@ import { ERC20ConversionMessage } from '../features/blockchain/services/messages
  * Called once when the hook is first used.
  * @returns Initialized OperationRegistry
  */
-export function initializeRegistry(): OperationRegistry<unknown> {
+export function initializeMessageRegistry(): OperationRegistry<unknown> {
   const registry = new OperationRegistry();
   // Register all supported operations
 

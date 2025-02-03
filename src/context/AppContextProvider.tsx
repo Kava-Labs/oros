@@ -21,7 +21,7 @@ import {
 } from '../features/blockchain/config/chainsRegistry';
 import { MODEL_REGISTRY } from '../services/modelRegistry';
 import { ModelConfig } from './types';
-import { initializeRegistry } from './initializeRegistry';
+import { initializeMessageRegistry } from './initializeMessageRegistry';
 
 export const AppContextProvider = ({
   children,
@@ -43,7 +43,7 @@ export const AppContextProvider = ({
   const [isRequesting, setIsRequesting] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [registry] = useState<OperationRegistry<unknown>>(() =>
-    initializeRegistry(),
+    initializeMessageRegistry(),
   );
 
   // Get model config from registry

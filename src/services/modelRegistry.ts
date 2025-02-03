@@ -1,4 +1,4 @@
-import { initializeRegistry } from '../context/initializeRegistry';
+import { initializeMessageRegistry } from '../context/initializeMessageRegistry';
 import { ChatCompletionTool } from 'openai/resources/index';
 import { ComponentType } from 'react';
 import {
@@ -42,7 +42,9 @@ interface ModelRegistry {
   reasoning: Record<SupportedReasoningModels, ModelConfig>;
 }
 
-const registry = initializeRegistry();
+const messageRegistry = initializeMessageRegistry();
+
+const { getToolDefinitions, getSystemPrompt, getIntroText } = messageRegistry;
 
 export const MODEL_REGISTRY: ModelRegistry = {
   blockchain: {
@@ -50,9 +52,9 @@ export const MODEL_REGISTRY: ModelRegistry = {
       name: 'gpt-4o',
       description:
         'A robust and powerful model for executing blockchain-specific actions',
-      tools: registry.getToolDefinitions(),
-      systemPrompt: registry.getSystemPrompt(),
-      introText: registry.getIntroText(),
+      tools: getToolDefinitions(),
+      systemPrompt: getSystemPrompt(),
+      introText: getIntroText(),
       components: {
         transaction: {
           inProgress: InProgressTxDisplay,
@@ -67,9 +69,9 @@ export const MODEL_REGISTRY: ModelRegistry = {
     'gpt-4o-mini': {
       name: 'gpt-4o-mini',
       description: 'A slightly leaner model (can be used in automated testing)',
-      tools: registry.getToolDefinitions(),
-      systemPrompt: registry.getSystemPrompt(),
-      introText: registry.getIntroText(),
+      tools: getToolDefinitions(),
+      systemPrompt: getSystemPrompt(),
+      introText: getIntroText(),
       components: {
         transaction: {
           inProgress: InProgressTxDisplay,
@@ -89,8 +91,8 @@ export const MODEL_REGISTRY: ModelRegistry = {
         'Specialized model for logical analysis and problem-solving in non-blockchain contexts',
       tools: [],
       //  todo - create reasoning-specific prompts
-      systemPrompt: registry.getSystemPrompt(),
-      introText: registry.getIntroText(),
+      systemPrompt: getSystemPrompt(),
+      introText: getIntroText(),
     },
   },
 };
