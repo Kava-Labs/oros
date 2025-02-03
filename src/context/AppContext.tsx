@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import { OperationRegistry } from '../services/chain/registry';
+import { OperationRegistry } from '../features/blockchain/services/registry';
 import { ChatCompletionTool } from 'openai/resources/index.mjs';
 import { WalletStore } from '../features/blockchain/stores/walletStore';
 import { TextStreamStore } from '../core/stores/textStreamStore';

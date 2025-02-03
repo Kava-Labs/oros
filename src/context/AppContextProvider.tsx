@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { AppContext } from './AppContext';
-import { OperationRegistry } from '../services/chain/registry';
+import { OperationRegistry } from '../features/blockchain/services/registry';
 import {
   ChainMessage,
   ChainQuery,

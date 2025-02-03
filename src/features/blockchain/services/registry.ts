@@ -3,7 +3,7 @@ import {
   ChainOperation,
   ChainQuery,
   OperationType,
-} from '../../features/blockchain/types/chain';
+} from '../types/chain';
 import type { ChatCompletionTool } from 'openai/resources/index';
 /**
  * Central registry for all chain operations (messages and queries).
