@@ -12,9 +12,8 @@ import { defaultCautionText } from './features/blockchain/config/prompts/default
 import { ToolCallStreamStore } from './core/stores/toolCallStreamStore';
 import { MessageHistoryStore } from './core/stores/messageHistoryStore';
 import { useAppContext } from './context/useAppContext';
-import { ExecuteOperation } from './context/AppContext';
 import { OperationResult } from './features/blockchain/types/chain';
-import { ModelConfig } from './context/AppContextProvider';
+import { ExecuteOperation, ModelConfig } from './context/types';
 
 let client: OpenAI | null = null;
 

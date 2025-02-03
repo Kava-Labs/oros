@@ -5,11 +5,7 @@ import {
   OperationType,
 } from '../types/chain';
 import type { ChatCompletionTool } from 'openai/resources/index';
-import {
-  defaultCautionText,
-  defaultIntroText,
-  defaultSystemPrompt,
-} from '../config';
+import { defaultIntroText, defaultSystemPrompt } from '../config';
 /**
  * Central registry for all chain operations (messages and queries).
  * Manages the registration and retrieval of operations, and generates
