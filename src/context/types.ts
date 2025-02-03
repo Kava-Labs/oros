@@ -4,6 +4,10 @@ import { WalletStore } from '../features/blockchain/stores/walletStore';
 import { TextStreamStore } from '../core/stores/textStreamStore';
 import { ToolCallStreamStore } from '../core/stores/toolCallStreamStore';
 import { MessageHistoryStore } from '../core/stores/messageHistoryStore';
+import {
+  SupportedBlockchainModels,
+  SupportedReasoningModels,
+} from '../services/modelRegistry';
 
 export type ExecuteOperation = (
   operationName: string,
@@ -19,6 +23,9 @@ export type AppContextType = {
   setIsRequesting: React.Dispatch<React.SetStateAction<boolean>>;
   registry: OperationRegistry<unknown>;
   modelConfig: ModelConfig;
+  setModel: (
+    modelName: SupportedBlockchainModels | SupportedReasoningModels,
+  ) => void;
   executeOperation: ExecuteOperation;
   walletStore: WalletStore;
   messageStore: TextStreamStore;

@@ -16,8 +16,8 @@ import {
 import { InProgressTxDisplayProps } from '../features/blockchain/components/displayCards/InProgressTxDisplay';
 import { CompleteQueryDisplayProps } from '../features/blockchain/components/displayCards/CompleteQueryDisplay';
 
-type SupportedBlockchainModels = 'gpt-4o' | 'gpt-4o-mini';
-type SupportedReasoningModels = 'deepseek-chat';
+export type SupportedBlockchainModels = 'gpt-4o' | 'gpt-4o-mini';
+export type SupportedReasoningModels = 'deepseek-chat';
 
 interface ModelConfig {
   name: SupportedBlockchainModels | SupportedReasoningModels;
