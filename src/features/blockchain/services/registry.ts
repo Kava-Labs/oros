@@ -59,13 +59,6 @@ export class OperationRegistry<T> {
   }
 
   /**
-   * @returns String value for the caution text a user sees below the chat input
-   */
-  getCautionText() {
-    return defaultCautionText;
-  }
-
-  /**
    * Gets all registered transaction message operations.
    * @returns Array of transaction operations
    */
