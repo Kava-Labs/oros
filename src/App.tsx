@@ -139,7 +139,6 @@ export const App = () => {
       setErrorText,
       setIsRequesting,
       executeOperation,
-      CHAT_TOOLS,
       messageHistoryStore,
       progressStore,
       toolCallStreamStore,
