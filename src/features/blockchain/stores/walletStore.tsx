@@ -1,9 +1,6 @@
-import {
-  ChainNames,
-  chainRegistry,
-} from './features/blockchain/config/chainsRegistry';
-import type { EIP712SignerParams } from './features/blockchain/types/eip712';
-import { ChainType } from './features/blockchain/types/chain';
+import { ChainNames, chainRegistry } from '../config/chainsRegistry';
+import type { EIP712SignerParams } from '../types/eip712';
+import { ChainType } from '../types/chain';
 
 type Listener = () => void;
 
@@ -149,9 +146,7 @@ export class WalletStore {
           return window.ethereum.request(opts.payload);
         }
         case SignatureTypes.EIP712: {
-          const { eip712SignAndBroadcast } = await import(
-            './features/blockchain/types/eip712'
-          );
+          const { eip712SignAndBroadcast } = await import('../types/eip712');
 
           return eip712SignAndBroadcast(opts.payload as EIP712SignerParams);
         }
