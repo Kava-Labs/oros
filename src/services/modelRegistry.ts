@@ -1,4 +1,4 @@
-import { initializeRegistry } from '../context/AppContextProvider';
+import { initializeRegistry } from '../context/initializeRegistry';
 
 const registry = initializeRegistry();
 

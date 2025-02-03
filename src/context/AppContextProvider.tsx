@@ -6,9 +6,6 @@ import {
   ChainQuery,
   ChainType,
 } from '../features/blockchain/types/chain';
-import { LendDepositMessage } from '../features/blockchain/services/messages/kava/lend/msgDeposit';
-import { EvmTransferMessage } from '../features/blockchain/services/messages/evm/transfer';
-import { EvmBalancesQuery } from '../features/blockchain/services/evm/evmBalances';
 import {
   WalletStore,
   WalletTypes,
@@ -22,9 +19,17 @@ import {
   chainRegistry,
   CosmosChainConfig,
 } from '../features/blockchain/config/chainsRegistry';
-import { ERC20ConversionMessage } from '../features/blockchain/services/messages/kava/evmutil/erc20Conversion';
 import { MODEL_REGISTRY } from '../services/modelRegistry';
 import type { ChatCompletionTool } from 'openai/resources/index';
+import { LendDepositMessage } from '../features/blockchain/services/messages/kava/lend/msgDeposit';
+import { EvmTransferMessage } from '../features/blockchain/services/messages/evm/transfer';
+import { EvmBalancesQuery } from '../features/blockchain/services/evm/evmBalances';
+import { ERC20ConversionMessage } from '../features/blockchain/services/messages/kava/evmutil/erc20Conversion';
+
+export interface ModelConfig {
+  name: string;
+  tools: ChatCompletionTool[];
+}
 
 /**
  * Initializes the operation registry with all supported operations.
@@ -43,12 +48,6 @@ export function initializeRegistry(): OperationRegistry<unknown> {
   return registry;
 }
 
-export interface ModelConfig {
-  name: string;
-  tools: ChatCompletionTool[];
-}
-
-// Update the AppContextProvider
 export const AppContextProvider = ({
   children,
   walletStore,
