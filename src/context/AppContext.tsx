@@ -1,6 +1,5 @@
 import { createContext } from 'react';
 import { OperationRegistry } from '../features/blockchain/services/registry';
-import { ChatCompletionTool } from 'openai/resources/index.mjs';
 import { WalletStore } from '../features/blockchain/stores/walletStore';
 import { TextStreamStore } from '../core/stores/textStreamStore';
 import { ToolCallStreamStore } from '../core/stores/toolCallStreamStore';
@@ -19,7 +18,6 @@ export type AppContextType = {
   isRequesting: boolean;
   setIsRequesting: React.Dispatch<React.SetStateAction<boolean>>;
   registry: OperationRegistry<unknown>;
-  getOpenAITools: () => ChatCompletionTool[];
   executeOperation: ExecuteOperation;
   walletStore: WalletStore;
   messageStore: TextStreamStore;

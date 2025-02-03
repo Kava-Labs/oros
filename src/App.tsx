@@ -19,16 +19,17 @@ import { MessageHistoryStore } from './core/stores/messageHistoryStore';
 import { useAppContext } from './context/useAppContext';
 import { ExecuteOperation } from './context/AppContext';
 import { OperationResult } from './features/blockchain/types/chain';
+import { MODEL_REGISTRY } from './services/modelRegistry';
 
 let client: OpenAI | null = null;
 
-const CHAT_MODEL = import.meta.env['VITE_CHAT_MODEL'] ?? 'gpt-4o-mini';
-const IMAGE_GEN_MODEL = import.meta.env['VITE_IMAGE_GEN_MODEL'] ?? 'dall-e-3';
+const CHAT_MODEL_NAME =
+  import.meta.env['VITE_CHAT_MODEL'] ?? MODEL_REGISTRY['gpt-4o-mini'].name;
+const CHAT_TOOLS = MODEL_REGISTRY['gpt-4o-mini'].tools;
 
 if (import.meta.env['MODE'] === 'development') {
   console.info({
-    CHAT_MODEL,
-    IMAGE_GEN_MODEL,
+    CHAT_MODEL_NAME,
   });
 }
 
@@ -39,7 +40,6 @@ export const App = () => {
     setIsReady,
     isRequesting,
     setIsRequesting,
-    getOpenAITools,
     executeOperation,
     messageHistoryStore,
     toolCallStreamStore,
@@ -110,7 +110,7 @@ export const App = () => {
           controller,
           client,
           messageHistoryStore,
-          getOpenAITools(),
+          CHAT_TOOLS,
           progressStore,
           messageStore,
           toolCallStreamStore,
@@ -138,7 +138,7 @@ export const App = () => {
       setErrorText,
       setIsRequesting,
       executeOperation,
-      getOpenAITools,
+      CHAT_TOOLS,
       messageHistoryStore,
       progressStore,
       toolCallStreamStore,
@@ -191,7 +191,7 @@ async function doChat(
   try {
     const stream = await client.chat.completions.create(
       {
-        model: CHAT_MODEL,
+        model: CHAT_MODEL_NAME,
         messages: messageHistoryStore.getSnapshot(),
         tools: tools,
         stream: true,

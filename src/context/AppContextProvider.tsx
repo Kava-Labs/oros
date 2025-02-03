@@ -29,7 +29,7 @@ import { ERC20ConversionMessage } from '../features/blockchain/services/messages
  * Called once when the hook is first used.
  * @returns Initialized OperationRegistry
  */
-function initializeRegistry(): OperationRegistry<unknown> {
+export function initializeRegistry(): OperationRegistry<unknown> {
   const registry = new OperationRegistry();
   // Register all supported operations
 
@@ -68,11 +68,6 @@ export const AppContextProvider = ({
   const [registry] = useState<OperationRegistry<unknown>>(() =>
     initializeRegistry(),
   );
-
-  // Memoized to prevent unnecessary regeneration.
-  const getOpenAITools = useCallback(() => {
-    return registry.getToolDefinitions();
-  }, [registry]);
 
   /**
    * Executes a chain operation with the provided parameters.
@@ -187,7 +182,6 @@ export const AppContextProvider = ({
         progressStore,
         walletStore,
         toolCallStreamStore,
-        getOpenAITools,
         executeOperation,
         registry,
         errorText,
