@@ -20,36 +20,8 @@ import {
   CosmosChainConfig,
 } from '../features/blockchain/config/chainsRegistry';
 import { MODEL_REGISTRY } from '../services/modelRegistry';
-import type { ChatCompletionTool } from 'openai/resources/index';
-import { LendDepositMessage } from '../features/blockchain/services/messages/kava/lend/msgDeposit';
-import { EvmTransferMessage } from '../features/blockchain/services/messages/evm/transfer';
-import { EvmBalancesQuery } from '../features/blockchain/services/evm/evmBalances';
-import { ERC20ConversionMessage } from '../features/blockchain/services/messages/kava/evmutil/erc20Conversion';
-
-export interface ModelConfig {
-  name: string;
-  description: string;
-  tools: ChatCompletionTool[];
-  systemPrompt: string;
-  introText: string;
-}
-
-/**
- * Initializes the operation registry with all supported operations.
- * Called once when the hook is first used.
- * @returns Initialized OperationRegistry
- */
-export function initializeRegistry(): OperationRegistry<unknown> {
-  const registry = new OperationRegistry();
-  // Register all supported operations
-
-  /** TODO: This probably needs to not be manual */
-  registry.register(new LendDepositMessage());
-  registry.register(new EvmTransferMessage());
-  registry.register(new EvmBalancesQuery());
-  registry.register(new ERC20ConversionMessage());
-  return registry;
-}
+import { ModelConfig } from './types';
+import { initializeRegistry } from './initializeRegistry';
 
 export const AppContextProvider = ({
   children,

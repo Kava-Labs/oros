@@ -121,14 +121,14 @@ export const App = () => {
     },
     [
       isRequesting,
-      toolCallStreamStore,
-      setIsRequesting,
-      messageHistoryStore,
       setErrorText,
-      modelConfig,
-      progressStore,
-      messageStore,
+      setIsRequesting,
       executeOperation,
+      modelConfig,
+      messageHistoryStore,
+      progressStore,
+      toolCallStreamStore,
+      messageStore,
     ],
   );
 
