@@ -1,4 +1,4 @@
-import OrosLogo from '../../src/features/blockchain/assets/orosLogo.svg';
+import OrosLogo from '../../features/blockchain/assets/orosLogo.svg';
 
 export interface ThemeColors {
   bgPrimary: string;

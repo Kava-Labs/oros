@@ -1,4 +1,4 @@
-import { TextStreamStore } from '../src/textStreamStore';
+import { TextStreamStore } from './textStreamStore';
 
 describe('TextStreamStore', () => {
   it('should return an empty string initially', () => {
