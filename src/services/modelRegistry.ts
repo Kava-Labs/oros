@@ -15,11 +15,12 @@ import {
 } from '../features/blockchain/components/displayCards';
 import { InProgressTxDisplayProps } from '../features/blockchain/components/displayCards/InProgressTxDisplay';
 import { CompleteQueryDisplayProps } from '../features/blockchain/components/displayCards/CompleteQueryDisplay';
+import { blockchainMessageProcessor } from '../features/blockchain/services/messageProcessing';
 
 export type SupportedBlockchainModels = 'gpt-4o' | 'gpt-4o-mini';
 export type SupportedReasoningModels = 'deepseek-chat';
 
-interface ModelConfig {
+export interface ModelConfig {
   name: SupportedBlockchainModels | SupportedReasoningModels;
   description: string;
   tools: ChatCompletionTool[];
@@ -34,6 +35,10 @@ interface ModelConfig {
       inProgress: ComponentType<InProgressQueryProps>;
       complete: ComponentType<CompleteQueryDisplayProps>;
     };
+  };
+  messageProcessors?: {
+    preProcess?: (message: string) => string;
+    postProcess?: (message: string) => string;
   };
 }
 
@@ -63,6 +68,7 @@ export const MODEL_REGISTRY: ModelRegistry = {
           complete: CompleteQueryDisplay,
         },
       },
+      messageProcessors: blockchainMessageProcessor,
     },
     'gpt-4o-mini': {
       name: 'gpt-4o-mini',

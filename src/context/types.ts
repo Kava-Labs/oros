@@ -1,10 +1,10 @@
-import type { ChatCompletionTool } from 'openai/resources/index';
 import { OperationRegistry } from '../features/blockchain/services/registry';
 import { WalletStore } from '../features/blockchain/stores/walletStore';
 import { TextStreamStore } from '../core/stores/textStreamStore';
 import { ToolCallStreamStore } from '../core/stores/toolCallStreamStore';
 import { MessageHistoryStore } from '../core/stores/messageHistoryStore';
 import {
+  ModelConfig,
   SupportedBlockchainModels,
   SupportedReasoningModels,
 } from '../services/modelRegistry';
@@ -34,11 +34,3 @@ export type AppContextType = {
   messageHistoryStore: MessageHistoryStore;
   isOperationValidated: boolean;
 };
-
-export interface ModelConfig {
-  name: string;
-  description: string;
-  tools: ChatCompletionTool[];
-  systemPrompt: string;
-  introText: string;
-}

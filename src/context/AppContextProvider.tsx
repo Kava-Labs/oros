@@ -7,10 +7,10 @@ import { ToolCallStreamStore } from '../core/stores/toolCallStreamStore';
 import { MessageHistoryStore } from '../core/stores/messageHistoryStore';
 import {
   MODEL_REGISTRY,
+  ModelConfig,
   SupportedBlockchainModels,
   SupportedReasoningModels,
 } from '../services/modelRegistry';
-import { ModelConfig } from './types';
 import { initializeMessageRegistry } from './initializeMessageRegistry';
 import { useExecuteOperation } from './useExecuteOperation';
 

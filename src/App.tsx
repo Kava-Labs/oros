@@ -13,7 +13,8 @@ import { ToolCallStreamStore } from './core/stores/toolCallStreamStore';
 import { MessageHistoryStore } from './core/stores/messageHistoryStore';
 import { useAppContext } from './context/useAppContext';
 import { OperationResult } from './features/blockchain/types/chain';
-import { ExecuteOperation, ModelConfig } from './context/types';
+import { ExecuteOperation } from './context/types';
+import { ModelConfig } from './services/modelRegistry';
 
 let client: OpenAI | null = null;
 

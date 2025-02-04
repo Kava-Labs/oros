@@ -5,7 +5,7 @@ import { AppContextProvider } from '../context/AppContextProvider';
 import { TextStreamStore } from '../core/stores/textStreamStore';
 import { ToolCallStreamStore } from '../core/stores/toolCallStreamStore';
 import { MessageHistoryStore } from '../core/stores/messageHistoryStore';
-import { WalletStore } from '../features/blockchain/stores//walletStore';
+import { WalletStore } from '../features/blockchain/stores/walletStore';
 const messageStore = new TextStreamStore();
 const progressStore = new TextStreamStore();
 const toolCallStreamStore = new ToolCallStreamStore();
