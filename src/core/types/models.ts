@@ -3,7 +3,7 @@ import { ComponentType } from 'react';
 import { WalletStore } from '../../features/blockchain/stores/walletStore';
 
 export interface ModelOperations {
-  executeOperation: (operationName: string, params: unknown) => Promise<any>;
+  executeOperation: (operationName: string, params: unknown) => Promise<string>;
   isOperationValidated: boolean;
 }
 
