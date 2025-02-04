@@ -34,10 +34,7 @@ export const ChatHistory = () => {
         <div>
           {chatHistories.map(({ title }, index) => {
             return (
-              <div
-                key={index}
-                className={styles.chatHistoryItem}
-              >
+              <div key={index} className={styles.chatHistoryItem}>
                 <p>{title}</p>
                 <div>
                   <svg
