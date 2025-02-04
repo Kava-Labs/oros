@@ -15,24 +15,20 @@ export interface BaseModelConfig {
   introText: string;
   components?: {
     transaction?: {
-      // @ts-ignore
       inProgress: ComponentType<any>;
-      // @ts-ignore
       complete: ComponentType<any>;
     };
     query?: {
-      // @ts-ignore
       inProgress: ComponentType<any>;
-      // @ts-ignore
       complete: ComponentType<any>;
     };
   };
-  getOperations?: (walletStore: WalletStore) => ModelOperations;
+  createOperations?: (walletStore: WalletStore) => ModelOperations;
 }
 
 export interface BlockchainModelConfig extends BaseModelConfig {
   tools: ChatCompletionTool[];
-  getOperations: (walletStore: WalletStore) => ModelOperations;
+  createOperations: (walletStore: WalletStore) => ModelOperations;
 }
 
 export type ReasoningModelConfig = BaseModelConfig;

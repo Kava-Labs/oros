@@ -6,6 +6,7 @@ import { ToolCallStreamStore } from '../stores/toolCallStreamStore';
 import { ModelConfig } from '../types/models';
 import { getModelConfig } from '../config/models';
 import { AppContext } from './AppContext';
+import { defaultOperations } from '../../features/blockchain/config/models';
 
 export const AppContextProvider = ({
   children,
@@ -36,7 +37,8 @@ export const AppContextProvider = ({
     setModelConfig(newConfig);
   }, []);
 
-  const operations = modelConfig.getOperations?.(walletStore);
+  const operations =
+    modelConfig.createOperations?.(walletStore) ?? defaultOperations;
 
   return (
     <AppContext.Provider
@@ -48,8 +50,7 @@ export const AppContextProvider = ({
         toolCallStreamStore,
         modelConfig,
         handleModelChange,
-        // Spread operations if they exist
-        ...operations,
+        ...operations, // Spread operations if they exist
         errorText,
         setErrorText,
         isReady,
