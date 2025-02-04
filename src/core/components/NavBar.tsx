@@ -1,4 +1,6 @@
 import styles from './NavBar.module.css';
+import DeepseekIcon from '../shared/assets/DeepseekIcon';
+import KavaAILogo from '../shared/assets/KavaAILogo';
 
 const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
 
@@ -12,11 +14,11 @@ const NavBar = () => {
     <div className={styles.container}>
       <nav className={styles.nav}>
         <div className={styles.logo}>
-          <span className={styles.kava}>Kava</span>
-          <span className={styles.ai}>AI</span>
+          <KavaAILogo />
         </div>
 
         <button className={styles.dropdown}>
+          <DeepseekIcon />
           <span>DeepSeek RI 67TB</span>
           <svg
             width="16"

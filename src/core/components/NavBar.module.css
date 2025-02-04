@@ -6,16 +6,19 @@
 
 .nav {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  padding: 8px 16px;
   background-color: #111111;
-  border-bottom: 1px solid #222222;
+  border-bottom: 2px solid #222222;
 }
 
 .logo {
   display: flex;
   align-items: center;
+  padding: 16px;
+  width: 100%;
+  justify-content: center;
+  border-bottom: 2px solid #222222;
 }
 
 .kava {
@@ -35,9 +38,31 @@
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background-color: #222222;
+  background-color: #111111;
   border-radius: 8px;
   color: #ffffff;
   cursor: pointer;
   border: none;
+  height: 60px;
+  width: 100%;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .nav {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 8px 16px;
+  }
+
+  .logo {
+    width: auto;
+    padding: 0;
+    border-bottom: none;
+  }
+
+  .dropdown {
+    width: auto;
+    border: 1px solid #A3A3A3;
+  }
 }
