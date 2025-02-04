@@ -17,6 +17,7 @@ import {
   CosmosChainConfig,
 } from '../config/chainsRegistry';
 import { ChainMessage, ChainQuery, ChainType } from '../types/chain';
+import { blockchainMessageProcessor } from './messageProcessing';
 
 export const messageRegistry = initializeMessageRegistry();
 
@@ -140,6 +141,7 @@ export const blockchainModels: Record<string, BlockchainModelConfig> = {
       },
     },
     createOperations: createBlockchainOperations,
+    messageProcessors: blockchainMessageProcessor,
   },
   'gpt-4o-mini': {
     name: 'gpt-4o-mini',
@@ -158,5 +160,6 @@ export const blockchainModels: Record<string, BlockchainModelConfig> = {
       },
     },
     createOperations: createBlockchainOperations,
+    messageProcessors: blockchainMessageProcessor,
   },
 };

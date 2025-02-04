@@ -28,11 +28,19 @@ export interface BaseModelConfig {
     };
   };
   createOperations?: (walletStore: WalletStore) => ModelOperations;
+  messageProcessors?: {
+    preProcess?: (message: string) => string;
+    postProcess?: (message: string) => string;
+  };
 }
 
 export interface BlockchainModelConfig extends BaseModelConfig {
   tools: ChatCompletionTool[];
   createOperations: (walletStore: WalletStore) => ModelOperations;
+  messageProcessors: {
+    preProcess: (message: string) => string;
+    postProcess: (message: string) => string;
+  };
 }
 
 export type ReasoningModelConfig = BaseModelConfig;

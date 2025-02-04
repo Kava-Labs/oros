@@ -1,8 +1,7 @@
 import { useState, useEffect, memo } from 'react';
 import { sanitizeContent } from '../core/utils/sanitize';
 import styles from './ChatView.module.css';
-import { unmaskAddresses } from '../utils/chat/unmaskAddresses';
-import { getStoredMasks } from '../utils/chat/helpers';
+import { useAppContext } from '../core/context/useAppContext';
 
 export interface ContentProps {
   content: string;
@@ -17,7 +16,7 @@ export const ContentComponent = ({
 }: ContentProps) => {
   const [hasError, setHasError] = useState(false);
   const [sanitizedContent, setSanitizedContent] = useState<string>('');
-  const storedMasks = getStoredMasks();
+  const { modelConfig } = useAppContext();
 
   useEffect(() => {
     let cancel = false;
@@ -29,9 +28,14 @@ export const ContentComponent = ({
       }
 
       try {
-        const updatedContent = await sanitizeContent(
-          unmaskAddresses(content, storedMasks.masksToValues),
-        );
+        // Process content through model-specific processor if it exists
+        let processedContent = content;
+        if (modelConfig?.messageProcessors?.postProcess) {
+          processedContent = modelConfig.messageProcessors.postProcess(content);
+        }
+
+        const updatedContent = await sanitizeContent(processedContent);
+
         if (!cancel) {
           setSanitizedContent(updatedContent);
         }
@@ -49,7 +53,7 @@ export const ContentComponent = ({
     return () => {
       cancel = true;
     };
-  }, [content, storedMasks.masksToValues]);
+  }, [content, modelConfig]);
 
   useEffect(() => {
     if (onRendered) {
