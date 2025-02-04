@@ -15,10 +15,8 @@ import {
 } from '../features/blockchain/components/displayCards';
 import { InProgressTxDisplayProps } from '../features/blockchain/components/displayCards/InProgressTxDisplay';
 import { CompleteQueryDisplayProps } from '../features/blockchain/components/displayCards/CompleteQueryDisplay';
-import {
-  defaultIntroText as defaultReasoningIntroText,
-  defaultSystemPrompt as defaultReasoningSystemPrompt,
-} from '../features/reasoning/config/prompts/defaultPrompts';
+import { reasoningModels } from '../features/reasoning/config/models';
+import { ReasoningModelConfig } from '../core/types/models';
 
 export type SupportedBlockchainModels = 'gpt-4o' | 'gpt-4o-mini';
 export type SupportedReasoningModels = 'deepseek-chat';
@@ -43,7 +41,7 @@ interface ModelConfig {
 
 interface ModelRegistry {
   blockchain: Record<SupportedBlockchainModels, ModelConfig>;
-  reasoning: Record<SupportedReasoningModels, ModelConfig>;
+  reasoning: Record<SupportedReasoningModels, ReasoningModelConfig>;
 }
 
 const messageRegistry = initializeMessageRegistry();
@@ -86,15 +84,5 @@ export const MODEL_REGISTRY: ModelRegistry = {
       },
     },
   },
-  reasoning: {
-    'deepseek-chat': {
-      name: 'deepseek-chat',
-      description:
-        'Specialized model for logical analysis and problem-solving in non-blockchain contexts',
-      tools: [],
-      //  todo - create reasoning-specific prompts
-      systemPrompt: defaultReasoningSystemPrompt,
-      introText: defaultReasoningIntroText,
-    },
-  },
+  reasoning: { ...reasoningModels },
 };
