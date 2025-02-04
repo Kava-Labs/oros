@@ -1,4 +1,10 @@
-import { useRef, useEffect, useCallback, useSyncExternalStore } from 'react';
+import {
+  useRef,
+  useEffect,
+  useCallback,
+  useSyncExternalStore,
+  useState,
+} from 'react';
 import { ChatView } from './core/components/ChatView';
 import { getToken } from './utils/token/token';
 import OpenAI from 'openai';
@@ -17,6 +23,7 @@ import { ExecuteOperation, ModelConfig } from './core/context/types';
 import NavBar from './core/components/NavBar';
 import styles from './App.module.css';
 import { ChatHistory } from './core/components/ChatHistory';
+import { useMediaQuery } from './shared/theme/useMediaQuery';
 
 let client: OpenAI | null = null;
 
@@ -153,22 +160,34 @@ export const App = () => {
     ]);
   }, [handleCancel, messageHistoryStore, modelConfig.systemPrompt]);
 
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  const [burgerToggle, setBurgerToggle] = useState(false);
+
   return (
     <>
       {isReady && (
         <div className={styles.appContent}>
-          <NavBar />
+          <NavBar
+            burgerToggle={burgerToggle}
+            setBurgerToggle={setBurgerToggle}
+          />
           {showHistorySidebar ? (
             <div className={styles.appContainer}>
-              <ChatHistory />
-              <ChatView
-                introText={modelConfig.introText}
-                cautionText={defaultCautionText}
-                messages={messages}
-                onSubmit={handleChatCompletion}
-                onReset={handleReset}
-                onCancel={handleCancel}
-              />
+              {!isMobile ? (
+                <ChatHistory />
+              ) : burgerToggle ? (
+                <ChatHistory />
+              ) : null}
+              {!burgerToggle ? (
+                <ChatView
+                  introText={modelConfig.introText}
+                  cautionText={defaultCautionText}
+                  messages={messages}
+                  onSubmit={handleChatCompletion}
+                  onReset={handleReset}
+                  onCancel={handleCancel}
+                />
+              ) : null}
             </div>
           ) : (
             <ChatView

@@ -6,7 +6,12 @@ import { isInIframe } from '../utils/isInIframe';
 
 const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
 
-const NavBar = () => {
+type NavBarProps = {
+  burgerToggle: boolean;
+  setBurgerToggle: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const NavBar = (props: NavBarProps) => {
   const isIframe = isInIframe();
   const showNavBar = !isIframe && FEAT_UPDATED_DESIGN;
 
@@ -16,7 +21,12 @@ const NavBar = () => {
     <div className={styles.container}>
       <nav className={styles.nav}>
         <div className={styles.menu}>
-          <div className={styles.hamburger}>
+          <div
+            className={styles.hamburger}
+            onClick={() => {
+              props.setBurgerToggle((prev) => !prev);
+            }}
+          >
             <HamburgerIcon />
           </div>
           <div className={styles.logo}>
