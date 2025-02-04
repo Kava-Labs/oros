@@ -7,9 +7,22 @@
 .nav {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   background-color: #111111;
   border-bottom: 2px solid #222222;
+}
+
+.menu {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border-bottom: 2px solid #222222;
+}
+
+.hamburger {
+  padding: 16px;
+  display: flex;
+  align-items: center;
 }
 
 .logo {
@@ -18,8 +31,6 @@
   padding: 16px;
   width: 100%;
   justify-content: center;
-  border-bottom: 2px solid #222222;
-  margin-left: 60px;
 }
 
 .dropdown {
@@ -43,16 +54,25 @@
     justify-content: space-between;
     padding: 8px 16px;
     height: 89px;
+    border-bottom: 2px solid #222222;
+  }
+
+  .menu {
+    width: auto;
+    border-bottom: none;
   }
 
   .logo {
     width: auto;
     padding: 0;
-    border-bottom: none;
   }
 
   .dropdown {
     width: auto;
     border: 1px solid #A3A3A3;
+  }
+
+  .hamburger {
+    visibility: hidden;
   }
 }
