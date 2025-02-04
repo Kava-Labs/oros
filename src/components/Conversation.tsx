@@ -4,7 +4,7 @@ import { StreamingText } from '../core/components/StreamingText';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { memo } from 'react';
 import { useTheme } from '../shared/theme/useTheme';
-import { useAppContext } from '../context/useAppContext';
+import { useAppContext } from '../core/context/useAppContext';
 import { ToolCallProgressCards } from '../core/components/ToolCallProgressCards';
 import {
   CompleteTxDisplay,
@@ -18,6 +18,7 @@ import {
   OperationResult,
   OperationType,
 } from '../features/blockchain/types/chain';
+import { messageRegistry } from '../features/blockchain/config/models';
 
 export interface ConversationProps {
   messages: ChatCompletionMessageParam[];
@@ -30,7 +31,7 @@ const StreamingTextContent = (message: string, onRendered: () => void) => {
 
 const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
   const { logo } = useTheme();
-  const { errorText, isRequesting, progressStore, messageStore, registry } =
+  const { errorText, isRequesting, progressStore, messageStore } =
     useAppContext();
 
   return (
@@ -84,7 +85,7 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
             chainNameToolCallParam.name in params
           ) {
             const chainName = params[chainNameToolCallParam.name];
-            const operation = registry.get(tc.function.name);
+            const operation = messageRegistry.get(tc.function.name);
             if (!operation) return null;
 
             const chain = chainRegistry[operation.chainType][chainName];

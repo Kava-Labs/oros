@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import { ChatView, ChatViewProps } from './ChatView';
 import { ThemeProvider } from '../shared/theme/themeProvider';
-import { AppContextProvider } from '../context/AppContextProvider';
+import { AppContextProvider } from '../core/context/AppContextProvider';
 import { TextStreamStore } from '../core/stores/textStreamStore';
 import { ToolCallStreamStore } from '../core/stores/toolCallStreamStore';
 import { MessageHistoryStore } from '../core/stores/messageHistoryStore';

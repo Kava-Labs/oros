@@ -5,7 +5,7 @@ import { mockChatMessages } from './mockdata';
 import { defaultIntroText } from '../features/blockchain/config';
 import type { Decorator } from '@storybook/react';
 import { ThemeProvider } from '../shared/theme/themeProvider';
-import { AppContextProvider } from '../context/AppContextProvider';
+import { AppContextProvider } from '../core/context/AppContextProvider';
 import { TextStreamStore } from '../core/stores/textStreamStore';
 import { ToolCallStreamStore } from '../core/stores/toolCallStreamStore';
 import { MessageHistoryStore } from '../core/stores/messageHistoryStore';

@@ -11,9 +11,10 @@ import { TextStreamStore } from './core/stores/textStreamStore';
 import { defaultCautionText } from './features/blockchain/config/prompts/defaultPrompts';
 import { ToolCallStreamStore } from './core/stores/toolCallStreamStore';
 import { MessageHistoryStore } from './core/stores/messageHistoryStore';
-import { useAppContext } from './context/useAppContext';
+import { useAppContext } from './core/context/useAppContext';
 import { OperationResult } from './features/blockchain/types/chain';
-import { ExecuteOperation, ModelConfig } from './context/types';
+import { ExecuteOperation } from './core/context/types';
+import { ModelConfig } from './core/types/models';
 
 let client: OpenAI | null = null;
 
@@ -170,7 +171,7 @@ async function doChat(
   progressStore: TextStreamStore,
   messageStore: TextStreamStore,
   toolCallStreamStore: ToolCallStreamStore,
-  executeOperation: ExecuteOperation,
+  executeOperation: ExecuteOperation | undefined,
 ) {
   progressStore.setText('Thinking');
   const { name, tools } = modelConfig;
@@ -252,12 +253,12 @@ async function doChat(
 async function callTools(
   toolCallStreamStore: ToolCallStreamStore,
   messageHistoryStore: MessageHistoryStore,
-  executeOperation: ExecuteOperation,
+  executeOperation: ExecuteOperation | undefined,
 ): Promise<void> {
   for (const toolCall of toolCallStreamStore.getSnapShot()) {
     const name = toolCall.function?.name;
 
-    if (name) {
+    if (name && executeOperation) {
       let content = '';
       try {
         const result = await executeOperation(
