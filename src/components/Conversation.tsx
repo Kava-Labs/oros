@@ -1,5 +1,5 @@
-import styles from './ChatView.module.css';
-import { Content } from './Content';
+import styles from '../core/components/ChatView.module.css';
+import { Content } from '../core/components/Content';
 import { StreamingText } from '../core/components/StreamingText';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { memo } from 'react';

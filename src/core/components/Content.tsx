@@ -1,7 +1,7 @@
 import { useState, useEffect, memo } from 'react';
-import { sanitizeContent } from '../core/utils/sanitize';
+import { sanitizeContent } from '../utils/sanitize';
 import styles from './ChatView.module.css';
-import { useAppContext } from '../core/context/useAppContext';
+import { useAppContext } from '../context/useAppContext';
 
 export interface ContentProps {
   content: string;

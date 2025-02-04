@@ -1,10 +1,14 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import styles from './ChatView.module.css';
-import { CancelChatIcon, ResetChatIcon, SendChatIcon } from '../shared/assets';
-import { useTheme } from '../shared/theme/useTheme';
-import { Conversation } from './Conversation';
+import {
+  CancelChatIcon,
+  ResetChatIcon,
+  SendChatIcon,
+} from '../../shared/assets';
+import { useTheme } from '../../shared/theme/useTheme';
+import { Conversation } from '../../components/Conversation';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
-import { useAppContext } from '../core/context/useAppContext';
+import { useAppContext } from '../context/useAppContext';
 
 export interface ChatViewProps {
   messages: ChatCompletionMessageParam[];

@@ -1,6 +1,6 @@
-import { getStoredMasks, updateStoredMasks } from '../../../utils/chat/helpers';
-import { maskAddresses } from '../../../utils/chat/maskAddresses';
-import { unmaskAddresses } from '../../../utils/chat/unmaskAddresses';
+import { getStoredMasks, updateStoredMasks } from '../utils/chat/helpers';
+import { maskAddresses } from '../utils/chat/maskAddresses';
+import { unmaskAddresses } from '../utils/chat/unmaskAddresses';
 
 export const blockchainMessageProcessor = {
   /**
