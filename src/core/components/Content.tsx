@@ -1,8 +1,8 @@
 import { useState, useEffect, memo } from 'react';
-import { sanitizeContent } from '../core/utils/sanitize';
+import { sanitizeContent } from '../utils/sanitize';
 import styles from './ChatView.module.css';
-import { unmaskAddresses } from '../utils/chat/unmaskAddresses';
-import { getStoredMasks } from '../utils/chat/helpers';
+import { unmaskAddresses } from '../../utils/chat/unmaskAddresses';
+import { getStoredMasks } from '../../utils/chat/helpers';
 
 export interface ContentProps {
   content: string;

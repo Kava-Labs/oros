@@ -1,5 +1,5 @@
 import { useRef, useEffect, useCallback, useSyncExternalStore } from 'react';
-import { ChatView } from './components/ChatView';
+import { ChatView } from './core/components/ChatView';
 import { getToken } from './utils/token/token';
 import OpenAI from 'openai';
 import {
