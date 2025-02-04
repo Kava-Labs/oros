@@ -16,8 +16,13 @@ import { OperationResult } from './features/blockchain/types/chain';
 import { ExecuteOperation, ModelConfig } from './core/context/types';
 import NavBar from './core/components/NavBar';
 import styles from './App.module.css';
+import { ChatHistory } from './core/components/ChatHistory';
 
 let client: OpenAI | null = null;
+
+const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
+const isInIframe = window !== window.parent;
+const showHistorySidebar = !isInIframe && FEAT_UPDATED_DESIGN;
 
 export const App = () => {
   const {
@@ -153,14 +158,28 @@ export const App = () => {
       {isReady && (
         <div className={styles.appContent}>
           <NavBar />
-          <ChatView
-            introText={modelConfig.introText}
-            cautionText={defaultCautionText}
-            messages={messages}
-            onSubmit={handleChatCompletion}
-            onReset={handleReset}
-            onCancel={handleCancel}
-          />
+          {showHistorySidebar ? (
+            <div className={styles.appContainer}>
+              <ChatHistory />
+              <ChatView
+                introText={modelConfig.introText}
+                cautionText={defaultCautionText}
+                messages={messages}
+                onSubmit={handleChatCompletion}
+                onReset={handleReset}
+                onCancel={handleCancel}
+              />
+            </div>
+          ) : (
+            <ChatView
+              introText={modelConfig.introText}
+              cautionText={defaultCautionText}
+              messages={messages}
+              onSubmit={handleChatCompletion}
+              onReset={handleReset}
+              onCancel={handleCancel}
+            />
+          )}
         </div>
       )}
     </>

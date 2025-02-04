@@ -1,0 +1,56 @@
+.chatHistoryContainer {
+  border-right: 1px solid #3e3e3e;
+}
+
+.newChatButton {
+  width: 300px;
+  height: 62px;
+  text-align: left;
+  padding-left: 2rem;
+  border-radius: 8px;
+  border: 1px;
+  margin-top: 28px;
+  margin-bottom: 28px;
+  margin-left: 14px;
+  margin-right: 14px;
+
+  background-color: #111111;
+  border: 1px solid #b4b4b4;
+  cursor: pointer;
+}
+
+.newChatButtonText {
+  padding-left: 2rem;
+  display: inline;
+  font-size: 18px;
+  line-height: 24px;
+  color: #b4b4b4;
+}
+
+.historySection {
+  border-top: 1px solid #3e3e3e;
+  border-bottom: 1px solid #3e3e3e;
+}
+
+.historySectionTitle {
+  margin-left: 14px;
+  margin-top: 20px;
+  color: #b4b4b4;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 24px;
+  text-align: left;
+}
+
+.chatHistoryItem {
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  color: #b4b4b4;
+  margin-right: 14px;
+  margin-left: 14px;
+  font-size: 16px;
+  line-height: 22px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
