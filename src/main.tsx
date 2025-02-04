@@ -35,7 +35,7 @@ import '@fontsource/inter/700-italic.css';
 //
 import { App } from './App.tsx';
 import { ThemeProvider } from './shared/theme/themeProvider.tsx';
-import { AppContextProvider } from './context/AppContextProvider.tsx';
+import { AppContextProvider } from './core/context/AppContextProvider.tsx';
 import {
   progressStore,
   messageHistoryStore,

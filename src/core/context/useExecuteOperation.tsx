@@ -2,19 +2,19 @@ import { useCallback, useState } from 'react';
 import {
   WalletStore,
   WalletTypes,
-} from '../features/blockchain/stores/walletStore';
+} from '../../features/blockchain/stores/walletStore';
 import {
   ChainNames,
   chainNameToolCallParam,
   chainRegistry,
   CosmosChainConfig,
-} from '../features/blockchain/config/chainsRegistry';
+} from '../../features/blockchain/config/chainsRegistry';
 import {
   ChainType,
   ChainMessage,
   ChainQuery,
-} from '../features/blockchain/types/chain';
-import { OperationRegistry } from '../features/blockchain/services/registry';
+} from '../../features/blockchain/types/chain';
+import { OperationRegistry } from '../../features/blockchain/services/registry';
 
 export const useExecuteOperation = (
   registry: OperationRegistry<unknown>,

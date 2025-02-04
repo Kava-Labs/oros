@@ -1,4 +1,4 @@
-import { useAppContext } from '../../../../context/useAppContext';
+import { useAppContext } from '../../../../core/context/useAppContext';
 import { useEffect, useSyncExternalStore } from 'react';
 import { useScrollToBottom } from '../../../../core/utils/useScrollToBottom';
 import { ToolCallStream } from '../../../../core/stores/toolCallStreamStore';

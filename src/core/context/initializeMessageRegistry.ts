@@ -1,8 +1,8 @@
-import { OperationRegistry } from '../features/blockchain/services/registry';
-import { LendDepositMessage } from '../features/blockchain/services/messages/kava/lend/msgDeposit';
-import { EvmTransferMessage } from '../features/blockchain/services/messages/evm/transfer';
-import { EvmBalancesQuery } from '../features/blockchain/services/evm/evmBalances';
-import { ERC20ConversionMessage } from '../features/blockchain/services/messages/kava/evmutil/erc20Conversion';
+import { OperationRegistry } from '../../features/blockchain/services/registry';
+import { LendDepositMessage } from '../../features/blockchain/services/messages/kava/lend/msgDeposit';
+import { EvmTransferMessage } from '../../features/blockchain/services/messages/evm/transfer';
+import { EvmBalancesQuery } from '../../features/blockchain/services/evm/evmBalances';
+import { ERC20ConversionMessage } from '../../features/blockchain/services/messages/kava/evmutil/erc20Conversion';
 
 /**
  * Initializes the operation registry with all supported operations.

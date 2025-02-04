@@ -4,7 +4,7 @@ import { StreamingText } from '../core/components/StreamingText';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { memo } from 'react';
 import { useTheme } from '../shared/theme/useTheme';
-import { useAppContext } from '../context/useAppContext';
+import { useAppContext } from '../core/context/useAppContext';
 import { ToolCallProgressCards } from '../core/components/ToolCallProgressCards';
 import {
   CompleteTxDisplay,

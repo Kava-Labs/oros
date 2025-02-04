@@ -11,9 +11,9 @@ import { TextStreamStore } from './core/stores/textStreamStore';
 import { defaultCautionText } from './features/blockchain/config/prompts/defaultPrompts';
 import { ToolCallStreamStore } from './core/stores/toolCallStreamStore';
 import { MessageHistoryStore } from './core/stores/messageHistoryStore';
-import { useAppContext } from './context/useAppContext';
+import { useAppContext } from './core/context/useAppContext';
 import { OperationResult } from './features/blockchain/types/chain';
-import { ExecuteOperation, ModelConfig } from './context/types';
+import { ExecuteOperation, ModelConfig } from './core/context/types';
 
 let client: OpenAI | null = null;
 

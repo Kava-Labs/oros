@@ -6,7 +6,7 @@ import { Conversation } from './Conversation';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { maskAddresses } from '../utils/chat/maskAddresses';
 import { getStoredMasks, updateStoredMasks } from '../utils/chat/helpers';
-import { useAppContext } from '../context/useAppContext';
+import { useAppContext } from '../core/context/useAppContext';
 
 export interface ChatViewProps {
   messages: ChatCompletionMessageParam[];

@@ -1,15 +1,15 @@
 import React, { useCallback, useState } from 'react';
 import { AppContext } from './AppContext';
-import { OperationRegistry } from '../features/blockchain/services/registry';
-import { WalletStore } from '../features/blockchain/stores/walletStore';
-import { TextStreamStore } from '../core/stores/textStreamStore';
-import { ToolCallStreamStore } from '../core/stores/toolCallStreamStore';
-import { MessageHistoryStore } from '../core/stores/messageHistoryStore';
+import { OperationRegistry } from '../../features/blockchain/services/registry';
+import { WalletStore } from '../../features/blockchain/stores/walletStore';
+import { TextStreamStore } from '../../core/stores/textStreamStore';
+import { ToolCallStreamStore } from '../../core/stores/toolCallStreamStore';
+import { MessageHistoryStore } from '../../core/stores/messageHistoryStore';
 import {
   MODEL_REGISTRY,
   SupportedBlockchainModels,
   SupportedReasoningModels,
-} from '../services/modelRegistry';
+} from '../../services/modelRegistry';
 import { ModelConfig } from './types';
 import { initializeMessageRegistry } from './initializeMessageRegistry';
 import { useExecuteOperation } from './useExecuteOperation';
