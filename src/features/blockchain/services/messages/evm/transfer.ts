@@ -15,7 +15,6 @@ import {
   chainRegistry,
   EVMChainConfig,
 } from '../../../config/chainsRegistry';
-import { ConnectWalletPrompt } from '../../../components/ConnectWalletPrompt';
 
 interface SendToolParams {
   chainName: string;
@@ -31,7 +30,6 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
   chainType = ChainType.EVM;
   needsWallet = [WalletTypes.METAMASK];
   walletMustMatchChainID = true;
-  private hasValidWallet = false;
 
   parameters = [
     chainNameToolCallParam,
@@ -56,7 +54,7 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
   ];
 
   inProgressComponent() {
-    return this.hasValidWallet ? InProgressTxDisplay : ConnectWalletPrompt;
+    return InProgressTxDisplay;
   }
 
   private async validateBalance(
@@ -112,7 +110,6 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
     params: SendToolParams,
     walletStore: WalletStore,
   ): Promise<boolean> {
-    this.hasValidWallet = false;
     if (!walletStore.getSnapshot().isWalletConnected) {
       throw new Error('please connect to a compatible wallet');
     }
@@ -122,9 +119,6 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
         throw new Error('please connect to a compatible wallet');
       }
     }
-
-    //  wallet checks have passed
-    this.hasValidWallet = true;
 
     if (!chainRegistry[this.chainType][params.chainName]) {
       throw new Error(`unknown chain name ${params.chainName}`);

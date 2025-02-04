@@ -6,7 +6,7 @@ import { useScrollToBottom } from '../../../core/utils/useScrollToBottom';
 export const ConnectWalletPrompt = ({
   onRendered,
 }: {
-  toolCall: ToolCallStream;
+  toolCall?: ToolCallStream;
   onRendered?: () => void;
 }) => {
   const { progressStore } = useAppContext();

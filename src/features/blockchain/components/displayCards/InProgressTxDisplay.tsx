@@ -2,16 +2,17 @@ import { ToolCallStream } from '../../../../core/stores/toolCallStreamStore';
 import styles from './DisplayCards.module.css';
 import { useScrollToBottom } from '../../../../core/utils/useScrollToBottom';
 import { useAppContext } from '../../../../core/context/useAppContext';
+import { ConnectWalletPrompt } from '../ConnectWalletPrompt';
 
 export interface InProgressTxDisplayProps {
-  toolCall: ToolCallStream;
+  toolCall?: ToolCallStream;
   onRendered?: () => void;
 }
 
 export const InProgressTxDisplay = ({
   onRendered,
 }: InProgressTxDisplayProps) => {
-  const { isOperationValidated } = useAppContext();
+  const { isOperationValidated, walletStore } = useAppContext();
 
   useScrollToBottom(onRendered, isOperationValidated);
 
@@ -19,6 +20,9 @@ export const InProgressTxDisplay = ({
     return null;
   }
 
+  if (!walletStore.getSnapshot().isWalletConnected) {
+    return <ConnectWalletPrompt />;
+  }
   return (
     <div
       data-testid="in-progress-tx-display"
