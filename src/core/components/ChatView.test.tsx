@@ -1,11 +1,11 @@
 import { render } from '@testing-library/react';
 import { ChatView, ChatViewProps } from './ChatView';
-import { ThemeProvider } from '../shared/theme/themeProvider';
+import { ThemeProvider } from '../../shared/theme/themeProvider';
 import { AppContextProvider } from '../context/AppContextProvider';
-import { TextStreamStore } from '../core/stores/textStreamStore';
-import { ToolCallStreamStore } from '../core/stores/toolCallStreamStore';
-import { MessageHistoryStore } from '../core/stores/messageHistoryStore';
-import { WalletStore } from '../features/blockchain/stores//walletStore';
+import { TextStreamStore } from '../stores/textStreamStore';
+import { ToolCallStreamStore } from '../stores/toolCallStreamStore';
+import { MessageHistoryStore } from '../stores/messageHistoryStore';
+import { WalletStore } from '../../features/blockchain/stores/walletStore';
 const messageStore = new TextStreamStore();
 const progressStore = new TextStreamStore();
 const toolCallStreamStore = new ToolCallStreamStore();
@@ -13,7 +13,7 @@ const messageHistoryStore = new MessageHistoryStore();
 const walletStore = new WalletStore();
 
 vi.mock(
-  import('../features/blockchain/services/registry'),
+  import('../../features/blockchain/services/registry'),
   async (messageRegistry) => {
     return await messageRegistry();
   },

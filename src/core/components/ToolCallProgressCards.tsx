@@ -1,18 +1,17 @@
 import { useSyncExternalStore } from 'react';
-import { useAppContext } from '../../context/useAppContext';
+import { useAppContext } from '../../core/context/useAppContext';
 
 export const ToolCallProgressCards = ({
   onRendered,
 }: {
   onRendered: () => void;
 }) => {
-  const { toolCallStreamStore } = useAppContext();
+  const { toolCallStreamStore, registry } = useAppContext();
 
   const toolCallStreams = useSyncExternalStore(
     toolCallStreamStore.subscribe,
     toolCallStreamStore.getSnapShot,
   );
-  const { registry } = useAppContext();
 
   if (!toolCallStreams.length) return null;
 

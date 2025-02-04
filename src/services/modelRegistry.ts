@@ -1,4 +1,4 @@
-import { initializeMessageRegistry } from '../context/initializeMessageRegistry';
+import { initializeMessageRegistry } from '../core/context/initializeMessageRegistry';
 import { ChatCompletionTool } from 'openai/resources/index';
 import { ComponentType } from 'react';
 import {

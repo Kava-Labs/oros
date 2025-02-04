@@ -1,7 +1,7 @@
 import { ToolCallStream } from '../../../../core/stores/toolCallStreamStore';
 import styles from './DisplayCards.module.css';
 import { useScrollToBottom } from '../../../../core/utils/useScrollToBottom';
-import { useAppContext } from '../../../../context/useAppContext';
+import { useAppContext } from '../../../../core/context/useAppContext';
 
 export interface InProgressTxDisplayProps {
   toolCall: ToolCallStream;
