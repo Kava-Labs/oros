@@ -1,36 +1,121 @@
-import { useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import styles from './NavBar.module.css';
 import KavaAILogo from '../assets/KavaAILogo';
 import HamburgerIcon from '../assets/HamburgerIcon';
 import { isInIframe } from '../utils/isInIframe';
 import { useAppContext } from '../context/useAppContext';
 import { getAllModels } from '../config/models';
+import { ModelConfig } from '../types/models';
 
 const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
 
-type NavBarProps = {
-  chatHistoryOpen: boolean;
+interface NavBarProps {
   setChatHistoryOpen: React.Dispatch<React.SetStateAction<boolean>>;
-};
+}
 
-const NavBar = (props: NavBarProps) => {
+const NavBar = ({ setChatHistoryOpen }: NavBarProps) => {
   const isIframe = isInIframe();
   const showNavBar = !isIframe && FEAT_UPDATED_DESIGN;
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const { modelConfig, handleModelChange } = useAppContext();
-
-  if (!showNavBar) return null;
+  const { modelConfig, handleModelChange, messageHistoryStore } =
+    useAppContext();
 
   const ModelIconComponent = modelConfig.icon;
 
+  const [isDisabled, setIsDisabled] = useState(false);
+
+  // Handle closing dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const dropdown = document.querySelector(`.${styles.dropdownContainer}`);
+      if (dropdown && !dropdown.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    if (dropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () =>
+        document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [dropdownOpen]);
+
+  // Handle message history changes
+  const messages = messageHistoryStore.getSnapshot();
+  const hasUserMessages = messages.length > 1;
+
+  useEffect(() => {
+    if (hasUserMessages) {
+      setIsDisabled(true);
+      setDropdownOpen(false);
+    } else {
+      setIsDisabled(false);
+    }
+  }, [hasUserMessages]);
+
+  // Keyboard navigation
+  // useEffect(() => {
+  //   const handleKeyDown = (e: KeyboardEvent) => {
+  //     if (!dropdownOpen) return;
+  //
+  //     switch (e.key) {
+  //       case 'Escape':
+  //         setDropdownOpen(false);
+  //         break;
+  //       case 'ArrowDown': {
+  //         e.preventDefault();
+  //         const currentIndex = modelOptions.findIndex(
+  //           (m) => m.id === selectedModel.id,
+  //         );
+  //         const nextIndex = (currentIndex + 1) % modelOptions.length;
+  //         setSelectedModel(modelOptions[nextIndex]);
+  //         break;
+  //       }
+  //       case 'ArrowUp': {
+  //         e.preventDefault();
+  //         const currIndex = modelOptions.findIndex(
+  //           (m) => m.id === selectedModel.id,
+  //         );
+  //         const prevIndex =
+  //           currIndex === 0 ? modelOptions.length - 1 : currIndex - 1;
+  //         setSelectedModel(modelOptions[prevIndex]);
+  //         break;
+  //       }
+  //     }
+  //   };
+  //
+  //   if (dropdownOpen) {
+  //     window.addEventListener('keydown', handleKeyDown);
+  //     return () => window.removeEventListener('keydown', handleKeyDown);
+  //   }
+  // }, [dropdownOpen, selectedModel]);
+  //
+  // const handleSelect = useCallback((model: ModelOption) => {
+  //   setSelectedModel(model);
+  //   setDropdownOpen(false);
+  // }, []);
+
+  const toggleDropdown = useCallback(() => {
+    if (!isDisabled) {
+      setDropdownOpen((prev) => !prev);
+    }
+  }, [isDisabled]);
+
+  const handleModelClick = (model: ModelConfig) => {
+    handleModelChange(model.id);
+    setDropdownOpen(false);
+  };
+
+  if (!showNavBar) return null;
+
   return (
     <div className={styles.container}>
-      <nav className={styles.nav}>
+      <nav className={styles.nav} role="navigation">
         <div className={styles.menu}>
           <div
             className={styles.hamburger}
             onClick={() => {
-              props.setChatHistoryOpen((prev) => !prev);
+              setChatHistoryOpen((prev) => !prev);
             }}
           >
             <HamburgerIcon />
@@ -42,8 +127,12 @@ const NavBar = (props: NavBarProps) => {
 
         <div className={styles.dropdownContainer}>
           <button
+            disabled={isDisabled}
             className={styles.dropdown}
-            onClick={() => setDropdownOpen(!dropdownOpen)}
+            onClick={toggleDropdown}
+            aria-haspopup="true"
+            aria-expanded={dropdownOpen}
+            aria-label="Select model"
           >
             <ModelIconComponent />
             <span>{modelConfig.name}</span>
@@ -54,6 +143,7 @@ const NavBar = (props: NavBarProps) => {
               stroke="currentColor"
               viewBox="0 0 24 24"
               className={dropdownOpen ? styles.arrowUp : styles.arrowDown}
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -73,7 +163,7 @@ const NavBar = (props: NavBarProps) => {
                   <button
                     key={model.name}
                     className={styles.dropdownItem}
-                    onClick={() => handleModelChange(model.id)}
+                    onClick={() => handleModelClick(model)}
                   >
                     <ModelOptionIcon />
                     <span>{model.name}</span>
