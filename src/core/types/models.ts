@@ -15,11 +15,15 @@ export interface BaseModelConfig {
   introText: string;
   components?: {
     transaction?: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       inProgress: ComponentType<any>;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       complete: ComponentType<any>;
     };
     query?: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       inProgress: ComponentType<any>;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       complete: ComponentType<any>;
     };
   };
