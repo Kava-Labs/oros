@@ -1,7 +1,7 @@
 import styles from './NavBar.module.css';
-import DeepseekIcon from '../shared/assets/DeepseekIcon';
-import KavaAILogo from '../shared/assets/KavaAILogo';
-import HamburgerIcon from '../shared/assets/HamburgerIcon';
+import DeepseekIcon from '../../features/reasoning/assets/DeepseekIcon';
+import KavaAILogo from '../../shared/assets/KavaAILogo';
+import HamburgerIcon from '../../shared/assets/HamburgerIcon';
 
 const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
 

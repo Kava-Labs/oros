@@ -112,7 +112,6 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
     params: SendToolParams,
     walletStore: WalletStore,
   ): Promise<boolean> {
-    console.log('hasvalidwallet', this.hasValidWallet);
     this.hasValidWallet = false;
     if (!walletStore.getSnapshot().isWalletConnected) {
       throw new Error('please connect to a compatible wallet');
