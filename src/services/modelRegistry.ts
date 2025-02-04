@@ -15,6 +15,10 @@ import {
 } from '../features/blockchain/components/displayCards';
 import { InProgressTxDisplayProps } from '../features/blockchain/components/displayCards/InProgressTxDisplay';
 import { CompleteQueryDisplayProps } from '../features/blockchain/components/displayCards/CompleteQueryDisplay';
+import {
+  defaultIntroText as defaultReasoningIntroText,
+  defaultSystemPrompt as defaultReasoningSystemPrompt,
+} from '../features/reasoning/config/prompts/defaultPrompts';
 
 export type SupportedBlockchainModels = 'gpt-4o' | 'gpt-4o-mini';
 export type SupportedReasoningModels = 'deepseek-chat';
@@ -89,8 +93,8 @@ export const MODEL_REGISTRY: ModelRegistry = {
         'Specialized model for logical analysis and problem-solving in non-blockchain contexts',
       tools: [],
       //  todo - create reasoning-specific prompts
-      systemPrompt: messageRegistry.getSystemPrompt(),
-      introText: messageRegistry.getIntroText(),
+      systemPrompt: defaultReasoningSystemPrompt,
+      introText: defaultReasoningIntroText,
     },
   },
 };
