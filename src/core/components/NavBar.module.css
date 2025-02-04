@@ -19,18 +19,7 @@
   width: 100%;
   justify-content: center;
   border-bottom: 2px solid #222222;
-}
-
-.kava {
-  font-size: 24px;
-  font-weight: bold;
-  color: #ff4444;
-}
-
-.ai {
-  font-size: 24px;
-  font-weight: bold;
-  color: #ffffff;
+  margin-left: 60px;
 }
 
 .dropdown {
@@ -43,7 +32,7 @@
   color: #ffffff;
   cursor: pointer;
   border: none;
-  height: 60px;
+  height: 62px;
   width: 100%;
   justify-content: center;
 }
@@ -53,6 +42,7 @@
     flex-direction: row;
     justify-content: space-between;
     padding: 8px 16px;
+    height: 89px;
   }
 
   .logo {
