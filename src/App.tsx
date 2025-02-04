@@ -14,6 +14,7 @@ import { MessageHistoryStore } from './core/stores/messageHistoryStore';
 import { useAppContext } from './core/context/useAppContext';
 import { OperationResult } from './features/blockchain/types/chain';
 import { ExecuteOperation, ModelConfig } from './core/context/types';
+import NavBar from './core/components/NavBar';
 
 let client: OpenAI | null = null;
 
@@ -149,14 +150,18 @@ export const App = () => {
   return (
     <>
       {isReady && (
-        <ChatView
-          introText={modelConfig.introText}
-          cautionText={defaultCautionText}
-          messages={messages}
-          onSubmit={handleChatCompletion}
-          onReset={handleReset}
-          onCancel={handleCancel}
-        />
+        <div style={{ height: '100vh' }}>
+          <NavBar />
+
+          <ChatView
+            introText={modelConfig.introText}
+            cautionText={defaultCautionText}
+            messages={messages}
+            onSubmit={handleChatCompletion}
+            onReset={handleReset}
+            onCancel={handleCancel}
+          />
+        </div>
       )}
     </>
   );

@@ -12,6 +12,8 @@ import { maskAddresses } from '../../utils/chat/maskAddresses';
 import { getStoredMasks, updateStoredMasks } from '../../utils/chat/helpers';
 import { useAppContext } from '../context/useAppContext';
 
+const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
+
 export interface ChatViewProps {
   messages: ChatCompletionMessageParam[];
   cautionText: string;
@@ -106,8 +108,15 @@ export const ChatView = ({
     }
   }, []);
 
+  const isInIframe = window !== window.parent;
+
+  const showNavBar = !isInIframe && FEAT_UPDATED_DESIGN;
+
   return (
-    <div id={styles.chatview} data-testid="chatview">
+    <div
+      id={showNavBar ? styles.updatedChatView : styles.chatview}
+      data-testid="chatview"
+    >
       <div
         ref={containerRef}
         id={styles.scrollContent}

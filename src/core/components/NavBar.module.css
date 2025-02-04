@@ -1,0 +1,43 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  background-color: #111111;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background-color: #111111;
+  border-bottom: 1px solid #222222;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.kava {
+  font-size: 24px;
+  font-weight: bold;
+  color: #ff4444;
+}
+
+.ai {
+  font-size: 24px;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.dropdown {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #222222;
+  border-radius: 8px;
+  color: #ffffff;
+  cursor: pointer;
+  border: none;
+}

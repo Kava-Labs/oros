@@ -7,6 +7,15 @@
   background: var(--colors-bgPrimary);
 }
 
+#updatedChatView {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 90vh;
+  justify-content: center;
+  background: var(--colors-bgPrimary);
+}
+
 ::-webkit-scrollbar {
   background-color: var(--colors-bgPrimary);
   width: 10px;
