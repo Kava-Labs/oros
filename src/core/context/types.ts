@@ -4,10 +4,8 @@ import { WalletStore } from '../../features/blockchain/stores/walletStore';
 import { TextStreamStore } from '../../core/stores/textStreamStore';
 import { ToolCallStreamStore } from '../../core/stores/toolCallStreamStore';
 import { MessageHistoryStore } from '../../core/stores/messageHistoryStore';
-import {
-  SupportedBlockchainModels,
-  SupportedReasoningModels,
-} from '../../services/modelRegistry';
+import { SupportedBlockchainModels } from '../../features/blockchain/config/models';
+import { SupportedReasoningModels } from '../../features/reasoning/config/models';
 
 export type ExecuteOperation = (
   operationName: string,
