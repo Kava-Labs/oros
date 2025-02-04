@@ -11,6 +11,7 @@ import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { maskAddresses } from '../../utils/chat/maskAddresses';
 import { getStoredMasks, updateStoredMasks } from '../../utils/chat/helpers';
 import { useAppContext } from '../context/useAppContext';
+import { isInIframe } from '../utils/isInIframe';
 
 const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
 
@@ -108,9 +109,9 @@ export const ChatView = ({
     }
   }, []);
 
-  const isInIframe = window !== window.parent;
+  const isIframe = isInIframe();
 
-  const showNavBar = !isInIframe && FEAT_UPDATED_DESIGN;
+  const showNavBar = !isIframe && FEAT_UPDATED_DESIGN;
 
   return (
     <div

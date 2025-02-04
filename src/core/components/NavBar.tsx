@@ -2,12 +2,13 @@ import styles from './NavBar.module.css';
 import DeepseekIcon from '../../features/reasoning/assets/DeepseekIcon';
 import KavaAILogo from '../../shared/assets/KavaAILogo';
 import HamburgerIcon from '../../shared/assets/HamburgerIcon';
+import { isInIframe } from '../utils/isInIframe';
 
 const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
 
 const NavBar = () => {
-  const isInIframe = window !== window.parent;
-  const showNavBar = !isInIframe && FEAT_UPDATED_DESIGN;
+  const isIframe = isInIframe();
+  const showNavBar = !isIframe && FEAT_UPDATED_DESIGN;
 
   if (!showNavBar) return null;
 
