@@ -20,6 +20,10 @@ import { ChatHistory } from './core/components/ChatHistory';
 
 let client: OpenAI | null = null;
 
+const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
+const isInIframe = window !== window.parent;
+const showHistorySidebar = !isInIframe && FEAT_UPDATED_DESIGN;
+
 export const App = () => {
   const {
     setErrorText,
@@ -154,9 +158,19 @@ export const App = () => {
       {isReady && (
         <div className={styles.appContent}>
           <NavBar />
-          <div className={styles.appContainer}>
-            <ChatHistory />
-
+          {showHistorySidebar ? (
+            <div className={styles.appContainer}>
+              <ChatHistory />
+              <ChatView
+                introText={modelConfig.introText}
+                cautionText={defaultCautionText}
+                messages={messages}
+                onSubmit={handleChatCompletion}
+                onReset={handleReset}
+                onCancel={handleCancel}
+              />
+            </div>
+          ) : (
             <ChatView
               introText={modelConfig.introText}
               cautionText={defaultCautionText}
@@ -165,7 +179,7 @@ export const App = () => {
               onReset={handleReset}
               onCancel={handleCancel}
             />
-          </div>
+          )}
         </div>
       )}
     </>
