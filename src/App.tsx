@@ -13,10 +13,11 @@ import { ToolCallStreamStore } from './core/stores/toolCallStreamStore';
 import { MessageHistoryStore } from './core/stores/messageHistoryStore';
 import { useAppContext } from './core/context/useAppContext';
 import { OperationResult } from './features/blockchain/types/chain';
-import { ExecuteOperation, ModelConfig } from './core/context/types';
+import { ExecuteOperation } from './core/context/types';
 import NavBar from './core/components/NavBar';
 import styles from './App.module.css';
 import { ChatHistory } from './core/components/ChatHistory';
+import { ModelConfig } from './core/types/models';
 
 let client: OpenAI | null = null;
 

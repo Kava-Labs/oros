@@ -5,12 +5,10 @@ import { WalletStore } from '../../features/blockchain/stores/walletStore';
 import { TextStreamStore } from '../../core/stores/textStreamStore';
 import { ToolCallStreamStore } from '../../core/stores/toolCallStreamStore';
 import { MessageHistoryStore } from '../../core/stores/messageHistoryStore';
-import { ModelConfig } from './types';
 import { initializeMessageRegistry } from '../../features/blockchain/config/initializeMessageRegistry';
 import { useExecuteOperation } from './useExecuteOperation';
-import { MODEL_REGISTRY } from '../config/models';
-import { SupportedBlockchainModels } from '../../features/blockchain/config/models';
-import { SupportedReasoningModels } from '../../features/reasoning/config/models';
+import { getModelConfig } from '../config/models';
+import { SupportedModels, ModelConfig } from '../types/models';
 
 export const AppContextProvider = ({
   children,
@@ -34,36 +32,15 @@ export const AppContextProvider = ({
     initializeMessageRegistry(),
   );
 
-  const [modelConfig, setModelConfig] = useState<ModelConfig>({
-    name: MODEL_REGISTRY.blockchain['gpt-4o-mini'].name,
-    tools: MODEL_REGISTRY.blockchain['gpt-4o-mini'].tools,
-    introText: MODEL_REGISTRY.blockchain['gpt-4o-mini'].introText,
-    systemPrompt: MODEL_REGISTRY.blockchain['gpt-4o-mini'].systemPrompt,
-    description: MODEL_REGISTRY.blockchain['gpt-4o-mini'].description,
-  });
-
-  const setModel = useCallback(
-    (modelName: SupportedBlockchainModels | SupportedReasoningModels) => {
-      if (modelName === 'deepseek-chat') {
-        setModelConfig({
-          name: MODEL_REGISTRY.reasoning[modelName].name,
-          tools: MODEL_REGISTRY.reasoning[modelName].tools,
-          introText: MODEL_REGISTRY.reasoning[modelName].introText,
-          systemPrompt: MODEL_REGISTRY.reasoning[modelName].systemPrompt,
-          description: MODEL_REGISTRY.reasoning[modelName].description,
-        });
-      } else {
-        setModelConfig({
-          name: MODEL_REGISTRY.blockchain[modelName].name,
-          tools: MODEL_REGISTRY.blockchain[modelName].tools,
-          introText: MODEL_REGISTRY.blockchain[modelName].introText,
-          systemPrompt: MODEL_REGISTRY.blockchain[modelName].systemPrompt,
-          description: MODEL_REGISTRY.blockchain[modelName].description,
-        });
-      }
-    },
-    [],
+  const [modelConfig, setModelConfig] = useState<ModelConfig>(() =>
+    getModelConfig('gpt-4o-mini'),
   );
+
+  // This callback would be passed to components that need to switch models
+  const handleModelChange = useCallback((modelName: SupportedModels) => {
+    const newConfig = getModelConfig(modelName);
+    setModelConfig(newConfig);
+  }, []);
 
   const { executeOperation, isOperationValidated } = useExecuteOperation(
     registry,
@@ -79,7 +56,7 @@ export const AppContextProvider = ({
         walletStore,
         toolCallStreamStore,
         modelConfig,
-        setModel,
+        handleModelChange,
         executeOperation,
         registry,
         errorText,

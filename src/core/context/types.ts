@@ -1,11 +1,9 @@
-import type { ChatCompletionTool } from 'openai/resources/index';
 import { OperationRegistry } from '../../features/blockchain/services/registry';
 import { WalletStore } from '../../features/blockchain/stores/walletStore';
 import { TextStreamStore } from '../../core/stores/textStreamStore';
 import { ToolCallStreamStore } from '../../core/stores/toolCallStreamStore';
 import { MessageHistoryStore } from '../../core/stores/messageHistoryStore';
-import { SupportedBlockchainModels } from '../../features/blockchain/config/models';
-import { SupportedReasoningModels } from '../../features/reasoning/config/models';
+import { ModelConfig, SupportedModels } from '../types/models';
 
 export type ExecuteOperation = (
   operationName: string,
@@ -21,9 +19,7 @@ export type AppContextType = {
   setIsRequesting: React.Dispatch<React.SetStateAction<boolean>>;
   registry: OperationRegistry<unknown>;
   modelConfig: ModelConfig;
-  setModel: (
-    modelName: SupportedBlockchainModels | SupportedReasoningModels,
-  ) => void;
+  handleModelChange: (modelName: SupportedModels) => void;
   executeOperation: ExecuteOperation;
   walletStore: WalletStore;
   messageStore: TextStreamStore;
@@ -32,11 +28,3 @@ export type AppContextType = {
   messageHistoryStore: MessageHistoryStore;
   isOperationValidated: boolean;
 };
-
-export interface ModelConfig {
-  name: string;
-  description: string;
-  tools: ChatCompletionTool[];
-  systemPrompt: string;
-  introText: string;
-}
