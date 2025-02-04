@@ -1,9 +1,10 @@
 import { ReasoningModelConfig } from '../../../core/types/models';
-import { SupportedReasoningModels } from '../../../services/modelRegistry';
 import {
   defaultIntroText,
   defaultSystemPrompt,
 } from './prompts/defaultPrompts';
+
+export type SupportedReasoningModels = 'deepseek-chat';
 
 export const reasoningModels: Record<
   SupportedReasoningModels,
