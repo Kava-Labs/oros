@@ -1,9 +1,12 @@
 import styles from './ChatHistory.module.css';
 import { ConversationHistory } from '../context/types';
 import { useEffect, useState } from 'react';
+import { useAppContext } from '../context/useAppContext';
 
 export const ChatHistory = () => {
   const [chatHistories, setChatHistories] = useState<ConversationHistory[]>([]);
+
+  const { loadConversation } = useAppContext();
 
   useEffect(() => {
     const allConversationsStr = localStorage.getItem('conversations');

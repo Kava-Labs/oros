@@ -30,6 +30,7 @@ export type AppContextType = {
   modelConfig: ModelConfig;
   handleModelChange: (modelName: SupportedModels) => void;
   executeOperation: ExecuteOperation;
+  loadConversation: (convoHistory: ConversationHistory) => void;
   walletStore: WalletStore;
   messageStore: TextStreamStore;
   toolCallStreamStore: ToolCallStreamStore;
