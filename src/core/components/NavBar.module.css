@@ -100,6 +100,16 @@
   background-color: var(--colors-bgPrimary);
 }
 
+.arrowDown {
+  transform: rotate(0deg);
+  transition: transform 0.2s ease-in-out;
+}
+
+.arrowUp {
+  transform: rotate(180deg);
+  transition: transform 0.2s ease-in-out;
+}
+
 @media (min-width: 768px) {
   .nav {
     flex-direction: row;

@@ -17,27 +17,30 @@ const ModelDropdownExpanded = ({ setDropdownOpen }: ModelDropdownProps) => {
     handleModelChange(model.id);
     setDropdownOpen(false);
   };
+
+  const displayedModelOptions = getAllModels().map((model) => {
+    const ModelOptionIcon = model.icon;
+
+    //  since we don't support metamask on mobile, don't allow a user to switch to blockchain models
+    const disableOption = isMobile && isBlockchainModelName(model.id);
+
+    return (
+      <button
+        key={model.name}
+        className={styles.dropdownItem}
+        onClick={() => handleModelClick(model)}
+        role="option"
+        disabled={disableOption}
+      >
+        <ModelOptionIcon />
+        <span>{model.name}</span>
+      </button>
+    );
+  });
+
   return (
     <div className={styles.dropdownMenu} data-testid="model-dropdown-menu">
-      {getAllModels().map((model) => {
-        const ModelOptionIcon = model.icon;
-
-        //  since we don't support metamask on mobile, don't allow a user to switch to blockchain models
-        const disableOption = isMobile && isBlockchainModelName(model.id);
-
-        return (
-          <button
-            key={model.name}
-            className={styles.dropdownItem}
-            onClick={() => handleModelClick(model)}
-            role="option"
-            disabled={disableOption}
-          >
-            <ModelOptionIcon />
-            <span>{model.name}</span>
-          </button>
-        );
-      })}
+      {displayedModelOptions}
     </div>
   );
 };
