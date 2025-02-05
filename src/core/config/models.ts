@@ -40,4 +40,4 @@ export const getAllModels = (): ModelConfig[] => {
   ];
 };
 
-export const DEFAULT_MODEL_NAME = 'gpt-4o-mini';
+export const DEFAULT_MODEL_NAME = 'deepseek-chat';

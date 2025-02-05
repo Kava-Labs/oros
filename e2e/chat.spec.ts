@@ -166,13 +166,13 @@ describe('chat', () => {
     expect(formattedAmount).toBe(0.2345);
   });
   test('model dropdown interactions', async ({ page }) => {
-    const DEFAULT_MODEL_NAME = 'gpt-4o-mini';
+    const DEFAULT_MODEL_DISPLAY_NAME = 'DeepSeek RI 67TB';
     const NUMBER_OF_SUPPORTED_MODELS = 3;
     const chat = new Chat(page);
     await chat.goto();
 
     const modelButton = page.getByRole('button', { name: 'Select model' });
-    await expect(modelButton).toContainText(DEFAULT_MODEL_NAME);
+    await expect(modelButton).toContainText(DEFAULT_MODEL_DISPLAY_NAME);
 
     // Open dropdown and verify options
     await modelButton.click();
@@ -184,7 +184,7 @@ describe('chat', () => {
     // Select a different model
     const alternativeModel = page.getByRole('option').first();
     const alternativeModelName = await alternativeModel.textContent();
-    expect(alternativeModelName).not.toBe(DEFAULT_MODEL_NAME);
+    expect(alternativeModelName).not.toBe(DEFAULT_MODEL_DISPLAY_NAME);
     await alternativeModel.click();
 
     // Verify dropdown closed and new model selected
@@ -193,9 +193,9 @@ describe('chat', () => {
 
     // // Change back to original model
     await modelButton.click();
-    const originalModel = page.getByRole('option').nth(1);
+    const originalModel = page.getByRole('option').nth(2);
     await originalModel.click();
-    await expect(modelButton).toContainText(DEFAULT_MODEL_NAME);
+    await expect(modelButton).toContainText(DEFAULT_MODEL_DISPLAY_NAME);
 
     // Type message to disable dropdown
     await chat.submitMessage('test message');
