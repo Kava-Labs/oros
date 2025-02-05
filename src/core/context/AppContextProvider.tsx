@@ -76,7 +76,7 @@ export const AppContextProvider = ({
     }
 
     setIsReady(true);
-  }, [setIsReady]);
+  }, []);
 
   return (
     <AppContext.Provider

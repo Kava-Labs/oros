@@ -125,6 +125,7 @@ export const App = () => {
       progressStore,
       toolCallStreamStore,
       messageStore,
+      client,
     ],
   );
 
