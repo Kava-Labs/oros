@@ -112,7 +112,10 @@ const NavBar = ({ setChatHistoryOpen }: NavBarProps) => {
           </button>
 
           {dropdownOpen && (
-            <div className={styles.dropdownMenu}>
+            <div
+              className={styles.dropdownMenu}
+              data-testid="model-dropdown-menu"
+            >
               {getAllModels().map((model) => {
                 const ModelOptionIcon = model.icon;
 

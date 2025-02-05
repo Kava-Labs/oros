@@ -164,4 +164,43 @@ describe('chat', () => {
 
     expect(formattedAmount).toBe(0.2345);
   });
+  test('model dropdown interactions', async ({ page }) => {
+    const NUMBER_OF_SUPPORTED_MODELS = 3;
+    const DEFAULT_MODEL_NAME = 'gpt-4o-mini';
+
+    const chat = new Chat(page);
+    await chat.goto();
+
+    // Check default model
+    const modelButton = page.getByRole('button', { name: 'Select model' });
+    await expect(modelButton).toContainText(DEFAULT_MODEL_NAME);
+
+    // Open dropdown and verify options
+    await modelButton.click();
+    const dropdown = await page.getByTestId('model-dropdown-menu');
+    const dropdownOptions = await page.getByRole('option').all();
+    await expect(dropdown).toBeVisible();
+    expect(dropdownOptions).toHaveLength(NUMBER_OF_SUPPORTED_MODELS);
+
+    // // Select a different model
+    const alternativeModel = page.getByRole('option').first();
+    const newModelName = await alternativeModel.textContent();
+    expect(newModelName).not.toBe(DEFAULT_MODEL_NAME);
+    await alternativeModel.click();
+
+    // Verify dropdown closed and new model selected
+    await expect(dropdown).not.toBeVisible();
+    await expect(modelButton).toContainText(newModelName);
+
+    // // Change back to original model
+    await modelButton.click();
+    const originalModel = page.getByRole('option').nth(1);
+    await originalModel.click();
+    await expect(modelButton).toContainText(DEFAULT_MODEL_NAME);
+
+    // Type message to disable dropdown
+    await chat.submitMessage('test message');
+
+    await expect(modelButton).toBeDisabled();
+  });
 });
