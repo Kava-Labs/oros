@@ -7,7 +7,7 @@ const KavaAILogo = () => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g clip-path="url(#clip0_9_427)">
+      <g clipPath="url(#clip0_9_427)">
         <path
           d="M73.8346 5.24167H79.6891L69.4955 30.46H62.7371L52.5435 5.24167H58.3979L66.0948 24.3826L73.8346 5.24167Z"
           fill="#FF433E"

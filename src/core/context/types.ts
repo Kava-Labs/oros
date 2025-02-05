@@ -4,11 +4,20 @@ import { TextStreamStore } from '../../core/stores/textStreamStore';
 import { ToolCallStreamStore } from '../../core/stores/toolCallStreamStore';
 import { MessageHistoryStore } from '../../core/stores/messageHistoryStore';
 import { ModelConfig, SupportedModels } from '../types/models';
+import type { ChatCompletionMessageParam } from 'openai/resources/index';
 
 export type ExecuteOperation = (
   operationName: string,
   params: unknown,
 ) => Promise<string>;
+
+export type ConversationHistory = {
+  id: string;
+  modelName: string;
+  title: string;
+  conversation: ChatCompletionMessageParam[];
+  lastSaved: number;
+};
 
 export type AppContextType = {
   errorText: string;
@@ -21,6 +30,7 @@ export type AppContextType = {
   modelConfig: ModelConfig;
   handleModelChange: (modelName: SupportedModels) => void;
   executeOperation: ExecuteOperation;
+  loadConversation: (convoHistory: ConversationHistory) => void;
   walletStore: WalletStore;
   messageStore: TextStreamStore;
   toolCallStreamStore: ToolCallStreamStore;

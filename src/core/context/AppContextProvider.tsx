@@ -9,6 +9,8 @@ import { initializeMessageRegistry } from '../../features/blockchain/config/init
 import { useExecuteOperation } from './useExecuteOperation';
 import { DEFAULT_MODEL_NAME, getModelConfig } from '../config/models';
 import { SupportedModels, ModelConfig } from '../types/models';
+import { useMessageSaver } from './useMessageSaver';
+import { ConversationHistory } from './types';
 
 export const AppContextProvider = ({
   children,
@@ -47,6 +49,16 @@ export const AppContextProvider = ({
     walletStore,
   );
 
+  useMessageSaver(messageHistoryStore, modelConfig.name);
+
+  const loadConversation = useCallback(
+    (convoHistory: ConversationHistory) => {
+      messageHistoryStore.loadConversation(convoHistory);
+      handleModelChange(convoHistory.modelName as SupportedModels);
+    },
+    [messageHistoryStore, handleModelChange],
+  );
+
   return (
     <AppContext.Provider
       value={{
@@ -57,6 +69,7 @@ export const AppContextProvider = ({
         toolCallStreamStore,
         modelConfig,
         handleModelChange,
+        loadConversation,
         executeOperation,
         registry,
         errorText,
