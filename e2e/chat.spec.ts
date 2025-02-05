@@ -227,13 +227,15 @@ describe('chat', () => {
     const modelButton = page.getByRole('button', { name: 'Select model' });
     await modelButton.click();
 
-    const gpt4o = page.getByRole('option').filter({ hasText: /^gpt-4o$/ });
+    const blockchainModel = page
+      .getByRole('option')
+      .filter({ hasText: 'Blockchain Instruct' });
     const gpt4oMini = page
       .getByRole('option')
-      .filter({ hasText: /^gpt-4o-mini$/ });
-    const deepseek = page.getByRole('option').filter({ hasText: 'deepseek' });
+      .filter({ hasText: 'Blockchain Instruct - mini' });
+    const deepseek = page.getByRole('option').filter({ hasText: 'Deepseek' });
 
-    await expect(gpt4o).toBeDisabled();
+    await expect(blockchainModel).toBeDisabled();
     await expect(gpt4oMini).toBeDisabled();
     await expect(deepseek).toBeEnabled();
 

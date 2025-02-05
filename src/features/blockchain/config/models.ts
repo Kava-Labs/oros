@@ -19,7 +19,7 @@ export const blockchainModels: Record<
 > = {
   'gpt-4o': {
     id: 'gpt-4o',
-    name: 'Blockchain Interact',
+    name: 'Blockchain Instruct',
     icon: OrosIcon,
     description:
       'A robust and powerful model for executing blockchain-specific actions',
@@ -40,7 +40,7 @@ export const blockchainModels: Record<
   },
   'gpt-4o-mini': {
     id: 'gpt-4o-mini',
-    name: 'gpt-4o-mini',
+    name: 'Blockchain Instruct - mini',
     icon: OrosIcon,
     description: 'A slightly leaner model (can be used in automated testing)',
     tools: messageRegistry.getToolDefinitions(),
