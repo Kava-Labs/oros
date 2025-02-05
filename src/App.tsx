@@ -6,8 +6,6 @@ import {
   useState,
 } from 'react';
 import { ChatView } from './core/components/ChatView';
-import { getToken } from './core/utils/token/token';
-import OpenAI from 'openai';
 import {
   isContentChunk,
   isToolCallChunk,
@@ -25,8 +23,7 @@ import styles from './App.module.css';
 import { ChatHistory } from './core/components/ChatHistory';
 import { useIsMobile } from './shared/theme/useIsMobile';
 import { ModelConfig } from './core/types/models';
-
-let client: OpenAI | null = null;
+import OpenAI from 'openai';
 
 const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
 const isInIframe = window !== window.parent;
@@ -36,7 +33,6 @@ export const App = () => {
   const {
     setErrorText,
     isReady,
-    setIsReady,
     isRequesting,
     setIsRequesting,
     modelConfig,
@@ -44,23 +40,9 @@ export const App = () => {
     messageHistoryStore,
     toolCallStreamStore,
     progressStore,
+    client,
     messageStore,
   } = useAppContext();
-
-  useEffect(() => {
-    try {
-      client = new OpenAI({
-        baseURL: import.meta.env['VITE_OPENAI_BASE_URL'],
-        apiKey: getToken(),
-        dangerouslyAllowBrowser: true,
-      });
-    } catch (err) {
-      console.error(err);
-      return;
-    }
-
-    setIsReady(true);
-  }, [setIsReady]);
 
   const messages = useSyncExternalStore(
     messageHistoryStore.subscribe,
