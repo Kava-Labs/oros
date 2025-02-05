@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import styles from './NavBar.module.css';
-import DeepseekIcon from '../../features/reasoning/assets/DeepseekIcon';
 import KavaAILogo from '../assets/KavaAILogo';
 import HamburgerIcon from '../assets/HamburgerIcon';
 import { isInIframe } from '../utils/isInIframe';
