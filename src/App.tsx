@@ -204,11 +204,11 @@ async function doChat(
   executeOperation: ExecuteOperation,
 ) {
   progressStore.setText('Thinking');
-  const { name, tools } = modelConfig;
+  const { id, tools } = modelConfig;
   try {
     const stream = await client.chat.completions.create(
       {
-        model: name,
+        model: id,
         messages: messageHistoryStore.getSnapshot(),
         tools: tools,
         stream: true,
