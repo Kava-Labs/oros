@@ -9,10 +9,7 @@ import {
   ChainType,
   OperationType,
 } from '../../../../types/chain';
-import {
-  getCoinRecord,
-  getERC20Record,
-} from '../../../../../../utils/chat/helpers';
+import { getCoinRecord, getERC20Record } from '../../../../utils/chat/helpers';
 import {
   SignatureTypes,
   WalletStore,

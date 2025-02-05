@@ -1,8 +1,5 @@
 import { erc20ABI } from '../../../utils/erc20ABI';
-import {
-  getERC20Record,
-  getStoredMasks,
-} from '../../../../../utils/chat/helpers';
+import { getERC20Record, getStoredMasks } from '../../../utils/chat/helpers';
 import { InProgressTxDisplay } from '../../../components/displayCards';
 import { ChainMessage, OperationType, ChainType } from '../../../types/chain';
 import {
