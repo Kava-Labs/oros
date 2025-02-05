@@ -1,5 +1,5 @@
 import { BlockchainModelConfig } from '../../../core/types/models';
-import KavaIcon from '../../../core/assets/KavaIcon';
+import { OrosIcon } from '../assets/OrosIcon';
 import {
   CompleteQueryDisplay,
   CompleteTxDisplay,
@@ -11,7 +11,7 @@ import { blockchainMessageProcessor } from './messageProcessing';
 
 const messageRegistry = initializeMessageRegistry();
 
-export type SupportedBlockchainModels = 'gpt-4o' | 'gpt-4o-mini';
+export type SupportedBlockchainModels = 'gpt-4o'; //| 'gpt-4o-mini';
 
 export const blockchainModels: Record<
   SupportedBlockchainModels,
@@ -19,8 +19,8 @@ export const blockchainModels: Record<
 > = {
   'gpt-4o': {
     id: 'gpt-4o',
-    name: 'gpt-4o',
-    icon: KavaIcon,
+    name: 'Blockchain Instruct',
+    icon: OrosIcon,
     description:
       'A robust and powerful model for executing blockchain-specific actions',
     tools: messageRegistry.getToolDefinitions(),
@@ -38,24 +38,24 @@ export const blockchainModels: Record<
     },
     messageProcessors: blockchainMessageProcessor,
   },
-  'gpt-4o-mini': {
-    id: 'gpt-4o-mini',
-    name: 'gpt-4o-mini',
-    icon: KavaIcon,
-    description: 'A slightly leaner model (can be used in automated testing)',
-    tools: messageRegistry.getToolDefinitions(),
-    systemPrompt: messageRegistry.getSystemPrompt(),
-    introText: messageRegistry.getIntroText(),
-    components: {
-      transaction: {
-        inProgress: InProgressTxDisplay,
-        complete: CompleteTxDisplay,
-      },
-      query: {
-        inProgress: InProgressQueryDisplay,
-        complete: CompleteQueryDisplay,
-      },
-    },
-    messageProcessors: blockchainMessageProcessor,
-  },
+  // 'gpt-4o-mini': {
+  //   id: 'gpt-4o-mini',
+  //   name: 'Blockchain Instruct - mini',
+  //   icon: OrosIcon,
+  //   description: 'A slightly leaner model (can be used in automated testing)',
+  //   tools: messageRegistry.getToolDefinitions(),
+  //   systemPrompt: messageRegistry.getSystemPrompt(),
+  //   introText: messageRegistry.getIntroText(),
+  //   components: {
+  //     transaction: {
+  //       inProgress: InProgressTxDisplay,
+  //       complete: CompleteTxDisplay,
+  //     },
+  //     query: {
+  //       inProgress: InProgressQueryDisplay,
+  //       complete: CompleteQueryDisplay,
+  //     },
+  //   },
+  //   messageProcessors: blockchainMessageProcessor,
+  // },
 };

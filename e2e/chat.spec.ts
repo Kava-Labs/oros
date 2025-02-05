@@ -179,7 +179,7 @@ describe('chat', () => {
   });
   test('model dropdown interactions', async ({ page }) => {
     const DEFAULT_MODEL_DISPLAY_NAME = 'DeepSeek RI 67TB';
-    const NUMBER_OF_SUPPORTED_MODELS = 3;
+    const NUMBER_OF_SUPPORTED_MODELS = 2;
     const chat = new Chat(page);
     await chat.goto();
 
@@ -205,7 +205,7 @@ describe('chat', () => {
 
     // // Change back to original model
     await modelButton.click();
-    const originalModel = page.getByRole('option').nth(2);
+    const originalModel = page.getByRole('option').nth(1);
     await originalModel.click();
     await expect(modelButton).toContainText(DEFAULT_MODEL_DISPLAY_NAME);
 
@@ -227,14 +227,16 @@ describe('chat', () => {
     const modelButton = page.getByRole('button', { name: 'Select model' });
     await modelButton.click();
 
-    const gpt4o = page.getByRole('option').filter({ hasText: /^gpt-4o$/ });
-    const gpt4oMini = page
+    const blockchainModel = page
       .getByRole('option')
-      .filter({ hasText: /^gpt-4o-mini$/ });
-    const deepseek = page.getByRole('option').filter({ hasText: 'deepseek' });
+      .filter({ hasText: 'Blockchain Instruct' });
+    // const gpt4oMini = page
+    //   .getByRole('option')
+    //   .filter({ hasText: 'Blockchain Instruct - mini' });
+    const deepseek = page.getByRole('option').filter({ hasText: 'Deepseek' });
 
-    await expect(gpt4o).toBeDisabled();
-    await expect(gpt4oMini).toBeDisabled();
+    await expect(blockchainModel).toBeDisabled();
+    // await expect(gpt4oMini).toBeDisabled();
     await expect(deepseek).toBeEnabled();
 
     await context.close();
