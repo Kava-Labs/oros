@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import styles from './NavBar.module.css';
-import KavaAILogo from '../../shared/assets/KavaAILogo';
-import HamburgerIcon from '../../shared/assets/HamburgerIcon';
+import KavaAILogo from '../assets/KavaAILogo';
+import HamburgerIcon from '../assets/HamburgerIcon';
 import { isInIframe } from '../utils/isInIframe';
 import { useAppContext } from '../context/useAppContext';
 import { getAllModels } from '../config/models';
