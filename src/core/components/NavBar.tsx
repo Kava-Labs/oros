@@ -8,7 +8,12 @@ import { getAllModels } from '../config/models';
 
 const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
 
-const NavBar = () => {
+type NavBarProps = {
+  chatHistoryOpen: boolean;
+  setChatHistoryOpen: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const NavBar = (props: NavBarProps) => {
   const isIframe = isInIframe();
   const showNavBar = !isIframe && FEAT_UPDATED_DESIGN;
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -22,7 +27,12 @@ const NavBar = () => {
     <div className={styles.container}>
       <nav className={styles.nav}>
         <div className={styles.menu}>
-          <div className={styles.hamburger}>
+          <div
+            className={styles.hamburger}
+            onClick={() => {
+              props.setChatHistoryOpen((prev) => !prev);
+            }}
+          >
             <HamburgerIcon />
           </div>
           <div className={styles.logo}>

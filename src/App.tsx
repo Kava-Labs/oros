@@ -1,4 +1,10 @@
-import { useRef, useEffect, useCallback, useSyncExternalStore } from 'react';
+import {
+  useRef,
+  useEffect,
+  useCallback,
+  useSyncExternalStore,
+  useState,
+} from 'react';
 import { ChatView } from './core/components/ChatView';
 import { getToken } from './core/utils/token/token';
 import OpenAI from 'openai';
@@ -17,6 +23,7 @@ import { ExecuteOperation } from './core/context/types';
 import NavBar from './core/components/NavBar';
 import styles from './App.module.css';
 import { ChatHistory } from './core/components/ChatHistory';
+import { useIsMobile } from './shared/theme/useIsMobile';
 import { ModelConfig } from './core/types/models';
 
 let client: OpenAI | null = null;
@@ -154,22 +161,41 @@ export const App = () => {
     ]);
   }, [handleCancel, messageHistoryStore, modelConfig.systemPrompt]);
 
+  const isMobile = useIsMobile();
+  const [chatHistoryOpen, setChatHistoryOpen] = useState(false);
+
+  useEffect(() => {
+    // when not on mobile the toggle should always be reset back to false
+    if (!isMobile && chatHistoryOpen) {
+      setChatHistoryOpen(false);
+    }
+  }, [chatHistoryOpen, isMobile]);
+
   return (
     <>
       {isReady && (
         <div className={styles.appContent}>
-          <NavBar />
+          <NavBar
+            chatHistoryOpen={chatHistoryOpen}
+            setChatHistoryOpen={setChatHistoryOpen}
+          />
           {showHistorySidebar ? (
             <div className={styles.appContainer}>
-              <ChatHistory />
-              <ChatView
-                introText={modelConfig.introText}
-                cautionText={defaultCautionText}
-                messages={messages}
-                onSubmit={handleChatCompletion}
-                onReset={handleReset}
-                onCancel={handleCancel}
-              />
+              {!isMobile ? (
+                <ChatHistory />
+              ) : chatHistoryOpen ? (
+                <ChatHistory />
+              ) : null}
+              {!chatHistoryOpen ? (
+                <ChatView
+                  introText={modelConfig.introText}
+                  cautionText={defaultCautionText}
+                  messages={messages}
+                  onSubmit={handleChatCompletion}
+                  onReset={handleReset}
+                  onCancel={handleCancel}
+                />
+              ) : null}
             </div>
           ) : (
             <ChatView
