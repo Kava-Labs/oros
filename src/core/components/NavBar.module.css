@@ -90,6 +90,15 @@
   background-color: #333333;
 }
 
+.dropdownItem:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #1a1a1a;
+}
+
+.dropdownItem:disabled:hover {
+  background-color: #1a1a1a;
+}
 .arrowDown {
   transform: rotate(0deg);
   transition: transform 0.2s ease-in-out;
