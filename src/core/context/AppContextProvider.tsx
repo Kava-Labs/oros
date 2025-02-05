@@ -48,8 +48,8 @@ export const AppContextProvider = ({
     walletStore,
   );
 
-  useMessageSaver(messageHistoryStore, modelConfig);
-  
+  useMessageSaver(messageHistoryStore, modelConfig.name);
+
   return (
     <AppContext.Provider
       value={{
