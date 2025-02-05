@@ -2,6 +2,7 @@ import { describe, expect, test, retryButtonClick } from './fixtures';
 import { Chat } from './Chat';
 import { MetaMask } from './Metamask';
 import { ethers } from 'ethers';
+import { devices } from '@playwright/test';
 
 describe('chat', () => {
   test('renders intro message', async ({ page }) => {
@@ -163,5 +164,67 @@ describe('chat', () => {
     const formattedAmount = Number(amount) / USDT_DECIMALS;
 
     expect(formattedAmount).toBe(0.2345);
+  });
+  test('model dropdown interactions', async ({ page }) => {
+    const DEFAULT_MODEL_NAME = 'gpt-4o-mini';
+    const NUMBER_OF_SUPPORTED_MODELS = 3;
+    const chat = new Chat(page);
+    await chat.goto();
+
+    const modelButton = page.getByRole('button', { name: 'Select model' });
+    await expect(modelButton).toContainText(DEFAULT_MODEL_NAME);
+
+    // Open dropdown and verify options
+    await modelButton.click();
+    const dropdown = page.getByTestId('model-dropdown-menu');
+    const dropdownOptions = await page.getByRole('option').all();
+    await expect(dropdown).toBeVisible();
+    expect(dropdownOptions).toHaveLength(NUMBER_OF_SUPPORTED_MODELS);
+
+    // Select a different model
+    const alternativeModel = page.getByRole('option').first();
+    const alternativeModelName = await alternativeModel.textContent();
+    expect(alternativeModelName).not.toBe(DEFAULT_MODEL_NAME);
+    await alternativeModel.click();
+
+    // Verify dropdown closed and new model selected
+    await expect(dropdown).not.toBeVisible();
+    await expect(modelButton).toContainText(alternativeModelName);
+
+    // // Change back to original model
+    await modelButton.click();
+    const originalModel = page.getByRole('option').nth(1);
+    await originalModel.click();
+    await expect(modelButton).toContainText(DEFAULT_MODEL_NAME);
+
+    // Type message to disable dropdown
+    await chat.submitMessage('test message');
+
+    await expect(modelButton).toBeDisabled();
+  });
+  test('model dropdown interactions in mobile', async ({ browser }) => {
+    const context = await browser.newContext({
+      ...devices['iPhone 13'],
+    });
+
+    const page = await context.newPage();
+
+    const chat = new Chat(page);
+    await chat.goto();
+
+    const modelButton = page.getByRole('button', { name: 'Select model' });
+    await modelButton.click();
+
+    const gpt4o = page.getByRole('option').filter({ hasText: /^gpt-4o$/ });
+    const gpt4oMini = page
+      .getByRole('option')
+      .filter({ hasText: /^gpt-4o-mini$/ });
+    const deepseek = page.getByRole('option').filter({ hasText: 'deepseek' });
+
+    await expect(gpt4o).toBeDisabled();
+    await expect(gpt4oMini).toBeDisabled();
+    await expect(deepseek).toBeEnabled();
+
+    await context.close();
   });
 });

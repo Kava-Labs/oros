@@ -1,36 +1,28 @@
-import { useState } from 'react';
 import styles from './NavBar.module.css';
 import KavaAILogo from '../assets/KavaAILogo';
 import HamburgerIcon from '../assets/HamburgerIcon';
 import { isInIframe } from '../utils/isInIframe';
-import { useAppContext } from '../context/useAppContext';
-import { getAllModels } from '../config/models';
+import ModelSelector from './ModelSelector';
 
 const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
 
-type NavBarProps = {
-  chatHistoryOpen: boolean;
+interface NavBarProps {
   setChatHistoryOpen: React.Dispatch<React.SetStateAction<boolean>>;
-};
+}
 
-const NavBar = (props: NavBarProps) => {
-  const isIframe = isInIframe();
-  const showNavBar = !isIframe && FEAT_UPDATED_DESIGN;
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const { modelConfig, handleModelChange } = useAppContext();
+const NavBar = ({ setChatHistoryOpen }: NavBarProps) => {
+  const showNavBar = !isInIframe() && FEAT_UPDATED_DESIGN;
 
   if (!showNavBar) return null;
 
-  const ModelIconComponent = modelConfig.icon;
-
   return (
     <div className={styles.container}>
-      <nav className={styles.nav}>
+      <nav className={styles.nav} role="navigation">
         <div className={styles.menu}>
           <div
             className={styles.hamburger}
             onClick={() => {
-              props.setChatHistoryOpen((prev) => !prev);
+              setChatHistoryOpen((prev) => !prev);
             }}
           >
             <HamburgerIcon />
@@ -39,49 +31,8 @@ const NavBar = (props: NavBarProps) => {
             <KavaAILogo />
           </div>
         </div>
-
         <div className={styles.dropdownContainer}>
-          <button
-            className={styles.dropdown}
-            onClick={() => setDropdownOpen(!dropdownOpen)}
-          >
-            <ModelIconComponent />
-            <span>{modelConfig.name}</span>
-            <svg
-              width="16"
-              height="16"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              className={dropdownOpen ? styles.arrowUp : styles.arrowDown}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </button>
-
-          {dropdownOpen && (
-            <div className={styles.dropdownMenu}>
-              {getAllModels().map((model) => {
-                const ModelOptionIcon = model.icon;
-
-                return (
-                  <button
-                    key={model.name}
-                    className={styles.dropdownItem}
-                    onClick={() => handleModelChange(model.id)}
-                  >
-                    <ModelOptionIcon />
-                    <span>{model.name}</span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
+          <ModelSelector />
         </div>
       </nav>
     </div>

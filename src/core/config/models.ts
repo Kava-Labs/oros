@@ -10,7 +10,7 @@ export const MODEL_REGISTRY: ModelRegistry = {
   reasoning: reasoningModels,
 };
 
-const isBlockchainModelName = (
+export const isBlockchainModelName = (
   name: SupportedModels,
 ): name is SupportedBlockchainModels => {
   return Object.keys(MODEL_REGISTRY.blockchain).includes(name);
@@ -39,3 +39,5 @@ export const getAllModels = (): ModelConfig[] => {
     ...Object.values(MODEL_REGISTRY.reasoning),
   ];
 };
+
+export const DEFAULT_MODEL_NAME = 'gpt-4o-mini';
