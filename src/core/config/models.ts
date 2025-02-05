@@ -40,4 +40,6 @@ export const getAllModels = (): ModelConfig[] => {
   ];
 };
 
-export const DEFAULT_MODEL_NAME = 'deepseek-chat';
+export const DEFAULT_MODEL_NAME = import.meta.env.VITE_FEAT_UPDATED_DESIGN
+  ? 'deepseek-chat'
+  : 'gpt-4o';
