@@ -2,6 +2,7 @@ import { describe, expect, test, retryButtonClick } from './fixtures';
 import { Chat } from './Chat';
 import { MetaMask } from './Metamask';
 import { ethers } from 'ethers';
+import { devices } from '@playwright/test';
 
 describe('chat', () => {
   test('renders intro message', async ({ page }) => {
@@ -202,5 +203,30 @@ describe('chat', () => {
     await chat.submitMessage('test message');
 
     await expect(modelButton).toBeDisabled();
+  });
+  test('model dropdown interactions in mobile', async ({ browser }) => {
+    const context = await browser.newContext({
+      ...devices['iPhone 13'],
+    });
+
+    const page = await context.newPage();
+
+    const chat = new Chat(page);
+    await chat.goto();
+
+    const modelButton = page.getByRole('button', { name: 'Select model' });
+    await modelButton.click();
+
+    const gpt4o = page.getByRole('option').filter({ hasText: /^gpt-4o$/ });
+    const gpt4oMini = page
+      .getByRole('option')
+      .filter({ hasText: /^gpt-4o-mini$/ });
+    const deepseek = page.getByRole('option').filter({ hasText: 'deepseek' });
+
+    await expect(gpt4o).toBeDisabled();
+    await expect(gpt4oMini).toBeDisabled();
+    await expect(deepseek).toBeEnabled();
+
+    await context.close();
   });
 });

@@ -1,5 +1,5 @@
 import styles from './NavBar.module.css';
-import { getAllModels } from '../config/models';
+import { getAllModels, isBlockchainModelName } from '../config/models';
 import { ModelConfig } from '../types/models';
 import { useAppContext } from '../context/useAppContext';
 
@@ -43,7 +43,8 @@ const ModelDropdownExpanded = ({ setDropdownOpen }: ModelDropdownProps) => {
       {getAllModels().map((model) => {
         const ModelOptionIcon = model.icon;
 
-        const disableOption = isMobile && model.id !== 'deepseek-chat';
+        //  since we don't support metamask on mobile, don't allow a user to switch to blockchain models
+        const disableOption = isMobile && isBlockchainModelName(model.id);
 
         return (
           <button

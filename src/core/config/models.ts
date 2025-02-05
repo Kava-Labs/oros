@@ -10,7 +10,7 @@ export const MODEL_REGISTRY: ModelRegistry = {
   reasoning: reasoningModels,
 };
 
-const isBlockchainModelName = (
+export const isBlockchainModelName = (
   name: SupportedModels,
 ): name is SupportedBlockchainModels => {
   return Object.keys(MODEL_REGISTRY.blockchain).includes(name);
