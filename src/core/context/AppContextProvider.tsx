@@ -9,6 +9,7 @@ import { initializeMessageRegistry } from '../../features/blockchain/config/init
 import { useExecuteOperation } from './useExecuteOperation';
 import { getModelConfig } from '../config/models';
 import { SupportedModels, ModelConfig } from '../types/models';
+import { useMessageSaver } from './useMessageSaver';
 
 export const AppContextProvider = ({
   children,
@@ -47,6 +48,8 @@ export const AppContextProvider = ({
     walletStore,
   );
 
+  useMessageSaver(messageHistoryStore, modelConfig);
+  
   return (
     <AppContext.Provider
       value={{
