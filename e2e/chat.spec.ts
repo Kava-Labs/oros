@@ -7,8 +7,6 @@ import {
   DEFAULT_MODEL_NAME,
   NUMBER_OF_SUPPORTED_MODELS,
 } from '../src/core/config/models';
-import { blockchainModels } from '../src/features/blockchain/config/models';
-import { reasoningModels } from '../src/features/reasoning/config/models';
 
 describe('chat', () => {
   test('renders intro message', async ({ page }) => {
@@ -175,26 +173,25 @@ describe('chat', () => {
     const chat = new Chat(page);
     await chat.goto();
 
-    // Check default model
     const modelButton = page.getByRole('button', { name: 'Select model' });
     await expect(modelButton).toContainText(DEFAULT_MODEL_NAME);
 
     // Open dropdown and verify options
     await modelButton.click();
-    const dropdown = await page.getByTestId('model-dropdown-menu');
+    const dropdown = page.getByTestId('model-dropdown-menu');
     const dropdownOptions = await page.getByRole('option').all();
     await expect(dropdown).toBeVisible();
     expect(dropdownOptions).toHaveLength(NUMBER_OF_SUPPORTED_MODELS);
 
-    // // Select a different model
+    // Select a different model
     const alternativeModel = page.getByRole('option').first();
-    const newModelName = await alternativeModel.textContent();
-    expect(newModelName).not.toBe(DEFAULT_MODEL_NAME);
+    const alternativeModelName = await alternativeModel.textContent();
+    expect(alternativeModelName).not.toBe(DEFAULT_MODEL_NAME);
     await alternativeModel.click();
 
     // Verify dropdown closed and new model selected
     await expect(dropdown).not.toBeVisible();
-    await expect(modelButton).toContainText(newModelName);
+    await expect(modelButton).toContainText(alternativeModelName);
 
     // // Change back to original model
     await modelButton.click();
