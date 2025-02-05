@@ -1,5 +1,5 @@
 import { BlockchainModelConfig } from '../../../core/types/models';
-import OrosIcon from '../assets/OrosIcon';
+import KavaIcon from '../../../core/assets/KavaIcon';
 import {
   CompleteQueryDisplay,
   CompleteTxDisplay,
@@ -19,7 +19,7 @@ export const blockchainModels: Record<
   'gpt-4o': {
     id: 'gpt-4o',
     name: 'gpt-4o',
-    icon: OrosIcon,
+    icon: KavaIcon,
     description:
       'A robust and powerful model for executing blockchain-specific actions',
     tools: messageRegistry.getToolDefinitions(),
@@ -39,7 +39,7 @@ export const blockchainModels: Record<
   'gpt-4o-mini': {
     id: 'gpt-4o-mini',
     name: 'gpt-4o-mini',
-    icon: OrosIcon,
+    icon: KavaIcon,
     description: 'A slightly leaner model (can be used in automated testing)',
     tools: messageRegistry.getToolDefinitions(),
     systemPrompt: messageRegistry.getSystemPrompt(),
