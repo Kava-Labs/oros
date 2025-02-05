@@ -3,10 +3,6 @@ import { Chat } from './Chat';
 import { MetaMask } from './Metamask';
 import { ethers } from 'ethers';
 import { devices } from '@playwright/test';
-import {
-  DEFAULT_MODEL_NAME,
-  NUMBER_OF_SUPPORTED_MODELS,
-} from '../src/core/config/models';
 
 describe('chat', () => {
   test('renders intro message', async ({ page }) => {
@@ -170,6 +166,8 @@ describe('chat', () => {
     expect(formattedAmount).toBe(0.2345);
   });
   test('model dropdown interactions', async ({ page }) => {
+    const DEFAULT_MODEL_NAME = 'gpt-4o-mini';
+    const NUMBER_OF_SUPPORTED_MODELS = 3;
     const chat = new Chat(page);
     await chat.goto();
 
