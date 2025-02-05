@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { AppContext } from './AppContext';
 import { OperationRegistry } from '../../features/blockchain/services/registry';
 import { WalletStore } from '../../features/blockchain/stores/walletStore';
@@ -11,6 +11,10 @@ import { DEFAULT_MODEL_NAME, getModelConfig } from '../config/models';
 import { SupportedModels, ModelConfig } from '../types/models';
 import { useMessageSaver } from './useMessageSaver';
 import { ConversationHistory } from './types';
+import { getToken } from '../../core/utils/token/token';
+import OpenAI from 'openai';
+
+let client: OpenAI | null = null;
 
 export const AppContextProvider = ({
   children,
@@ -59,9 +63,25 @@ export const AppContextProvider = ({
     [messageHistoryStore, handleModelChange],
   );
 
+  useEffect(() => {
+    try {
+      client = new OpenAI({
+        baseURL: import.meta.env['VITE_OPENAI_BASE_URL'],
+        apiKey: getToken(),
+        dangerouslyAllowBrowser: true,
+      });
+    } catch (err) {
+      console.error(err);
+      return;
+    }
+
+    setIsReady(true);
+  }, []);
+
   return (
     <AppContext.Provider
       value={{
+        client,
         messageHistoryStore,
         messageStore,
         progressStore,
