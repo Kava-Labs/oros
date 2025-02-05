@@ -9,6 +9,9 @@ describe('chat', () => {
     const chat = new Chat(page);
     await chat.goto();
 
+    //  todo - remove when the default (reasoning) model is functioning
+    await chat.switchToBlockchainModel();
+
     expect(chat.messageContainer).not.toBeNull();
 
     await expect(page.getByText("let's get started").first()).toBeVisible();
@@ -25,6 +28,9 @@ describe('chat', () => {
 
     const chat = new Chat(page);
     await chat.goto();
+
+    //  todo - remove when the default (reasoning) model is functioning
+    await chat.switchToBlockchainModel();
 
     await chat.submitMessage(
       'This is an automated test suite, please respond with the exact text: THIS IS A TEST',
@@ -49,6 +55,8 @@ describe('chat', () => {
 
     const chat = new Chat(page);
     await chat.goto();
+
+    await chat.switchToBlockchainModel();
 
     const metaMask = await MetaMask.prepareWallet(context, metaMaskExtensionId);
 
@@ -85,6 +93,8 @@ describe('chat', () => {
 
     const chat = new Chat(page);
     await chat.goto();
+
+    await chat.switchToBlockchainModel();
 
     const metaMask = await MetaMask.prepareWallet(context, metaMaskExtensionId);
 
@@ -127,6 +137,8 @@ describe('chat', () => {
 
     const chat = new Chat(page);
     await chat.goto();
+
+    await chat.switchToBlockchainModel();
 
     const metaMask = await MetaMask.prepareWallet(context, metaMaskExtensionId);
 
