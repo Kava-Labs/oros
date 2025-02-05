@@ -21,7 +21,6 @@ const NavBar = ({ setChatHistoryOpen }: NavBarProps) => {
     useAppContext();
 
   const ModelIconComponent = modelConfig.icon;
-
   const [isDisabled, setIsDisabled] = useState(false);
 
   // Handle closing dropdown when clicking outside
@@ -52,48 +51,6 @@ const NavBar = ({ setChatHistoryOpen }: NavBarProps) => {
       setIsDisabled(false);
     }
   }, [hasUserMessages]);
-
-  // Keyboard navigation
-  // useEffect(() => {
-  //   const handleKeyDown = (e: KeyboardEvent) => {
-  //     if (!dropdownOpen) return;
-  //
-  //     switch (e.key) {
-  //       case 'Escape':
-  //         setDropdownOpen(false);
-  //         break;
-  //       case 'ArrowDown': {
-  //         e.preventDefault();
-  //         const currentIndex = modelOptions.findIndex(
-  //           (m) => m.id === selectedModel.id,
-  //         );
-  //         const nextIndex = (currentIndex + 1) % modelOptions.length;
-  //         setSelectedModel(modelOptions[nextIndex]);
-  //         break;
-  //       }
-  //       case 'ArrowUp': {
-  //         e.preventDefault();
-  //         const currIndex = modelOptions.findIndex(
-  //           (m) => m.id === selectedModel.id,
-  //         );
-  //         const prevIndex =
-  //           currIndex === 0 ? modelOptions.length - 1 : currIndex - 1;
-  //         setSelectedModel(modelOptions[prevIndex]);
-  //         break;
-  //       }
-  //     }
-  //   };
-  //
-  //   if (dropdownOpen) {
-  //     window.addEventListener('keydown', handleKeyDown);
-  //     return () => window.removeEventListener('keydown', handleKeyDown);
-  //   }
-  // }, [dropdownOpen, selectedModel]);
-  //
-  // const handleSelect = useCallback((model: ModelOption) => {
-  //   setSelectedModel(model);
-  //   setDropdownOpen(false);
-  // }, []);
 
   const toggleDropdown = useCallback(() => {
     if (!isDisabled) {
@@ -164,6 +121,7 @@ const NavBar = ({ setChatHistoryOpen }: NavBarProps) => {
                     key={model.name}
                     className={styles.dropdownItem}
                     onClick={() => handleModelClick(model)}
+                    role="option"
                   >
                     <ModelOptionIcon />
                     <span>{model.name}</span>
