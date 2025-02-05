@@ -1,15 +1,9 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import styles from './ChatView.module.css';
-import {
-  CancelChatIcon,
-  ResetChatIcon,
-  SendChatIcon,
-} from '../../shared/assets';
+import { CancelChatIcon, ResetChatIcon, SendChatIcon } from '../assets';
 import { useTheme } from '../../shared/theme/useTheme';
 import { Conversation } from './Conversation';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
-import { maskAddresses } from '../../utils/chat/maskAddresses';
-import { getStoredMasks, updateStoredMasks } from '../../utils/chat/helpers';
 import { useAppContext } from '../context/useAppContext';
 import { isInIframe } from '../utils/isInIframe';
 
@@ -32,7 +26,7 @@ export const ChatView = ({
   onCancel,
   introText,
 }: ChatViewProps) => {
-  const { isRequesting } = useAppContext();
+  const { isRequesting, modelConfig } = useAppContext();
   const hasMessages =
     messages.filter((message) => message.role != 'system').length > 0;
 
@@ -68,22 +62,18 @@ export const ChatView = ({
       return;
     }
 
-    if (inputValue == '') {
+    if (inputValue === '') {
       return;
     }
 
-    const storedMasks = getStoredMasks();
-    const { output, masksToValues, valuesToMasks } = maskAddresses(
-      inputValue,
-      storedMasks.valuesToMasks,
-      storedMasks.masksToValues,
-    );
+    let processedMessage = inputValue;
+    if (modelConfig.messageProcessors?.preProcess) {
+      processedMessage = modelConfig.messageProcessors.preProcess(inputValue);
+    }
 
-    updateStoredMasks(masksToValues, valuesToMasks);
-
-    onSubmit(output);
+    onSubmit(processedMessage);
     setInputValue('');
-  }, [isRequesting, inputValue, onSubmit, onCancel]);
+  }, [isRequesting, inputValue, onSubmit, onCancel, modelConfig]);
 
   const buttonRef = useRef<HTMLButtonElement>(null);
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {

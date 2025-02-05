@@ -3,8 +3,14 @@ import { ComponentType } from 'react';
 import { SupportedBlockchainModels } from '../../features/blockchain/config/models';
 import { SupportedReasoningModels } from '../../features/reasoning/config/models';
 
+export type SupportedModels =
+  | SupportedBlockchainModels
+  | SupportedReasoningModels;
+
 export interface BaseModelConfig {
+  id: SupportedModels;
   name: string;
+  icon: ComponentType;
   description: string;
   tools: ChatCompletionTool[];
   systemPrompt: string;
@@ -23,12 +29,22 @@ export interface BaseModelConfig {
       complete: ComponentType<any>;
     };
   };
+  messageProcessors?: {
+    preProcess?: (message: string) => string;
+    postProcess?: (message: string) => string;
+  };
 }
 export interface BlockchainModelConfig extends BaseModelConfig {
   tools: ChatCompletionTool[];
+  messageProcessors: {
+    preProcess: (message: string) => string;
+    postProcess: (message: string) => string;
+  };
 }
 
 export type ReasoningModelConfig = BaseModelConfig;
+
+export type ModelConfig = BlockchainModelConfig | ReasoningModelConfig;
 
 export interface ModelRegistry {
   blockchain: Record<SupportedBlockchainModels, BlockchainModelConfig>;

@@ -1,4 +1,5 @@
 import { BlockchainModelConfig } from '../../../core/types/models';
+import KavaIcon from '../../../core/assets/KavaIcon';
 import {
   CompleteQueryDisplay,
   CompleteTxDisplay,
@@ -6,6 +7,7 @@ import {
   InProgressTxDisplay,
 } from '../components/displayCards';
 import { initializeMessageRegistry } from './initializeMessageRegistry';
+import { blockchainMessageProcessor } from './messageProcessing';
 
 const messageRegistry = initializeMessageRegistry();
 
@@ -16,7 +18,9 @@ export const blockchainModels: Record<
   BlockchainModelConfig
 > = {
   'gpt-4o': {
+    id: 'gpt-4o',
     name: 'gpt-4o',
+    icon: KavaIcon,
     description:
       'A robust and powerful model for executing blockchain-specific actions',
     tools: messageRegistry.getToolDefinitions(),
@@ -32,9 +36,12 @@ export const blockchainModels: Record<
         complete: CompleteQueryDisplay,
       },
     },
+    messageProcessors: blockchainMessageProcessor,
   },
   'gpt-4o-mini': {
+    id: 'gpt-4o-mini',
     name: 'gpt-4o-mini',
+    icon: KavaIcon,
     description: 'A slightly leaner model (can be used in automated testing)',
     tools: messageRegistry.getToolDefinitions(),
     systemPrompt: messageRegistry.getSystemPrompt(),
@@ -49,5 +56,6 @@ export const blockchainModels: Record<
         complete: CompleteQueryDisplay,
       },
     },
+    messageProcessors: blockchainMessageProcessor,
   },
 };
