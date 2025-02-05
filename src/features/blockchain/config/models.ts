@@ -6,6 +6,7 @@ import {
   InProgressTxDisplay,
 } from '../components/displayCards';
 import { initializeMessageRegistry } from './initializeMessageRegistry';
+import { blockchainMessageProcessor } from './messageProcessing';
 
 const messageRegistry = initializeMessageRegistry();
 
@@ -32,6 +33,7 @@ export const blockchainModels: Record<
         complete: CompleteQueryDisplay,
       },
     },
+    messageProcessors: blockchainMessageProcessor,
   },
   'gpt-4o-mini': {
     name: 'gpt-4o-mini',
@@ -49,5 +51,6 @@ export const blockchainModels: Record<
         complete: CompleteQueryDisplay,
       },
     },
+    messageProcessors: blockchainMessageProcessor,
   },
 };

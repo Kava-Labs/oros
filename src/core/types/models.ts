@@ -27,9 +27,17 @@ export interface BaseModelConfig {
       complete: ComponentType<any>;
     };
   };
+  messageProcessors?: {
+    preProcess?: (message: string) => string;
+    postProcess?: (message: string) => string;
+  };
 }
 export interface BlockchainModelConfig extends BaseModelConfig {
   tools: ChatCompletionTool[];
+  messageProcessors: {
+    preProcess: (message: string) => string;
+    postProcess: (message: string) => string;
+  };
 }
 
 export type ReasoningModelConfig = BaseModelConfig;
