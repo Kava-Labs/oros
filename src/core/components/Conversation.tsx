@@ -33,8 +33,18 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
   const { errorText, isRequesting, progressStore, messageStore, registry } =
     useAppContext();
 
+  const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
+  /* FEAT_UPDATED_DESIGN TODO: when this goes live:
+     - update the #conversation id in chat view to have:   margin-top: 10px;
+     - remove style={ on the div}}
+  
+  */
   return (
-    <div id={styles.conversation} data-testid="conversation">
+    <div
+      id={styles.conversation}
+      data-testid="conversation"
+      style={{ marginTop: FEAT_UPDATED_DESIGN ? '10px' : '-10px' }}
+    >
       {messages.map((message, index) => {
         if (message.role === 'user') {
           return (

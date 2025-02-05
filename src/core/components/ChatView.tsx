@@ -125,15 +125,20 @@ export const ChatView = ({
       >
         {hasMessages && (
           <>
-            <div id={styles.stickyHeader}>
-              <button
-                id={styles.resetButton}
-                aria-label="Reset Chat"
-                onClick={onReset}
-              >
-                <ResetChatIcon color={colors.accentTransparent} />
-              </button>
-            </div>
+            {/* Important: When this goes live, the conditional to render ResetChatIcon will change.
+                       We only want to show this trash can in the iframe: !FEAT_UPDATED_DESIGN wil change to  isIframe
+             */}
+            {!FEAT_UPDATED_DESIGN && (
+              <div id={styles.stickyHeader}>
+                <button
+                  id={styles.resetButton}
+                  aria-label="Reset Chat"
+                  onClick={onReset}
+                >
+                  <ResetChatIcon color={colors.accentTransparent} />
+                </button>
+              </div>
+            )}
 
             <Conversation
               messages={messages}
