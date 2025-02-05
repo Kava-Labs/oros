@@ -8,6 +8,7 @@ import {
 } from '../components/displayCards';
 import { initializeMessageRegistry } from './initializeMessageRegistry';
 import { blockchainMessageProcessor } from './messageProcessing';
+import OrosIcon from '../../../core/assets/OrosIcon';
 
 const messageRegistry = initializeMessageRegistry();
 
@@ -19,8 +20,8 @@ export const blockchainModels: Record<
 > = {
   'gpt-4o': {
     id: 'gpt-4o',
-    name: 'gpt-4o',
-    icon: KavaIcon,
+    name: 'Blockchain Instruct',
+    icon: OrosIcon,
     description:
       'A robust and powerful model for executing blockchain-specific actions',
     tools: messageRegistry.getToolDefinitions(),
