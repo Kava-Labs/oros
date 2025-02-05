@@ -179,7 +179,7 @@ describe('chat', () => {
   });
   test('model dropdown interactions', async ({ page }) => {
     const DEFAULT_MODEL_DISPLAY_NAME = 'DeepSeek RI 67TB';
-    const NUMBER_OF_SUPPORTED_MODELS = 3;
+    const NUMBER_OF_SUPPORTED_MODELS = 2;
     const chat = new Chat(page);
     await chat.goto();
 
