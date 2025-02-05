@@ -23,7 +23,7 @@ import { ExecuteOperation, ModelConfig } from './core/context/types';
 import NavBar from './core/components/NavBar';
 import styles from './App.module.css';
 import { ChatHistory } from './core/components/ChatHistory';
-import { useMediaQuery } from './shared/theme/useMediaQuery';
+import { useIsMobile } from './shared/theme/useIsMobile';
 
 let client: OpenAI | null = null;
 
@@ -160,8 +160,15 @@ export const App = () => {
     ]);
   }, [handleCancel, messageHistoryStore, modelConfig.systemPrompt]);
 
-  const isMobile = useMediaQuery('(max-width: 768px)');
+  const isMobile = useIsMobile();
   const [burgerToggle, setBurgerToggle] = useState(false);
+
+  useEffect(() => {
+    // when not on mobile the toggle should always be reset back to false
+    if (!isMobile && burgerToggle) {
+      setBurgerToggle(false);
+    }
+  }, [burgerToggle, isMobile]);
 
   return (
     <>
