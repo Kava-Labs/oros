@@ -1,23 +1,26 @@
 import styles from './ChatHistory.module.css';
 import { ConversationHistory } from '../context/types';
-import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAppContext } from '../context/useAppContext';
 
 export const ChatHistory = () => {
   const [chatHistories, setChatHistories] = useState<ConversationHistory[]>([]);
 
   const { loadConversation, messageHistoryStore } = useAppContext();
-  const messages = useSyncExternalStore(
-    messageHistoryStore.subscribe,
-    messageHistoryStore.getSnapshot,
-  );
 
   useEffect(() => {
-    const allConversationsStr = localStorage.getItem('conversations');
-    if (allConversationsStr) {
-      setChatHistories(Object.values(JSON.parse(allConversationsStr)));
-    }
-  }, [messages]);
+    // we have to poll local storage
+    const id = setInterval(() => {
+      const allConversationsStr = localStorage.getItem('conversations');
+      if (allConversationsStr) {
+        setChatHistories(Object.values(JSON.parse(allConversationsStr)));
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(id);
+    };
+  }, []);
 
   const deleteConversation = useCallback((id: string) => {
     const allConversations = JSON.parse(
