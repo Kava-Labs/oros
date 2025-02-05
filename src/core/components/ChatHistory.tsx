@@ -9,13 +9,15 @@ export const ChatHistory = () => {
   const { loadConversation, messageHistoryStore } = useAppContext();
 
   useEffect(() => {
-    // we have to poll local storage
-    const id = setInterval(() => {
+    const load = () => {
       const allConversationsStr = localStorage.getItem('conversations');
       if (allConversationsStr) {
         setChatHistories(Object.values(JSON.parse(allConversationsStr)));
       }
-    }, 1000);
+    };
+    load();
+    // we have to poll local storage
+    const id = setInterval(load, 1000);
 
     return () => {
       clearInterval(id);
