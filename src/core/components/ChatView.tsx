@@ -1,6 +1,11 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import styles from './ChatView.module.css';
-import { CancelChatIcon, ResetChatIcon, SendChatIcon } from '../assets';
+import {
+  CancelChatIcon,
+  ResetChatIcon,
+  SendChatIcon,
+  KavaAISendChatIcon,
+} from '../assets';
 import { useTheme } from '../../shared/theme/useTheme';
 import { Conversation } from './Conversation';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
@@ -158,13 +163,19 @@ export const ChatView = ({
           <button
             data-testid="chat-view-button"
             ref={buttonRef}
-            id={styles.sendChatButton}
+            id={
+              FEAT_UPDATED_DESIGN
+                ? styles.sendChatButtonV2
+                : styles.sendChatButton
+            }
             type="submit"
             onClick={handleButtonClick}
             aria-label="Send Chat"
           >
             {isRequesting ? (
               <CancelChatIcon color={colors.accentTransparent} />
+            ) : FEAT_UPDATED_DESIGN ? (
+              <KavaAISendChatIcon />
             ) : (
               <SendChatIcon color={colors.accentTransparent} />
             )}
