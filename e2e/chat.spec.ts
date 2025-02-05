@@ -230,13 +230,13 @@ describe('chat', () => {
     const blockchainModel = page
       .getByRole('option')
       .filter({ hasText: 'Blockchain Instruct' });
-    const gpt4oMini = page
-      .getByRole('option')
-      .filter({ hasText: 'Blockchain Instruct - mini' });
+    // const gpt4oMini = page
+    //   .getByRole('option')
+    //   .filter({ hasText: 'Blockchain Instruct - mini' });
     const deepseek = page.getByRole('option').filter({ hasText: 'Deepseek' });
 
     await expect(blockchainModel).toBeDisabled();
-    await expect(gpt4oMini).toBeDisabled();
+    // await expect(gpt4oMini).toBeDisabled();
     await expect(deepseek).toBeEnabled();
 
     await context.close();

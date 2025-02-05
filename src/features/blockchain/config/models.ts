@@ -11,7 +11,7 @@ import { blockchainMessageProcessor } from './messageProcessing';
 
 const messageRegistry = initializeMessageRegistry();
 
-export type SupportedBlockchainModels = 'gpt-4o' | 'gpt-4o-mini';
+export type SupportedBlockchainModels = 'gpt-4o'; //| 'gpt-4o-mini';
 
 export const blockchainModels: Record<
   SupportedBlockchainModels,
@@ -38,24 +38,24 @@ export const blockchainModels: Record<
     },
     messageProcessors: blockchainMessageProcessor,
   },
-  'gpt-4o-mini': {
-    id: 'gpt-4o-mini',
-    name: 'Blockchain Instruct - mini',
-    icon: OrosIcon,
-    description: 'A slightly leaner model (can be used in automated testing)',
-    tools: messageRegistry.getToolDefinitions(),
-    systemPrompt: messageRegistry.getSystemPrompt(),
-    introText: messageRegistry.getIntroText(),
-    components: {
-      transaction: {
-        inProgress: InProgressTxDisplay,
-        complete: CompleteTxDisplay,
-      },
-      query: {
-        inProgress: InProgressQueryDisplay,
-        complete: CompleteQueryDisplay,
-      },
-    },
-    messageProcessors: blockchainMessageProcessor,
-  },
+  // 'gpt-4o-mini': {
+  //   id: 'gpt-4o-mini',
+  //   name: 'Blockchain Instruct - mini',
+  //   icon: OrosIcon,
+  //   description: 'A slightly leaner model (can be used in automated testing)',
+  //   tools: messageRegistry.getToolDefinitions(),
+  //   systemPrompt: messageRegistry.getSystemPrompt(),
+  //   introText: messageRegistry.getIntroText(),
+  //   components: {
+  //     transaction: {
+  //       inProgress: InProgressTxDisplay,
+  //       complete: CompleteTxDisplay,
+  //     },
+  //     query: {
+  //       inProgress: InProgressQueryDisplay,
+  //       complete: CompleteQueryDisplay,
+  //     },
+  //   },
+  //   messageProcessors: blockchainMessageProcessor,
+  // },
 };
