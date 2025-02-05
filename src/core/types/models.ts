@@ -8,7 +8,9 @@ export type SupportedModels =
   | SupportedReasoningModels;
 
 export interface BaseModelConfig {
+  id: SupportedModels;
   name: string;
+  icon: ComponentType;
   description: string;
   tools: ChatCompletionTool[];
   systemPrompt: string;
