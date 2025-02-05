@@ -112,4 +112,13 @@ export class Chat {
       localStorage.getItem('chat-messages'),
     );
   }
+
+  async switchToBlockchainModel() {
+    const modelDropdownButton = this.page.getByRole('button', {
+      name: 'Select model',
+    });
+    await modelDropdownButton.click();
+    const blockchainModelOption = this.page.getByRole('option').first();
+    await blockchainModelOption.click();
+  }
 }
