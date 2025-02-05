@@ -18,6 +18,7 @@ import NavBar from './core/components/NavBar';
 import styles from './App.module.css';
 import { ChatHistory } from './core/components/ChatHistory';
 import { ModelConfig } from './core/types/models';
+import { useSummarizeChat } from './core/utils/useSummarizeChat';
 
 let client: OpenAI | null = null;
 
@@ -153,6 +154,10 @@ export const App = () => {
       { role: 'system' as const, content: modelConfig.systemPrompt },
     ]);
   }, [handleCancel, messageHistoryStore, modelConfig.systemPrompt]);
+
+  const summary = useSummarizeChat(client as OpenAI, messages);
+
+  console.log('summary', summary);
 
   return (
     <>
