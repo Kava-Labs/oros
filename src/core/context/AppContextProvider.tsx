@@ -7,7 +7,7 @@ import { ToolCallStreamStore } from '../../core/stores/toolCallStreamStore';
 import { MessageHistoryStore } from '../../core/stores/messageHistoryStore';
 import { initializeMessageRegistry } from '../../features/blockchain/config/initializeMessageRegistry';
 import { useExecuteOperation } from './useExecuteOperation';
-import { getModelConfig } from '../config/models';
+import { DEFAULT_MODEL_NAME, getModelConfig } from '../config/models';
 import { SupportedModels, ModelConfig } from '../types/models';
 
 export const AppContextProvider = ({
@@ -33,7 +33,7 @@ export const AppContextProvider = ({
   );
 
   const [modelConfig, setModelConfig] = useState<ModelConfig>(() =>
-    getModelConfig('gpt-4o-mini'),
+    getModelConfig(DEFAULT_MODEL_NAME),
   );
 
   // This callback would be passed to components that need to switch models

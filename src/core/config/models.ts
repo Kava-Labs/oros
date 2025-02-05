@@ -39,3 +39,10 @@ export const getAllModels = (): ModelConfig[] => {
     ...Object.values(MODEL_REGISTRY.reasoning),
   ];
 };
+
+export const DEFAULT_MODEL_NAME = 'gpt-4o-mini';
+
+export const NUMBER_OF_SUPPORTED_MODELS = Object.values(MODEL_REGISTRY).reduce(
+  (total, models) => total + Object.keys(models).length,
+  0,
+);
