@@ -9,8 +9,8 @@ import { getAllModels } from '../config/models';
 const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
 
 type NavBarProps = {
-  burgerToggle: boolean;
-  setBurgerToggle: React.Dispatch<React.SetStateAction<boolean>>;
+  chatHistoryOpen: boolean;
+  setChatHistoryOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const NavBar = (props: NavBarProps) => {
@@ -30,7 +30,7 @@ const NavBar = (props: NavBarProps) => {
           <div
             className={styles.hamburger}
             onClick={() => {
-              props.setBurgerToggle((prev) => !prev);
+              props.setChatHistoryOpen((prev) => !prev);
             }}
           >
             <HamburgerIcon />

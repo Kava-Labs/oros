@@ -162,31 +162,31 @@ export const App = () => {
   }, [handleCancel, messageHistoryStore, modelConfig.systemPrompt]);
 
   const isMobile = useIsMobile();
-  const [burgerToggle, setBurgerToggle] = useState(false);
+  const [chatHistoryOpen, setChatHistoryOpen] = useState(false);
 
   useEffect(() => {
     // when not on mobile the toggle should always be reset back to false
-    if (!isMobile && burgerToggle) {
-      setBurgerToggle(false);
+    if (!isMobile && chatHistoryOpen) {
+      setChatHistoryOpen(false);
     }
-  }, [burgerToggle, isMobile]);
+  }, [chatHistoryOpen, isMobile]);
 
   return (
     <>
       {isReady && (
         <div className={styles.appContent}>
           <NavBar
-            burgerToggle={burgerToggle}
-            setBurgerToggle={setBurgerToggle}
+            chatHistoryOpen={chatHistoryOpen}
+            setChatHistoryOpen={setChatHistoryOpen}
           />
           {showHistorySidebar ? (
             <div className={styles.appContainer}>
               {!isMobile ? (
                 <ChatHistory />
-              ) : burgerToggle ? (
+              ) : chatHistoryOpen ? (
                 <ChatHistory />
               ) : null}
-              {!burgerToggle ? (
+              {!chatHistoryOpen ? (
                 <ChatView
                   introText={modelConfig.introText}
                   cautionText={defaultCautionText}
