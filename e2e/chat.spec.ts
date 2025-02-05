@@ -205,7 +205,7 @@ describe('chat', () => {
 
     // // Change back to original model
     await modelButton.click();
-    const originalModel = page.getByRole('option').nth(2);
+    const originalModel = page.getByRole('option').nth(1);
     await originalModel.click();
     await expect(modelButton).toContainText(DEFAULT_MODEL_DISPLAY_NAME);
 
