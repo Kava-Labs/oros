@@ -1,23 +1,39 @@
 import styles from './ChatHistory.module.css';
 import { ConversationHistory } from '../context/types';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 import { useAppContext } from '../context/useAppContext';
 
 export const ChatHistory = () => {
   const [chatHistories, setChatHistories] = useState<ConversationHistory[]>([]);
 
-  const { loadConversation } = useAppContext();
+  const { loadConversation, messageHistoryStore } = useAppContext();
+  const messages = useSyncExternalStore(
+    messageHistoryStore.subscribe,
+    messageHistoryStore.getSnapshot,
+  );
 
   useEffect(() => {
     const allConversationsStr = localStorage.getItem('conversations');
     if (allConversationsStr) {
       setChatHistories(Object.values(JSON.parse(allConversationsStr)));
     }
+  }, [messages]);
+
+  const deleteConversation = useCallback((id: string) => {
+    const allConversations = JSON.parse(
+      localStorage.getItem('conversations') ?? '{}',
+    );
+
+    delete allConversations[id];
+
+    localStorage.setItem('conversations', JSON.stringify(allConversations));
+    setChatHistories(Object.values(allConversations));
   }, []);
 
   return (
     <div className={styles.chatHistoryContainer}>
       <button
+        onClick={() => messageHistoryStore.reset()}
         className={styles.newChatButton}
         data-testid="new-chat-container-button"
       >
@@ -41,12 +57,16 @@ export const ChatHistory = () => {
         <h5 className={styles.historySectionTitle}>History</h5>
 
         <div>
-          {chatHistories.map(({ title, id }) => {
+          {chatHistories.map((conversation) => {
+            const { id, title } = conversation;
             return (
               <div key={id} className={styles.chatHistoryItem}>
-                <p>{title}</p>
+                <p onClick={() => loadConversation(conversation)}>{title}</p>
                 <div>
                   <svg
+                    onClick={() => {
+                      deleteConversation(id);
+                    }}
                     width="19"
                     height="19"
                     viewBox="0 0 19 19"

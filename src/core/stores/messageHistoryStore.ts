@@ -36,6 +36,12 @@ export class MessageHistoryStore {
     this.emitChange();
   };
 
+  public reset() {
+    this.id = '';
+    this.currentValue = [];
+    this.emitChange();
+  }
+
   public subscribe = (callback: Listener): (() => void) => {
     this.listeners.add(callback);
     return () => {
