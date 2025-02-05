@@ -1,14 +1,6 @@
 import { useEffect } from 'react';
 import { MessageHistoryStore } from '../stores/messageHistoryStore';
-import type { ChatCompletionMessageParam } from 'openai/resources/index';
-
-export type ConversationHistory = {
-  id: string;
-  modelName: string;
-  title: string;
-  conversation: ChatCompletionMessageParam[];
-  lastSaved: number;
-};
+import { ConversationHistory } from './types';
 
 export const useMessageSaver = (
   messageHistoryStore: MessageHistoryStore,

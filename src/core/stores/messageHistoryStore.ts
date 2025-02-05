@@ -1,6 +1,6 @@
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { v4 as uuidv4 } from 'uuid';
-import { ConversationHistory } from '../context/useMessageSaver';
+import { ConversationHistory } from '../context/types';
 type Listener = () => void;
 
 export class MessageHistoryStore {
