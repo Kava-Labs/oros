@@ -23,7 +23,22 @@ export const useMessageSaver = (
           lastSaved: new Date().valueOf(),
         };
 
-        localStorage.setItem(id, JSON.stringify(history));
+        const allConversationsStr = localStorage.getItem('conversations');
+        if (allConversationsStr) {
+          const allConversations = JSON.parse(allConversationsStr);
+          allConversations[id] = history;
+          localStorage.setItem(
+            'conversations',
+            JSON.stringify(allConversations),
+          );
+        } else {
+          localStorage.setItem(
+            'conversations',
+            JSON.stringify({
+              [id]: history,
+            }),
+          );
+        }
       }
     };
 

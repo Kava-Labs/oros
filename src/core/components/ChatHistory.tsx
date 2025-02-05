@@ -1,10 +1,16 @@
 import styles from './ChatHistory.module.css';
+import { ConversationHistory } from '../context/types';
+import { useEffect, useState } from 'react';
 
 export const ChatHistory = () => {
-  const chatHistories = [
-    { title: 'Mock Chat History Number one', conversation: [] },
-    { title: 'Mock Chat History Number two', conversation: [] },
-  ];
+  const [chatHistories, setChatHistories] = useState<ConversationHistory[]>([]);
+
+  useEffect(() => {
+    const allConversationsStr = localStorage.getItem('conversations');
+    if (allConversationsStr) {
+      setChatHistories(Object.values(JSON.parse(allConversationsStr)));
+    }
+  }, []);
 
   return (
     <div className={styles.chatHistoryContainer}>
@@ -32,9 +38,9 @@ export const ChatHistory = () => {
         <h5 className={styles.historySectionTitle}>History</h5>
 
         <div>
-          {chatHistories.map(({ title }, index) => {
+          {chatHistories.map(({ title, id }) => {
             return (
-              <div key={index} className={styles.chatHistoryItem}>
+              <div key={id} className={styles.chatHistoryItem}>
                 <p>{title}</p>
                 <div>
                   <svg
