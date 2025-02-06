@@ -149,7 +149,11 @@ export const ChatView = ({
         )}
       </div>
 
-      <div id={styles.controls} data-testid="controls">
+      <div
+        id={styles.controls}
+        data-testid="controls"
+        className={hasMessages ? styles.inputNormal : styles.inputRaised}
+      >
         <div id={styles.inputContainer}>
           <textarea
             id={styles.input}
