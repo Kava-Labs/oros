@@ -149,27 +149,27 @@ jobs:
             ./api/go.sum
             ./tests/kvtool/go.mod
 
-      - name: Install kvtool
-        run: make -C tests/kvtool install
+      # kvtool is not necessary until we run the kavanode in the docker compose
+      # step
+      # - name: Install kvtool
+      #   run: make -C tests/kvtool install
 
       # kvtool is only used to generate the kava config files for the container to mount
-      - name: Generate kava config
-        run: kvtool testnet gen-config kava --kava.configTemplate $KVTOOL_CONFIGTEMPLATE
+      # - name: Generate kava config
+      #   run: kvtool testnet gen-config kava --kava.configTemplate $KVTOOL_CONFIGTEMPLATE
 
       - name: Start proxy and kava node
         env:
           KAVACHAT_IMAGE: ${{ steps.image-name.outputs.image }}
+          KAVACHAT_API_LOG_LEVEL: 'debug'
         # Wait for containers to be healthy or fail after 30 seconds
         run: |
           echo "Using image $KAVACHAT_IMAGE"
           docker compose \
             -f docker-compose.yaml \
             -f docker-compose.ci.yaml \
-            up -d --wait --wait-timeout 30
-
-      - name: Output logs if containers are unhealthy
-        if: failure()
-        run: docker compose -f docker-compose.yaml logs
+            up -d --wait --wait-timeout 30 \
+            kavachat-api
 
       - name: Install Node.js
         uses: actions/setup-node@v4
@@ -186,6 +186,10 @@ jobs:
 
       - name: Run Playwright tests
         run: DEBUG=pw:webserver xvfb-run npx playwright test
+
+      - name: Output logs if containers are unhealthy or if tests fail
+        if: failure()
+        run: docker compose -f docker-compose.yaml logs
 
       - name: Shutdown proxy and kava node
         if: always()

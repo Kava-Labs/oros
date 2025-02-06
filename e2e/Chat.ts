@@ -10,6 +10,25 @@ export class Chat {
     this.messageContainer = this.page.locator(
       `[data-testid="conversation"] div div`,
     );
+
+    // Log any failed requests
+    this.page.on('requestfailed', (request) => {
+      const failure = request.failure();
+      if (failure) {
+        console.log(request.url() + ' ' + failure.errorText);
+      }
+    });
+
+    // Log any 4xx or 5xx responses
+    this.page.on('requestfinished', async (request) => {
+      const resp = await request.response();
+
+      if (resp && resp.status() >= 400) {
+        const bodyBuffer = resp.body();
+        const bodyStr = bodyBuffer.toString();
+        console.log(request.url() + ' ' + resp.status() + ' ' + bodyStr);
+      }
+    });
   }
 
   private async getAllMessageElements(): Promise<ElementHandle<Node>[]> {

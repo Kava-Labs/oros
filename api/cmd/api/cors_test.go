@@ -23,7 +23,11 @@ func TestCors(t *testing.T) {
 	baseURL, err := url.JoinPath(mockServer.URL, "/v1")
 	require.NoError(t, err)
 	config.baseURL = baseURL
-	ctx, _ := context.WithTimeout(context.Background(), time.Duration(60*time.Second))
+	config.allowedModels = []string{"gpt-4o-mini", "dall-e-2"}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(20*time.Second))
+	defer cancel()
+
 	serverUrl, shutdown, err := launchApiServer(ctx, config)
 
 	defer shutdown()
@@ -127,6 +131,14 @@ func TestCors(t *testing.T) {
 			require.NoError(t, err)
 			defer response.Body.Close()
 
+			if response.StatusCode != tc.wantStatusCode {
+				// Read body bytes
+				body, err := io.ReadAll(response.Body)
+				require.NoError(t, err)
+
+				t.Logf("response body: %v", string(body))
+			}
+
 			require.Equal(t, tc.wantStatusCode, response.StatusCode)
 
 			for name, value := range tc.wantResponseHeaders {
@@ -134,5 +146,4 @@ func TestCors(t *testing.T) {
 			}
 		})
 	}
-
 }

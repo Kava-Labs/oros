@@ -6,10 +6,13 @@ services:
     ports:
       - "5555:5555"
     environment:
+      KAVACHAT_API_PORT: "5555"
+      KAVACHAT_API_HOST: "0.0.0.0"
+      KAVACHAT_API_BACKEND_0_NAME: "OpenAI"
       # Pass through existing environment variables
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
-      OPENAI_BASE_URL: ${OPENAI_BASE_URL}
-      KAVACHAT_HOST: "0.0.0.0"
+      KAVACHAT_API_BACKEND_0_BASE_URL: ${OPENAI_BASE_URL}
+      KAVACHAT_API_BACKEND_0_API_KEY: ${OPENAI_API_KEY}
+      KAVACHAT_API_BACKEND_0_ALLOWED_MODELS: "gpt-4o,gpt-4o-mini"
 
   kavanode:
     image: "kava/kava:${KAVA_TAG:-v0.27.0-goleveldb}"
