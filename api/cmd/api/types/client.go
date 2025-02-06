@@ -33,12 +33,22 @@ func (c *OpenAIPassthroughClient) DoRequest(
 	path string,
 	body io.ReadCloser,
 ) (*http.Response, error) {
-	// BaseURL has a / suffix
-	// path also has / prefix
+	// To properly build URL:
+	// BaseURL should NOT have a trailing slash
+	// Path SHOULD have a leading slash
+
+	// Check if base URL has a trailing slash
+	if c.BaseURL[len(c.BaseURL)-1] == '/' {
+		c.BaseURL = c.BaseURL[:len(c.BaseURL)-1]
+	}
+
+	if (len(path)) == 0 {
+		return nil, fmt.Errorf("path is empty when making request")
+	}
 
 	// Check if path has a leading slash
-	if path[0] == '/' {
-		path = path[1:]
+	if path[0] != '/' {
+		path = "/" + path
 	}
 
 	reqUrl := c.BaseURL + path

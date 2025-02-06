@@ -59,41 +59,44 @@ type OpenAIBackend struct {
 }
 
 // Validate checks if the required fields are set
-func (c *OpenAIBackend) Validate() error {
-	if c.Name == "" {
+func (b OpenAIBackend) Validate() error {
+	if b.Name == "" {
 		return errors.New("NAME is required for backend")
 	}
 
-	if c.BaseURL == "" {
-		return fmt.Errorf("BASE_URL is required for backend %s", c.Name)
+	if b.BaseURL == "" {
+		return fmt.Errorf("BASE_URL is required for backend %s", b.Name)
 	}
 
-	// Require trailing slash, otherwise the last part of the URL will excluded
-	// in openai client
-	if c.BaseURL[len(c.BaseURL)-1] != '/' {
-		c.BaseURL += "/"
+	if b.APIKey == "" {
+		return fmt.Errorf("API_KEY is required for backend %s", b.Name)
 	}
 
-	if c.APIKey == "" {
-		return fmt.Errorf("API_KEY is required for backend %s", c.Name)
-	}
-
-	if len(c.AllowedModels) == 0 {
-		return fmt.Errorf("ALLOWED_MODELS needs at least one model for backend %s", c.Name)
+	if len(b.AllowedModels) == 0 {
+		return fmt.Errorf("ALLOWED_MODELS needs at least one model for backend %s", b.Name)
 	}
 
 	return nil
 }
 
-// GetClient returns the OpenAI client for the backend and caches it
-func (c *OpenAIBackend) GetClient() *types.OpenAIPassthroughClient {
-	if c.client == nil {
-		c.client = types.NewOpenAIClient(c.BaseURL, c.APIKey)
+// String returns a string representation of the backend with the API key redacted
+func (b OpenAIBackend) String() string {
+	// Return with API key redacted
+	return fmt.Sprintf(
+		"Name: %s, BaseURL: %s, APIKey: %s, AllowedModels: %v",
+		b.Name, b.BaseURL, "REDACTED", b.AllowedModels,
+	)
+}
 
-		return c.client
+// GetClient returns the OpenAI client for the backend and caches it
+func (b *OpenAIBackend) GetClient() *types.OpenAIPassthroughClient {
+	if b.client == nil {
+		b.client = types.NewOpenAIClient(b.BaseURL, b.APIKey)
+
+		return b.client
 	}
 
-	return c.client
+	return b.client
 }
 
 // OpenAIBackends is a list of OpenAIBackend

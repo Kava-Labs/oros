@@ -33,9 +33,8 @@ func main() {
 		logFatal(logger, fmt.Errorf("invalid config: %w", err))
 	}
 
-	fmt.Printf("cfg: %+v\n", cfg)
-
-	logger.Info("Load config from env")
+	// API Keys are redacted in the OpenAIBackend.String() method
+	logger.Info("Load config from env", "config", cfg)
 
 	// Update log level
 	logger.Info("Setting log level", "level", cfg.LogLevel)
