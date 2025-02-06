@@ -45,11 +45,21 @@ const ModelDropdownButton = ({
       aria-expanded={dropdownOpen}
       aria-label="Select model"
     >
-      <ModelIconComponent />
-      <span>{modelConfig.name}</span>
+      <div className={styles.modelOption}>
+        <div className={styles.modelInfo}>
+          <ModelIconComponent />
+          <div className={styles.nameContainer}>
+            <h6>{modelConfig.name}</h6>
+            <span className={styles.description}>
+              {modelConfig.description}
+            </span>
+          </div>
+        </div>
+      </div>
+
       <svg
-        width="16"
-        height="16"
+        width="24"
+        height="24"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -60,7 +70,7 @@ const ModelDropdownButton = ({
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
-          d="M19 9l-7 7-7-7"
+          d="M19 9l-9 9-9-9"
         />
       </svg>
     </button>

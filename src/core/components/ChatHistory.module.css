@@ -7,15 +7,13 @@
   height: 62px;
   text-align: left;
   padding-left: 2rem;
-  border-radius: 8px;
+  border-radius: var(--borderRadius-sm);
   border: 1px;
-  margin-top: 28px;
-  margin-bottom: 28px;
-  margin-left: 14px;
-  margin-right: 14px;
+  margin: var(--spacing-lg) var(--spacing-md) var(--spacing-lg)
+    var(--spacing-md);
 
-  background-color: #111111;
-  border: 1px solid #b4b4b4;
+  background-color: var(--colors-bgPrimary);
+  border: 1px solid var(--colors-borderPrimary);
   cursor: pointer;
 }
 
@@ -24,20 +22,21 @@
   display: inline;
   font-size: 18px;
   line-height: 24px;
-  color: #b4b4b4;
+  color: var(--colors-textSecondary);
 }
 
 .historySection {
-  border-top: 1px solid #3e3e3e;
-  border-bottom: 1px solid #3e3e3e;
+  padding: var(--spacing-sm);
+  border-top: 1px solid var(--colors-borderSecondary);
+  border-bottom: 1px solid var(--colors-borderSecondary);
 }
 
 .historySectionTitle {
-  margin-left: 14px;
-  margin-top: 20px;
-  color: #b4b4b4;
+  margin-left: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+  color: var(--colors-textSecondary);
   font-size: 18px;
-  font-weight: 700;
+  font-weight: var(--typography-fontWeightBold);
   line-height: 24px;
   text-align: left;
 }
@@ -46,11 +45,11 @@
   display: flex;
   justify-content: space-between;
   cursor: pointer;
-  color: #b4b4b4;
-  margin-right: 14px;
-  margin-left: 14px;
+  color: var(--colors-textSecondary);
+  margin-right: var(--spacing-md);
+  margin-left: var(--spacing-md);
   font-size: 16px;
   line-height: 22px;
-  padding-top: 8px;
-  padding-bottom: 8px;
+  padding-top: var(--spacing-sm);
+  padding-bottom: var(--spacing-sm);
 }

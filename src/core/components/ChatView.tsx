@@ -6,6 +6,7 @@ import { Conversation } from './Conversation';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { useAppContext } from '../context/useAppContext';
 import { isInIframe } from '../utils/isInIframe';
+import { useIsMobile } from '../../shared/theme/useIsMobile';
 
 const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
 
@@ -89,7 +90,7 @@ export const ChatView = ({
     }
   };
 
-  const { colors, logo } = useTheme();
+  const { colors, logo: Logo } = useTheme();
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -100,6 +101,7 @@ export const ChatView = ({
   }, []);
 
   const isIframe = isInIframe();
+  const isMobile = useIsMobile();
 
   const showNavBar = !isIframe && FEAT_UPDATED_DESIGN;
 
@@ -115,15 +117,20 @@ export const ChatView = ({
       >
         {hasMessages && (
           <>
-            <div id={styles.stickyHeader}>
-              <button
-                id={styles.resetButton}
-                aria-label="Reset Chat"
-                onClick={onReset}
-              >
-                <ResetChatIcon color={colors.accentTransparent} />
-              </button>
-            </div>
+            {/* Important: When this goes live, the conditional to render ResetChatIcon will change.
+                       We only want to show this trash can in the iframe: !FEAT_UPDATED_DESIGN wil change to  isIframe
+             */}
+            {!FEAT_UPDATED_DESIGN && (
+              <div id={styles.stickyHeader}>
+                <button
+                  id={styles.resetButton}
+                  aria-label="Reset Chat"
+                  onClick={onReset}
+                >
+                  <ResetChatIcon color={colors.accentTransparent} />
+                </button>
+              </div>
+            )}
 
             <Conversation
               messages={messages}
@@ -135,9 +142,8 @@ export const ChatView = ({
         {!hasMessages && (
           <div id={styles.startContainer}>
             <div id={styles.start} data-testid="start">
-              <img src={logo} id={styles.chatIconContainer} />
-              <h3>Let's get started!</h3>
-              <h6>{introText}</h6>
+              {Logo && <Logo width={isMobile ? 210 : 292} />}
+              <h5 className={styles.introText}>{introText}</h5>
             </div>
           </div>
         )}
@@ -164,9 +170,9 @@ export const ChatView = ({
             aria-label="Send Chat"
           >
             {isRequesting ? (
-              <CancelChatIcon color={colors.accentTransparent} />
+              <CancelChatIcon color={colors.accent} />
             ) : (
-              <SendChatIcon color={colors.accentTransparent} />
+              <SendChatIcon />
             )}
           </button>
         </div>

@@ -3,7 +3,6 @@ import { Content } from './Content';
 import { StreamingText } from './StreamingText';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { memo } from 'react';
-import { useTheme } from '../../shared/theme/useTheme';
 import { useAppContext } from '../context/useAppContext';
 import { ToolCallProgressCards } from './ToolCallProgressCards';
 import {
@@ -18,6 +17,7 @@ import {
   OperationResult,
   OperationType,
 } from '../../features/blockchain/types/chain';
+import KavaIcon from '../assets/KavaIcon';
 
 export interface ConversationProps {
   messages: ChatCompletionMessageParam[];
@@ -29,12 +29,21 @@ const StreamingTextContent = (message: string, onRendered: () => void) => {
 };
 
 const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
-  const { logo } = useTheme();
   const { errorText, isRequesting, progressStore, messageStore, registry } =
     useAppContext();
 
+  const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
+  /* FEAT_UPDATED_DESIGN TODO: when this goes live:
+       - update the #conversation id in chat view to have:  var(--spacing-lg);
+       - remove style={ on the div}}
+    
+    */
   return (
-    <div id={styles.conversation} data-testid="conversation">
+    <div
+      id={styles.conversation}
+      data-testid="conversation"
+      style={{ marginTop: FEAT_UPDATED_DESIGN ? '24px' : '-10px' }}
+    >
       {messages.map((message, index) => {
         if (message.role === 'user') {
           return (
@@ -50,7 +59,8 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
         if (message.role === 'assistant' && message.content) {
           return (
             <div key={index} className={styles.left}>
-              <img src={logo} className={styles.conversationChatIcon} />
+              <KavaIcon className={styles.conversationChatIcon} />
+
               <div className={styles.assistantContainer}>
                 <Content
                   role={message.role}
@@ -120,7 +130,7 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
       })}
       {isRequesting && (
         <div className={styles.left}>
-          <img src={logo} className={styles.conversationChatIcon} />
+          <KavaIcon className={styles.conversationChatIcon} />
 
           <div className={styles.assistantContainer}>
             <div id={styles.progressStream}>
@@ -138,7 +148,7 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
       )}
       {errorText.length > 0 && (
         <div className={styles.left}>
-          <img src={logo} className={styles.conversationChatIcon} />
+          <KavaIcon className={styles.conversationChatIcon} />
           <div className={styles.assistantContainer}>
             <Content
               content={errorText}

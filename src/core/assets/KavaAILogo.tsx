@@ -1,11 +1,23 @@
-const KavaAILogo = () => {
+interface KavaAILogoProps {
+  width?: number;
+  height?: number;
+}
+
+const KavaAILogo: React.FC<KavaAILogoProps> = ({ width, height }) => {
+  const aspectRatio = 31 / 140;
+  const calculatedHeight =
+    typeof width === 'number' ? width * aspectRatio : (height ?? 31);
+  const calculatedWidth =
+    typeof height === 'number' ? height / aspectRatio : (width ?? 140);
+
   return (
     <svg
-      width="140"
-      height="31"
+      width={calculatedWidth}
+      height={calculatedHeight}
       viewBox="0 0 140 31"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      preserveAspectRatio="xMidYMid meet"
     >
       <g clipPath="url(#clip0_9_427)">
         <path
