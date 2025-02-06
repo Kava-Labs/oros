@@ -47,6 +47,7 @@ export interface Theme {
   typography: ThemeTypography;
   spacing: ThemeSpacing;
   borderRadius: ThemeBorderRadius;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   logo?: ComponentType<any>;
 }
 
