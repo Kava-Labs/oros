@@ -53,12 +53,12 @@ export const AppContextProvider = ({
     walletStore,
   );
 
-  useMessageSaver(messageHistoryStore, modelConfig.name, client!);
+  useMessageSaver(messageHistoryStore, modelConfig.id, client!);
 
   const loadConversation = useCallback(
     (convoHistory: ConversationHistory) => {
+      handleModelChange(convoHistory.model as SupportedModels);
       messageHistoryStore.loadConversation(convoHistory);
-      handleModelChange(convoHistory.modelName as SupportedModels);
     },
     [messageHistoryStore, handleModelChange],
   );

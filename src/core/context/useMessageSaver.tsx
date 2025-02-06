@@ -5,7 +5,7 @@ import OpenAI from 'openai';
 
 export const useMessageSaver = (
   messageHistoryStore: MessageHistoryStore,
-  modelName: string,
+  modelID: string,
   client: OpenAI,
 ) => {
   useEffect(() => {
@@ -16,16 +16,17 @@ export const useMessageSaver = (
         const firstUserMessage = messages.find((msg) => msg.role === 'user');
         if (!firstUserMessage) return;
         const { content } = firstUserMessage;
+
+        const allConversations: Record<string, ConversationHistory> =
+          JSON.parse(localStorage.getItem('conversations') ?? '{}');
+
         const history: ConversationHistory = {
           id,
-          modelName,
+          model: allConversations[id] ? allConversations[id].model : modelID,
           title: content as string, // fallback value
           conversation: messages,
           lastSaved: new Date().valueOf(),
         };
-
-        const allConversations: Record<string, ConversationHistory> =
-          JSON.parse(localStorage.getItem('conversations') ?? '{}');
 
         if (!allConversations[id]) {
           try {
@@ -74,5 +75,5 @@ export const useMessageSaver = (
     // this is to prevent re-renders of the caller using this hook
     const unsubscribe = messageHistoryStore.subscribe(onChange);
     return () => unsubscribe();
-  }, [messageHistoryStore, modelName, client]);
+  }, [messageHistoryStore, modelID, client]);
 };
