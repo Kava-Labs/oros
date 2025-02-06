@@ -199,6 +199,7 @@ jobs:
 
           # Fetch GitHub username from pusher event
           USERNAME=$(echo ${{ github.event.pusher.username }})
+          echo "Pusher username: $USERNAME"
 
           # Exit if invalid username
           if [ -z "$USERNAME" ]; then
@@ -211,6 +212,7 @@ jobs:
 
           # Get key ID of the most recent pubkey
           KEY_ID=$(gpg --list-keys --with-colons | awk -F: '/^pub/ {print $5}' | tail -n 1)
+          echo "Encrypting test results with gpg key ID $KEY_ID"
 
           # Encrypt zip file with pubkey
           gpg --output test-results.zip.gpg --encrypt --recipient $KEY_ID test-results.zip
