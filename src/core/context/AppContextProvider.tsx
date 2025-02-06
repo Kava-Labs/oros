@@ -59,8 +59,10 @@ export const AppContextProvider = ({
     (convoHistory: ConversationHistory) => {
       handleModelChange(convoHistory.model as SupportedModels);
       messageHistoryStore.loadConversation(convoHistory);
+      setErrorText('');
+      progressStore.setText('');
     },
-    [messageHistoryStore, handleModelChange],
+    [messageHistoryStore, handleModelChange, progressStore],
   );
 
   useEffect(() => {
