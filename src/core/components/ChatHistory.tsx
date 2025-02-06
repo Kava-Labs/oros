@@ -8,7 +8,8 @@ import { useIsMobile } from '../../shared/theme/useIsMobile';
 export const ChatHistory = () => {
   const [chatHistories, setChatHistories] = useState<ConversationHistory[]>([]);
 
-  const { loadConversation, messageHistoryStore } = useAppContext();
+  const { loadConversation, messageHistoryStore, modelConfig } =
+    useAppContext();
   const isMobile = useIsMobile();
 
   const truncateTitle = useCallback((title: string) => {
@@ -52,11 +53,20 @@ export const ChatHistory = () => {
     setChatHistories(Object.values(allConversations));
   }, []);
 
+  //  todo - refactor duplicate code in NavBar
+  const startNewChat = () => {
+    messageHistoryStore.reset();
+    messageHistoryStore.addMessage({
+      role: 'system' as const,
+      content: modelConfig.systemPrompt,
+    });
+  };
+
   return (
     <div className={styles.chatHistoryContainer}>
       {!isMobile && (
         <button
-          onClick={() => messageHistoryStore.reset()}
+          onClick={startNewChat}
           className={styles.newChatButton}
           data-testid="new-chat-container-button"
         >

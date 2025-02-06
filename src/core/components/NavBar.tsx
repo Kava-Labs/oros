@@ -16,8 +16,17 @@ interface NavBarProps {
 
 const NavBar = ({ chatHistoryOpen, setChatHistoryOpen }: NavBarProps) => {
   const showNavBar = !isInIframe() && FEAT_UPDATED_DESIGN;
-  const { messageHistoryStore } = useAppContext();
+  const { messageHistoryStore, modelConfig } = useAppContext();
   const isMobile = useIsMobile();
+
+  //  todo -refactor duplicate code in ChatHistory
+  const startNewChat = () => {
+    messageHistoryStore.reset();
+    messageHistoryStore.addMessage({
+      role: 'system' as const,
+      content: modelConfig.systemPrompt,
+    });
+  };
 
   if (!showNavBar) return null;
 
@@ -38,7 +47,7 @@ const NavBar = ({ chatHistoryOpen, setChatHistoryOpen }: NavBarProps) => {
           </div>
           {isMobile && (
             <button
-              onClick={() => messageHistoryStore.reset()}
+              onClick={startNewChat}
               data-testid="new-chat-button"
               className={styles.newChatIcon}
             >
