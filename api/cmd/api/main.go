@@ -33,6 +33,8 @@ func main() {
 		logFatal(logger, fmt.Errorf("invalid config: %w", err))
 	}
 
+	fmt.Printf("cfg: %+v\n", cfg)
+
 	logger.Info("Load config from env")
 
 	// Update log level

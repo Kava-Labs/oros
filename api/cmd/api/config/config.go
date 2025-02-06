@@ -25,7 +25,11 @@ func (c Config) Validate() error {
 		return err
 	}
 
-	// c.ServerPort can be 0, uses random port if 0
+	// Technically still works if 0 and uses a random port. But this may cause
+	// more confusion than it's worth if it wasn't intentionally left out
+	if c.ServerPort == 0 {
+		return errors.New("PORT is required")
+	}
 
 	if c.ServerHost == "" {
 		return errors.New("HOST is required")

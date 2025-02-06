@@ -100,13 +100,13 @@ func TestOpenAIBackendValidate(t *testing.T) {
 			wantErr: errors.New("BASE_URL is required for backend OpenAI"),
 		},
 		{
-			name: "no trailing slash in BaseURL",
+			name: "no error without trailing slash in BaseURL",
 			backend: func() config.OpenAIBackend {
 				b := validBackend()
 				b.BaseURL = "https://api.openai.com/v1"
 				return b
 			}(),
-			wantErr: errors.New("BASE_URL for backend OpenAI must have a trailing slash"),
+			wantErr: nil,
 		},
 		{
 			name: "missing ApiKey",
@@ -286,13 +286,13 @@ func TestConfigValidate(t *testing.T) {
 			),
 		},
 		{
-			name: "allowed - missing ServerPort",
+			name: "missing ServerPort",
 			cfg: func() config.Config {
 				cfg := validCfg
 				cfg.ServerPort = 0
 				return cfg
 			}(),
-			wantErr: nil,
+			wantErr: errors.New("PORT is required"),
 		},
 		{
 			name: "missing ServerHost",

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -43,7 +44,7 @@ func newDefaultTestConfig() testConfig {
 		// don't use external URL's by default
 		baseURL:       "http://localhost:5556/v1/",
 		allowedModels: []string{"gpt-4o-mini"},
-		port:          0,
+		port:          8080,
 		host:          "127.0.0.1",
 	}
 }
@@ -102,22 +103,34 @@ func TestIncorrectRequiredEnvironmentVariable(t *testing.T) {
 		{
 			name:                "Backend name missing",
 			environmentVariable: "KAVACHAT_API_BACKEND_0_NAME",
+			substitutedString:   "",
 			expectedError:       "invalid config: invalid backend: NAME is required for backend",
 		},
 		{
 			name:                "API key missing",
 			environmentVariable: "KAVACHAT_API_BACKEND_0_API_KEY",
+			substitutedString:   "",
 			expectedError:       "invalid config: invalid backend: API_KEY is required for backend openai",
 		},
+
 		{
 			name:                "Base url missing",
 			environmentVariable: "KAVACHAT_API_BACKEND_0_BASE_URL",
+			substitutedString:   "",
 			expectedError:       "invalid config: invalid backend: BASE_URL is required for backend openai",
 		},
+
 		{
 			name:                "Allowed models missing",
 			environmentVariable: "KAVACHAT_API_BACKEND_0_ALLOWED_MODELS",
+			substitutedString:   "",
 			expectedError:       "invalid config: invalid backend: ALLOWED_MODELS needs at least one model for backend openai",
+		},
+		{
+			name:                "Port missing, has default",
+			environmentVariable: "KAVACHAT_API_PORT",
+			substitutedString:   "",
+			expectedError:       "",
 		},
 		{
 			name:                "Non-integer for port",
@@ -139,11 +152,12 @@ func TestIncorrectRequiredEnvironmentVariable(t *testing.T) {
 		},
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(1*time.Second))
-	defer cancel()
-
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
+			// Create new ctx each time to avoid context cancellation
+			ctx, cancel := context.WithTimeout(context.Background(), time.Duration(10*time.Second))
+			defer cancel()
+
 			//	be sure we start with a fresh environment for each case
 			cmd := startProxyCmd(ctx, newDefaultTestConfig())
 			newEnv := []string{}
@@ -155,8 +169,6 @@ func TestIncorrectRequiredEnvironmentVariable(t *testing.T) {
 					//	Some errors are triggered by inserting bad values for environment variables,
 					if testCase.substitutedString != "" {
 						envVar = fmt.Sprintf("%v=%s", testCase.environmentVariable, testCase.substitutedString)
-
-						t.Logf("Setting test substitute %s to %s", testCase.environmentVariable, testCase.substitutedString)
 					} else {
 						//	While other errors are triggered by their absence
 						continue
@@ -175,11 +187,21 @@ func TestIncorrectRequiredEnvironmentVariable(t *testing.T) {
 			err := cmd.Run()
 			require.Error(t, err, fmt.Sprintf("expected %s to fail", cmd.String()))
 
-			expStdout := stdout.String()
-			// Remove backslashes
-			expStdout = strings.ReplaceAll(expStdout, "\\", "")
+			// if context.DeadlineExceeded  error
+			if err != nil && errors.Is(err, context.DeadlineExceeded) {
+				t.Fatalf("timeout while running cmd, likely because it did not exit with error: %v", err)
+			}
 
-			assert.Contains(t, expStdout, fmt.Sprintf("level=ERROR msg=\"%s", testCase.expectedError))
+			stdoutStr := stdout.String()
+			// Remove backslashes
+			stdoutStr = strings.ReplaceAll(stdoutStr, "\\", "")
+
+			if testCase.expectedError == "" {
+				assert.NotContains(t, stdoutStr, "level=ERROR", "expected no error")
+				return
+			}
+
+			assert.Contains(t, stdoutStr, fmt.Sprintf("level=ERROR msg=\"%s", testCase.expectedError))
 
 			if exitErr, ok := err.(*exec.ExitError); ok {
 				assert.Equal(t, 1, exitErr.ExitCode(), "expected exit code to equal 1")
