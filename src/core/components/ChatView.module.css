@@ -293,7 +293,7 @@
   scrollbar-color: var(--colors-bgTertiary) var(--colors-bgPrimary);
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
-  padding: 0px var(--spacing-xs) var(--spacing-xs) var(--spacing-xs);
+  padding: var(--spacing-md);
 
   @media (max-width: 768px) {
     overflow-y: hidden;
@@ -315,7 +315,7 @@
   scrollbar-color: var(--colors-bgTertiary) var(--colors-bgPrimary);
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
-  padding: 0px var(--spacing-xs) var(--spacing-xs) var(--spacing-xs);
+  padding: var(--spacing-md);
 
   @media (max-width: 768px) {
     overflow-y: hidden;
