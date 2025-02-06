@@ -67,7 +67,7 @@ func (c OpenAIBackend) Validate() error {
 	// Require trailing slash, otherwise the last part of the URL will excluded
 	// in openai client
 	if c.BaseURL[len(c.BaseURL)-1] != '/' {
-		return fmt.Errorf("BASE_URL for backend %s must have a trailing slash", c.Name)
+		c.BaseURL += "/"
 	}
 
 	if c.APIKey == "" {

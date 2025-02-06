@@ -51,7 +51,7 @@ func main() {
 	if cfg.SkipBackendValidation {
 		logger.Warn("Skipping backend validation")
 	} else {
-		logger.Info("Validating backends...")
+		// logger.Info("Validating backends...")
 
 		// if err := validateBackendModels(cfg); err != nil {
 		// 	logger.Warn("Error when validating backends", "error", err)
