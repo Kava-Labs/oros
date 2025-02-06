@@ -10,10 +10,11 @@ import { useAppContext } from '../context/useAppContext';
 const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
 
 interface NavBarProps {
+  chatHistoryOpen: boolean;
   setChatHistoryOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const NavBar = ({ setChatHistoryOpen }: NavBarProps) => {
+const NavBar = ({ chatHistoryOpen, setChatHistoryOpen }: NavBarProps) => {
   const showNavBar = !isInIframe() && FEAT_UPDATED_DESIGN;
   const { messageHistoryStore } = useAppContext();
   const isMobile = useIsMobile();
@@ -45,10 +46,11 @@ const NavBar = ({ setChatHistoryOpen }: NavBarProps) => {
             </button>
           )}
         </div>
-
-        <div className={styles.dropdownContainer}>
-          <ModelSelector />
-        </div>
+        {!chatHistoryOpen && (
+          <div className={styles.dropdownContainer}>
+            <ModelSelector />
+          </div>
+        )}
       </nav>
     </div>
   );
