@@ -138,42 +138,75 @@ export const ChatView = ({
               <img src={logo} id={styles.chatIconContainer} />
               <h3>Let's get started!</h3>
               <h6>{introText}</h6>
+              <div id={styles.controls} data-testid="controls">
+                <div id={styles.inputContainer}>
+                  <textarea
+                    id={styles.input}
+                    data-testid="chat-view-input"
+                    rows={1}
+                    value={inputValue}
+                    onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    ref={inputRef}
+                  ></textarea>
+
+                  <button
+                    data-testid="chat-view-button"
+                    ref={buttonRef}
+                    id={styles.sendChatButton}
+                    type="submit"
+                    onClick={handleButtonClick}
+                    aria-label="Send Chat"
+                  >
+                    {isRequesting ? (
+                      <CancelChatIcon color={colors.accentTransparent} />
+                    ) : (
+                      <SendChatIcon color={colors.accentTransparent} />
+                    )}
+                  </button>
+                </div>
+                <span id={styles.importantInfo} data-testid="importantInfo">
+                  <p>{cautionText}</p>
+                </span>
+              </div>
             </div>
           </div>
         )}
       </div>
 
-      <div id={styles.controls} data-testid="controls">
-        <div id={styles.inputContainer}>
-          <textarea
-            id={styles.input}
-            data-testid="chat-view-input"
-            rows={1}
-            value={inputValue}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            ref={inputRef}
-          ></textarea>
+      {hasMessages && (
+        <div id={styles.controls} data-testid="controls">
+          <div id={styles.inputContainer}>
+            <textarea
+              id={styles.input}
+              data-testid="chat-view-input"
+              rows={1}
+              value={inputValue}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              ref={inputRef}
+            ></textarea>
 
-          <button
-            data-testid="chat-view-button"
-            ref={buttonRef}
-            id={styles.sendChatButton}
-            type="submit"
-            onClick={handleButtonClick}
-            aria-label="Send Chat"
-          >
-            {isRequesting ? (
-              <CancelChatIcon color={colors.accentTransparent} />
-            ) : (
-              <SendChatIcon color={colors.accentTransparent} />
-            )}
-          </button>
+            <button
+              data-testid="chat-view-button"
+              ref={buttonRef}
+              id={styles.sendChatButton}
+              type="submit"
+              onClick={handleButtonClick}
+              aria-label="Send Chat"
+            >
+              {isRequesting ? (
+                <CancelChatIcon color={colors.accentTransparent} />
+              ) : (
+                <SendChatIcon color={colors.accentTransparent} />
+              )}
+            </button>
+          </div>
+          <span id={styles.importantInfo} data-testid="importantInfo">
+            <p>{cautionText}</p>
+          </span>
         </div>
-        <span id={styles.importantInfo} data-testid="importantInfo">
-          <p>{cautionText}</p>
-        </span>
-      </div>
+      )}
     </div>
   );
 };

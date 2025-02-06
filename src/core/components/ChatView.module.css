@@ -155,7 +155,7 @@
 
 #input {
   min-height: 50px;
-  max-width: 768px;
+  max-width: 500px;
   width: 100%;
   background-color: var(--colors-bgTertiary);
   border-radius: var(--borderRadius-md);
@@ -179,9 +179,10 @@
   }
 }
 
+
 #inputContainer {
   width: 100%;
-  max-width: 768px;
+  max-width: 500px;
   display: flex;
   align-items: flex-start;
   position: relative;
