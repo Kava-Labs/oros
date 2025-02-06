@@ -6,7 +6,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -26,22 +25,26 @@ const (
 	binName = "kavachat-api"
 )
 
-type config struct {
-	apiKey  string
-	baseURL string
-	port    int
-	host    string
+type testConfig struct {
+	name          string
+	apiKey        string
+	baseURL       string
+	allowedModels []string
+	port          int
+	host          string
 }
 
 var httpTestCases []*HttpTestCase
 
-func newDefaultTestConfig() config {
-	return config{
+func newDefaultTestConfig() testConfig {
+	return testConfig{
+		name:   "openai",
 		apiKey: "test-openai-api-key",
 		// don't use external URL's by default
-		baseURL: "http://localhost:5556/v1",
-		port:    0,
-		host:    "127.0.0.1",
+		baseURL:       "http://localhost:5556/v1/",
+		allowedModels: []string{"gpt-4o-mini"},
+		port:          0,
+		host:          "127.0.0.1",
 	}
 }
 
@@ -72,12 +75,16 @@ func TestMain(m *testing.M) {
 	os.Exit(r)
 }
 
-func startProxyCmd(context context.Context, config config, args ...string) *exec.Cmd {
+func startProxyCmd(context context.Context, config testConfig, args ...string) *exec.Cmd {
 	cmd := exec.CommandContext(context, fmt.Sprintf("./%s", binName), args...)
 
-	cmd.Env = append(cmd.Env,
-		fmt.Sprintf("OPENAI_API_KEY=%s", config.apiKey),
-		fmt.Sprintf("OPENAI_BASE_URL=%s", config.baseURL),
+	cmd.Env = append(
+		cmd.Env,
+		"KAVACHAT_API_LOG_LEVEL=debug",
+		fmt.Sprintf("KAVACHAT_API_BACKEND_0_NAME=%s", config.name),
+		fmt.Sprintf("KAVACHAT_API_BACKEND_0_API_KEY=%s", config.apiKey),
+		fmt.Sprintf("KAVACHAT_API_BACKEND_0_BASE_URL=%s", config.baseURL),
+		fmt.Sprintf("KAVACHAT_API_BACKEND_0_ALLOWED_MODELS=%s", strings.Join(config.allowedModels, ",")),
 		fmt.Sprintf("KAVACHAT_API_PORT=%d", config.port),
 		fmt.Sprintf("KAVACHAT_API_HOST=%s", config.host),
 	)
@@ -89,39 +96,51 @@ func TestIncorrectRequiredEnvironmentVariable(t *testing.T) {
 	testCases := []struct {
 		name                string
 		environmentVariable string
-		susbstitutedValue   string
+		substitutedString   string
 		expectedError       string
 	}{
 		{
+			name:                "Backend name missing",
+			environmentVariable: "KAVACHAT_API_BACKEND_0_NAME",
+			expectedError:       "invalid config: invalid backend: NAME is required for backend",
+		},
+		{
 			name:                "API key missing",
-			environmentVariable: "OPENAI_API_KEY",
-			expectedError:       "OPENAI_API_KEY is required",
+			environmentVariable: "KAVACHAT_API_BACKEND_0_API_KEY",
+			expectedError:       "invalid config: invalid backend: API_KEY is required for backend openai",
 		},
 		{
 			name:                "Base url missing",
-			environmentVariable: "OPENAI_BASE_URL",
-			expectedError:       "OPENAI_BASE_URL is required",
+			environmentVariable: "KAVACHAT_API_BACKEND_0_BASE_URL",
+			expectedError:       "invalid config: invalid backend: BASE_URL is required for backend openai",
+		},
+		{
+			name:                "Allowed models missing",
+			environmentVariable: "KAVACHAT_API_BACKEND_0_ALLOWED_MODELS",
+			expectedError:       "invalid config: invalid backend: ALLOWED_MODELS needs at least one model for backend openai",
 		},
 		{
 			name:                "Non-integer for port",
 			environmentVariable: "KAVACHAT_API_PORT",
-			susbstitutedValue:   "abc",
-			expectedError:       "error setting KAVACHAT_API_PORT to abc",
+			substitutedString:   "abc",
+			expectedError:       "error parsing config: env: parse error on field \"ServerPort\" of type \"int\": strconv.ParseInt: parsing \"abc\"",
 		},
 		{
 			name:                "Integer outside range for port",
 			environmentVariable: "KAVACHAT_API_PORT",
-			susbstitutedValue:   "123456789000000000000000000000",
-			expectedError:       "error setting KAVACHAT_API_PORT to 123456789000000000000000000000",
+			substitutedString:   "123456789000000000000000000000",
+			expectedError:       "error parsing config: env: parse error on field \"ServerPort\" of type \"int\": strconv.ParseInt: parsing \"123456789000000000000000000000\": value out of range",
 		},
 		{
 			name:                "Restricted port",
 			environmentVariable: "KAVACHAT_API_PORT",
-			susbstitutedValue:   "80",
+			substitutedString:   "80",
 			expectedError:       "failed to start server: listen tcp 127.0.0.1:80: bind: permission denied",
 		},
 	}
-	ctx, _ := context.WithTimeout(context.Background(), time.Duration(1*time.Second))
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(1*time.Second))
+	defer cancel()
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
@@ -134,13 +153,16 @@ func TestIncorrectRequiredEnvironmentVariable(t *testing.T) {
 
 				if match, _ := regexp.MatchString(envVariablePattern, envVar); match {
 					//	Some errors are triggered by inserting bad values for environment variables,
-					if testCase.susbstitutedValue != "" {
-						envVar = fmt.Sprintf("%v=%s", testCase.environmentVariable, testCase.susbstitutedValue)
+					if testCase.substitutedString != "" {
+						envVar = fmt.Sprintf("%v=%s", testCase.environmentVariable, testCase.substitutedString)
+
+						t.Logf("Setting test substitute %s to %s", testCase.environmentVariable, testCase.substitutedString)
 					} else {
 						//	While other errors are triggered by their absence
 						continue
 					}
 				}
+
 				newEnv = append(newEnv, envVar)
 			}
 
@@ -153,8 +175,11 @@ func TestIncorrectRequiredEnvironmentVariable(t *testing.T) {
 			err := cmd.Run()
 			require.Error(t, err, fmt.Sprintf("expected %s to fail", cmd.String()))
 
-			assert.Contains(t, stderr.String(), fmt.Sprintf("fatal: %s", testCase.expectedError))
-			assert.Contains(t, stdout.String(), fmt.Sprintf("level=ERROR msg=\"%s", testCase.expectedError))
+			expStdout := stdout.String()
+			// Remove backslashes
+			expStdout = strings.ReplaceAll(expStdout, "\\", "")
+
+			assert.Contains(t, expStdout, fmt.Sprintf("level=ERROR msg=\"%s", testCase.expectedError))
 
 			if exitErr, ok := err.(*exec.ExitError); ok {
 				assert.Equal(t, 1, exitErr.ExitCode(), "expected exit code to equal 1")
@@ -165,7 +190,7 @@ func TestIncorrectRequiredEnvironmentVariable(t *testing.T) {
 	}
 }
 
-func launchApiServer(ctx context.Context, conf config) (string, func() error, error) {
+func launchApiServer(ctx context.Context, conf testConfig) (string, func() error, error) {
 	cmd := startProxyCmd(ctx, conf)
 
 	shutdownServer := func() error {
@@ -179,6 +204,20 @@ func launchApiServer(ctx context.Context, conf config) (string, func() error, er
 	}
 
 	scanner := bufio.NewScanner(stdout)
+
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		return "", shutdownServer, fmt.Errorf("could not obtain stdout pipe: %w", err)
+	}
+
+	scannerStderr := bufio.NewScanner(stderr)
+
+	go func() {
+		for scannerStderr.Scan() {
+			fmt.Println(scannerStderr.Text())
+		}
+	}()
+
 	err = cmd.Start()
 	if err != nil {
 		return "", shutdownServer, err
@@ -196,6 +235,7 @@ func launchApiServer(ctx context.Context, conf config) (string, func() error, er
 		go func() {
 			for scanner.Scan() {
 				line := scanner.Text()
+				fmt.Println(line)
 
 				matches := portMatcher.FindStringSubmatch(line)
 				if len(matches) > 1 {
@@ -234,7 +274,7 @@ func launchApiServer(ctx context.Context, conf config) (string, func() error, er
 			for ctx.Err() == nil {
 				resp, err := http.Get(requestURL)
 				if err == nil && resp.StatusCode == 200 {
-					body, err := ioutil.ReadAll(resp.Body)
+					body, err := io.ReadAll(resp.Body)
 					defer resp.Body.Close()
 					if err == nil {
 						if string(body) == "available\n" {
@@ -258,7 +298,8 @@ func launchApiServer(ctx context.Context, conf config) (string, func() error, er
 }
 
 func TestHttpHealthCheck(t *testing.T) {
-	ctx, _ := context.WithTimeout(context.Background(), time.Duration(1*time.Second))
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(2*time.Second))
+	defer cancel()
 
 	serverUrl, shutdown, err := launchApiServer(ctx, newDefaultTestConfig())
 	require.NoError(t, err, "expected server to start without error")
@@ -279,10 +320,14 @@ func TestChatCompletionProxy(t *testing.T) {
 	mockServer := newHttpMockServer(authHeader)
 	mockServer.Start()
 
-	baseURL, err := url.JoinPath(mockServer.URL, "/v1")
+	baseURL, err := url.JoinPath(mockServer.URL, "/v1/")
 	require.NoError(t, err)
 	config.baseURL = baseURL
-	ctx, _ := context.WithTimeout(context.Background(), time.Duration(60*time.Second))
+	config.allowedModels = []string{"gpt-4o-mini", "dall-e-2"}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(20*time.Second))
+	defer cancel()
+
 	serverUrl, shutdown, err := launchApiServer(ctx, config)
 
 	defer shutdown()

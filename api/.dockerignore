@@ -1,9 +1,6 @@
 out/
-**/node_modules/
 **/.git
 **/.DS_Store
-.github/
-tests/
 
 # Ignore build cache directories to avoid
 # errors when addings these to docker images

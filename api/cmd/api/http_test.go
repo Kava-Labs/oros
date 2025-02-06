@@ -10,7 +10,7 @@ import (
 	"os"
 	"strings"
 
-	api "github.com/kava-labs/kavachat/api/cmd/api"
+	"github.com/kava-labs/kavachat/api/cmd/api/config"
 )
 
 const (
@@ -83,14 +83,9 @@ func loadHttpTestCases(generate bool) ([]*HttpTestCase, error) {
 }
 
 func generateTestCases() ([]*HttpTestCase, error) {
-	var apiKey, baseURL string
-
-	if apiKey = os.Getenv("OPENAI_API_KEY"); apiKey == "" {
-		return nil, api.ErrOpenAIKeyRequired
-	}
-
-	if baseURL = os.Getenv("OPENAI_BASE_URL"); baseURL == "" {
-		return nil, api.ErrOpenAIBaseURLRequired
+	cfg, err := config.NewConfigFromEnv()
+	if err != nil {
+		return nil, err
 	}
 
 	testCases := []*HttpTestCase{
@@ -153,10 +148,10 @@ func generateTestCases() ([]*HttpTestCase, error) {
 	}
 
 	client := &http.Client{}
-	authHeader := fmt.Sprintf("Bearer %s", apiKey)
+	authHeader := fmt.Sprintf("Bearer %s", cfg.Backends[0].APIKey)
 
 	for _, tc := range testCases {
-		url, err := url.JoinPath(baseURL, tc.Path)
+		url, err := url.JoinPath(cfg.Backends[0].BaseURL, tc.Path)
 		if err != nil {
 			return nil, fmt.Errorf("building url for %v: %w", tc.Name, err)
 		}

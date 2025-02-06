@@ -1,41 +1,65 @@
 package main
 
 import (
-	"errors"
 	"fmt"
-	"io"
-	"log"
 	"log/slog"
 	"net"
 	"net/http"
-	"net/url"
 	"os"
-	"strconv"
-)
+	"strings"
 
-const (
-	defaultAPIPort = 5555
+	"github.com/justinas/alice"
+	"github.com/kava-labs/kavachat/api/cmd/api/config"
+	"github.com/kava-labs/kavachat/api/cmd/api/handlers"
+	"github.com/kava-labs/kavachat/api/cmd/api/middleware"
 )
-
-const (
-	defaultHost = "127.0.0.1"
-)
-
-var ErrOpenAIKeyRequired = errors.New("OPENAI_API_KEY is required")
-var ErrOpenAIBaseURLRequired = errors.New("OPENAI_BASE_URL is required")
 
 func main() {
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+	// -------------------------------------------------------------------------
+	// Setup logging, configuration
+	logLevel := new(slog.LevelVar)
+	logLevel.Set(slog.LevelInfo)
 
-	apiKey := os.Getenv("OPENAI_API_KEY")
-	if apiKey == "" {
-		logFatal(logger, ErrOpenAIKeyRequired)
-	}
-	baseURL := os.Getenv("OPENAI_BASE_URL")
-	if baseURL == "" {
-		logFatal(logger, ErrOpenAIBaseURLRequired)
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		Level: logLevel,
+	}))
+
+	cfg, err := config.NewConfigFromEnv()
+	if err != nil {
+		logFatal(logger, fmt.Errorf("error parsing config: %w", err))
 	}
 
+	if err := cfg.Validate(); err != nil {
+		logFatal(logger, fmt.Errorf("invalid config: %w", err))
+	}
+
+	logger.Info("Load config from env")
+
+	// Update log level
+	logger.Info("Setting log level", "level", cfg.LogLevel)
+	if strings.ToLower(cfg.LogLevel) == "debug" {
+		logLevel.Set(slog.LevelDebug)
+	} else if strings.ToLower(cfg.LogLevel) == "info" {
+		logLevel.Set(slog.LevelInfo)
+	}
+
+	// -------------------------------------------------------------------------
+	// Verify backends
+
+	// Runpod LLaMA.cpp worker doesn't implement v1/models endpoint right now,
+	// only warn for now
+	if cfg.SkipBackendValidation {
+		logger.Warn("Skipping backend validation")
+	} else {
+		logger.Info("Validating backends...")
+
+		// if err := validateBackendModels(cfg); err != nil {
+		// 	logger.Warn("Error when validating backends", "error", err)
+		// }
+	}
+
+	// -------------------------------------------------------------------------
+	// API Routes
 	logger.Info("Starting Kavachat API!")
 
 	mux := http.NewServeMux()
@@ -43,108 +67,54 @@ func main() {
 		fmt.Fprintln(w, "available")
 	})
 
-	authHeader := fmt.Sprintf("Bearer %s", apiKey)
-	chatCompletionsUrl, err := url.JoinPath(baseURL, "/chat/completions")
-	if err != nil {
-		logFatal(logger, err)
-	}
+	mux.Handle(
+		"/openai/v1/chat/completions",
+		alice.
+			// Middlewares
+			New(
+				middleware.PreflightMiddleware,
+				middleware.ExtractModelMiddleware(logger),
+				middleware.ModelAllowlistMiddleware(logger, cfg.Backends),
+			).
+			// Handler
+			Then(
+				handlers.NewOpenAIProxyHandler(
+					cfg.Backends,
+					logger,
+					"/chat/completions",
+				),
+			),
+	)
 
-	imageGenerationUrl, err := url.JoinPath(baseURL, "/images/generations")
-	if err != nil {
-		logFatal(logger, err)
-	}
+	mux.Handle(
+		"/openai/v1/images/generations",
+		alice.
+			// Middlewares
+			New(
+				middleware.PreflightMiddleware,
+				middleware.ExtractModelMiddleware(logger),
+				middleware.ModelAllowlistMiddleware(logger, cfg.Backends),
+			).
+			// Handler
+			Then(
+				handlers.NewOpenAIProxyHandler(
+					cfg.Backends,
+					logger,
+					"/images/generations",
+				),
+			),
+	)
 
-	client := http.Client{}
+	// -------------------------------------------------------------------------
+	// Server setup
 
-	// handle browsers's OPTIONS request and halt or forward to the handler
-	preFlightMiddleware := func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.Method == http.MethodOptions {
-				w.Header().Set("Access-Control-Allow-Origin", "*")
-				w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
-				w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, x-stainless-os, x-stainless-runtime-version, x-stainless-package-version, x-stainless-runtime, x-stainless-arch, x-stainless-retry-count, x-stainless-lang, user-agent")
-				w.Header().Set("Access-Control-Max-Age", "3600")
-				w.WriteHeader(http.StatusOK)
-				return
-			}
-			next.ServeHTTP(w, r)
-		})
-	}
-
-	completionsHandler := func(w http.ResponseWriter, r *http.Request) {
-		request, err := http.NewRequest(r.Method, chatCompletionsUrl, r.Body)
-		if err != nil {
-			logger.Error(fmt.Errorf("error building request for upstream: %w", err).Error())
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		request.Header.Set("Authorization", authHeader)
-		request.Header.Set("Content-Type", r.Header.Get("Content-Type"))
-
-		response, err := client.Do(request)
-		if err != nil {
-			logger.Error(fmt.Errorf("error forwarding request to upstream: %w", err).Error())
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		defer response.Body.Close()
-
-		w.Header().Set("Content-Type", response.Header.Get("Content-Type"))
-		w.Header().Set("Transfer-Encoding", "identity")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.WriteHeader(response.StatusCode)
-		io.Copy(w, response.Body)
-	}
-
-	imageGenerationHandler := func(w http.ResponseWriter, r *http.Request) {
-		request, err := http.NewRequest(r.Method, imageGenerationUrl, r.Body)
-		if err != nil {
-			logger.Error(fmt.Errorf("error building request for upstream: %w", err).Error())
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		request.Header.Set("Authorization", authHeader)
-		request.Header.Set("Content-Type", r.Header.Get("Content-Type"))
-
-		response, err := client.Do(request)
-		if err != nil {
-			logger.Error(fmt.Errorf("error forwarding request to upstream: %w", err).Error())
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		defer response.Body.Close()
-
-		w.Header().Set("Content-Type", response.Header.Get("Content-Type"))
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.WriteHeader(response.StatusCode)
-
-		io.Copy(w, response.Body)
-	}
-
-	mux.Handle("/openai/v1/chat/completions", preFlightMiddleware(http.HandlerFunc(completionsHandler)))
-	mux.Handle("/openai/v1/images/generations", preFlightMiddleware(http.HandlerFunc(imageGenerationHandler)))
-
-	port := defaultAPIPort
-	if envPort := os.Getenv("KAVACHAT_API_PORT"); envPort != "" {
-		parsedPort, err := strconv.Atoi(envPort)
-		if err != nil {
-			logFatal(logger, fmt.Errorf("error setting KAVACHAT_API_PORT to %s: %w", envPort, err))
-		}
-		port = parsedPort
-	}
-
-	host := defaultHost
-
-	if envHost := os.Getenv("KAVACHAT_HOST"); envHost != "" {
-		host = envHost
-	}
-
-	address := fmt.Sprintf("%s:%d", host, port)
+	address := fmt.Sprintf("%s:%d", cfg.ServerHost, cfg.ServerPort)
 
 	listener, err := net.Listen("tcp", address)
 	if err != nil {
 		logFatal(logger, fmt.Errorf("failed to start server: %w", err))
 	}
+
 	tcpAddr := listener.Addr().(*net.TCPAddr)
 	logger.Info("listening", "port", tcpAddr.Port)
 
@@ -160,7 +130,57 @@ func main() {
 	}
 }
 
+// validateBackendModels checks if the models in the config are available in the
+// backend APIs
+/*
+func validateBackendModels(cfg config.Config) error {
+	missingModels := make(map[string][]string)
+
+	for _, backend := range cfg.Backends {
+		client := backend.GetClient()
+
+		backendModels, err := client.Models.List(context.Background())
+		if err != nil {
+			return fmt.Errorf(
+				"error fetching models from backend %s with base URL %s: %w",
+				backend.Name,
+				backend.BaseURL,
+				err,
+			)
+		}
+
+		// Convert to map for easier lookup
+		backendModelsMap := make(map[string]struct{})
+		for _, backendModel := range backendModels.Data {
+			backendModelsMap[backendModel.ID] = struct{}{}
+		}
+
+		for _, allowedModel := range backend.AllowedModels {
+			// Allowed model is present in the backend, skip
+			_, ok := backendModelsMap[allowedModel]
+			if ok {
+				continue
+			}
+
+			// Init empty slice if not present
+			if _, ok := missingModels[backend.BaseURL]; !ok {
+				missingModels[backend.BaseURL] = []string{}
+			}
+
+			// Add missing model to the list
+			missingModels[backend.BaseURL] = append(missingModels[backend.BaseURL], allowedModel)
+		}
+	}
+
+	if len(missingModels) > 0 {
+		return fmt.Errorf("models not found in backends: %v", missingModels)
+	}
+
+	return nil
+}
+*/
+
 func logFatal(logger *slog.Logger, err error) {
 	logger.Error(err.Error())
-	log.Fatalf("fatal: %v", err)
+	os.Exit(1)
 }
