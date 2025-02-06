@@ -45,21 +45,6 @@ func main() {
 	}
 
 	// -------------------------------------------------------------------------
-	// Verify backends
-
-	// Runpod LLaMA.cpp worker doesn't implement v1/models endpoint right now,
-	// only warn for now
-	if cfg.SkipBackendValidation {
-		logger.Warn("Skipping backend validation")
-	} else {
-		// logger.Info("Validating backends...")
-
-		// if err := validateBackendModels(cfg); err != nil {
-		// 	logger.Warn("Error when validating backends", "error", err)
-		// }
-	}
-
-	// -------------------------------------------------------------------------
 	// API Routes
 	logger.Info("Starting Kavachat API!")
 
@@ -130,56 +115,6 @@ func main() {
 		logFatal(logger, err)
 	}
 }
-
-// validateBackendModels checks if the models in the config are available in the
-// backend APIs
-/*
-func validateBackendModels(cfg config.Config) error {
-	missingModels := make(map[string][]string)
-
-	for _, backend := range cfg.Backends {
-		client := backend.GetClient()
-
-		backendModels, err := client.Models.List(context.Background())
-		if err != nil {
-			return fmt.Errorf(
-				"error fetching models from backend %s with base URL %s: %w",
-				backend.Name,
-				backend.BaseURL,
-				err,
-			)
-		}
-
-		// Convert to map for easier lookup
-		backendModelsMap := make(map[string]struct{})
-		for _, backendModel := range backendModels.Data {
-			backendModelsMap[backendModel.ID] = struct{}{}
-		}
-
-		for _, allowedModel := range backend.AllowedModels {
-			// Allowed model is present in the backend, skip
-			_, ok := backendModelsMap[allowedModel]
-			if ok {
-				continue
-			}
-
-			// Init empty slice if not present
-			if _, ok := missingModels[backend.BaseURL]; !ok {
-				missingModels[backend.BaseURL] = []string{}
-			}
-
-			// Add missing model to the list
-			missingModels[backend.BaseURL] = append(missingModels[backend.BaseURL], allowedModel)
-		}
-	}
-
-	if len(missingModels) > 0 {
-		return fmt.Errorf("models not found in backends: %v", missingModels)
-	}
-
-	return nil
-}
-*/
 
 func logFatal(logger *slog.Logger, err error) {
 	logger.Error(err.Error())

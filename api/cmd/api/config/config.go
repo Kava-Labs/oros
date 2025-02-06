@@ -14,8 +14,6 @@ type Config struct {
 	ServerPort int    `env:"PORT" envDefault:"8080"`
 	ServerHost string `env:"HOST" envDefault:"127.0.0.1"`
 
-	SkipBackendValidation bool `env:"SKIP_BACKEND_VALIDATION" envDefault:"false"`
-
 	Backends OpenAIBackends `envPrefix:"BACKEND"`
 }
 
