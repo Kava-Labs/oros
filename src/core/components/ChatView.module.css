@@ -163,11 +163,9 @@
   color: var(--colors-textPrimary);
   font-family: inherit;
   font-weight: inherit;
-  line-height: inherit;
-  flex: 1;
-  /* 12px works with line-height to center text vertically  in textarea */
-  padding: 12px 55px 10px 20px;
-  overflow-y: auto; /* Enable vertical scrolling */
+  font-size: 18px; /* Explicit font size */
+  line-height: 1.5; /* Ensure proper alignment with font size */
+  overflow-y: auto; /* Enable vertical scrolling if needed */
   resize: none; /* Disable manual resizing */
   text-wrap: wrap;
 
@@ -191,8 +189,8 @@
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   padding: 0;
   border-radius: 50%;
   box-sizing: border-box;
