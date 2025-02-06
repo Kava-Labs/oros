@@ -259,16 +259,14 @@ describe('chat', () => {
     await chat.waitForStreamToFinish();
     await chat.waitForAssistantResponse();
 
-    const historyEntry = await page
+    const initialHistoryEntry = await page
       .getByTestId('chat-history-entry')
       .first()
       .textContent();
 
-    console.log({ historyEntry });
-    expect(historyEntry).not.toBe('');
+    expect(initialHistoryEntry).not.toBe('');
 
     const newChatIcon = page.getByRole('button', { name: 'New Chat' });
-
     await newChatIcon.click();
 
     await chat.submitMessage(
@@ -278,12 +276,38 @@ describe('chat', () => {
     await chat.waitForStreamToFinish();
     await chat.waitForAssistantResponse();
 
-    const updatedHistoryEntry = await page
+    await chat.submitMessage('ok thanks');
+
+    await chat.waitForStreamToFinish();
+    await chat.waitForAssistantResponse();
+
+    //  Switching between conversation histories
+
+    //  Deleting entries
+
+    const secondHistoryEntry = await page
       .getByTestId('chat-history-entry')
       .nth(1)
       .textContent();
 
-    console.log({ updatedHistoryEntry });
-    expect(updatedHistoryEntry).not.toBe('');
+    expect(secondHistoryEntry).not.toBe('');
+    expect(secondHistoryEntry).not.toBe(initialHistoryEntry);
+
+    let historyEntries = await page.getByTestId('chat-history-entry').all();
+    expect(historyEntries).toHaveLength(2);
+
+    let deleteIcon = page.getByTestId('delete-chat-history-entry-icon').first();
+    await deleteIcon.waitFor({ state: 'visible' });
+    await deleteIcon.click({ force: true });
+
+    historyEntries = await page.getByTestId('chat-history-entry').all();
+    expect(historyEntries).toHaveLength(1);
+
+    deleteIcon = page.getByTestId('delete-chat-history-entry-icon').first();
+    await deleteIcon.waitFor({ state: 'visible' });
+    await deleteIcon.click({ force: true });
+
+    historyEntries = await page.getByTestId('chat-history-entry').all();
+    expect(historyEntries).toHaveLength(0);
   });
 });

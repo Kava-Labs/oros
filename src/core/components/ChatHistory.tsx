@@ -83,6 +83,7 @@ export const ChatHistory = () => {
                 </p>
                 <div>
                   <svg
+                    data-testid="delete-chat-history-entry-icon"
                     onClick={() => {
                       deleteConversation(id);
                     }}
