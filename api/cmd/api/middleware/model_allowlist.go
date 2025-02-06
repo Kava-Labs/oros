@@ -100,6 +100,8 @@ func ModelAllowlistMiddleware(
 				return
 			}
 
+			logger.Debug(fmt.Sprintf("model is allowed: %s", model))
+
 			next.ServeHTTP(w, r)
 		})
 	}

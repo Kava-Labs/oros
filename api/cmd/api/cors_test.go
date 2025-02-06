@@ -146,5 +146,4 @@ func TestCors(t *testing.T) {
 			}
 		})
 	}
-
 }
