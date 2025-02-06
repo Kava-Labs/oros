@@ -179,12 +179,15 @@ describe('chat', () => {
   });
   test('model dropdown interactions', async ({ page }) => {
     const DEFAULT_MODEL_DISPLAY_NAME = 'DeepSeek RI 67TB';
+    const DEFAULT_MODEL_DESCRIPTION = 'Logical Analysis Engine';
     const NUMBER_OF_SUPPORTED_MODELS = 2;
     const chat = new Chat(page);
     await chat.goto();
 
     const modelButton = page.getByRole('button', { name: 'Select model' });
-    await expect(modelButton).toContainText(DEFAULT_MODEL_DISPLAY_NAME);
+    await expect(modelButton).toContainText(
+      DEFAULT_MODEL_DISPLAY_NAME + DEFAULT_MODEL_DESCRIPTION,
+    );
 
     // Open dropdown and verify options
     await modelButton.click();
@@ -196,7 +199,9 @@ describe('chat', () => {
     // Select a different model
     const alternativeModel = page.getByRole('option').first();
     const alternativeModelName = await alternativeModel.textContent();
-    expect(alternativeModelName).not.toBe(DEFAULT_MODEL_DISPLAY_NAME);
+    expect(alternativeModelName).not.toBe(
+      DEFAULT_MODEL_DISPLAY_NAME + DEFAULT_MODEL_DESCRIPTION,
+    );
     await alternativeModel.click();
 
     // Verify dropdown closed and new model selected
@@ -207,7 +212,9 @@ describe('chat', () => {
     await modelButton.click();
     const originalModel = page.getByRole('option').nth(1);
     await originalModel.click();
-    await expect(modelButton).toContainText(DEFAULT_MODEL_DISPLAY_NAME);
+    await expect(modelButton).toContainText(
+      DEFAULT_MODEL_DISPLAY_NAME + DEFAULT_MODEL_DESCRIPTION,
+    );
 
     // Type message to disable dropdown
     await chat.submitMessage('test message');
