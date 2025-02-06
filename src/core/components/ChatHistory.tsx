@@ -66,7 +66,9 @@ export const ChatHistory = () => {
             const { id, title } = conversation;
             return (
               <div key={id} className={styles.chatHistoryItem}>
-                <p onClick={() => loadConversation(conversation)}>{title}</p>
+                <p onClick={() => loadConversation(conversation)}>
+                  {title.slice(1, -1)}
+                </p>
                 <div>
                   <svg
                     onClick={() => {

@@ -9,13 +9,11 @@
   padding-left: 2rem;
   border-radius: 8px;
   border: 1px;
-  margin-top: 28px;
-  margin-bottom: 28px;
-  margin-left: 14px;
-  margin-right: 14px;
+  margin: var(--spacing-lg) var(--spacing-md) var(--spacing-lg)
+    var(--spacing-md);
 
-  background-color: #111111;
-  border: 1px solid #b4b4b4;
+  background-color: var(--colors-bgPrimary);
+  border: 1px solid var(--colors-borderPrimary);
   cursor: pointer;
 }
 
@@ -28,6 +26,7 @@
 }
 
 .historySection {
+  padding: var(--spacing-sm);
   border-top: 1px solid #3e3e3e;
   border-bottom: 1px solid #3e3e3e;
 }
@@ -37,7 +36,7 @@
   margin-top: 20px;
   color: #b4b4b4;
   font-size: 18px;
-  font-weight: 700;
+  font-weight: var(--typography-fontWeightBold);
   line-height: 24px;
   text-align: left;
 }
