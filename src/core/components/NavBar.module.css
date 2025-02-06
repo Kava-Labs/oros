@@ -28,7 +28,7 @@
 .logo {
   display: flex;
   align-items: center;
-  padding: var(--spacing-md) var(--spacing-xl) var(--spacing-md) 0;
+  padding: var(--spacing-md) 0 var(--spacing-md) 0;
   width: 100%;
   justify-content: center;
 }
@@ -182,5 +182,16 @@
   .description {
     display: block;
     font-weight: var(--typography-fontWeightLight);
+  }
+}
+
+.newChatIcon {
+  padding: var(--spacing-md) var(--spacing-lg) var(--spacing-md) 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+
+  &:active {
+    opacity: 0.6;
   }
 }

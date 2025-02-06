@@ -2,11 +2,14 @@ import styles from './ChatHistory.module.css';
 import { ConversationHistory } from '../context/types';
 import { useCallback, useEffect, useState } from 'react';
 import { useAppContext } from '../context/useAppContext';
+import NewChatIcon from '../assets/NewChatIcon';
+import { useIsMobile } from '../../shared/theme/useIsMobile';
 
 export const ChatHistory = () => {
   const [chatHistories, setChatHistories] = useState<ConversationHistory[]>([]);
 
   const { loadConversation, messageHistoryStore } = useAppContext();
+  const isMobile = useIsMobile();
 
   const truncateTitle = useCallback((title: string) => {
     if (title.startsWith(`"`) || title.startsWith(`'`)) {
@@ -51,25 +54,16 @@ export const ChatHistory = () => {
 
   return (
     <div className={styles.chatHistoryContainer}>
-      <button
-        onClick={() => messageHistoryStore.reset()}
-        className={styles.newChatButton}
-        data-testid="new-chat-container-button"
-      >
-        <svg
-          width="20"
-          height="21"
-          viewBox="0 0 20 21"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
+      {!isMobile && (
+        <button
+          onClick={() => messageHistoryStore.reset()}
+          className={styles.newChatButton}
+          data-testid="new-chat-container-button"
         >
-          <path
-            d="M2 21C1.45 21 0.979167 20.8042 0.5875 20.4125C0.195833 20.0208 0 19.55 0 19V5.00001C0 4.45001 0.195833 3.97917 0.5875 3.58751C0.979167 3.19584 1.45 3.00001 2 3.00001H10.925L8.925 5.00001H2V19H16V12.05L18 10.05V19C18 19.55 17.8042 20.0208 17.4125 20.4125C17.0208 20.8042 16.55 21 16 21H2ZM6 15V10.75L15.175 1.57501C15.375 1.37501 15.6 1.22501 15.85 1.12501C16.1 1.02501 16.35 0.975006 16.6 0.975006C16.8667 0.975006 17.1208 1.02501 17.3625 1.12501C17.6042 1.22501 17.825 1.37501 18.025 1.57501L19.425 3.00001C19.6083 3.20001 19.75 3.42084 19.85 3.66251C19.95 3.90417 20 4.15001 20 4.40001C20 4.65001 19.9542 4.89584 19.8625 5.13751C19.7708 5.37917 19.625 5.60001 19.425 5.80001L10.25 15H6ZM8 13H9.4L15.2 7.20001L14.5 6.50001L13.775 5.80001L8 11.575V13Z"
-            fill="#B4B4B4"
-          />
-        </svg>
-        <p className={styles.newChatButtonText}>New Chat</p>
-      </button>
+          <NewChatIcon />
+          <p className={styles.newChatButtonText}>New Chat</p>
+        </button>
+      )}
 
       {/*  */}
       <div className={styles.historySection} data-testid="chat-history-section">
