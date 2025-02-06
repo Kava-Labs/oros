@@ -8,17 +8,31 @@ export const ChatHistory = () => {
 
   const { loadConversation, messageHistoryStore } = useAppContext();
 
+  const truncateTitle = useCallback((title: string) => {
+    if (title.startsWith(`"`) || title.startsWith(`'`)) {
+      title = title.slice(1);
+    }
+    if (title.endsWith(`"`) || title.endsWith(`'`)) {
+      title = title.slice(0, -1);
+    }
+    if (title.length > 32) {
+      title = title.slice(0, 32) + '....';
+    }
+
+    return title;
+  }, []);
+
   useEffect(() => {
     const load = () => {
-      const allConversationsStr = localStorage.getItem('conversations');
-      if (allConversationsStr) {
-        setChatHistories(Object.values(JSON.parse(allConversationsStr)));
-      }
+      setChatHistories(
+        Object.values(
+          JSON.parse(localStorage.getItem('conversations') ?? '{}'),
+        ),
+      );
     };
     load();
     // we have to poll local storage
     const id = setInterval(load, 1000);
-
     return () => {
       clearInterval(id);
     };
@@ -67,7 +81,7 @@ export const ChatHistory = () => {
             return (
               <div key={id} className={styles.chatHistoryItem}>
                 <p onClick={() => loadConversation(conversation)}>
-                  {title.slice(1, -1)}
+                  {truncateTitle(title)}
                 </p>
                 <div>
                   <svg
