@@ -191,6 +191,41 @@ jobs:
         if: failure()
         run: docker compose -f docker-compose.yaml logs
 
+      - name: Zip and encrypt Playwright test results if tests failed
+        if: failure()
+        run: |
+          # Regular zip
+          zip -r test-results.zip test-results
+
+          # Fetch GitHub username from pusher event
+          USERNAME=$(echo ${{ github.event.pusher.username }})
+
+          # Exit if invalid username
+          if [ -z "$USERNAME" ]; then
+            echo "No GitHub username found, exiting"
+            exit 1
+          fi
+
+          # Fetch GPG pubkey from github.com/<username>.gpg
+          curl -sSL https://github.com/$USERNAME.gpg | gpg --import
+
+          # Get key ID of the most recent pubkey
+          KEY_ID=$(gpg --list-keys --with-colons | awk -F: '/^pub/ {print $5}' | tail -n 1)
+
+          # Encrypt zip file with pubkey
+          gpg --output test-results.zip.gpg --encrypt --recipient $KEY_ID test-results.zip
+
+          # Delete the unencrypted zip file so there's no chance of accidentally
+          # uploading it
+          rm test-results.zip
+
+      - name: Upload encrypted zip file to artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results
+          path: test-results.zip.gpg
+
       - name: Shutdown proxy and kava node
         if: always()
         run: docker compose -f docker-compose.yaml down
