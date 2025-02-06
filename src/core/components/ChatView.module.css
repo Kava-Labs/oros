@@ -30,7 +30,7 @@
   max-width: 768px;
   width: 100%;
   padding: 0 var(--spacing-sm);
-  margin-top: -10px;
+  margin-top: -70px;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -163,11 +163,9 @@
   color: var(--colors-textPrimary);
   font-family: inherit;
   font-weight: inherit;
-  line-height: inherit;
-  flex: 1;
-  /* 12px works with line-height to center text vertically  in textarea */
-  padding: 12px 55px 10px 20px;
-  overflow-y: auto; /* Enable vertical scrolling */
+  font-size: 18px; /* Explicit font size */
+  line-height: 1.5; /* Ensure proper alignment with font size */
+  overflow-y: auto; /* Enable vertical scrolling if needed */
   resize: none; /* Disable manual resizing */
   text-wrap: wrap;
 
@@ -191,8 +189,8 @@
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   padding: 0;
   border-radius: 50%;
   box-sizing: border-box;
@@ -211,27 +209,10 @@
   }
 }
 
-#controls {
-  width: 100%;
-  flex-shrink: 0;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  scrollbar-color: var(--colors-bgTertiary) var(--colors-bgPrimary);
-  overflow-y: scroll;
-  -webkit-overflow-scrolling: touch;
-  padding: 0px var(--spacing-xs) var(--spacing-xs) var(--spacing-xs);
-
-  @media (max-width: 768px) {
-    overflow-y: hidden;
-  }
-}
-
 #importantInfo {
   margin-top: var(--spacing-xs);
   /* custom font-size for chat warning */
-  font-size: 1rem;
+  font-size: 2rem;
   text-align: center;
   color: var(--colors-textMuted);
 }
@@ -295,5 +276,42 @@
 @media (min-width: 768px) {
   .introText {
     font-size: 2.43rem;
+  }
+}
+
+.inputRaised {
+  position: absolute;
+  bottom: 30%;
+  transition: transform 0.5s ease-in-out, bottom 0.5s ease-in-out;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  scrollbar-color: var(--colors-bgTertiary) var(--colors-bgPrimary);
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 0px var(--spacing-xs) var(--spacing-xs) var(--spacing-xs);
+
+  @media (max-width: 768px) {
+    overflow-y: hidden;
+  }
+}
+
+.inputNormal {
+  position: absolute;
+  bottom: 10px;
+  transition: transform 0.5s ease-in-out, bottom 0.5s ease-in-out;
+  flex-shrink: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  scrollbar-color: var(--colors-bgTertiary) var(--colors-bgPrimary);
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 0px var(--spacing-xs) var(--spacing-xs) var(--spacing-xs);
+
+  @media (max-width: 768px) {
+    overflow-y: hidden;
   }
 }

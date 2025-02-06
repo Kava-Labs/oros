@@ -6,6 +6,7 @@ import { devices } from '@playwright/test';
 
 describe('chat', () => {
   test('renders intro message', async ({ page }) => {
+    const expectedIntroMessage = 'What can I help you with?';
     const chat = new Chat(page);
     await chat.goto();
 
@@ -14,13 +15,7 @@ describe('chat', () => {
 
     expect(chat.messageContainer).not.toBeNull();
 
-    await expect(page.getByText("let's get started").first()).toBeVisible();
-
-    await expect(
-      page.getByText(
-        "Welcome to Oros! I'm here to help you with all things blockchain and DeFi. Whether you're checking your balances, managing transactions, or exploring earning opportunities, I'll guide you every step of the way. Let's get started. What can I assist you with today?",
-      ),
-    ).toBeVisible();
+    await expect(page.getByText(expectedIntroMessage)).toBeVisible();
   });
 
   test('receiving a response from the model', async ({ page }) => {

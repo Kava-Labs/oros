@@ -25,6 +25,7 @@ export const blockchainModels: Record<
     tools: messageRegistry.getToolDefinitions(),
     systemPrompt: messageRegistry.getSystemPrompt(),
     introText: messageRegistry.getIntroText(),
+    inputPlaceholderText: messageRegistry.getInputPlaceholderText(),
     components: {
       transaction: {
         inProgress: InProgressTxDisplay,

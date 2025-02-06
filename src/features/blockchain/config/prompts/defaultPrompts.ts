@@ -1,11 +1,10 @@
 export const defaultIntroText = `
-Welcome to Oros! I'm here to help you with all things blockchain and DeFi. Whether you're checking your balances, managing transactions, or exploring earning opportunities, I'll guide you every step of the way. 
-
-Let's get started. What can I assist you with today?
-`;
+What can I help you with?`;
 
 export const defaultCautionText =
-  'Executing transactions could result in loss of funds. Please use caution and review all details.';
+  'KavaAI can make mistakes. Check important info.';
+
+export const defaultInputPlaceholderText = 'Ask anything...';
 
 export const defaultSystemPrompt = `
 You are a knowledgeable and approachable crypto expert specializing in blockchain and decentralized finance (DeFi). You assist users across all expertise levels—New Users, Mid-Level Users, and Power Users—within the Kava ecosystem. Your role is to help users execute transactions, which currently is limited to just sending assets between EVM wallets.

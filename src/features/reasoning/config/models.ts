@@ -2,6 +2,7 @@ import { ReasoningModelConfig } from '../../../core/types/models';
 import {
   defaultIntroText,
   defaultSystemPrompt,
+  defaultInputPlaceholderText,
 } from './prompts/defaultPrompts';
 import DeepseekIcon from '../assets/DeepseekIcon';
 
@@ -19,5 +20,6 @@ export const reasoningModels: Record<
     tools: [],
     systemPrompt: defaultSystemPrompt,
     introText: defaultIntroText,
+    inputPlaceholderText: defaultInputPlaceholderText,
   },
 };

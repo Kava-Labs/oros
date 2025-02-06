@@ -149,7 +149,10 @@ export const ChatView = ({
         )}
       </div>
 
-      <div id={styles.controls} data-testid="controls">
+      <div
+        data-testid="controls"
+        className={hasMessages ? styles.inputNormal : styles.inputRaised}
+      >
         <div id={styles.inputContainer}>
           <textarea
             id={styles.input}
@@ -159,6 +162,7 @@ export const ChatView = ({
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             ref={inputRef}
+            placeholder="Ask anything..."
           ></textarea>
 
           <button
