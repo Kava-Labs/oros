@@ -178,7 +178,7 @@ describe('chat', () => {
     expect(formattedAmount).toBe(0.2345);
   });
   test('model dropdown interactions', async ({ page }) => {
-    const DEFAULT_MODEL_DISPLAY_NAME = 'DeepSeek RI 67TB';
+    const DEFAULT_MODEL_DISPLAY_NAME = 'DeepSeek R1 67TB';
     const DEFAULT_MODEL_DESCRIPTION = 'Logical Analysis Engine';
     const NUMBER_OF_SUPPORTED_MODELS = 2;
     const chat = new Chat(page);
