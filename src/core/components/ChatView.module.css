@@ -209,23 +209,6 @@
   }
 }
 
-#controls {
-  width: 100%;
-  flex-shrink: 0;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  scrollbar-color: var(--colors-bgTertiary) var(--colors-bgPrimary);
-  overflow-y: scroll;
-  -webkit-overflow-scrolling: touch;
-  padding: 0px var(--spacing-xs) var(--spacing-xs) var(--spacing-xs);
-
-  @media (max-width: 768px) {
-    overflow-y: hidden;
-  }
-}
-
 #importantInfo {
   margin-top: var(--spacing-xs);
   /* custom font-size for chat warning */
@@ -299,14 +282,36 @@
 .inputRaised {
   position: absolute;
   bottom: 30%;
-  width: 100%;
   transition: transform 0.5s ease-in-out, bottom 0.5s ease-in-out;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  scrollbar-color: var(--colors-bgTertiary) var(--colors-bgPrimary);
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 0px var(--spacing-xs) var(--spacing-xs) var(--spacing-xs);
+
+  @media (max-width: 768px) {
+    overflow-y: hidden;
+  }
 }
 
 .inputNormal {
   position: absolute;
   bottom: 10px;
-  width: 100%;
   transition: transform 0.5s ease-in-out, bottom 0.5s ease-in-out;
-}
+  flex-shrink: 0;
 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  scrollbar-color: var(--colors-bgTertiary) var(--colors-bgPrimary);
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 0px var(--spacing-xs) var(--spacing-xs) var(--spacing-xs);
+
+  @media (max-width: 768px) {
+    overflow-y: hidden;
+  }
+}

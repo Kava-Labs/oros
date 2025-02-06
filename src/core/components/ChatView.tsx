@@ -150,7 +150,6 @@ export const ChatView = ({
       </div>
 
       <div
-        id={styles.controls}
         data-testid="controls"
         className={hasMessages ? styles.inputNormal : styles.inputRaised}
       >
