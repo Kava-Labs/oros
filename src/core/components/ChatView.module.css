@@ -280,7 +280,9 @@
 }
 
 .inputRaised {
-  width: -webkit-fill-available;
+  width: -webkit-fill-available; /* WebKit browsers (Chrome, Edge, Safari) */
+  width: -moz-available;
+  width: fill-available;
   position: absolute;
   bottom: 30%;
   transition: transform 0.5s ease-in-out, bottom 0.5s ease-in-out;
@@ -299,7 +301,9 @@
 }
 
 .inputNormal {
-  width: -webkit-fill-available;
+  width: -webkit-fill-available; /* WebKit browsers (Chrome, Edge, Safari) */
+  width: -moz-available;
+  width: fill-available;
   position: absolute;
   bottom: 10px;
   transition: transform 0.5s ease-in-out, bottom 0.5s ease-in-out;
