@@ -103,8 +103,8 @@ At its core, Oros is a bridge between natural language and blockchain actions, l
 
 ## Product Roadmap
 
-| Milestone                  | Description                                          | Status         |
-| -------------------------- | ---------------------------------------------------- | -------------- |
+| Milestone                  | Description                                          | Status        |
+| -------------------------- | ---------------------------------------------------- | ------------- |
 | **Oros MVP**               | Basic chat + tool bridging, single dApp integration  | ✅ Done        |
 | **Multi-dApp Integration** | Expand Oros to multiple Kava dApps                   | 🚧 In progress |
 | **Cross-Chain Support**    | EVM bridging (ERC20 transfers, bridging logic)       | 🚧 In progress |
@@ -142,13 +142,8 @@ cd oros
 
 #### 3. **Set Up the Backend**
 
-Oros requires an OpenAI API key for its backend. Obtain your key from [OpenAI's API portal](https://platform.openai.com/account/api-keys).
-
-Run the following command to start the backend API:
-
-```bash
-OPENAI_API_KEY=<your_key> OPENAI_BASE_URL=https://api.openai.com/v1 go run ./api/cmd/api/main.go
-```
+Oros requires an OpenAI compatible API that is proxied with the Oros API. Check
+the [API](api/) documentation for more details.
 
 #### 4. **Set Up the Frontend**
 
