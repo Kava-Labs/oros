@@ -243,4 +243,71 @@ describe('chat', () => {
 
     await context.close();
   });
+  test('chat history', async ({ page }) => {
+    test.setTimeout(90 * 1000);
+
+    const chat = new Chat(page);
+    await chat.goto();
+
+    //  todo - remove when the default (reasoning) model is functioning
+    await chat.switchToBlockchainModel();
+
+    await chat.submitMessage(
+      'This is an automated test suite, please respond with the exact text: THIS IS A TEST',
+    );
+
+    await chat.waitForStreamToFinish();
+    await chat.waitForAssistantResponse();
+
+    const initialHistoryEntry = await page
+      .getByTestId('chat-history-entry')
+      .first()
+      .textContent();
+
+    expect(initialHistoryEntry).not.toBe('');
+
+    const newChatIcon = page.getByRole('button', { name: 'New Chat' });
+    await newChatIcon.click();
+
+    await chat.submitMessage(
+      'Can you help me move my blockchain asset from one chain to another?',
+    );
+
+    await chat.waitForStreamToFinish();
+    await chat.waitForAssistantResponse();
+
+    await chat.submitMessage('ok thanks');
+
+    await chat.waitForStreamToFinish();
+    await chat.waitForAssistantResponse();
+
+    //  Switching between conversation histories
+
+    //  Deleting entries
+
+    const secondHistoryEntry = await page
+      .getByTestId('chat-history-entry')
+      .nth(1)
+      .textContent();
+
+    expect(secondHistoryEntry).not.toBe('');
+    expect(secondHistoryEntry).not.toBe(initialHistoryEntry);
+
+    let historyEntries = await page.getByTestId('chat-history-entry').all();
+    expect(historyEntries).toHaveLength(2);
+
+    let deleteIcon = page.getByTestId('delete-chat-history-entry-icon').first();
+    await deleteIcon.waitFor({ state: 'visible' });
+    await deleteIcon.click({ force: true });
+
+    historyEntries = await page.getByTestId('chat-history-entry').all();
+    expect(historyEntries).toHaveLength(1);
+
+    deleteIcon = page.getByTestId('delete-chat-history-entry-icon').first();
+    await deleteIcon.waitFor({ state: 'visible' });
+    await deleteIcon.click({ force: true });
+
+    historyEntries = await page.getByTestId('chat-history-entry').all();
+    expect(historyEntries).toHaveLength(0);
+  });
 });
