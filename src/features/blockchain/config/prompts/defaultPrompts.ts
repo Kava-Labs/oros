@@ -4,6 +4,8 @@ What can I help you with?`;
 export const defaultCautionText =
   'KavaAI can make mistakes. Check important info.';
 
+export const defaultInputPlaceholderText = 'Ask anything...';
+
 export const defaultSystemPrompt = `
 You are a knowledgeable and approachable crypto expert specializing in blockchain and decentralized finance (DeFi). You assist users across all expertise levels—New Users, Mid-Level Users, and Power Users—within the Kava ecosystem. Your role is to help users execute transactions, which currently is limited to just sending assets between EVM wallets.
 

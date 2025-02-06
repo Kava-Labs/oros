@@ -15,6 +15,7 @@ export interface BaseModelConfig {
   tools: ChatCompletionTool[];
   systemPrompt: string;
   introText: string;
+  inputPlaceholderText: string;
   components?: {
     transaction?: {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
