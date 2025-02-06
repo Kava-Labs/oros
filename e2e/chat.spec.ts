@@ -243,4 +243,47 @@ describe('chat', () => {
 
     await context.close();
   });
+  test('chat history', async ({ page }) => {
+    test.setTimeout(90 * 1000);
+
+    const chat = new Chat(page);
+    await chat.goto();
+
+    //  todo - remove when the default (reasoning) model is functioning
+    await chat.switchToBlockchainModel();
+
+    await chat.submitMessage(
+      'This is an automated test suite, please respond with the exact text: THIS IS A TEST',
+    );
+
+    await chat.waitForStreamToFinish();
+    await chat.waitForAssistantResponse();
+
+    const historyEntry = await page
+      .getByTestId('chat-history-entry')
+      .first()
+      .textContent();
+
+    console.log({ historyEntry });
+    expect(historyEntry).not.toBe('');
+
+    const newChatIcon = page.getByRole('button', { name: 'New Chat' });
+
+    await newChatIcon.click();
+
+    await chat.submitMessage(
+      'Can you help me move my blockchain asset from one chain to another?',
+    );
+
+    await chat.waitForStreamToFinish();
+    await chat.waitForAssistantResponse();
+
+    const updatedHistoryEntry = await page
+      .getByTestId('chat-history-entry')
+      .nth(1)
+      .textContent();
+
+    console.log({ updatedHistoryEntry });
+    expect(updatedHistoryEntry).not.toBe('');
+  });
 });

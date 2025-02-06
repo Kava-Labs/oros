@@ -73,7 +73,11 @@ export const ChatHistory = () => {
           {chatHistories.map((conversation) => {
             const { id, title } = conversation;
             return (
-              <div key={id} className={styles.chatHistoryItem}>
+              <div
+                data-testid="chat-history-entry"
+                key={id}
+                className={styles.chatHistoryItem}
+              >
                 <p onClick={() => loadConversation(conversation)}>
                   {truncateTitle(title)}
                 </p>
