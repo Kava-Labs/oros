@@ -2,8 +2,8 @@ export const OrosIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 400 400"
-    width="40"
-    height="40"
+    width="33"
+    height="33"
     aria-labelledby="orosTitle orosDesc"
     role="img"
     className="w-10 h-10 flex-shrink-0"

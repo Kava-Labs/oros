@@ -1,10 +1,14 @@
-import OrosLogo from '../../features/blockchain/assets/orosLogo.svg';
+import { ComponentType } from 'react';
+import KavaAILogo from '../../core/assets/KavaAILogo';
+// import OrosLogo from '../../features/blockchain/assets/orosLogo.svg';
 
 export interface ThemeColors {
   bgPrimary: string;
   bgSecondary: string;
   bgTertiary?: string;
   bgQuaternary?: string;
+  borderPrimary: string;
+  borderSecondary: string;
   textPrimary: string;
   textSecondary: string;
   textTertiary?: string;
@@ -43,29 +47,31 @@ export interface Theme {
   typography: ThemeTypography;
   spacing: ThemeSpacing;
   borderRadius: ThemeBorderRadius;
-  logo?: string;
+  logo?: ComponentType<any>;
 }
 
 // Base theme with shared styles
 export const baseTheme: Theme = {
   colors: {
-    bgPrimary: '#121212',
+    bgPrimary: '#212121',
     bgSecondary: '#1a1a1a',
     bgTertiary: '#2d2d2d',
     bgQuaternary: '#333333',
+    borderPrimary: 'rgb(180 180 180)',
+    borderSecondary: 'rgb(62, 62, 62)',
     textPrimary: '#ffffff',
-    textSecondary: '#d1d1d1',
+    textSecondary: 'rgb(180 180 180)',
     textTertiary: '#bbbbbb',
     textMuted: 'rgb(150, 150, 150)',
-    accent: '#0070f3',
-    accentTransparent: 'rgba(0, 112, 243, 0.75)',
-    accentBorder: 'rgba(0, 112, 243, 0.2)',
+    accent: 'rgb(255, 67, 62)',
+    accentTransparent: 'rgba(255, 67, 62, 0.75)',
+    accentBorder: 'rgba(255, 67, 62, 0.2)',
     link: '#1e90ff',
     linkHover: '#87cefa',
   },
   typography: {
     fontFamilyBase: "'Inter', system-ui, -apple-system, sans-serif",
-    fontWeightLight: 300,
+    fontWeightLight: 200,
     fontWeightRegular: 400,
     fontWeightBold: 700,
   },
@@ -82,7 +88,28 @@ export const baseTheme: Theme = {
     lg: '24px',
     full: '9999px',
   },
-  logo: OrosLogo,
+  logo: KavaAILogo,
+};
+
+export const orosTheme: Theme = {
+  ...baseTheme,
+  colors: {
+    ...baseTheme.colors,
+    bgPrimary: '#121212',
+    bgSecondary: '#1a1a1a',
+    bgTertiary: '#2d2d2d',
+    bgQuaternary: '#333333',
+    textPrimary: '#ffffff',
+    textSecondary: '#d1d1d1',
+    textTertiary: '#bbbbbb',
+    textMuted: 'rgb(150, 150, 150)',
+    accent: '#0070f3',
+    accentTransparent: 'rgba(0, 112, 243, 0.75)',
+    accentBorder: 'rgba(0, 112, 243, 0.2)',
+    link: '#1e90ff',
+    linkHover: '#87cefa',
+  },
+  // logo: OrosLogo,
 };
 
 /** This allows for simple config overrides if we want to build a quick

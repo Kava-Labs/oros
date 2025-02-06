@@ -13,9 +13,9 @@ export const reasoningModels: Record<
 > = {
   'deepseek-chat': {
     id: 'deepseek-chat',
-    name: 'DeepSeek RI 67TB',
+    name: 'DeepSeek R1 67TB',
     icon: DeepseekIcon,
-    description: 'Specialized model for logical analysis and problem-solving',
+    description: 'Logical Analysis Engine',
     tools: [],
     systemPrompt: defaultSystemPrompt,
     introText: defaultIntroText,
