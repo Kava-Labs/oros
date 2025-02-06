@@ -202,9 +202,15 @@ jobs:
           # Regular zip
           zip -r test-results.zip test-results
 
-          # Fetch GitHub username from pusher event
-          USERNAME=$(echo ${{ github.event.pusher.username }})
-          echo "Pusher username: $USERNAME"
+          # Fetch GitHub username from pull_request event
+          USERNAME=$(echo ${{ github.event.pull_request.user.login }})
+
+          # Fetch GitHub username from pusher event empty
+          if [ -z "$USERNAME" ]; then
+            USERNAME=$(echo ${{ github.event.pusher.username }})
+          fi
+
+          echo "GitHub Username: $USERNAME"
 
           # Exit if invalid username
           if [ -z "$USERNAME" ]; then
