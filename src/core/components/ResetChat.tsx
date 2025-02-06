@@ -7,9 +7,7 @@ import type { ChatCompletionMessageParam } from 'openai/resources/index';
 
 interface ResetChatProps {
   containerRef: RefObject<HTMLDivElement | null>;
-
   onReset(): void;
-
   messages: ChatCompletionMessageParam[];
 }
 
