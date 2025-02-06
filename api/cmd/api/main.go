@@ -73,9 +73,9 @@ func main() {
 		alice.
 			// Middlewares
 			New(
-				middleware.PreflightMiddleware,
-				middleware.ExtractModelMiddleware(logger),
 				middleware.ModelAllowlistMiddleware(logger, cfg.Backends),
+				middleware.ExtractModelMiddleware(logger),
+				middleware.PreflightMiddleware,
 			).
 			// Handler
 			Then(
@@ -92,9 +92,9 @@ func main() {
 		alice.
 			// Middlewares
 			New(
-				middleware.PreflightMiddleware,
-				middleware.ExtractModelMiddleware(logger),
 				middleware.ModelAllowlistMiddleware(logger, cfg.Backends),
+				middleware.ExtractModelMiddleware(logger),
+				middleware.PreflightMiddleware,
 			).
 			// Handler
 			Then(

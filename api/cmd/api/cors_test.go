@@ -20,7 +20,7 @@ func TestCors(t *testing.T) {
 	mockServer := newHttpMockServer(authHeader)
 	mockServer.Start()
 
-	baseURL, err := url.JoinPath(mockServer.URL, "/v1/")
+	baseURL, err := url.JoinPath(mockServer.URL, "/v1")
 	require.NoError(t, err)
 	config.baseURL = baseURL
 	config.allowedModels = []string{"gpt-4o-mini", "dall-e-2"}
