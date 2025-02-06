@@ -30,7 +30,7 @@
   max-width: 768px;
   width: 100%;
   padding: 0 var(--spacing-sm);
-  margin-top: -70px;
+  margin-top: -90px;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -212,7 +212,7 @@
 #importantInfo {
   margin-top: var(--spacing-xs);
   /* custom font-size for chat warning */
-  font-size: 2rem;
+  font-size: 1.5rem;
   text-align: center;
   color: var(--colors-textMuted);
 }
@@ -280,6 +280,9 @@
 }
 
 .inputRaised {
+  width: -webkit-fill-available; /* WebKit browsers (Chrome, Edge, Safari) */
+  width: -moz-available;
+  width: fill-available;
   position: absolute;
   bottom: 30%;
   transition: transform 0.5s ease-in-out, bottom 0.5s ease-in-out;
@@ -290,7 +293,7 @@
   scrollbar-color: var(--colors-bgTertiary) var(--colors-bgPrimary);
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
-  padding: 0px var(--spacing-xs) var(--spacing-xs) var(--spacing-xs);
+  padding: var(--spacing-md);
 
   @media (max-width: 768px) {
     overflow-y: hidden;
@@ -298,18 +301,20 @@
 }
 
 .inputNormal {
+  width: -webkit-fill-available; /* WebKit browsers (Chrome, Edge, Safari) */
+  width: -moz-available;
+  width: fill-available;
   position: absolute;
   bottom: 10px;
   transition: transform 0.5s ease-in-out, bottom 0.5s ease-in-out;
   flex-shrink: 0;
-
   display: flex;
   flex-direction: column;
   align-items: center;
   scrollbar-color: var(--colors-bgTertiary) var(--colors-bgPrimary);
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
-  padding: 0px var(--spacing-xs) var(--spacing-xs) var(--spacing-xs);
+  padding: var(--spacing-md);
 
   @media (max-width: 768px) {
     overflow-y: hidden;
