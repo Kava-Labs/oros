@@ -7,10 +7,11 @@ import ModelSelector from './ModelSelector';
 const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
 
 interface NavBarProps {
+  chatHistoryOpen: boolean;
   setChatHistoryOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const NavBar = ({ setChatHistoryOpen }: NavBarProps) => {
+const NavBar = ({ chatHistoryOpen, setChatHistoryOpen }: NavBarProps) => {
   const showNavBar = !isInIframe() && FEAT_UPDATED_DESIGN;
 
   if (!showNavBar) return null;
@@ -31,9 +32,11 @@ const NavBar = ({ setChatHistoryOpen }: NavBarProps) => {
             <KavaAILogo />
           </div>
         </div>
-        <div className={styles.dropdownContainer}>
-          <ModelSelector />
-        </div>
+        {!chatHistoryOpen && (
+          <div className={styles.dropdownContainer}>
+            <ModelSelector />
+          </div>
+        )}
       </nav>
     </div>
   );
