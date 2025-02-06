@@ -55,7 +55,7 @@ type OpenAIBackend struct {
 }
 
 // Validate checks if the required fields are set
-func (c OpenAIBackend) Validate() error {
+func (c *OpenAIBackend) Validate() error {
 	if c.Name == "" {
 		return errors.New("NAME is required for backend")
 	}
