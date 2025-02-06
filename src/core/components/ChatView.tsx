@@ -163,6 +163,7 @@ export const ChatView = ({
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             ref={inputRef}
+            placeholder="Ask anything..."
           ></textarea>
 
           <button
