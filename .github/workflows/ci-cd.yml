@@ -165,7 +165,8 @@ jobs:
           docker compose \
             -f docker-compose.yaml \
             -f docker-compose.ci.yaml \
-            up -d --wait --wait-timeout 30
+            up -d --wait --wait-timeout 30 \
+            kavachat-api
 
       - name: Output logs if containers are unhealthy
         if: failure()
