@@ -41,5 +41,5 @@ export const getAllModels = (): ModelConfig[] => {
 };
 
 export const DEFAULT_MODEL_NAME = import.meta.env.VITE_FEAT_UPDATED_DESIGN
-  ? 'deepseek-chat'
+  ? 'deepseek-r1'
   : 'gpt-4o';
