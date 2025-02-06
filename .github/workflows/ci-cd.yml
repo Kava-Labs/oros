@@ -185,7 +185,12 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run Playwright tests
-        run: DEBUG=pw:webserver xvfb-run npx playwright test
+        run: |
+          DEBUG=pw:webserver xvfb-run npx playwright test
+
+          # Purposefully trigger a failure to test the failure steps
+          echo "Failing the build"
+          exit 1
 
       - name: Output logs if containers are unhealthy or if tests fail
         if: failure()
