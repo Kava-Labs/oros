@@ -3,6 +3,9 @@ import KavaAILogo from '../assets/KavaAILogo';
 import HamburgerIcon from '../assets/HamburgerIcon';
 import { isInIframe } from '../utils/isInIframe';
 import ModelSelector from './ModelSelector';
+import { useIsMobile } from '../../shared/theme/useIsMobile';
+import NewChatIcon from '../assets/NewChatIcon';
+import { useAppContext } from '../context/useAppContext';
 
 const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
 
@@ -12,6 +15,8 @@ interface NavBarProps {
 
 const NavBar = ({ setChatHistoryOpen }: NavBarProps) => {
   const showNavBar = !isInIframe() && FEAT_UPDATED_DESIGN;
+  const { messageHistoryStore } = useAppContext();
+  const isMobile = useIsMobile();
 
   if (!showNavBar) return null;
 
@@ -30,7 +35,17 @@ const NavBar = ({ setChatHistoryOpen }: NavBarProps) => {
           <div className={styles.logo}>
             <KavaAILogo />
           </div>
+          {isMobile && (
+            <button
+              onClick={() => messageHistoryStore.reset()}
+              data-testid="new-chat-button"
+              className={styles.newChatIcon}
+            >
+              <NewChatIcon />
+            </button>
+          )}
         </div>
+
         <div className={styles.dropdownContainer}>
           <ModelSelector />
         </div>
