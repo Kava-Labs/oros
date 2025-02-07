@@ -42,25 +42,35 @@ export const ChatHistory = () => {
     };
   }, []);
 
-  const deleteConversation = useCallback((id: string) => {
-    const allConversations = JSON.parse(
-      localStorage.getItem('conversations') ?? '{}',
-    );
-
-    delete allConversations[id];
-
-    localStorage.setItem('conversations', JSON.stringify(allConversations));
-    setChatHistories(Object.values(allConversations));
-  }, []);
-
   //  todo - refactor duplicate code in NavBar
-  const startNewChat = () => {
+  const startNewChat = useCallback(() => {
     messageHistoryStore.reset();
     messageHistoryStore.addMessage({
       role: 'system' as const,
       content: modelConfig.systemPrompt,
     });
-  };
+  }, [messageHistoryStore, modelConfig.systemPrompt]);
+
+  const deleteConversation = useCallback(
+    (id: string) => {
+      const allConversations = JSON.parse(
+        localStorage.getItem('conversations') ?? '{}',
+      );
+
+      if (
+        allConversations[id] &&
+        id === messageHistoryStore.getConversationID()
+      ) {
+        startNewChat();
+      }
+
+      delete allConversations[id];
+
+      localStorage.setItem('conversations', JSON.stringify(allConversations));
+      setChatHistories(Object.values(allConversations));
+    },
+    [messageHistoryStore, startNewChat],
+  );
 
   return (
     <div className={styles.chatHistoryContainer}>
