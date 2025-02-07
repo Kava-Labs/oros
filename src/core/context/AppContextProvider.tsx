@@ -43,10 +43,17 @@ export const AppContextProvider = ({
   );
 
   // This callback would be passed to components that need to switch models
-  const handleModelChange = useCallback((modelName: SupportedModels) => {
-    const newConfig = getModelConfig(modelName);
-    setModelConfig(newConfig);
-  }, []);
+  const handleModelChange = useCallback(
+    (modelName: SupportedModels) => {
+      const newConfig = getModelConfig(modelName);
+      setModelConfig(newConfig);
+      messageHistoryStore.reset();
+      messageHistoryStore.setMessages([
+        { role: 'system', content: newConfig.systemPrompt },
+      ]);
+    },
+    [messageHistoryStore],
+  );
 
   const { executeOperation, isOperationValidated } = useExecuteOperation(
     registry,
