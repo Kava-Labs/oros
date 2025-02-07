@@ -15,6 +15,10 @@
   background-color: var(--colors-bgPrimary);
   border: 1px solid var(--colors-borderPrimary);
   cursor: pointer;
+
+  &:hover {
+    background-color: var(--colors-bgTertiary);
+  }
 }
 
 .newChatButtonText {
@@ -42,6 +46,7 @@
 }
 
 .chatHistoryItem {
+  border-radius: var(--spacing-sm);
   display: flex;
   justify-content: space-between;
   cursor: pointer;
@@ -50,6 +55,9 @@
   margin-left: var(--spacing-md);
   font-size: 16px;
   line-height: 22px;
-  padding-top: var(--spacing-sm);
-  padding-bottom: var(--spacing-sm);
+  padding: var(--spacing-sm);
+
+  &:hover {
+    background-color: var(--colors-bgTertiary);
+  }
 }
