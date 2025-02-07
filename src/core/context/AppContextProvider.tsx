@@ -38,8 +38,10 @@ export const AppContextProvider = ({
     initializeMessageRegistry(),
   );
 
+  const isInIframe = window !== window.parent;
+
   const [modelConfig, setModelConfig] = useState<ModelConfig>(() =>
-    getModelConfig(DEFAULT_MODEL_NAME),
+    getModelConfig(isInIframe ? 'gpt-4o' : DEFAULT_MODEL_NAME),
   );
 
   // This callback would be passed to components that need to switch models
