@@ -23,6 +23,10 @@
   padding: var(--spacing-md) 0 var(--spacing-md) var(--spacing-lg);
   display: flex;
   align-items: center;
+
+  &:hover {
+    cursor: pointer;
+  }
 }
 
 .logo {
