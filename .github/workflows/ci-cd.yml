@@ -185,6 +185,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run Playwright tests
+        id: playwright-tests
         run: DEBUG=pw:webserver xvfb-run npx playwright test
 
       - name: Output logs if containers are unhealthy or if tests fail
@@ -192,7 +193,7 @@ jobs:
         run: docker compose -f docker-compose.yaml logs
 
       - name: Zip and encrypt Playwright test results if tests failed
-        if: failure()
+        if: failure() && steps.playwright-tests.outputs.outcome == 'failure'
         run: |
           # Regular zip
           zip -r test-results.zip test-results
@@ -228,7 +229,7 @@ jobs:
           rm test-results.zip
 
       - name: Upload encrypted zip file to artifacts
-        if: failure()
+        if: failure() && steps.playwright-tests.outputs.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
           name: playwright-test-results
