@@ -2,22 +2,23 @@
   width: 100%;
   max-width: 600px;
   margin: 15px auto 0;
-  font-family: system-ui,
-  -apple-system,
-  BlinkMacSystemFont,
-  sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   padding-bottom: 10px;
 }
 
 .inprogressContainer {
   width: 100%;
   max-width: 600px;
-  margin: -100px auto 0;
+  margin: -82px auto 0;
   font-family:
-          system-ui,
-          -apple-system,
-          BlinkMacSystemFont,
-          sans-serif;
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   padding-bottom: 10px;
 }
 
@@ -64,7 +65,7 @@
 }
 
 .statusDot.complete {
-  background-color: var(--colors-accent);
+  background-color: #0070f3;
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1);
 }
 
@@ -78,7 +79,7 @@
 }
 
 .statusText.complete {
-  color: var(--colors-accent);
+  color: #0070f3;
 }
 
 .hashLink {
@@ -86,13 +87,13 @@
   align-items: center;
   gap: var(--spacing-sm);
   font-size: 14px;
-  color: var(--colors-accent);
+  color: #0070f3;
   text-decoration: none;
   transition: color 0.15s ease;
 }
 
 .hashLink:hover {
-  color: var(--colors-accent);
+  color: #0070f3;
 }
 
 .hashText {
