@@ -43,13 +43,13 @@ export const ChatHistory = () => {
   }, []);
 
   //  todo - refactor duplicate code in NavBar
-  const startNewChat = () => {
+  const startNewChat = useCallback(() => {
     messageHistoryStore.reset();
     messageHistoryStore.addMessage({
       role: 'system' as const,
       content: modelConfig.systemPrompt,
     });
-  };
+  }, [messageHistoryStore, modelConfig.systemPrompt]);
 
   const deleteConversation = useCallback(
     (id: string) => {
@@ -69,7 +69,7 @@ export const ChatHistory = () => {
       localStorage.setItem('conversations', JSON.stringify(allConversations));
       setChatHistories(Object.values(allConversations));
     },
-    [messageHistoryStore],
+    [messageHistoryStore, startNewChat],
   );
 
   return (
