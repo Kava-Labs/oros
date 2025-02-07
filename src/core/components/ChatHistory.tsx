@@ -5,7 +5,11 @@ import { useAppContext } from '../context/useAppContext';
 import NewChatIcon from '../assets/NewChatIcon';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
 
-export const ChatHistory = () => {
+interface ChatHistoryProps {
+  setChatHistoryOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
   const [chatHistories, setChatHistories] = useState<ConversationHistory[]>([]);
 
   const { loadConversation, messageHistoryStore, modelConfig } =
@@ -72,6 +76,11 @@ export const ChatHistory = () => {
     [messageHistoryStore, startNewChat],
   );
 
+  const handleChatHistoryClick = (conversation: ConversationHistory) => {
+    loadConversation(conversation);
+    setChatHistoryOpen(false);
+  };
+
   return (
     <div className={styles.chatHistoryContainer}>
       {!isMobile && (
@@ -98,7 +107,7 @@ export const ChatHistory = () => {
                 key={id}
                 className={styles.chatHistoryItem}
               >
-                <p onClick={() => loadConversation(conversation)}>
+                <p onClick={() => handleChatHistoryClick(conversation)}>
                   {truncateTitle(title)}
                 </p>
                 <div>

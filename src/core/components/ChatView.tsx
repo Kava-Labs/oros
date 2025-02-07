@@ -173,11 +173,7 @@ export const ChatView = ({
             onClick={handleButtonClick}
             aria-label="Send Chat"
           >
-            {isRequesting ? (
-              <CancelChatIcon color={colors.accent} />
-            ) : (
-              <SendChatIcon />
-            )}
+            {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
           </button>
         </div>
         <span id={styles.importantInfo} data-testid="importantInfo">

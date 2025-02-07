@@ -165,9 +165,9 @@ export const App = () => {
           {showHistorySidebar ? (
             <div className={styles.appContainer}>
               {!isMobile ? (
-                <ChatHistory />
+                <ChatHistory setChatHistoryOpen={setChatHistoryOpen} />
               ) : chatHistoryOpen ? (
-                <ChatHistory />
+                <ChatHistory setChatHistoryOpen={setChatHistoryOpen} />
               ) : null}
               {!chatHistoryOpen ? (
                 <ChatView
