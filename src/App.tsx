@@ -24,10 +24,10 @@ import { ChatHistory } from './core/components/ChatHistory';
 import { useIsMobile } from './shared/theme/useIsMobile';
 import { ModelConfig } from './core/types/models';
 import OpenAI from 'openai';
+import { isInIframe } from './core/utils/isInIframe';
 
 const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
-const isInIframe = window !== window.parent;
-const showHistorySidebar = !isInIframe && FEAT_UPDATED_DESIGN;
+const showHistorySidebar = !isInIframe() && FEAT_UPDATED_DESIGN;
 
 export const App = () => {
   const {
