@@ -4,7 +4,7 @@ import {
   defaultSystemPrompt,
   defaultInputPlaceholderText,
 } from './prompts/defaultPrompts';
-import DeepseekIcon from '../assets/DeepseekIcon';
+import KavaIcon from '../../../core/assets/KavaIcon';
 
 export type SupportedReasoningModels = 'deepseek-r1';
 
@@ -14,8 +14,8 @@ export const reasoningModels: Record<
 > = {
   'deepseek-r1': {
     id: 'deepseek-r1',
-    name: 'DeepSeek R1 67TB',
-    icon: DeepseekIcon,
+    name: 'General Reasoning',
+    icon: KavaIcon,
     description: 'Logical Analysis Engine',
     tools: [],
     systemPrompt: defaultSystemPrompt,

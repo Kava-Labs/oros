@@ -173,7 +173,7 @@ describe('chat', () => {
     expect(formattedAmount).toBe(0.2345);
   });
   test('model dropdown interactions', async ({ page }) => {
-    const DEFAULT_MODEL_DISPLAY_NAME = 'DeepSeek R1 67TB';
+    const DEFAULT_MODEL_DISPLAY_NAME = 'General Reasoning';
     const DEFAULT_MODEL_DESCRIPTION = 'Logical Analysis Engine';
     const NUMBER_OF_SUPPORTED_MODELS = 2;
     const chat = new Chat(page);
@@ -235,7 +235,9 @@ describe('chat', () => {
     // const gpt4oMini = page
     //   .getByRole('option')
     //   .filter({ hasText: 'Blockchain Instruct - mini' });
-    const deepseek = page.getByRole('option').filter({ hasText: 'Deepseek' });
+    const deepseek = page
+      .getByRole('option')
+      .filter({ hasText: 'General Reasoning' });
 
     await expect(blockchainModel).toBeDisabled();
     // await expect(gpt4oMini).toBeDisabled();
