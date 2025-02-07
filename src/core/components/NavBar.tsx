@@ -26,6 +26,7 @@ const NavBar = ({ chatHistoryOpen, setChatHistoryOpen }: NavBarProps) => {
       role: 'system' as const,
       content: modelConfig.systemPrompt,
     });
+    setChatHistoryOpen(() => false);
   };
 
   if (!showNavBar) return null;
