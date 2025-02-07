@@ -7,9 +7,8 @@ on:
         required: true
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  # Only cancel in-progress jobs on non-main branches
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+  group: api-manual-deploy
+  cancel-in-progress: false
 
 env:
   AWS_REGION: us-east-1
