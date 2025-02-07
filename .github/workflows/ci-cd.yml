@@ -226,7 +226,7 @@ jobs:
           echo "Encrypting test results with gpg key ID $KEY_ID"
 
           # Encrypt zip file with pubkey
-          gpg --output test-results.zip.gpg --encrypt --recipient $KEY_ID test-results.zip
+          gpg --output test-results.zip.gpg --encrypt --trust-model always --recipient $KEY_ID test-results.zip
 
           # Delete the unencrypted zip file so there's no chance of accidentally
           # uploading it
