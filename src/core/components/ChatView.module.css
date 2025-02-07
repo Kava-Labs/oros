@@ -34,10 +34,6 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-
-  @media (max-height: 570px) {
-    display: none;
-  }
 }
 
 #start {
