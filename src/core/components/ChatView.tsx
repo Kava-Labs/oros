@@ -117,10 +117,7 @@ export const ChatView = ({
       >
         {hasMessages && (
           <>
-            {/* Important: When this goes live, the conditional to render ResetChatIcon will change.
-                       We only want to show this trash can in the iframe: !FEAT_UPDATED_DESIGN wil change to  isIframe
-             */}
-            {!FEAT_UPDATED_DESIGN && (
+            {isIframe && (
               <div id={styles.stickyHeader}>
                 <button
                   id={styles.resetButton}

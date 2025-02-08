@@ -18,6 +18,7 @@ import {
   OperationType,
 } from '../../features/blockchain/types/chain';
 import KavaIcon from '../assets/KavaIcon';
+import { isInIframe } from '../utils/isInIframe';
 
 export interface ConversationProps {
   messages: ChatCompletionMessageParam[];
@@ -32,17 +33,11 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
   const { errorText, isRequesting, progressStore, messageStore, registry } =
     useAppContext();
 
-  const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
-  /* FEAT_UPDATED_DESIGN TODO: when this goes live:
-       - update the #conversation id in chat view to have:  var(--spacing-lg);
-       - remove style={ on the div}}
-    
-    */
   return (
     <div
       id={styles.conversation}
       data-testid="conversation"
-      style={{ marginTop: FEAT_UPDATED_DESIGN ? '24px' : '-10px' }}
+      style={{ marginTop: !isInIframe() ? '24px' : '-10px' }}
     >
       {messages.map((message, index) => {
         if (message.role === 'user') {

@@ -146,7 +146,6 @@
   max-width: 768px;
   width: 100%;
   padding: 0 var(--spacing-sm);
-  margin-top: -10px;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -285,7 +284,9 @@
   width: fill-available;
   position: absolute;
   bottom: 30%;
-  transition: transform 0.5s ease-in-out, bottom 0.5s ease-in-out;
+  transition:
+    transform 0.5s ease-in-out,
+    bottom 0.5s ease-in-out;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -306,7 +307,9 @@
   width: fill-available;
   position: relative;
   bottom: 10px;
-  transition: transform 0.5s ease-in-out, bottom 0.5s ease-in-out;
+  transition:
+    transform 0.5s ease-in-out,
+    bottom 0.5s ease-in-out;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
