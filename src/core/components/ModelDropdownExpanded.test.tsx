@@ -2,7 +2,11 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import ModelDropdownExpanded from './ModelDropdownExpanded';
 import { useAppContext } from '../context/useAppContext';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
-import { getAllModels, isBlockchainModelName } from '../config/models';
+import {
+  getAllModels,
+  isBlockchainModelName,
+  MODEL_REGISTRY,
+} from '../config/models';
 import { vi } from 'vitest';
 
 // Mock the required modules and hooks
@@ -12,16 +16,8 @@ vi.mock('../config/models');
 
 // Create mock models for testing
 const mockModels = [
-  {
-    id: 'model1',
-    name: 'Model 1',
-    icon: () => <div data-testid="icon-1">Icon1</div>,
-  },
-  {
-    id: 'blockchain-model',
-    name: 'Blockchain Model',
-    icon: () => <div data-testid="icon-2">Icon2</div>,
-  },
+  ...Object.values(MODEL_REGISTRY.blockchain),
+  ...Object.values(MODEL_REGISTRY.reasoning),
 ];
 
 describe('ModelDropdownExpanded', () => {
@@ -40,7 +36,7 @@ describe('ModelDropdownExpanded', () => {
     );
     (
       isBlockchainModelName as unknown as ReturnType<typeof vi.fn>
-    ).mockImplementation((id: string) => id === 'blockchain-model');
+    ).mockImplementation((id: string) => id === 'gpt-4o');
   });
 
   it('renders all model options', () => {
@@ -49,10 +45,8 @@ describe('ModelDropdownExpanded', () => {
     render(<ModelDropdownExpanded setDropdownOpen={mockSetDropdownOpen} />);
 
     expect(screen.getByTestId('model-dropdown-menu')).toBeInTheDocument();
-    expect(screen.getByText('Model 1')).toBeInTheDocument();
-    expect(screen.getByText('Blockchain Model')).toBeInTheDocument();
-    expect(screen.getByTestId('icon-1')).toBeInTheDocument();
-    expect(screen.getByTestId('icon-2')).toBeInTheDocument();
+    expect(screen.getByText('Blockchain Instruct')).toBeInTheDocument();
+    expect(screen.getByText('General Reasoning')).toBeInTheDocument();
   });
 
   it('calls handleModelChange and setDropdownOpen when a model is selected', () => {
@@ -60,9 +54,9 @@ describe('ModelDropdownExpanded', () => {
 
     render(<ModelDropdownExpanded setDropdownOpen={mockSetDropdownOpen} />);
 
-    fireEvent.click(screen.getByText('Model 1'));
+    fireEvent.click(screen.getByText('Blockchain Instruct'));
 
-    expect(mockHandleModelChange).toHaveBeenCalledWith('model1');
+    expect(mockHandleModelChange).toHaveBeenCalledWith('gpt-4o');
     expect(mockSetDropdownOpen).toHaveBeenCalledWith(false);
   });
 
@@ -71,9 +65,11 @@ describe('ModelDropdownExpanded', () => {
 
     render(<ModelDropdownExpanded setDropdownOpen={mockSetDropdownOpen} />);
 
-    const regularModelButton = screen.getByText('Model 1').closest('button');
+    const regularModelButton = screen
+      .getByText('General Reasoning')
+      .closest('button');
     const blockchainModelButton = screen
-      .getByText('Blockchain Model')
+      .getByText('Blockchain Instruct')
       .closest('button');
 
     expect(regularModelButton).not.toBeDisabled();
