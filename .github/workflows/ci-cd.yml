@@ -22,6 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       VITE_OPENAI_BASE_URL: https://kavachat-api.production.kava.io/openai/v1
+      VITE_FEAT_UPDATED_DESIGN: true
     outputs:
       changed: ${{ steps.diff.outputs.diff != '' }}
     steps:
