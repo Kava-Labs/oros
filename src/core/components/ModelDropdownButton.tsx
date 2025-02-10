@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useAppContext } from '../context/useAppContext';
 import styles from './NavBar.module.css';
-import Tooltip from './ToolTip';
+import Tooltip from './Tooltip';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
 
 interface ModelDropdownButtonProps {
