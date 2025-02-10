@@ -16,7 +16,7 @@ interface NavBarProps {
 
 const NavBar = ({ chatHistoryOpen, setChatHistoryOpen }: NavBarProps) => {
   const showNavBar = !isInIframe() && FEAT_UPDATED_DESIGN;
-  const { messageHistoryStore, modelConfig } = useAppContext();
+  const { messageHistoryStore, modelConfig, setIsRequesting } = useAppContext();
   const isMobile = useIsMobile();
 
   //  todo -refactor duplicate code in ChatHistory
@@ -26,6 +26,7 @@ const NavBar = ({ chatHistoryOpen, setChatHistoryOpen }: NavBarProps) => {
       role: 'system' as const,
       content: modelConfig.systemPrompt,
     });
+    setIsRequesting(false);
     setChatHistoryOpen(() => false);
   };
 

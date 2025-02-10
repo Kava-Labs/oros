@@ -13,8 +13,12 @@ interface ChatHistoryProps {
 export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
   const [chatHistories, setChatHistories] = useState<ConversationHistory[]>([]);
 
-  const { loadConversation, messageHistoryStore, modelConfig } =
-    useAppContext();
+  const {
+    loadConversation,
+    messageHistoryStore,
+    modelConfig,
+    setIsRequesting,
+  } = useAppContext();
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -40,6 +44,7 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
       role: 'system' as const,
       content: modelConfig.systemPrompt,
     });
+    setIsRequesting(false);
   }, [messageHistoryStore, modelConfig.systemPrompt]);
 
   const deleteConversation = useCallback(
