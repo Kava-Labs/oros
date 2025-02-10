@@ -1,5 +1,4 @@
 import { ElementHandle, expect, Locator, Page } from '@playwright/test';
-import type { ChatCompletionMessageParam } from 'openai/resources/index';
 
 export class Chat {
   public page: Page;
@@ -79,22 +78,6 @@ export class Chat {
     });
   }
 
-  async waitForImageGenerationToFinish() {
-    await this.page.waitForResponse(
-      async (res) => {
-        if (res.url().includes('generations')) {
-          expect(res.status()).toBe(200);
-          await res.finished();
-          return true;
-        }
-        return false;
-      },
-      {
-        timeout: 40000,
-      },
-    );
-  }
-
   async waitForAssistantResponse() {
     await this.page.waitForFunction(
       () => {
@@ -112,23 +95,6 @@ export class Chat {
         timeout: 10000,
         polling: 100,
       },
-    );
-  }
-
-  async setMessagesInStorage(msgs: ChatCompletionMessageParam[]) {
-    await this.page.evaluate((messages) => {
-      localStorage.setItem(
-        'chat-messages',
-        JSON.stringify({
-          messages,
-        }),
-      );
-    }, msgs); //  this second arg defines what is passed to pageFunction, the first arg
-  }
-
-  async getMessageHistoryFromStorage() {
-    return await this.page.evaluate(() =>
-      localStorage.getItem('chat-messages'),
     );
   }
 

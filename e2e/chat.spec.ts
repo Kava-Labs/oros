@@ -315,4 +315,34 @@ describe('chat', () => {
     historyEntries = await page.getByTestId('chat-history-entry').all();
     expect(historyEntries).toHaveLength(0);
   });
+  test('conversation history from local storage populates the UI', async ({
+    page,
+  }) => {
+    const chat = new Chat(page);
+
+    await page.addInitScript(() => {
+      localStorage.setItem(
+        'conversations',
+        JSON.stringify({
+          'test-id': {
+            id: 'test-id',
+            model: 'test-model',
+            title: 'Test Conversation Title',
+            conversation: [
+              {
+                role: 'user',
+                content: 'test message',
+              },
+            ],
+            lastSaved: Date.now(),
+          },
+        }),
+      );
+    });
+
+    await chat.goto();
+
+    const historyEntry = page.getByTestId('chat-history-entry').first();
+    await expect(historyEntry).toHaveText('Test Conversation Title');
+  });
 });
