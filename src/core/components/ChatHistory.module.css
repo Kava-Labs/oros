@@ -32,7 +32,6 @@
 .historySection {
   padding: var(--spacing-sm);
   border-top: 1px solid var(--colors-borderSecondary);
-  border-bottom: 1px solid var(--colors-borderSecondary);
 }
 
 .historySectionTitle {
