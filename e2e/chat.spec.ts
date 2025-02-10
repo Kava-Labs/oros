@@ -10,6 +10,9 @@ describe('chat', () => {
     const chat = new Chat(page);
     await chat.goto();
 
+    //  todo - remove when the default (reasoning) model is functioning
+    await chat.switchToBlockchainModel();
+
     expect(chat.messageContainer).not.toBeNull();
 
     await expect(page.getByText(expectedIntroMessage)).toBeVisible();
@@ -20,6 +23,9 @@ describe('chat', () => {
 
     const chat = new Chat(page);
     await chat.goto();
+
+    //  todo - remove when the default (reasoning) model is functioning
+    await chat.switchToBlockchainModel();
 
     await chat.submitMessage(
       'This is an automated test suite, please respond with the exact text: THIS IS A TEST',
