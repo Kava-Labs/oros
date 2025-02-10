@@ -19,6 +19,8 @@ export interface ChatViewProps {
   introText: string;
 }
 
+const DEFAULT_HEIGHT = '70px';
+
 export const ChatView = ({
   messages,
   cautionText,
@@ -28,6 +30,17 @@ export const ChatView = ({
   introText,
 }: ChatViewProps) => {
   const { isRequesting, modelConfig } = useAppContext();
+  const [inputValue, setInputValue] = useState('');
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  // Reset textarea height when input is cleared
+  useEffect(() => {
+    if (inputRef.current && inputValue === '') {
+      inputRef.current.style.height = DEFAULT_HEIGHT;
+    }
+  }, [inputValue]);
+
   const hasMessages =
     messages.filter((message) => message.role != 'system').length > 0;
 
@@ -38,8 +51,6 @@ export const ChatView = ({
     }
   }, [containerRef]);
 
-  const [inputValue, setInputValue] = useState('');
-
   const handleInputChange = useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {
       /**
@@ -49,7 +60,7 @@ export const ChatView = ({
        * upward keeping the user on the same line
        */
       const textarea = event.target;
-      textarea.style.height = 'auto';
+      textarea.style.height = DEFAULT_HEIGHT; // Reset to default height first
       textarea.style.height = `min(${textarea.scrollHeight}px, 60vh)`; // Adjust to scrollHeight
 
       setInputValue(textarea.value);
@@ -74,9 +85,13 @@ export const ChatView = ({
 
     onSubmit(processedMessage);
     setInputValue('');
+
+    // Reset height after submitting
+    if (inputRef.current) {
+      inputRef.current.style.height = DEFAULT_HEIGHT;
+    }
   }, [isRequesting, inputValue, onSubmit, onCancel, modelConfig]);
 
-  const buttonRef = useRef<HTMLButtonElement>(null);
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter') {
       if (event.shiftKey) {
@@ -91,8 +106,6 @@ export const ChatView = ({
   };
 
   const { colors, logo: Logo } = useTheme();
-
-  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (inputRef.current) {
