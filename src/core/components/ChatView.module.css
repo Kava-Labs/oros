@@ -75,7 +75,7 @@
   border-radius: var(--borderRadius-md);
   background: var(--colors-bgTertiary);
   color: var(--colors-textPrimary);
-  padding: var(--spacing-md);
+  padding: var(--spacing-lg);
   margin-left: auto;
   margin-top: var(--borderRadius-sm);
   max-width: 80%;
