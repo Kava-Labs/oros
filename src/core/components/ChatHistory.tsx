@@ -17,20 +17,6 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
     useAppContext();
   const isMobile = useIsMobile();
 
-  const truncateTitle = useCallback((title: string) => {
-    if (title.startsWith(`"`) || title.startsWith(`'`)) {
-      title = title.slice(1);
-    }
-    if (title.endsWith(`"`) || title.endsWith(`'`)) {
-      title = title.slice(0, -1);
-    }
-    if (title.length > 32) {
-      title = title.slice(0, 32) + '....';
-    }
-
-    return title;
-  }, []);
-
   useEffect(() => {
     const load = () => {
       setChatHistories(
@@ -100,29 +86,70 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
         <h5 className={styles.historySectionTitle}>History</h5>
 
         <div>
-          {chatHistories.map((conversation) => {
-            const { id, title } = conversation;
-            return (
-              <div
-                data-testid="chat-history-entry"
-                key={id}
-                className={styles.chatHistoryItem}
-              >
-                <p onClick={() => handleChatHistoryClick(conversation)}>
-                  {truncateTitle(title)}
-                </p>
-                <div>
-                  <Trash2
-                    data-testid="delete-chat-history-entry-icon"
-                    width="19px"
-                    height="19px"
-                    onClick={() => deleteConversation(id)}
-                  />
-                </div>
-              </div>
-            );
-          })}
+          {chatHistories.map((conversation) => (
+            <HistoryItem
+              conversation={conversation}
+              handleChatHistoryClick={handleChatHistoryClick}
+              deleteConversation={deleteConversation}
+            />
+          ))}
         </div>
+      </div>
+    </div>
+  );
+};
+
+const HistoryItem = ({
+  conversation,
+  handleChatHistoryClick,
+  deleteConversation,
+}: {
+  conversation: ConversationHistory;
+  handleChatHistoryClick: (conversation: ConversationHistory) => void;
+  deleteConversation: (id: string) => void;
+}) => {
+  const { id, title } = conversation;
+
+  const isMobile = useIsMobile();
+
+  const [hover, setHover] = useState(false);
+
+  const truncateTitle = (title: string) => {
+    const threshold = hover ? 32 : 36;
+
+    if (title.startsWith(`"`) || title.startsWith(`'`)) {
+      title = title.slice(1);
+    }
+    if (title.endsWith(`"`) || title.endsWith(`'`)) {
+      title = title.slice(0, -1);
+    }
+    if (title.length > threshold) {
+      title = title.slice(0, threshold) + '....';
+    }
+
+    return title;
+  };
+
+  return (
+    <div
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      data-testid="chat-history-entry"
+      key={id}
+      className={styles.chatHistoryItem}
+    >
+      <p onClick={() => handleChatHistoryClick(conversation)}>
+        {truncateTitle(title)}
+      </p>
+      <div>
+        {hover || isMobile ? (
+          <Trash2
+            data-testid="delete-chat-history-entry-icon"
+            width="19px"
+            height="19px"
+            onClick={() => deleteConversation(id)}
+          />
+        ) : null}
       </div>
     </div>
   );
