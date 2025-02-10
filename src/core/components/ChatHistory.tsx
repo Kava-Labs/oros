@@ -81,8 +81,10 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
           className={styles.newChatButton}
           data-testid="new-chat-container-button"
         >
-          <NewChatIcon />
-          <p className={styles.newChatButtonText}>New Chat</p>
+          <div className={styles.newChatButtonAlignment}>
+            <NewChatIcon />
+            <p className={styles.newChatButtonText}>New Chat</p>
+          </div>
         </button>
       )}
 
