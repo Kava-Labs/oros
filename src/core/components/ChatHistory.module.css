@@ -60,18 +60,3 @@
     background-color: var(--colors-bgTertiary);
   }
 }
-
-.trashIconContainer {
-  opacity: 0;
-  transition: opacity 0.2s ease-in-out;
-}
-
-.chatHistoryItem:hover .trashIconContainer {
-  opacity: 1;
-}
-
-@media (max-width: 768px) {
-  .trashIconContainer {
-    opacity: 1;
-  }
-}

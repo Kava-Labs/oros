@@ -111,7 +111,7 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
                 <p onClick={() => handleChatHistoryClick(conversation)}>
                   {truncateTitle(title)}
                 </p>
-                <div className={styles.trashIconContainer}>
+                <div>
                   <Trash2
                     data-testid="delete-chat-history-entry-icon"
                     width="19px"
