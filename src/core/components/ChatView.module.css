@@ -325,3 +325,8 @@
     overflow-y: hidden;
   }
 }
+
+/** Basic list wrapping **/
+li {
+  overflow-wrap: break-word;
+}
