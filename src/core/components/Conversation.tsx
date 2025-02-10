@@ -2,7 +2,7 @@ import styles from './ChatView.module.css';
 import { Content } from './Content';
 import { StreamingText } from './StreamingText';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
-import { memo } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { useAppContext } from '../context/useAppContext';
 import { ToolCallProgressCards } from './ToolCallProgressCards';
 import {
@@ -19,6 +19,8 @@ import {
 } from '../../features/blockchain/types/chain';
 import KavaIcon from '../assets/KavaIcon';
 import { isInIframe } from '../utils/isInIframe';
+import { Copy, ClipboardCheck } from 'lucide-react';
+import { useIsMobile } from '../../shared/theme/useIsMobile';
 
 export interface ConversationProps {
   messages: ChatCompletionMessageParam[];
@@ -53,16 +55,7 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
 
         if (message.role === 'assistant' && message.content) {
           return (
-            <div key={index} className={styles.left}>
-              <KavaIcon className={styles.conversationChatIcon} />
-
-              <div className={styles.assistantContainer}>
-                <Content
-                  role={message.role}
-                  content={message.content as string}
-                />
-              </div>
-            </div>
+            <AssistantMessage key={index} content={message.content as string} />
           );
         }
 
@@ -155,6 +148,70 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
       )}
 
       <ToolCallProgressCards onRendered={onRendered} />
+    </div>
+  );
+};
+
+const AssistantMessage = ({ content }: { content: string }) => {
+  const [hover, setHover] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const isMobile = useIsMobile();
+
+  useEffect(() => {
+    let id: NodeJS.Timeout;
+
+    if (copied) {
+      id = setTimeout(() => {
+        setCopied(false);
+      }, 1000);
+    }
+
+    return () => {
+      if (id) {
+        clearTimeout(id);
+      }
+    };
+  }, [copied]);
+
+  const copyIcon = useMemo(
+    () =>
+      !copied ? (
+        <Copy
+          width="20px"
+          cursor="pointer"
+          onClick={() => {
+            try {
+              window.navigator.clipboard.writeText(content);
+              setCopied(true);
+            } catch (err) {
+              console.error(err);
+            }
+          }}
+        />
+      ) : (
+        <ClipboardCheck
+          width="20px"
+          cursor="pointer"
+          onClick={() => setCopied(false)}
+        />
+      ),
+    [content, copied],
+  );
+
+  return (
+    <div
+      className={styles.left}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+    >
+      <KavaIcon className={styles.conversationChatIcon} />
+      <div className={styles.assistantContainer}>
+        <Content role="assistant" content={content} />
+        <div className={styles.copyIconContainer}>
+          {isMobile ? copyIcon : hover ? copyIcon : null}
+        </div>
+      </div>
     </div>
   );
 };

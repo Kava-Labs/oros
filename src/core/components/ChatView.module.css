@@ -330,3 +330,10 @@
 li {
   overflow-wrap: break-word;
 }
+
+.copyIconContainer {
+  display: flex;
+  justify-content: right;
+  padding-top: 10px;
+  height: 20px;
+}
