@@ -232,16 +232,13 @@ describe('chat', () => {
     const blockchainModel = page
       .getByRole('option')
       .filter({ hasText: 'Blockchain Instruct' });
-    // const gpt4oMini = page
-    //   .getByRole('option')
-    //   .filter({ hasText: 'Blockchain Instruct - mini' });
-    const deepseek = page
+
+    const reasoningModel = page
       .getByRole('option')
       .filter({ hasText: 'General Reasoning' });
 
     await expect(blockchainModel).toBeDisabled();
-    // await expect(gpt4oMini).toBeDisabled();
-    await expect(deepseek).toBeEnabled();
+    await expect(reasoningModel).toBeEnabled();
 
     await context.close();
   });
@@ -251,7 +248,7 @@ describe('chat', () => {
     const chat = new Chat(page);
     await chat.goto();
 
-    //  todo - remove when the default (reasoning) model is functioning
+    //  this test runs very slowly on the reasoning model
     await chat.switchToBlockchainModel();
 
     await chat.submitMessage(
@@ -261,12 +258,12 @@ describe('chat', () => {
     await chat.waitForStreamToFinish();
     await chat.waitForAssistantResponse();
 
-    const initialHistoryEntry = await page
+    const initialHistoryTitle = await page
       .getByTestId('chat-history-entry')
       .first()
       .textContent();
 
-    expect(initialHistoryEntry).not.toBe('');
+    expect(initialHistoryTitle).not.toBe('');
 
     const newChatIcon = page.getByRole('button', { name: 'New Chat' });
     await newChatIcon.click();
@@ -278,22 +275,34 @@ describe('chat', () => {
     await chat.waitForStreamToFinish();
     await chat.waitForAssistantResponse();
 
-    await chat.submitMessage('ok thanks');
-
-    await chat.waitForStreamToFinish();
-    await chat.waitForAssistantResponse();
-
     //  Switching between conversation histories
+    const currentConversation = await chat.getMessageElementsWithContent();
+    const currentResponse =
+      await currentConversation[currentConversation.length - 1].innerText();
+
+    const initialConversation = page.getByTestId('chat-history-entry').first();
+    await initialConversation.click();
+
+    const updatedConversation = await chat.getMessageElementsWithContent();
+    const updatedResponse =
+      await updatedConversation[updatedConversation.length - 1].innerText();
+
+    expect(updatedResponse).not.toEqual(currentResponse);
+
+    //  switch back to the initial conversation
+    const secondConversation = page.getByTestId('chat-history-entry').nth(1);
+    await secondConversation.click();
+
+    const conversation = await chat.getMessageElementsWithContent();
+    const response = await conversation[conversation.length - 1].innerText();
+
+    expect(response).toBe(currentResponse);
 
     //  Deleting entries
+    const secondHistoryTitle = await secondConversation.textContent();
 
-    const secondHistoryEntry = await page
-      .getByTestId('chat-history-entry')
-      .nth(1)
-      .textContent();
-
-    expect(secondHistoryEntry).not.toBe('');
-    expect(secondHistoryEntry).not.toBe(initialHistoryEntry);
+    expect(secondHistoryTitle).not.toBe('');
+    expect(secondHistoryTitle).not.toBe(initialHistoryTitle);
 
     let historyEntries = await page.getByTestId('chat-history-entry').all();
     expect(historyEntries).toHaveLength(2);
@@ -311,5 +320,40 @@ describe('chat', () => {
 
     historyEntries = await page.getByTestId('chat-history-entry').all();
     expect(historyEntries).toHaveLength(0);
+  });
+  test('conversation history from local storage populates the UI', async ({
+    page,
+  }) => {
+    const chat = new Chat(page);
+
+    await page.addInitScript(() => {
+      localStorage.setItem(
+        'conversations',
+        JSON.stringify({
+          'test-id': {
+            id: 'test-id',
+            model: 'test-model',
+            title: 'Test Conversation Title',
+            conversation: [
+              {
+                role: 'user',
+                content: 'test message',
+              },
+            ],
+            lastSaved: Date.now(),
+          },
+        }),
+      );
+    });
+
+    await chat.goto();
+
+    const historyEntry = page.getByTestId('chat-history-entry').first();
+    await expect(historyEntry).toHaveText('Test Conversation Title');
+
+    //  still there after a refresh/reload
+    await page.reload();
+
+    await expect(historyEntry).toHaveText('Test Conversation Title');
   });
 });
