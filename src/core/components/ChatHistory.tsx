@@ -110,6 +110,8 @@ const HistoryItem = ({
 }) => {
   const { id, title } = conversation;
 
+  const isMobile = useIsMobile();
+
   const [hover, setHover] = useState(false);
 
   const truncateTitle = (title: string) => {
@@ -140,7 +142,7 @@ const HistoryItem = ({
         {truncateTitle(title)}
       </p>
       <div>
-        {hover ? (
+        {hover || isMobile ? (
           <Trash2
             data-testid="delete-chat-history-entry-icon"
             width="19px"
