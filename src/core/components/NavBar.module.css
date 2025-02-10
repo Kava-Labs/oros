@@ -69,14 +69,6 @@
   background-color: var(--colors-bgTertiary);
 }
 
-.dropdown:disabled .modelOption {
-  opacity: 0.6;
-}
-
-.dropdown:disabled:hover {
-  background-color: var(--colors-bgTertiary);
-}
-
 .dropdownMenu {
   position: absolute;
   top: 100%;
