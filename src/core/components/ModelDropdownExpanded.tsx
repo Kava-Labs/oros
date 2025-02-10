@@ -3,6 +3,7 @@ import { getAllModels, isBlockchainModelName } from '../config/models';
 import { ModelConfig } from '../types/models';
 import { useAppContext } from '../context/useAppContext';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
+import Tooltip from './Tooltip';
 
 interface ModelDropdownProps {
   setDropdownOpen: (dropdownOpen: boolean) => void;
@@ -10,7 +11,6 @@ interface ModelDropdownProps {
 
 const ModelDropdownExpanded = ({ setDropdownOpen }: ModelDropdownProps) => {
   const { handleModelChange } = useAppContext();
-
   const isMobile = useIsMobile();
 
   const handleModelClick = (model: ModelConfig) => {
@@ -20,11 +20,9 @@ const ModelDropdownExpanded = ({ setDropdownOpen }: ModelDropdownProps) => {
 
   const displayedModelOptions = getAllModels().map((model) => {
     const ModelOptionIcon = model.icon;
-
-    //  since we don't support metamask on mobile, don't allow a user to switch to blockchain models
     const disableOption = isMobile && isBlockchainModelName(model.id);
 
-    return (
+    const modelButton = (
       <button
         key={model.name}
         className={styles.dropdownItem}
@@ -35,6 +33,18 @@ const ModelDropdownExpanded = ({ setDropdownOpen }: ModelDropdownProps) => {
         <ModelOptionIcon />
         <span>{model.name}</span>
       </button>
+    );
+
+    return disableOption ? (
+      <Tooltip
+        key={model.name}
+        content="Blockchain models are not supported on mobile devices"
+        topMargin="30"
+      >
+        {modelButton}
+      </Tooltip>
+    ) : (
+      modelButton
     );
   });
 
