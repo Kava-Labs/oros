@@ -60,6 +60,21 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.dropdown:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: var(--colors-bgTertiary);
+}
+
+.dropdown:disabled .modelOption {
+  opacity: 0.6;
+}
+
+.dropdown:disabled:hover {
+  background-color: var(--colors-bgTertiary);
 }
 
 .dropdownMenu {
