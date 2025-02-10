@@ -61,3 +61,8 @@
     background-color: var(--colors-bgTertiary);
   }
 }
+
+.newChatButtonAlignment {
+  display: flex;
+  align-items: center;
+}
