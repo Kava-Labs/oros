@@ -1,5 +1,5 @@
 export const defaultIntroText = `
-What can I help you with?`;
+How can I help you with Web3?`;
 
 export const defaultCautionText =
   'KavaAI can make mistakes. Check important info.';

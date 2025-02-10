@@ -5,17 +5,20 @@ import { ethers } from 'ethers';
 import { devices } from '@playwright/test';
 
 describe('chat', () => {
-  test('renders intro message', async ({ page }) => {
-    const expectedIntroMessage = 'What can I help you with?';
+  test('renders intro messages by model', async ({ page }) => {
+    const initialIntroMessage = 'What can I help you with?';
     const chat = new Chat(page);
     await chat.goto();
 
-    //  todo - remove when the default (reasoning) model is functioning
+    expect(chat.messageContainer).not.toBeNull();
+    await expect(page.getByText(initialIntroMessage)).toBeVisible();
+
     await chat.switchToBlockchainModel();
 
-    expect(chat.messageContainer).not.toBeNull();
+    const updatedIntroMessage = 'How can I help you with Web3?';
 
-    await expect(page.getByText(expectedIntroMessage)).toBeVisible();
+    await expect(page.getByText(initialIntroMessage)).not.toBeVisible();
+    await expect(page.getByText(updatedIntroMessage)).toBeVisible();
   });
 
   test('receiving a response from the model', async ({ page }) => {
@@ -24,7 +27,7 @@ describe('chat', () => {
     const chat = new Chat(page);
     await chat.goto();
 
-    //  todo - remove when the default (reasoning) model is functioning
+    //  todo - remove when the default (reasoning) model is quicker
     await chat.switchToBlockchainModel();
 
     await chat.submitMessage(
