@@ -45,7 +45,7 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
       content: modelConfig.systemPrompt,
     });
     setIsRequesting(false);
-  }, [messageHistoryStore, modelConfig.systemPrompt]);
+  }, [messageHistoryStore, modelConfig.systemPrompt, setIsRequesting]);
 
   const deleteConversation = useCallback(
     (id: string) => {

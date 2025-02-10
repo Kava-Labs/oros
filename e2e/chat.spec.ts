@@ -307,7 +307,7 @@ describe('chat', () => {
     expect(secondHistoryTitle).not.toBe('');
     expect(secondHistoryTitle).not.toBe(initialHistoryTitle);
 
-    let historyEntries = await page.getByTestId('chat-history-entry').all();
+    const historyEntries = await page.getByTestId('chat-history-entry').all();
     expect(historyEntries).toHaveLength(2);
 
     // let deleteIcon = page.getByTestId('delete-chat-history-entry-icon').first();
