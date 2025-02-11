@@ -94,6 +94,7 @@
 .assistantContainer {
   margin-top: var(--spacing-sm);
   max-width: 80%;
+  width: 80%;
 }
 
 #progressStream {
