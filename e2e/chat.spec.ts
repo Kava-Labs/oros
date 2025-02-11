@@ -279,30 +279,46 @@ describe('chat', () => {
     await chat.waitForAssistantResponse();
 
     //  Switching between conversation histories
-    const currentConversation = await chat.getMessageElementsWithContent();
-    const currentResponse =
-      await currentConversation[currentConversation.length - 1].innerText();
+    let blockchainQuestionConversation =
+      await chat.getMessageElementsWithContent();
+    let blockchainQuestionConversationResponse =
+      await blockchainQuestionConversation[
+        blockchainQuestionConversation.length - 1
+      ].innerText();
 
-    const initialConversation = page.getByTestId('chat-history-entry').nth(1);
-    await initialConversation.click();
+    const thisIsATestConversation = page
+      .getByTestId('chat-history-entry')
+      .nth(1);
+    await thisIsATestConversation.click();
 
-    const updatedConversation = await chat.getMessageElementsWithContent();
-    const updatedResponse =
-      await updatedConversation[updatedConversation.length - 1].innerText();
+    let currentInViewConversation = await chat.getMessageElementsWithContent();
+    let currentInViewResponse =
+      await currentInViewConversation[
+        currentInViewConversation.length - 1
+      ].innerText();
 
-    expect(updatedResponse).not.toEqual(currentResponse);
+    expect(currentInViewResponse).not.toEqual(
+      blockchainQuestionConversationResponse,
+    );
 
     //  switch back to the initial conversation
-    const secondConversation = page.getByTestId('chat-history-entry').nth(1);
-    await secondConversation.click();
+    const blockChainHistoryItem = page
+      .getByTestId('chat-history-entry')
+      .first();
+    await blockChainHistoryItem.click();
 
-    const conversation = await chat.getMessageElementsWithContent();
-    const response = await conversation[conversation.length - 1].innerText();
+    blockchainQuestionConversation = await chat.getMessageElementsWithContent();
+    const newBlockChainConversationResponse =
+      await blockchainQuestionConversation[
+        blockchainQuestionConversation.length - 1
+      ].innerText();
 
-    expect(response).toBe(currentResponse);
+    expect(newBlockChainConversationResponse).toBe(
+      blockchainQuestionConversationResponse,
+    );
 
     //  Deleting entries
-    const secondHistoryTitle = await secondConversation.textContent();
+    const secondHistoryTitle = await blockChainHistoryItem.textContent();
 
     expect(secondHistoryTitle).not.toBe('');
     expect(secondHistoryTitle).not.toBe(initialHistoryTitle);
