@@ -1,5 +1,6 @@
 .chatHistoryContainer {
   border-right: 1px solid #3e3e3e;
+  width: 332px;
 }
 
 .newChatButton {
