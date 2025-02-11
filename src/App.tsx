@@ -128,6 +128,7 @@ export const App = () => {
       toolCallStreamStore,
       messageStore,
       client,
+      thinkingStore,
     ],
   );
 
@@ -215,7 +216,14 @@ async function doChat(
     const stream = await client.chat.completions.create(
       {
         model: id,
-        messages: messageHistoryStore.getSnapshot(),
+        messages: messageHistoryStore.getSnapshot().map((msg) => {
+          // @ts-expect-error reasoningContent may exist
+          if (msg.reasoningContent) {
+            // @ts-expect-error delete from msg
+            delete msg.reasoningContent;
+          }
+          return msg;
+        }),
         tools: tools,
         stream: true,
       },
@@ -274,16 +282,20 @@ async function doChat(
 
     // Push a message
     if (messageStore.getSnapshot() !== '') {
-      messageHistoryStore.addMessage({
+      const msg = {
         role: 'assistant' as const,
         content: messageStore.getSnapshot(),
-      });
+      };
+
+      if (thinkingStore.getSnapshot() !== '') {
+        // @ts-expect-error setting reasoningContent
+        msg.reasoningContent = thinkingStore.getSnapshot();
+        thinkingStore.setText('');
+      }
+
+      messageHistoryStore.addMessage(msg);
 
       messageStore.setText('');
-    }
-
-    if (thinkingStore.getSnapshot() !== '') {
-      thinkingStore.setText('');
     }
 
     if (toolCallStreamStore.getSnapShot().length > 0) {

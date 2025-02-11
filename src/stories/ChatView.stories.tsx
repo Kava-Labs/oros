@@ -11,11 +11,12 @@ import { ToolCallStreamStore } from '../core/stores/toolCallStreamStore';
 import { MessageHistoryStore } from '../core/stores/messageHistoryStore';
 import { WalletStore } from '../features/blockchain/stores/walletStore';
 
-export const messageStore = new TextStreamStore();
-export const progressStore = new TextStreamStore();
-export const toolCallStreamStore = new ToolCallStreamStore();
-export const messageHistoryStore = new MessageHistoryStore();
-export const walletStore = new WalletStore();
+const messageStore = new TextStreamStore();
+const progressStore = new TextStreamStore();
+const toolCallStreamStore = new ToolCallStreamStore();
+const messageHistoryStore = new MessageHistoryStore();
+const walletStore = new WalletStore();
+const thinkingStore = new TextStreamStore();
 
 const withProviders =
   (
@@ -28,6 +29,7 @@ const withProviders =
   (Story) => (
     <ThemeProvider>
       <AppContextProvider
+        thinkingStore={thinkingStore}
         progressStore={progressStore}
         messageStore={messageStore}
         toolCallStreamStore={toolCallStreamStore}

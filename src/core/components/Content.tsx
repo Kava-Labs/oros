@@ -2,7 +2,6 @@ import { useState, useEffect, memo } from 'react';
 import { sanitizeContent } from '../utils/sanitize';
 import styles from './ChatView.module.css';
 import { useAppContext } from '../context/useAppContext';
-import { ThinkingContent } from './ThinkingContent';
 
 export interface ContentProps {
   content: string;
@@ -17,7 +16,7 @@ export const ContentComponent = ({
 }: ContentProps) => {
   const [hasError, setHasError] = useState(false);
   const [sanitizedContent, setSanitizedContent] = useState<string>('');
-  const { modelConfig, isRequesting } = useAppContext();
+  const { modelConfig } = useAppContext();
 
   useEffect(() => {
     let cancel = false;
@@ -29,47 +28,22 @@ export const ContentComponent = ({
       }
 
       try {
-        let contentToSanitize = content;
-        const hasThinkingContent = content.includes('<think>');
-
-        if (hasThinkingContent) {
-          const thinkEnd = content.indexOf('</think>');
-          if (thinkEnd !== -1) {
-            // Only take the content after </think>
-            contentToSanitize = content.slice(thinkEnd + 8).trim();
-          } else {
-            // If we're still streaming the thinking content, don't show anything yet
-            contentToSanitize = '';
-          }
-        }
-
         // Process content through model-specific processor if it exists
-        let processedContent = contentToSanitize;
+        let processedContent = content;
         if (modelConfig?.messageProcessors?.postProcess) {
-          processedContent =
-            modelConfig.messageProcessors.postProcess(contentToSanitize);
+          processedContent = modelConfig.messageProcessors.postProcess(content);
         }
 
         const updatedContent = await sanitizeContent(processedContent);
 
         if (!cancel) {
           setSanitizedContent(updatedContent);
-          if (onRendered) {
-            requestAnimationFrame(() => {
-              if (!cancel) onRendered();
-            });
-          }
         }
       } catch (error) {
         // TODO: This is noisy in tests
         console.error(error);
         if (!cancel) {
           setHasError(true);
-          if (onRendered) {
-            requestAnimationFrame(() => {
-              if (!cancel) onRendered();
-            });
-          }
         }
       }
     };
@@ -79,24 +53,25 @@ export const ContentComponent = ({
     return () => {
       cancel = true;
     };
-  }, [content, modelConfig, hasError, onRendered]);
+  }, [content, modelConfig]);
+
+  useEffect(() => {
+    if (onRendered) {
+      requestAnimationFrame(onRendered);
+    }
+  }, [sanitizedContent, hasError, onRendered]);
 
   if (hasError) {
     return <span>Error: Could not render content!</span>;
   }
 
-  const hasThinkingContent = content.includes('<think>');
-
   return (
     <div data-testid="conversation-message" data-chat-role={role}>
-      {role === 'assistant' && hasThinkingContent && (
-        <ThinkingContent content={content} isStreaming={isRequesting} />
-      )}
       {sanitizedContent !== '' && (
         <span
           className={styles.content}
           dangerouslySetInnerHTML={{ __html: sanitizedContent }}
-        />
+        ></span>
       )}
     </div>
   );

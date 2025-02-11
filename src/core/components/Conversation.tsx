@@ -21,9 +21,10 @@ import KavaIcon from '../assets/KavaIcon';
 import { isInIframe } from '../utils/isInIframe';
 import AssistantMessage from './AssistantMessage';
 import { ThinkingContent } from './ThinkingContent';
+import type { ChatMessage } from '../stores/messageHistoryStore';
 
 export interface ConversationProps {
-  messages: ChatCompletionMessageParam[];
+  messages: ChatMessage[];
   onRendered(): void;
 }
 
@@ -61,13 +62,18 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
 
         if (message.role === 'assistant' && message.content) {
           return (
-            <AssistantMessage key={index} content={message.content as string} />
+            <AssistantMessage
+              key={index}
+              content={message.content as string}
+              // @ts-expect-error reasoningContent may exist
+              reasoningContent={message.reasoningContent}
+            />
           );
         }
 
         if (message.role === 'tool') {
           const id = message.tool_call_id;
-          const prevMsg = messages[index - 1];
+          const prevMsg = messages[index - 1] as ChatCompletionMessageParam;
           if (
             !(
               prevMsg.role === 'assistant' &&
