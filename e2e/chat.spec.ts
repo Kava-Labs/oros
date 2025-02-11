@@ -281,7 +281,7 @@ describe('chat', () => {
     //  Switching between conversation histories
     let blockchainQuestionConversation =
       await chat.getMessageElementsWithContent();
-    let blockchainQuestionConversationResponse =
+    const blockchainQuestionConversationResponse =
       await blockchainQuestionConversation[
         blockchainQuestionConversation.length - 1
       ].innerText();
@@ -291,8 +291,9 @@ describe('chat', () => {
       .nth(1);
     await thisIsATestConversation.click();
 
-    let currentInViewConversation = await chat.getMessageElementsWithContent();
-    let currentInViewResponse =
+    const currentInViewConversation =
+      await chat.getMessageElementsWithContent();
+    const currentInViewResponse =
       await currentInViewConversation[
         currentInViewConversation.length - 1
       ].innerText();
