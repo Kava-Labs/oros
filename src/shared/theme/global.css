@@ -19,7 +19,6 @@ body {
   font-weight: var(--typography-fontWeightLight);
 }
 
-
 html, body {
   overflow-x: hidden;
   width: 100%;
@@ -100,4 +99,60 @@ a {
 a:hover {
   color: var(--colors-link-hover);
   text-decoration: underline;
+}
+
+/* List Styles */
+ol {
+  counter-reset: list-counter;
+  list-style: none;
+  padding-left: 0;
+}
+
+ol > li {
+  counter-increment: list-counter;
+  position: relative;
+  padding-left: 2em;
+}
+
+ol > li::before {
+  content: counter(list-counter) ".";
+  position: absolute;
+  left: 0;
+  width: 1.5em;
+  text-align: right;
+}
+
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+ul > li {
+  position: relative;
+  padding-left: 2em;
+}
+
+ul > li::before {
+  content: "•";
+  position: absolute;
+  left: 0.75em;
+  width: 1em;
+  text-align: center;
+}
+
+/* Nested Lists */
+ol ol,
+ol ul,
+ul ol,
+ul ul {
+  margin-left: 1em;
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}
+
+/* Code Blocks */
+pre,
+code {
+  white-space: pre-wrap;
+  word-break: break-word;
 }
