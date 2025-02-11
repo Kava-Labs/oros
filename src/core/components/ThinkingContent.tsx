@@ -46,7 +46,7 @@ export const ThinkingContent = ({
   }, [isStreaming]);
 
   // If there's no thinking content, don't render anything
-  if (!content) {
+  if (!content || !content.trim()) {
     return null;
   }
 
