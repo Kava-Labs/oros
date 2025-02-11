@@ -95,6 +95,7 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
         <div>
           {chatHistories.map((conversation) => (
             <HistoryItem
+              key={conversation.id}
               conversation={conversation}
               handleChatHistoryClick={handleChatHistoryClick}
               deleteConversation={deleteConversation}
