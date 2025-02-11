@@ -99,3 +99,13 @@
   align-items: center;
   padding-left: var(--spacing-sm);
 }
+
+.selected {
+  background-color: var(--colors-bgSecondary);
+  border: 1px solid var(--colors-accentBorder);
+
+  /* Override hover state when selected */
+  &:hover {
+    background-color: var(--colors-bgSecondary);
+  }
+}

@@ -176,6 +176,9 @@ const HistoryItem = ({
   const isMobile = useIsMobile();
   const [hover, setHover] = useState(false);
 
+  const { messageHistoryStore } = useAppContext();
+  const isSelected = messageHistoryStore.getConversationID() === id;
+
   const truncateTitle = (title: string) => {
     const threshold = hover ? 32 : 36;
 
@@ -197,7 +200,7 @@ const HistoryItem = ({
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       data-testid="chat-history-entry"
-      className={styles.chatHistoryItem}
+      className={`${styles.chatHistoryItem} ${isSelected ? styles.selected : ''}`}
     >
       <div className={styles.chatHistoryContent}>
         <p
