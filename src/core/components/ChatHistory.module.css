@@ -31,17 +31,26 @@
 
 .historySection {
   padding: var(--spacing-sm);
-  border-top: 1px solid var(--colors-borderSecondary);
 }
 
-.historySectionTitle {
-  margin-left: var(--spacing-md);
-  margin-top: var(--spacing-lg);
-  color: var(--colors-textSecondary);
-  font-size: 18px;
-  font-weight: var(--typography-fontWeightBold);
-  line-height: 24px;
-  text-align: left;
+.timeGroup {
+  margin-bottom: var(--spacing-md);
+}
+
+.timeGroupTitle {
+  margin: var(--spacing-sm) var(--spacing-md);
+  color: var(--colors-textTertiary);
+  font-size: 10px;
+  font-weight: var(--typography-fontWeightSemibold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding-left: var(--spacing-sm);
+}
+
+.timeGroupContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
 }
 
 .chatHistoryItem {
@@ -61,14 +70,25 @@
   }
 }
 
-.newChatButtonAlignment {
+.chatHistoryContent {
   display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .chatHistoryTitle {
+  margin: 0;
+  cursor: pointer;
   color: var(--colors-textPrimary);
 }
 
 .modelName {
+  margin: 0;
   font-size: 12px;
+  color: var(--colors-textTertiary);
+  opacity: 0.8;
+}
+
+.newChatButtonAlignment {
+  display: flex;
 }
