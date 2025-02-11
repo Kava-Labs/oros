@@ -4,8 +4,15 @@ import { ClipboardCheck, Copy } from 'lucide-react';
 import styles from './ChatView.module.css';
 import KavaIcon from '../assets/KavaIcon';
 import { Content } from './Content';
+import { ThinkingContent } from './ThinkingContent';
 
-const AssistantMessage = ({ content }: { content: string }) => {
+const AssistantMessage = ({
+  content,
+  reasoningContent,
+}: {
+  content: string;
+  reasoningContent?: string;
+}) => {
   const [hover, setHover] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -60,6 +67,9 @@ const AssistantMessage = ({ content }: { content: string }) => {
     >
       <KavaIcon className={styles.conversationChatIcon} />
       <div className={styles.assistantContainer}>
+        {reasoningContent ? (
+          <ThinkingContent content={reasoningContent} />
+        ) : null}
         <Content role="assistant" content={content} />
         <div className={styles.copyIconContainer}>
           {isMobile ? copyIcon : hover ? copyIcon : null}

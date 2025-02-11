@@ -3,18 +3,28 @@ import { v4 as uuidv4 } from 'uuid';
 import { ConversationHistory } from '../context/types';
 type Listener = () => void;
 
+export interface ReasoningAssistantMessage {
+  role: 'assistant';
+  content: string;
+  reasoningContent?: string;
+}
+
+export type ChatMessage =
+  | ChatCompletionMessageParam
+  | ReasoningAssistantMessage;
+
 export class MessageHistoryStore {
   private id: string = '';
-  private currentValue: ChatCompletionMessageParam[] = [];
+  private currentValue: ChatMessage[] = [];
   private listeners: Set<Listener> = new Set();
 
-  public addMessage(msg: ChatCompletionMessageParam) {
+  public addMessage(msg: ChatMessage) {
     const newMessages = [...this.currentValue, msg];
     this.currentValue = newMessages;
     this.emitChange();
   }
 
-  public setMessages(msgs: ChatCompletionMessageParam[]) {
+  public setMessages(msgs: ChatMessage[]) {
     if (msgs !== this.currentValue) {
       this.currentValue = msgs;
       this.emitChange();

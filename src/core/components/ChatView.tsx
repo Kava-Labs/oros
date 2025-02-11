@@ -3,15 +3,15 @@ import styles from './ChatView.module.css';
 import { CancelChatIcon, ResetChatIcon, SendChatIcon } from '../assets';
 import { useTheme } from '../../shared/theme/useTheme';
 import { Conversation } from './Conversation';
-import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { useAppContext } from '../context/useAppContext';
 import { isInIframe } from '../utils/isInIframe';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
+import type { ChatMessage } from '../stores/messageHistoryStore';
 
 const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
 
 export interface ChatViewProps {
-  messages: ChatCompletionMessageParam[];
+  messages: ChatMessage[];
   cautionText: string;
   onSubmit(value: string): void;
   onReset(): void;
