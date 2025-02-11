@@ -61,7 +61,7 @@ const AssistantMessage = ({ content }: { content: string }) => {
       <KavaIcon className={styles.conversationChatIcon} />
       <div className={styles.assistantContainer}>
         <Content role="assistant" content={content} />
-        <div data-testid="copy-icon" className={styles.copyIconContainer}>
+        <div className={styles.copyIconContainer}>
           {isMobile ? copyIcon : hover ? copyIcon : null}
         </div>
       </div>
