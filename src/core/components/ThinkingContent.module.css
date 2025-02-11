@@ -27,7 +27,7 @@
 .iconContainer {
   padding: var(--spacing-xs);
   border-radius: 50%;
-  background: var(--colors-accentBorder);
+  background: var(--colors-accentTwoBorder);
   transition: background 0.3s ease;
 }
 
@@ -36,6 +36,34 @@
   opacity: 0.7;
   transition: opacity 0.3s ease;
   display: block;
+}
+
+.iconContainer.pulsing {
+  animation: iconContainerPulse 2s ease-in-out infinite;
+}
+
+.icon.pulsing {
+  animation: iconPulse 2s ease-in-out infinite;
+}
+
+@keyframes iconContainerPulse {
+  0%,
+  100% {
+    background: var(--colors-accentTwoBorder);
+  }
+  50% {
+    background: rgba(147, 130, 215, 0.3);
+  }
+}
+
+@keyframes iconPulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 .headerText {
@@ -72,33 +100,6 @@
   margin-bottom: var(--spacing-sm);
   line-height: 1.5;
   transition: all 0.3s ease;
-}
-
-.dotsContainer {
-  display: flex;
-  gap: 2px;
-  height: 6px;
-  align-items: center;
-  margin-left: var(--spacing-sm);
-}
-
-.dot {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--colors-accent);
-  opacity: 0.7;
-  animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 0.4;
-  }
-  50% {
-    opacity: 0.7;
-  }
 }
 
 .thinkingContentWrapper {

@@ -103,7 +103,9 @@ export const ThinkingContent = ({
         className={styles.header}
       >
         <div
-          className={styles.iconContainer}
+          className={`${styles.iconContainer} ${
+            showLoadingState ? styles.pulsing : ''
+          }`}
           style={{
             background: isExpanded
               ? 'var(--colors-accentTwoBorder)'
@@ -112,7 +114,7 @@ export const ThinkingContent = ({
         >
           <BrainIcon
             color={colors.accentTwo}
-            className={styles.icon}
+            className={`${styles.icon} ${showLoadingState ? styles.pulsing : ''}`}
             style={{
               opacity: isExpanded ? 1 : 0.7,
             }}
@@ -121,7 +123,6 @@ export const ThinkingContent = ({
 
         <span className={styles.headerText}>
           {showLoadingState ? 'Thinking' : 'Thinking Process'}
-          {showLoadingState && <ThinkingDots />}
         </span>
 
         <ChevronDown
