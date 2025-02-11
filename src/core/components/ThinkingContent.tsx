@@ -4,20 +4,6 @@ import styles from './ThinkingContent.module.css';
 import { BrainIcon } from '../assets/BrainIcon';
 import { useTheme } from '../../shared/theme/useTheme';
 
-const ThinkingDots = () => (
-  <div className={styles.dotsContainer}>
-    {[0, 1, 2].map((i) => (
-      <div
-        key={i}
-        className={styles.dot}
-        style={{
-          animationDelay: `${i * 200}ms`,
-        }}
-      />
-    ))}
-  </div>
-);
-
 interface ThinkingContentProps {
   content: string;
   isStreaming?: boolean;
