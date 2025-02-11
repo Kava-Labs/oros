@@ -50,9 +50,6 @@ export const useMessageSaver = (
         const history: ConversationHistory = {
           id,
           model: existingConversation ? existingConversation.model : modelID,
-          modelName: existingConversation
-            ? existingConversation.modelName
-            : modelID,
           title: content as string, // fallback value
           conversation: messages,
           lastSaved,
