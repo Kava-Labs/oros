@@ -217,9 +217,7 @@ async function doChat(
       {
         model: id,
         messages: messageHistoryStore.getSnapshot().map((msg) => {
-          // @ts-expect-error reasoningContent may exist
-          if (msg.reasoningContent) {
-            // @ts-expect-error delete from msg
+          if ('reasoningContent' in msg) {
             delete msg.reasoningContent;
           }
           return msg;

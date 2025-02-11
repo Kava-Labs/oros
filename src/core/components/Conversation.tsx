@@ -65,8 +65,11 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
             <AssistantMessage
               key={index}
               content={message.content as string}
-              // @ts-expect-error reasoningContent may exist
-              reasoningContent={message.reasoningContent}
+              reasoningContent={
+                'reasoningContent' in message
+                  ? message.reasoningContent
+                  : undefined
+              }
             />
           );
         }

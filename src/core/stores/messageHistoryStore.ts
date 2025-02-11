@@ -6,7 +6,7 @@ type Listener = () => void;
 export interface ReasoningAssistantMessage {
   role: 'assistant';
   content: string;
-  reasoningContent: string;
+  reasoningContent?: string;
 }
 
 export type ChatMessage =
