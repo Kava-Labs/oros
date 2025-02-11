@@ -338,3 +338,10 @@ li {
   margin-top: var(--spacing-sm);
   height: var(--spacing-md);
 }
+
+.left h3,
+.left h4,
+.left h5,
+.left h6 {
+  margin-top: 2rem;
+}
