@@ -283,7 +283,7 @@ describe('chat', () => {
     const currentResponse =
       await currentConversation[currentConversation.length - 1].innerText();
 
-    const initialConversation = page.getByTestId('chat-history-entry').first();
+    const initialConversation = page.getByTestId('chat-history-entry').nth(1);
     await initialConversation.click();
 
     const updatedConversation = await chat.getMessageElementsWithContent();
