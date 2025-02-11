@@ -293,7 +293,7 @@ describe('chat', () => {
     expect(updatedResponse).not.toEqual(currentResponse);
 
     //  switch back to the initial conversation
-    const secondConversation = page.getByTestId('chat-history-entry').nth(1);
+    const secondConversation = page.getByTestId('chat-history-entry').first();
     await secondConversation.click();
 
     const conversation = await chat.getMessageElementsWithContent();
