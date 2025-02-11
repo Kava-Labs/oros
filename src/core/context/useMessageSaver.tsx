@@ -6,6 +6,7 @@ import OpenAI from 'openai';
 export const useMessageSaver = (
   messageHistoryStore: MessageHistoryStore,
   modelID: string,
+  modelName: string,
   client: OpenAI,
 ) => {
   useEffect(() => {
@@ -23,6 +24,9 @@ export const useMessageSaver = (
         const history: ConversationHistory = {
           id,
           model: allConversations[id] ? allConversations[id].model : modelID,
+          modelName: allConversations[id]
+            ? allConversations[id].modelName
+            : modelName,
           title: content as string, // fallback value
           conversation: messages,
           lastSaved: new Date().valueOf(),

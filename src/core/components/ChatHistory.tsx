@@ -88,7 +88,6 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
         </button>
       )}
 
-      {/*  */}
       <div className={styles.historySection} data-testid="chat-history-section">
         <h5 className={styles.historySectionTitle}>History</h5>
 
@@ -116,7 +115,7 @@ const HistoryItem = ({
   handleChatHistoryClick: (conversation: ConversationHistory) => void;
   deleteConversation: (id: string) => void;
 }) => {
-  const { id, title } = conversation;
+  const { id, title, model } = conversation;
 
   const isMobile = useIsMobile();
 
@@ -146,9 +145,15 @@ const HistoryItem = ({
       key={id}
       className={styles.chatHistoryItem}
     >
-      <p onClick={() => handleChatHistoryClick(conversation)}>
-        {truncateTitle(title)}
-      </p>
+      <div className={styles.chatHistoryContent}>
+        <p
+          onClick={() => handleChatHistoryClick(conversation)}
+          className={styles.chatHistoryTitle}
+        >
+          {truncateTitle(title)}
+        </p>
+        <p className={styles.modelName}>{model}</p>
+      </div>
       <div>
         {hover || isMobile ? (
           <Trash2

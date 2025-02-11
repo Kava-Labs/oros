@@ -61,7 +61,12 @@ export const AppContextProvider = ({
     walletStore,
   );
 
-  useMessageSaver(messageHistoryStore, modelConfig.id, client!);
+  useMessageSaver(
+    messageHistoryStore,
+    modelConfig.id,
+    modelConfig.name,
+    client!,
+  );
 
   const loadConversation = useCallback(
     (convoHistory: ConversationHistory) => {

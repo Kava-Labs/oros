@@ -52,7 +52,7 @@
   color: var(--colors-textSecondary);
   margin-right: var(--spacing-md);
   margin-left: var(--spacing-md);
-  font-size: 16px;
+  font-size: 14px;
   line-height: 22px;
   padding: var(--spacing-sm);
 
@@ -63,4 +63,12 @@
 
 .newChatButtonAlignment {
   display: flex;
+}
+
+.chatHistoryTitle {
+  color: var(--colors-textPrimary);
+}
+
+.modelName {
+  font-size: 12px;
 }
