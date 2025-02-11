@@ -19,6 +19,108 @@ body {
   font-weight: var(--typography-fontWeightLight);
 }
 
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-wrap: balance;
+  font-weight: var(--typography-fontWeightLight);
+  margin-bottom: 2rem;
+  margin-top: 0;
+}
+
+p {
+  text-wrap: pretty;
+  line-height: 1.45;
+  margin-top: 0;
+}
+
+h1 {
+  font-size: 3.2rem;
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: 2.79rem;
+  line-height: 1.25;
+}
+
+h3 {
+  font-size: 2.43rem;
+  line-height: 1.3;
+}
+
+h4 {
+  font-size: 2.11rem;
+  letter-spacing: -0.08rem;
+  line-height: 1.35;
+}
+
+h5 {
+  font-size: 1.84rem;
+  letter-spacing: -0.05rem;
+  line-height: 1.4;
+}
+
+h6 {
+  font-size: 1.6rem;
+  letter-spacing: 0;
+  line-height: 1.45;
+}
+
+b,
+strong {
+  font-weight: var(--typography-fontWeightBold);
+}
+
+a {
+  color: var(--colors-link);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--colors-link-hover);
+  text-decoration: underline;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--colors-bgPrimary);
+  font-family: var(--typography-fontFamilyBase);
+  line-height: 1.5;
+  min-height: 100vh;
+  font-size: 1.6rem;
+  font-weight: var(--typography-fontWeightLight);
+}
 
 html, body {
   overflow-x: hidden;
@@ -100,4 +202,60 @@ a {
 a:hover {
   color: var(--colors-link-hover);
   text-decoration: underline;
+}
+
+/* List Styles */
+ol {
+  counter-reset: list-counter;
+  list-style: none;
+  padding-left: 0;
+}
+
+ol > li {
+  counter-increment: list-counter;
+  position: relative;
+  padding-left: 2em;
+}
+
+ol > li::before {
+  content: counter(list-counter) ".";
+  position: absolute;
+  left: 0;
+  width: 1.5em;
+  text-align: right;
+}
+
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+ul > li {
+  position: relative;
+  padding-left: 2em;
+}
+
+ul > li::before {
+  content: "•";
+  position: absolute;
+  left: 0.75em;
+  width: 1em;
+  text-align: center;
+}
+
+/* Nested Lists */
+ol ol,
+ol ul,
+ul ol,
+ul ul {
+  margin-left: 1em;
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}
+
+/* Code Blocks */
+pre,
+code {
+  white-space: pre-wrap;
+  word-break: break-word;
 }
