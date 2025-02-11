@@ -47,7 +47,11 @@ export const ChatView = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const handleContentRendered = useCallback(() => {
     if (containerRef.current) {
-      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+      requestAnimationFrame(() => {
+        if (containerRef.current) {
+          containerRef.current.scrollTop = containerRef.current.scrollHeight;
+        }
+      });
     }
   }, [containerRef]);
 

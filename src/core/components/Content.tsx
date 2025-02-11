@@ -54,12 +54,22 @@ export const ContentComponent = ({
 
         if (!cancel) {
           setSanitizedContent(updatedContent);
+          if (onRendered) {
+            requestAnimationFrame(() => {
+              if (!cancel) onRendered();
+            });
+          }
         }
       } catch (error) {
         // TODO: This is noisy in tests
         console.error(error);
         if (!cancel) {
           setHasError(true);
+          if (onRendered) {
+            requestAnimationFrame(() => {
+              if (!cancel) onRendered();
+            });
+          }
         }
       }
     };
@@ -69,13 +79,7 @@ export const ContentComponent = ({
     return () => {
       cancel = true;
     };
-  }, [content, modelConfig]);
-
-  useEffect(() => {
-    if (onRendered) {
-      requestAnimationFrame(onRendered);
-    }
-  }, [sanitizedContent, hasError, onRendered]);
+  }, [content, modelConfig, hasError, onRendered]);
 
   if (hasError) {
     return <span>Error: Could not render content!</span>;
@@ -86,11 +90,7 @@ export const ContentComponent = ({
   return (
     <div data-testid="conversation-message" data-chat-role={role}>
       {role === 'assistant' && hasThinkingContent && (
-        <ThinkingContent
-          content={content}
-          isStreaming={isRequesting}
-          onRendered={onRendered}
-        />
+        <ThinkingContent content={content} isStreaming={isRequesting} />
       )}
       {sanitizedContent !== '' && (
         <span

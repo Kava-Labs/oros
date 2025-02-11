@@ -21,13 +21,11 @@ const ThinkingDots = () => (
 interface ThinkingContentProps {
   content: string;
   isStreaming?: boolean;
-  onRendered?: () => void;
 }
 
 export const ThinkingContent = ({
   content,
   isStreaming = false,
-  onRendered,
 }: ThinkingContentProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [thinkingContent, setThinkingContent] = useState<{
@@ -38,12 +36,6 @@ export const ThinkingContent = ({
     isThinking: false,
   });
   const { colors } = useTheme();
-
-  useEffect(() => {
-    if (onRendered) {
-      requestAnimationFrame(onRendered);
-    }
-  }, [content, onRendered]);
 
   useEffect(() => {
     const thinkStart = content.indexOf('<think>');
