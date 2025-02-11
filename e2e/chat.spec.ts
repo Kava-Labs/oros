@@ -357,6 +357,6 @@ describe('chat', () => {
     //  still there after a refresh/reload
     await page.reload();
 
-    await expect(historyEntry).toHaveText('Test Conversation Titletest');
+    await expect(historyEntry).toHaveText('Test Conversation Title');
   });
 });

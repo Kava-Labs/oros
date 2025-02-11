@@ -15,7 +15,6 @@ export type ExecuteOperation = (
 export type ConversationHistory = {
   id: string;
   model: string;
-  modelName: string;
   title: string;
   conversation: ChatCompletionMessageParam[];
   lastSaved: number;
