@@ -41,6 +41,7 @@ import {
   messageHistoryStore,
   messageStore,
   walletStore,
+  thinkingStore,
   toolCallStreamStore,
 } from './core/stores/stores.ts';
 
@@ -55,6 +56,7 @@ root.render(
       <AppContextProvider
         progressStore={progressStore}
         messageStore={messageStore}
+        thinkingStore={thinkingStore}
         toolCallStreamStore={toolCallStreamStore}
         walletStore={walletStore}
         messageHistoryStore={messageHistoryStore}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import styles from './ThinkingContent.module.css';
 import { BrainIcon } from '../assets/BrainIcon';
@@ -7,66 +7,41 @@ import { useTheme } from '../../shared/theme/useTheme';
 interface ThinkingContentProps {
   content: string;
   isStreaming?: boolean;
+  onRendered?: () => void;
 }
 
 export const ThinkingContent = ({
   content,
   isStreaming = false,
+  onRendered,
 }: ThinkingContentProps) => {
-  const [isExpanded, setIsExpanded] = useState(true);
-  const [thinkingContent, setThinkingContent] = useState<{
-    thinking: string | null;
-    isThinking: boolean;
-  }>({
-    thinking: null,
-    isThinking: false,
-  });
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const { colors } = useTheme();
 
   useEffect(() => {
-    const thinkStart = content.indexOf('<think>');
-    const thinkEnd = content.indexOf('</think>');
-
-    if (thinkStart === -1) {
-      setThinkingContent({
-        thinking: null,
-        isThinking: false,
-      });
-      return;
+    if (onRendered) {
+      requestAnimationFrame(onRendered);
     }
+  }, [onRendered, content]);
 
-    // We're in the middle of streaming a thinking section:
-    if (thinkStart !== -1 && thinkEnd === -1) {
-      const thinking = content.slice(thinkStart + 7);
-      setThinkingContent({
-        thinking,
-        isThinking: true,
-      });
-      return;
+  useEffect(() => {
+    if (isStreaming) {
+      setIsExpanded(true);
     }
+  }, [isStreaming]);
 
-    // We have a complete thinking section:
-    if (thinkStart !== -1 && thinkEnd !== -1) {
-      const thinking = content.slice(thinkStart + 7, thinkEnd);
-      setThinkingContent({
-        thinking,
-        isThinking: false,
-      });
-      return;
-    }
-  }, [content]);
-
-  // If there's no thinking content and we're not streaming, don't render anything
-  if (!thinkingContent.thinking && !isStreaming) {
+  // If there's no thinking content, don't render anything
+  if (!content || !content.trim()) {
     return null;
   }
 
-  const showLoadingState = isStreaming && thinkingContent.isThinking;
+  const showLoadingState = isStreaming;
 
   const renderThinkingContent = () => {
-    if (!thinkingContent.thinking) return null;
+    if (!content) return null;
 
-    return thinkingContent.thinking.split('\n').map((line, i) => (
+    return content.split('\n').map((line, i) => (
       <p
         key={i}
         className={styles.paragraph}

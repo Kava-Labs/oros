@@ -42,6 +42,7 @@ export const App = () => {
     progressStore,
     client,
     messageStore,
+    thinkingStore,
   } = useAppContext();
 
   const messages = useSyncExternalStore(
@@ -96,6 +97,7 @@ export const App = () => {
           progressStore,
           messageStore,
           toolCallStreamStore,
+          thinkingStore,
           executeOperation,
         );
       } catch (error) {
@@ -126,6 +128,7 @@ export const App = () => {
       toolCallStreamStore,
       messageStore,
       client,
+      thinkingStore,
     ],
   );
 
@@ -204,6 +207,7 @@ async function doChat(
   progressStore: TextStreamStore,
   messageStore: TextStreamStore,
   toolCallStreamStore: ToolCallStreamStore,
+  thinkingStore: TextStreamStore,
   executeOperation: ExecuteOperation,
 ) {
   progressStore.setText('Thinking');
@@ -212,7 +216,12 @@ async function doChat(
     const stream = await client.chat.completions.create(
       {
         model: id,
-        messages: messageHistoryStore.getSnapshot(),
+        messages: messageHistoryStore.getSnapshot().map((msg) => {
+          if ('reasoningContent' in msg) {
+            delete msg.reasoningContent;
+          }
+          return msg;
+        }),
         tools: tools,
         stream: true,
       },
@@ -221,13 +230,49 @@ async function doChat(
       },
     );
 
+    let content = '';
+    let thinkingEnd = -1;
+
     for await (const chunk of stream) {
       if (progressStore.getSnapshot() !== '') {
         progressStore.setText('');
       }
 
       if (isContentChunk(chunk)) {
-        messageStore.appendText(chunk.choices[0].delta.content as string);
+        content += chunk['choices'][0]['delta']['content'];
+        // todo: chance to clean up into a helper similar to assembleToolCallFromStream
+        switch (modelConfig.id) {
+          case 'deepseek-r1': {
+            const openTag = '<think>';
+            const closeTag = '</think>';
+
+            if (thinkingEnd === -1) {
+              thinkingEnd = content.indexOf(closeTag);
+              // stream the thoughts part to the thinking store
+              if (content.length >= openTag.length) {
+                thinkingStore.setText(
+                  content.slice(
+                    openTag.length,
+                    thinkingEnd === -1 ? content.length : thinkingEnd,
+                  ),
+                );
+              }
+            }
+
+            if (thinkingEnd !== -1) {
+              // stream the response part to the message store
+              messageStore.setText(
+                content.slice(thinkingEnd + closeTag.length),
+              );
+            }
+            break;
+          }
+
+          default: {
+            messageStore.setText(content);
+            break;
+          }
+        }
       } else if (isToolCallChunk(chunk)) {
         assembleToolCallsFromStream(chunk, toolCallStreamStore);
       }
@@ -235,10 +280,18 @@ async function doChat(
 
     // Push a message
     if (messageStore.getSnapshot() !== '') {
-      messageHistoryStore.addMessage({
+      const msg = {
         role: 'assistant' as const,
         content: messageStore.getSnapshot(),
-      });
+      };
+
+      if (thinkingStore.getSnapshot() !== '') {
+        // @ts-expect-error setting reasoningContent
+        msg.reasoningContent = thinkingStore.getSnapshot();
+        thinkingStore.setText('');
+      }
+
+      messageHistoryStore.addMessage(msg);
 
       messageStore.setText('');
     }
@@ -260,6 +313,7 @@ async function doChat(
         progressStore,
         messageStore,
         toolCallStreamStore,
+        thinkingStore,
         executeOperation,
       );
     }

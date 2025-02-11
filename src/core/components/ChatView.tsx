@@ -3,15 +3,15 @@ import styles from './ChatView.module.css';
 import { CancelChatIcon, ResetChatIcon, SendChatIcon } from '../assets';
 import { useTheme } from '../../shared/theme/useTheme';
 import { Conversation } from './Conversation';
-import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { useAppContext } from '../context/useAppContext';
 import { isInIframe } from '../utils/isInIframe';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
+import type { ChatMessage } from '../stores/messageHistoryStore';
 
 const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
 
 export interface ChatViewProps {
-  messages: ChatCompletionMessageParam[];
+  messages: ChatMessage[];
   cautionText: string;
   onSubmit(value: string): void;
   onReset(): void;
@@ -33,27 +33,60 @@ export const ChatView = ({
   const [inputValue, setInputValue] = useState('');
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Track if we should auto-scroll
+  const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
+
+  // Handle scroll events
+  const handleScroll = useCallback(() => {
+    if (!containerRef.current) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
+    const isAtBottom = Math.abs(scrollHeight - clientHeight - scrollTop) < 10;
+
+    // Only update auto-scroll if we're not at the bottom, like if the user scrolls up in the chat
+    if (!isAtBottom) {
+      setShouldAutoScroll(false);
+    } else {
+      setShouldAutoScroll(true);
+    }
+  }, []);
+
+  const scrollToBottom = useCallback(() => {
+    if (!containerRef.current) return;
+    containerRef.current.scrollTop = containerRef.current.scrollHeight;
+  }, []);
 
   // Reset textarea height when input is cleared
   useEffect(() => {
     if (inputRef.current && inputValue === '') {
       inputRef.current.style.height = DEFAULT_HEIGHT;
+      setShouldAutoScroll(true); // Reset scroll state when input is cleared
     }
   }, [inputValue]);
+
+  // Add scroll event listener
+  useEffect(() => {
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+      return () => container.removeEventListener('scroll', handleScroll);
+    }
+  }, [handleScroll]);
 
   const hasMessages =
     messages.filter((message) => message.role != 'system').length > 0;
 
-  const containerRef = useRef<HTMLDivElement>(null);
   const handleContentRendered = useCallback(() => {
-    if (containerRef.current) {
+    if (!containerRef.current) return;
+
+    if (shouldAutoScroll) {
       requestAnimationFrame(() => {
-        if (containerRef.current) {
-          containerRef.current.scrollTop = containerRef.current.scrollHeight;
-        }
+        scrollToBottom();
       });
     }
-  }, [containerRef]);
+  }, [shouldAutoScroll, scrollToBottom]);
 
   const handleInputChange = useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -66,7 +99,6 @@ export const ChatView = ({
       const textarea = event.target;
       textarea.style.height = DEFAULT_HEIGHT; // Reset to default height first
       textarea.style.height = `min(${textarea.scrollHeight}px, 60vh)`; // Adjust to scrollHeight
-
       setInputValue(textarea.value);
     },
     [],
@@ -89,6 +121,7 @@ export const ChatView = ({
 
     onSubmit(processedMessage);
     setInputValue('');
+    setShouldAutoScroll(true); // Reset scroll state when sending new message
 
     // Reset height after submitting
     if (inputRef.current) {

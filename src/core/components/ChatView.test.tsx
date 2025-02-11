@@ -11,6 +11,7 @@ const progressStore = new TextStreamStore();
 const toolCallStreamStore = new ToolCallStreamStore();
 const messageHistoryStore = new MessageHistoryStore();
 const walletStore = new WalletStore();
+const thinkingStore = new TextStreamStore();
 
 vi.mock(
   import('../../features/blockchain/services/registry'),
@@ -47,6 +48,7 @@ describe('ChatView', () => {
     const wrapper = render(
       <ThemeProvider>
         <AppContextProvider
+          thinkingStore={thinkingStore}
           progressStore={progressStore}
           messageStore={messageStore}
           toolCallStreamStore={toolCallStreamStore}

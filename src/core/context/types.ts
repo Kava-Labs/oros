@@ -34,6 +34,7 @@ export type AppContextType = {
   loadConversation: (convoHistory: ConversationHistory) => void;
   walletStore: WalletStore;
   client: OpenAI | null;
+  thinkingStore: TextStreamStore;
   messageStore: TextStreamStore;
   toolCallStreamStore: ToolCallStreamStore;
   progressStore: TextStreamStore;

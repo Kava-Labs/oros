@@ -20,9 +20,11 @@ import {
 import KavaIcon from '../assets/KavaIcon';
 import { isInIframe } from '../utils/isInIframe';
 import AssistantMessage from './AssistantMessage';
+import { ThinkingContent } from './ThinkingContent';
+import type { ChatMessage } from '../stores/messageHistoryStore';
 
 export interface ConversationProps {
-  messages: ChatCompletionMessageParam[];
+  messages: ChatMessage[];
   onRendered(): void;
 }
 
@@ -31,8 +33,14 @@ const StreamingTextContent = (message: string, onRendered: () => void) => {
 };
 
 const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
-  const { errorText, isRequesting, progressStore, messageStore, registry } =
-    useAppContext();
+  const {
+    errorText,
+    isRequesting,
+    progressStore,
+    messageStore,
+    registry,
+    thinkingStore,
+  } = useAppContext();
 
   return (
     <div
@@ -54,13 +62,21 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
 
         if (message.role === 'assistant' && message.content) {
           return (
-            <AssistantMessage key={index} content={message.content as string} />
+            <AssistantMessage
+              key={index}
+              content={message.content as string}
+              reasoningContent={
+                'reasoningContent' in message
+                  ? message.reasoningContent
+                  : undefined
+              }
+            />
           );
         }
 
         if (message.role === 'tool') {
           const id = message.tool_call_id;
-          const prevMsg = messages[index - 1];
+          const prevMsg = messages[index - 1] as ChatCompletionMessageParam;
           if (
             !(
               prevMsg.role === 'assistant' &&
@@ -126,6 +142,16 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
               </StreamingText>
             </div>
             <div id={styles.assistantStream}>
+              <StreamingText store={thinkingStore} onRendered={onRendered}>
+                {(msg) => (
+                  <ThinkingContent
+                    content={msg}
+                    isStreaming={true}
+                    onRendered={onRendered}
+                  />
+                )}
+              </StreamingText>
+
               <StreamingText store={messageStore} onRendered={onRendered}>
                 {StreamingTextContent}
               </StreamingText>
