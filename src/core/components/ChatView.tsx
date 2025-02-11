@@ -7,6 +7,7 @@ import { useAppContext } from '../context/useAppContext';
 import { isInIframe } from '../utils/isInIframe';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
 import type { ChatMessage } from '../stores/messageHistoryStore';
+import ModelSelector from './ModelSelector';
 
 const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
 
@@ -160,6 +161,11 @@ export const ChatView = ({
       id={showNavBar ? styles.updatedChatView : styles.chatview}
       data-testid="chatview"
     >
+      {!isMobile && (
+        <div className={styles.modelSelectorContainer}>
+          <ModelSelector />
+        </div>
+      )}
       <div
         ref={containerRef}
         id={styles.scrollContent}

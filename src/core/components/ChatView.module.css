@@ -339,6 +339,13 @@ li {
   height: var(--spacing-md);
 }
 
+.modelSelectorContainer {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 100;
+}
+
 .left h1, .left h2, .left h3, .left h4, .left h5, .left h6,
 .right h1, .right h2, .right h3, .right h4, .right h5, .right h6 {
   margin-top: 2rem;

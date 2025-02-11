@@ -176,7 +176,7 @@
 
   .dropdown {
     width: 330px;
-    border: 1px solid var(--colors-textMuted);
+    border: 1px solid var(--colors-bgTertiary);
   }
 
   .dropdownMenu {
