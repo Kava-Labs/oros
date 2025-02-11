@@ -94,11 +94,13 @@
 .assistantContainer {
   margin-top: var(--spacing-sm);
   max-width: 80%;
+  width: 80%;
 }
 
 #progressStream {
   .content {
     color: var(--colors-textTertiary);
+    font-size: 1.5rem;
 
     p::after {
       content: '.';
