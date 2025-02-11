@@ -122,7 +122,7 @@ const HistoryItem = ({
   const [hover, setHover] = useState(false);
 
   const truncateTitle = (title: string) => {
-    const threshold = hover ? 32 : 36;
+    const threshold = hover ? 30 : 34;
 
     if (title.startsWith(`"`) || title.startsWith(`'`)) {
       title = title.slice(1);
@@ -145,7 +145,10 @@ const HistoryItem = ({
       key={id}
       className={styles.chatHistoryItem}
     >
-      <p onClick={() => handleChatHistoryClick(conversation)}>
+      <p
+        className={styles.historyTitle}
+        onClick={() => handleChatHistoryClick(conversation)}
+      >
         {truncateTitle(title)}
       </p>
       <div>

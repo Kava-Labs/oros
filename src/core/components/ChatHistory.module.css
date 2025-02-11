@@ -68,3 +68,7 @@
 .newChatButtonAlignment {
   display: flex;
 }
+
+.historyTitle {
+  font-size: 14px;
+}
