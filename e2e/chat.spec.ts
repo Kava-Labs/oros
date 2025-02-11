@@ -352,11 +352,11 @@ describe('chat', () => {
     await chat.goto();
 
     const historyEntry = page.getByTestId('chat-history-entry').first();
-    await expect(historyEntry).toHaveText('Test Conversation Title');
+    await expect(historyEntry).toHaveText('Test Conversation Titletest-model');
 
     //  still there after a refresh/reload
     await page.reload();
 
-    await expect(historyEntry).toHaveText('Test Conversation Title');
+    await expect(historyEntry).toHaveText('Test Conversation Titletest-model');
   });
 });
