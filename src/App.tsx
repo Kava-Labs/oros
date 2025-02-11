@@ -161,10 +161,12 @@ export const App = () => {
     <>
       {isReady && (
         <div className={styles.appContent}>
-          <NavBar
-            chatHistoryOpen={chatHistoryOpen}
-            setChatHistoryOpen={setChatHistoryOpen}
-          />
+          {isMobile && (
+            <NavBar
+              chatHistoryOpen={chatHistoryOpen}
+              setChatHistoryOpen={setChatHistoryOpen}
+            />
+          )}
           {showHistorySidebar ? (
             <div className={styles.appContainer}>
               {!isMobile ? (

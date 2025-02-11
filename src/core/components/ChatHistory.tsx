@@ -5,6 +5,7 @@ import { useAppContext } from '../context/useAppContext';
 import NewChatIcon from '../assets/NewChatIcon';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
 import { TrashIcon } from '../assets/TrashIcon';
+import KavaAILogo from '../assets/KavaAILogo';
 
 interface ChatHistoryProps {
   setChatHistoryOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -128,6 +129,11 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
   return (
     <div className={styles.chatHistoryContainer}>
       {!isMobile && (
+        <div style={{ marginTop: '14px', marginLeft: '20px' }}>
+          <KavaAILogo />
+        </div>
+      )}
+      {!isMobile && (
         <button
           onClick={startNewChat}
           className={styles.newChatButton}
@@ -160,7 +166,6 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
     </div>
   );
 };
-
 interface HistoryItemProps {
   conversation: ConversationHistory;
   handleChatHistoryClick: (conversation: ConversationHistory) => void;
