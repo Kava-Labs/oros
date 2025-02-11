@@ -24,9 +24,11 @@ export const AppContextProvider = ({
   toolCallStreamStore,
   progressStore,
   messageHistoryStore,
+  thinkingStore,
 }: {
   children: React.ReactNode;
   walletStore: WalletStore;
+  thinkingStore: TextStreamStore;
   messageStore: TextStreamStore;
   toolCallStreamStore: ToolCallStreamStore;
   progressStore: TextStreamStore;
@@ -99,6 +101,7 @@ export const AppContextProvider = ({
         toolCallStreamStore,
         modelConfig,
         handleModelChange,
+        thinkingStore,
         loadConversation,
         executeOperation,
         registry,

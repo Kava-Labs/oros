@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import styles from './ThinkingContent.module.css';
 import { BrainIcon } from '../assets/BrainIcon';
@@ -28,59 +28,20 @@ export const ThinkingContent = ({
   isStreaming = false,
 }: ThinkingContentProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
-  const [thinkingContent, setThinkingContent] = useState<{
-    thinking: string | null;
-    isThinking: boolean;
-  }>({
-    thinking: null,
-    isThinking: false,
-  });
+
   const { colors } = useTheme();
 
-  useEffect(() => {
-    const thinkStart = content.indexOf('<think>');
-    const thinkEnd = content.indexOf('</think>');
-
-    if (thinkStart === -1) {
-      setThinkingContent({
-        thinking: null,
-        isThinking: false,
-      });
-      return;
-    }
-
-    // We're in the middle of streaming a thinking section:
-    if (thinkStart !== -1 && thinkEnd === -1) {
-      const thinking = content.slice(thinkStart + 7);
-      setThinkingContent({
-        thinking,
-        isThinking: true,
-      });
-      return;
-    }
-
-    // We have a complete thinking section:
-    if (thinkStart !== -1 && thinkEnd !== -1) {
-      const thinking = content.slice(thinkStart + 7, thinkEnd);
-      setThinkingContent({
-        thinking,
-        isThinking: false,
-      });
-      return;
-    }
-  }, [content]);
-
-  // If there's no thinking content and we're not streaming, don't render anything
-  if (!thinkingContent.thinking && !isStreaming) {
+  // If there's no thinking content, don't render anything
+  if (!content) {
     return null;
   }
 
-  const showLoadingState = isStreaming && thinkingContent.isThinking;
+  const showLoadingState = isStreaming;
 
   const renderThinkingContent = () => {
-    if (!thinkingContent.thinking) return null;
+    if (!content) return null;
 
-    return thinkingContent.thinking.split('\n').map((line, i) => (
+    return content.split('\n').map((line, i) => (
       <p
         key={i}
         className={styles.paragraph}

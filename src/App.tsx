@@ -42,6 +42,7 @@ export const App = () => {
     progressStore,
     client,
     messageStore,
+    thinkingStore,
   } = useAppContext();
 
   const messages = useSyncExternalStore(
@@ -96,6 +97,7 @@ export const App = () => {
           progressStore,
           messageStore,
           toolCallStreamStore,
+          thinkingStore,
           executeOperation,
         );
       } catch (error) {
@@ -204,6 +206,7 @@ async function doChat(
   progressStore: TextStreamStore,
   messageStore: TextStreamStore,
   toolCallStreamStore: ToolCallStreamStore,
+  thinkingStore: TextStreamStore,
   executeOperation: ExecuteOperation,
 ) {
   progressStore.setText('Thinking');
@@ -221,13 +224,49 @@ async function doChat(
       },
     );
 
+    let content = '';
+    let thinkingEnd = -1;
+
     for await (const chunk of stream) {
       if (progressStore.getSnapshot() !== '') {
         progressStore.setText('');
       }
 
       if (isContentChunk(chunk)) {
-        messageStore.appendText(chunk.choices[0].delta.content as string);
+        content += chunk['choices'][0]['delta']['content'];
+
+        switch (modelConfig.id) {
+          case 'deepseek-r1': {
+            const openTag = '<think>';
+            const closeTag = '</think>';
+
+            if (thinkingEnd === -1) {
+              thinkingEnd = content.indexOf(closeTag);
+              // stream the thoughts part to the thinking store
+              if (content.length >= openTag.length) {
+                thinkingStore.setText(
+                  content.slice(
+                    openTag.length,
+                    thinkingEnd === -1 ? content.length : thinkingEnd,
+                  ),
+                );
+              }
+            }
+
+            if (thinkingEnd !== -1) {
+              // stream the response part to the message store
+              messageStore.setText(
+                content.slice(thinkingEnd + closeTag.length),
+              );
+            }
+            break;
+          }
+
+          default: {
+            messageStore.setText(content);
+            break;
+          }
+        }
       } else if (isToolCallChunk(chunk)) {
         assembleToolCallsFromStream(chunk, toolCallStreamStore);
       }
@@ -241,6 +280,10 @@ async function doChat(
       });
 
       messageStore.setText('');
+    }
+
+    if (thinkingStore.getSnapshot() !== '') {
+      thinkingStore.setText('');
     }
 
     if (toolCallStreamStore.getSnapShot().length > 0) {
@@ -260,6 +303,7 @@ async function doChat(
         progressStore,
         messageStore,
         toolCallStreamStore,
+        thinkingStore,
         executeOperation,
       );
     }

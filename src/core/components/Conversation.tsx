@@ -20,6 +20,7 @@ import {
 import KavaIcon from '../assets/KavaIcon';
 import { isInIframe } from '../utils/isInIframe';
 import AssistantMessage from './AssistantMessage';
+import { ThinkingContent } from './ThinkingContent';
 
 export interface ConversationProps {
   messages: ChatCompletionMessageParam[];
@@ -31,8 +32,14 @@ const StreamingTextContent = (message: string, onRendered: () => void) => {
 };
 
 const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
-  const { errorText, isRequesting, progressStore, messageStore, registry } =
-    useAppContext();
+  const {
+    errorText,
+    isRequesting,
+    progressStore,
+    messageStore,
+    registry,
+    thinkingStore,
+  } = useAppContext();
 
   return (
     <div
@@ -126,6 +133,10 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
               </StreamingText>
             </div>
             <div id={styles.assistantStream}>
+              <StreamingText store={thinkingStore} onRendered={onRendered}>
+                {(msg) => <ThinkingContent content={msg} isStreaming={true} />}
+              </StreamingText>
+
               <StreamingText store={messageStore} onRendered={onRendered}>
                 {StreamingTextContent}
               </StreamingText>
