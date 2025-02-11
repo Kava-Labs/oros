@@ -333,7 +333,6 @@ li {
 
 .copyIconContainer {
   display: flex;
-  justify-content: right;
-  padding-top: 10px;
-  height: 20px;
+  margin-top: var(--spacing-sm);
+  height: var(--spacing-md);
 }
