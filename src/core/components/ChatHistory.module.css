@@ -3,17 +3,14 @@
 }
 
 .newChatButton {
-  width: 300px;
-  height: 62px;
+  width: calc(100% - var(--spacing-md) * 2);
+  height: 48px;
   text-align: left;
-  padding-left: 2rem;
   border-radius: var(--borderRadius-sm);
-  border: 1px;
-  margin: var(--spacing-md) var(--spacing-md) var(--spacing-md)
-    var(--spacing-md);
-
-  background-color: var(--colors-bgPrimary);
   border: 1px solid var(--colors-borderPrimary);
+  margin: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--colors-bgPrimary);
   cursor: pointer;
 
   &:hover {
@@ -22,15 +19,12 @@
 }
 
 .newChatButtonText {
-  padding-left: 2rem;
+  padding-left: var(--spacing-md);
   display: inline;
-  font-size: 18px;
+  font-size: 16px;
   line-height: 24px;
   color: var(--colors-textSecondary);
-}
-
-.historySection {
-  padding: 0 var(--spacing-sm);
+  margin: 0;
 }
 
 .timeGroup {
@@ -38,13 +32,12 @@
 }
 
 .timeGroupTitle {
-  margin: var(--spacing-sm) var(--spacing-md);
+  margin: var(--spacing-xs) var(--spacing-md);
   color: var(--colors-textTertiary);
   font-size: 10px;
   font-weight: var(--typography-fontWeightSemibold);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  padding-left: var(--spacing-sm);
 }
 
 .timeGroupContent {
@@ -54,14 +47,14 @@
 }
 
 .chatHistoryItem {
+  width: calc(100% - var(--spacing-md) * 1.5);
   border-radius: var(--spacing-sm);
   display: flex;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
   color: var(--colors-textSecondary);
-  margin-right: var(--spacing-md);
-  margin-left: var(--spacing-md);
+  margin: var(--spacing-xs) var(--spacing-sm);
   font-size: 14px;
   line-height: 22px;
   padding: var(--spacing-sm);
@@ -74,7 +67,6 @@
 .chatHistoryContent {
   display: flex;
   flex-direction: column;
-  gap: 4px;
 }
 
 .chatHistoryTitle {
@@ -92,6 +84,7 @@
 
 .newChatButtonAlignment {
   display: flex;
+  align-items: center;
 }
 
 .trashIconContainer {

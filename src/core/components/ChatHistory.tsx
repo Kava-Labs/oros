@@ -140,7 +140,7 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
         </button>
       )}
 
-      <div className={styles.historySection} data-testid="chat-history-section">
+      <div data-testid="chat-history-section">
         {Object.entries(groupedHistories).map(([timeGroup, conversations]) => (
           <div key={timeGroup} className={styles.timeGroup}>
             <h6 className={styles.timeGroupTitle}>{timeGroup}</h6>
