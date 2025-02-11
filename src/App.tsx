@@ -18,7 +18,7 @@ import { MessageHistoryStore } from './core/stores/messageHistoryStore';
 import { useAppContext } from './core/context/useAppContext';
 import { OperationResult } from './features/blockchain/types/chain';
 import { ExecuteOperation } from './core/context/types';
-import NavBar from './core/components/NavBar';
+import MobileNav from './core/components/NavBar';
 import styles from './App.module.css';
 import { ChatHistory } from './core/components/ChatHistory';
 import { useIsMobile } from './shared/theme/useIsMobile';
@@ -162,7 +162,7 @@ export const App = () => {
       {isReady && (
         <div className={styles.appContent}>
           {isMobile && (
-            <NavBar
+            <MobileNav
               chatHistoryOpen={chatHistoryOpen}
               setChatHistoryOpen={setChatHistoryOpen}
             />

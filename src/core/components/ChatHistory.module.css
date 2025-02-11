@@ -107,3 +107,8 @@
     background-color: var(--colors-bgSecondary);
   }
 }
+
+.desktopLogo {
+  margin-top: 14px;
+  margin-left: 20px;
+}

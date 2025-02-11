@@ -129,7 +129,7 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
   return (
     <div className={styles.chatHistoryContainer}>
       {!isMobile && (
-        <div style={{ marginTop: '14px', marginLeft: '20px' }}>
+        <div className={styles.desktopLogo}>
           <KavaAILogo />
         </div>
       )}
