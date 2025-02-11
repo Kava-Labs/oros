@@ -54,7 +54,7 @@
   align-items: center;
   cursor: pointer;
   color: var(--colors-textSecondary);
-  margin: var(--spacing-xs) var(--spacing-sm);
+  margin: 0 var(--spacing-sm);
   font-size: 14px;
   line-height: 22px;
   padding: var(--spacing-sm);

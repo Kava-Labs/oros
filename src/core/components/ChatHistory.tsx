@@ -172,7 +172,7 @@ const HistoryItem = ({
   handleChatHistoryClick,
   deleteConversation,
 }: HistoryItemProps) => {
-  const { id, title, model } = conversation;
+  const { id, title } = conversation;
   const isMobile = useIsMobile();
   const [hover, setHover] = useState(false);
 
