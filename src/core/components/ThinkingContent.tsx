@@ -106,12 +106,12 @@ export const ThinkingContent = ({
           className={styles.iconContainer}
           style={{
             background: isExpanded
-              ? 'var(--colors-accentBorder)'
+              ? 'var(--colors-accentTwoBorder)'
               : 'rgba(255, 67, 62, 0.1)',
           }}
         >
           <BrainIcon
-            color={colors.accent}
+            color={colors.accentTwo}
             className={styles.icon}
             style={{
               opacity: isExpanded ? 1 : 0.7,

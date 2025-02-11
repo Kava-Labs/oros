@@ -32,7 +32,7 @@
 }
 
 .icon {
-  color: var(--colors-accent);
+  color: var(--colors-accentTwo);
   opacity: 0.7;
   transition: opacity 0.3s ease;
   display: block;
@@ -64,7 +64,7 @@
 
 .thinkingText {
   padding-left: var(--spacing-xl);
-  border-left: 2px solid var(--colors-accentBorder);
+  border-left: 2px solid var(--colors-accentTwoBorder);
   color: var(--colors-textTertiary);
 }
 
