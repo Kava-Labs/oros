@@ -1,6 +1,8 @@
-import styles from './NavBar.module.css';
 import { useCallback, useEffect, useState } from 'react';
 import { useAppContext } from '../context/useAppContext';
+import styles from './NavBar.module.css';
+import Tooltip from './Tooltip';
+import { useIsMobile } from '../../shared/theme/useIsMobile';
 
 interface ModelDropdownButtonProps {
   dropdownOpen: boolean;
@@ -11,10 +13,9 @@ const ModelDropdownButton = ({
   dropdownOpen,
   setDropdownOpen,
 }: ModelDropdownButtonProps) => {
+  const isMobile = useIsMobile();
   const [isDisabled, setIsDisabled] = useState(false);
-
   const { modelConfig, messageHistoryStore } = useAppContext();
-
   const ModelIconComponent = modelConfig.icon;
 
   const toggleDropdown = useCallback(() => {
@@ -23,7 +24,6 @@ const ModelDropdownButton = ({
     }
   }, [dropdownOpen, isDisabled, setDropdownOpen]);
 
-  // Handle message history changes
   const messages = messageHistoryStore.getSnapshot();
   const hasUserMessages = messages.length > 1;
 
@@ -36,7 +36,7 @@ const ModelDropdownButton = ({
     }
   }, [hasUserMessages, setDropdownOpen]);
 
-  return (
+  const button = (
     <button
       disabled={isDisabled}
       className={styles.dropdown}
@@ -74,6 +74,17 @@ const ModelDropdownButton = ({
         />
       </svg>
     </button>
+  );
+
+  return isDisabled ? (
+    <Tooltip
+      content="Model switching is disabled once a chat has started"
+      topMargin={isMobile ? '100' : '65'}
+    >
+      {button}
+    </Tooltip>
+  ) : (
+    button
   );
 };
 

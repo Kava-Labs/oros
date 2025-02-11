@@ -1,0 +1,15 @@
+.container {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip {
+  position: fixed;
+  z-index: 50;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: white;
+  background-color: var(--colors-bgTertiary);
+  border-radius: var(--borderRadius-sm);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
