@@ -240,7 +240,7 @@ async function doChat(
 
       if (isContentChunk(chunk)) {
         content += chunk['choices'][0]['delta']['content'];
-
+        // todo: chance to clean up into a helper similar to assembleToolCallFromStream
         switch (modelConfig.id) {
           case 'deepseek-r1': {
             const openTag = '<think>';
