@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import styles from './ThinkingContent.module.css';
 import { BrainIcon } from '../assets/BrainIcon';
@@ -21,15 +21,23 @@ const ThinkingDots = () => (
 interface ThinkingContentProps {
   content: string;
   isStreaming?: boolean;
+  onRendered?: () => void;
 }
 
 export const ThinkingContent = ({
   content,
   isStreaming = false,
+  onRendered,
 }: ThinkingContentProps) => {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const { colors } = useTheme();
+
+  useEffect(() => {
+    if (onRendered) {
+      requestAnimationFrame(onRendered);
+    }
+  }, [onRendered]);
 
   // If there's no thinking content, don't render anything
   if (!content) {
@@ -37,6 +45,12 @@ export const ThinkingContent = ({
   }
 
   const showLoadingState = isStreaming;
+
+  useEffect(() => {
+    if (isStreaming) {
+      setIsExpanded(true);
+    }
+  }, [isStreaming]);
 
   const renderThinkingContent = () => {
     if (!content) return null;

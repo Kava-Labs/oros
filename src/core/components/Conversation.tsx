@@ -140,7 +140,13 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
             </div>
             <div id={styles.assistantStream}>
               <StreamingText store={thinkingStore} onRendered={onRendered}>
-                {(msg) => <ThinkingContent content={msg} isStreaming={true} />}
+                {(msg) => (
+                  <ThinkingContent
+                    content={msg}
+                    isStreaming={true}
+                    onRendered={onRendered}
+                  />
+                )}
               </StreamingText>
 
               <StreamingText store={messageStore} onRendered={onRendered}>
