@@ -39,18 +39,18 @@ export const ThinkingContent = ({
     }
   }, [onRendered]);
 
+  useEffect(() => {
+    if (isStreaming) {
+      setIsExpanded(true);
+    }
+  }, [isStreaming]);
+
   // If there's no thinking content, don't render anything
   if (!content) {
     return null;
   }
 
   const showLoadingState = isStreaming;
-
-  useEffect(() => {
-    if (isStreaming) {
-      setIsExpanded(true);
-    }
-  }, [isStreaming]);
 
   const renderThinkingContent = () => {
     if (!content) return null;

@@ -71,7 +71,7 @@ export const ContentComponent = ({
         <span
           className={styles.content}
           dangerouslySetInnerHTML={{ __html: sanitizedContent }}
-        ></span>
+        />
       )}
     </div>
   );
