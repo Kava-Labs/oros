@@ -73,6 +73,7 @@
   margin: 0;
   cursor: pointer;
   color: var(--colors-textPrimary);
+  flex: 1;
 }
 
 .modelName {
@@ -95,7 +96,7 @@
 
 .selected {
   background-color: var(--colors-bgSecondary);
-  border: 1px solid var(--colors-accentBorder);
+  border: 1px solid var(--colors-bgSecondary);
 
   /* Override hover state when selected */
   &:hover {

@@ -209,7 +209,6 @@ const HistoryItem = ({
         >
           {truncateTitle(title)}
         </p>
-        <p className={styles.modelName}>{model}</p>
       </div>
       <div className={styles.trashIconContainer}>
         {hover || isMobile ? (
