@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { MessageHistoryStore } from '../stores/messageHistoryStore';
 import { ConversationHistory } from './types';
 import OpenAI from 'openai';
@@ -8,10 +8,14 @@ export const useMessageSaver = (
   modelID: string,
   client: OpenAI,
 ) => {
+  // Keep track of the conversation length to detect new messages
+  const prevMessageCountRef = useRef<Record<string, number>>({});
+
   useEffect(() => {
     const onChange = async () => {
       const messages = messageHistoryStore.getSnapshot();
       const id = messageHistoryStore.getConversationID();
+
       if (messages.length >= 3) {
         const firstUserMessage = messages.find((msg) => msg.role === 'user');
         if (!firstUserMessage) return;
@@ -20,15 +24,41 @@ export const useMessageSaver = (
         const allConversations: Record<string, ConversationHistory> =
           JSON.parse(localStorage.getItem('conversations') ?? '{}');
 
+        // Check if this is an existing conversation
+        const existingConversation = allConversations[id];
+
+        // Initialize message count for this conversation if it doesn't exist
+        if (!prevMessageCountRef.current[id]) {
+          prevMessageCountRef.current[id] = existingConversation
+            ? existingConversation.conversation.length
+            : messages.length;
+        }
+
+        // Determine if new messages were added to an existing conversation
+        const hasNewMessages =
+          existingConversation &&
+          messages.length > prevMessageCountRef.current[id];
+
+        // Update the message count reference
+        prevMessageCountRef.current[id] = messages.length;
+
+        // Only update lastSaved if new messages were added to an existing conversation
+        const lastSaved = hasNewMessages
+          ? new Date().valueOf()
+          : (existingConversation?.lastSaved ?? new Date().valueOf());
+
         const history: ConversationHistory = {
           id,
-          model: allConversations[id] ? allConversations[id].model : modelID,
+          model: existingConversation ? existingConversation.model : modelID,
+          modelName: existingConversation
+            ? existingConversation.modelName
+            : modelID,
           title: content as string, // fallback value
           conversation: messages,
-          lastSaved: new Date().valueOf(),
+          lastSaved,
         };
 
-        if (!allConversations[id]) {
+        if (!existingConversation) {
           try {
             const data = await client.chat.completions.create({
               stream: false,
