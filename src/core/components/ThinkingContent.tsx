@@ -37,7 +37,7 @@ export const ThinkingContent = ({
     if (onRendered) {
       requestAnimationFrame(onRendered);
     }
-  }, [onRendered]);
+  }, [onRendered, content]);
 
   useEffect(() => {
     if (isStreaming) {
