@@ -1,14 +1,9 @@
 import styles from './NavBar.module.css';
-import KavaAILogo from '../assets/KavaAILogo';
 import HamburgerIcon from '../assets/HamburgerIcon';
-import { isInIframe } from '../utils/isInIframe';
 import ModelSelector from './ModelSelector';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
 import NewChatIcon from '../assets/NewChatIcon';
-import { useAppContext } from '../context/useAppContext';
 import { PanelLeftOpen } from 'lucide-react';
-
-const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
 
 interface NavBarProps {
   onMenu(): void;

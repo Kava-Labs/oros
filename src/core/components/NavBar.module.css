@@ -44,11 +44,28 @@
   display: none;
   visibility: hidden;
   opacity: 0;
+
+  transition:
+    opacity 0.1s,
+    visibility 0.1s;
+
+  &:hover {
+    cursor: pointer;
+    color: white;
+  }
+
+  &:active {
+    opacity: 0.6;
+  }
 }
 
 .panelOpen.showPanelOpen {
   opacity: 1;
   visibility: visible;
+
+  transition:
+    opacity 0.3s,
+    visibility 0s 0.1s;
 }
 
 @media (min-width: 768px) {
@@ -65,12 +82,10 @@
   }
 }
 
-
 .modelSelector {
   width: 400px;
   height: 40px;
 }
-
 
 .container {
   display: flex;
@@ -107,7 +122,9 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: opacity 0.2s ease, background-color 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .dropdown:disabled {
