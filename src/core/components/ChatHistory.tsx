@@ -7,6 +7,7 @@ import {
   useMemo,
   Dispatch,
   SetStateAction,
+  memo,
 } from 'react';
 import { useAppContext } from '../context/useAppContext';
 import NewChatIcon from '../assets/NewChatIcon';
@@ -88,7 +89,6 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
     load();
     // we have to poll local storage
     const id = setInterval(load, 1000);
-
     return () => clearInterval(id);
   }, []);
 
@@ -193,7 +193,7 @@ interface HistoryItemProps {
   deleteConversation: (id: string) => void;
 }
 
-const HistoryItem = React.memo(
+const HistoryItem = memo(
   ({
     conversation,
     handleChatHistoryClick,
@@ -260,5 +260,3 @@ const HistoryItem = React.memo(
     );
   },
 );
-
-HistoryItem.displayName = 'HistoryItem';
