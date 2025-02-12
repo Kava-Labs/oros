@@ -16,7 +16,6 @@ import { useIsMobile } from '../../shared/theme/useIsMobile';
 import { TrashIcon } from '../assets/TrashIcon';
 import KavaAILogo from '../assets/KavaAILogo';
 import { Pencil } from 'lucide-react';
-import { thinkingStore } from '../stores/stores';
 
 interface ChatHistoryProps {
   setChatHistoryOpen: Dispatch<SetStateAction<boolean>>;
@@ -78,6 +77,7 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
     loadConversation,
     messageHistoryStore,
     modelConfig,
+    thinkingStore,
     setIsRequesting,
   } = useAppContext();
   const isMobile = useIsMobile();
