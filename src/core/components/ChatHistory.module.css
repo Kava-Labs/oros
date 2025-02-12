@@ -113,3 +113,32 @@
   margin-top: 14px;
   margin-left: 20px;
 }
+
+.searchInput {
+  height: 40px;
+  width: 90%;
+  background-color: var(--colors-bgTertiary);
+  border-radius: var(--borderRadius-sm);
+  border: none;
+  /* Remove top/bottom padding and use line-height for vertical centering */
+  padding: 0 var(--spacing-sm);
+  /* Set line-height equal to height for perfect vertical centering */
+  line-height: 40px;
+  color: var(--colors-textPrimary);
+  font-family: inherit;
+  font-weight: inherit;
+  overflow-y: auto;
+  resize: none;
+  text-wrap: wrap;
+
+  &:focus {
+    border: none;
+    outline: none;
+    caret-color: white;
+  }
+}
+
+.searchInputWrapper {
+  margin-top: var(--spacing-md);
+  margin-left: var(--spacing-md);
+}

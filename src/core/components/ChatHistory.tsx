@@ -102,7 +102,7 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
     return groupConversations(filteredConversations);
   }, [conversations, searchTerm]);
 
-  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setSearchTerm(e.target.value);
   };
 
@@ -158,16 +158,18 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
         >
           <div className={styles.newChatButtonAlignment}>
             <NewChatIcon />
-            <input
-              onChange={handleSearchChange}
-              value={searchTerm}
-              placeholder="Search conversations..."
-            />
             <p className={styles.newChatButtonText}>New Chat</p>
           </div>
         </button>
       )}
-
+      <div className={styles.searchInputWrapper}>
+        <textarea
+          className={styles.searchInput}
+          onChange={handleSearchChange}
+          value={searchTerm}
+          placeholder="Search conversations..."
+        />
+      </div>
       <div data-testid="chat-history-section">
         {Object.entries(groupedHistories).map(([timeGroup, conversations]) => (
           <div key={timeGroup} className={styles.timeGroup}>
