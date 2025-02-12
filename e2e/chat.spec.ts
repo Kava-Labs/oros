@@ -379,4 +379,75 @@ describe('chat', () => {
 
     await expect(historyEntry).toHaveText('Test Conversation Title');
   });
+
+  test('conversation search functionality', async ({ page }) => {
+    const chat = new Chat(page);
+
+    await page.addInitScript(() => {
+      localStorage.setItem(
+        'conversations',
+        JSON.stringify({
+          'test-id-1': {
+            id: 'test-id-1',
+            model: 'test-model',
+            title: 'Blockchain Discussion',
+            conversation: [
+              {
+                role: 'user',
+                content: 'Tell me about blockchain',
+              },
+            ],
+            lastSaved: Date.now(),
+          },
+          'test-id-2': {
+            id: 'test-id-2',
+            model: 'test-model',
+            title: 'Machine Learning Chat',
+            conversation: [
+              {
+                role: 'user',
+                content: 'Explain ML concepts',
+              },
+            ],
+            lastSaved: Date.now() - 1000,
+          },
+          'test-id-3': {
+            id: 'test-id-3',
+            model: 'test-model',
+            title: 'API Integration Help',
+            conversation: [
+              {
+                role: 'user',
+                content: 'How to integrate APIs',
+              },
+            ],
+            lastSaved: Date.now() - 2000,
+          },
+        }),
+      );
+    });
+
+    await chat.goto();
+
+    const historyEntries = page.getByTestId('chat-history-entry');
+    await expect(historyEntries).toHaveCount(3);
+
+    // Search for first three letters of "Blockchain Discussion"
+    const searchInput = page.getByTestId('conversation-search-input');
+    await searchInput.fill('Blo');
+
+    const filteredEntries = page.getByTestId('chat-history-entry');
+    await expect(filteredEntries).toHaveCount(1);
+
+    const remainingEntry = filteredEntries.first();
+    await expect(remainingEntry).toHaveText('Blockchain Discussion');
+
+    // Clear the search & verify all conversations are visible again
+    await searchInput.clear();
+
+    await expect(page.getByTestId('chat-history-entry')).toHaveCount(3);
+
+    const titles = await page.getByTestId('chat-history-entry').all();
+    expect(titles).toHaveLength(3);
+  });
 });
