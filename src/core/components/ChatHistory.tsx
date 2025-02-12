@@ -301,12 +301,13 @@ const HistoryItem = memo(
           {(hover || isMobile) && !editingTitle ? (
             <>
               <Pencil
+                className={styles.editIcon}
                 data-testid="edit-chat-history-entry-icon"
                 width="19px"
                 height="19px"
                 onClick={() => setEditingTitle(true)}
               />
-              <div style={{ marginLeft: '2px', marginRight: '2px' }} />
+              <div className={styles.deleteIcon} />
               <TrashIcon
                 data-testid="delete-chat-history-entry-icon"
                 width="19px"

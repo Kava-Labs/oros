@@ -166,3 +166,16 @@
   padding: var(--spacing-md);
   align-items: center;
 }
+
+.deleteIcon {
+  margin-left: 2px;
+  margin-right: 2px;
+}
+
+.editIcon {
+  color: var(--colors-textPrimary);
+
+  &:hover {
+    color: var(--colors-link);
+  }
+}
