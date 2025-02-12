@@ -91,6 +91,12 @@
 .newChatButtonAlignment {
   display: flex;
   align-items: center;
+  cursor: pointer;
+  color: var(--colors-textTertiary);
+
+  &:hover {
+    color: var(--colors-link);
+  }
 }
 
 .trashIconContainer {
@@ -148,5 +154,6 @@
   display: flex;
   width: 100%;
   justify-content: space-between;
-  padding: var(--spacing-md)
+  padding: var(--spacing-md);
+  align-items: center;
 }
