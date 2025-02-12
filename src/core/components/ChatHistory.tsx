@@ -8,6 +8,7 @@ import {
   Dispatch,
   SetStateAction,
   memo,
+  ChangeEvent,
 } from 'react';
 import { useAppContext } from '../context/useAppContext';
 import NewChatIcon from '../assets/NewChatIcon';
@@ -99,7 +100,7 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
     return groupConversations(filteredConversations);
   }, [conversations, searchTerm]);
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
 
@@ -166,23 +167,21 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
       )}
 
       <div data-testid="chat-history-section">
-        {Object.entries(groupedHistories).map(
-          ([timeGroup, groupConversations]) => (
-            <div key={timeGroup} className={styles.timeGroup}>
-              <h6 className={styles.timeGroupTitle}>{timeGroup}</h6>
-              <div className={styles.timeGroupContent}>
-                {groupConversations.map((conversation) => (
-                  <HistoryItem
-                    key={conversation.id}
-                    conversation={conversation}
-                    handleChatHistoryClick={handleChatHistoryClick}
-                    deleteConversation={deleteConversation}
-                  />
-                ))}
-              </div>
+        {Object.entries(groupedHistories).map(([timeGroup, conversations]) => (
+          <div key={timeGroup} className={styles.timeGroup}>
+            <h6 className={styles.timeGroupTitle}>{timeGroup}</h6>
+            <div className={styles.timeGroupContent}>
+              {conversations.map((conversation) => (
+                <HistoryItem
+                  key={conversation.id}
+                  conversation={conversation}
+                  handleChatHistoryClick={handleChatHistoryClick}
+                  deleteConversation={deleteConversation}
+                />
+              ))}
             </div>
-          ),
-        )}
+          </div>
+        ))}
       </div>
     </div>
   );
