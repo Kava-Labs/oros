@@ -90,7 +90,9 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
     load();
     // we have to poll local storage
     const id = setInterval(load, 1000);
-    return () => clearInterval(id);
+    return () => {
+      clearInterval(id);
+    };
   }, []);
 
   const groupedHistories = useMemo(() => {
