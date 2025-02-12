@@ -102,7 +102,6 @@
   align-items: center;
   cursor: pointer;
   color: var(--colors-textPrimary);
-  margin-top: var(--spacing-sm);
 
   &:hover {
     color: var(--colors-textMuted);
@@ -163,9 +162,7 @@
 .searchControls {
   display: flex;
   width: 100%;
-  justify-content: space-between;
   padding: var(--spacing-md);
-  align-items: center;
 }
 
 .deleteIcon {
