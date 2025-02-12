@@ -60,7 +60,7 @@ describe('ModelDropdownExpanded', () => {
     expect(mockSetDropdownOpen).toHaveBeenCalledWith(false);
   });
 
-  it('disables blockchain models on mobile', () => {
+  it('enables blockchain models on mobile', () => {
     (useIsMobile as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
 
     render(<ModelDropdownExpanded setDropdownOpen={mockSetDropdownOpen} />);
@@ -72,8 +72,8 @@ describe('ModelDropdownExpanded', () => {
       .getByText('Blockchain Instruct')
       .closest('button');
 
-    expect(regularModelButton).not.toBeDisabled();
-    expect(blockchainModelButton).toBeDisabled();
+    expect(regularModelButton).toBeEnabled();
+    expect(blockchainModelButton).toBeEnabled();
   });
 
   it('enables all models on desktop', () => {
