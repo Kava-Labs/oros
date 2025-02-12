@@ -6,6 +6,7 @@ import ModelSelector from './ModelSelector';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
 import NewChatIcon from '../assets/NewChatIcon';
 import { useAppContext } from '../context/useAppContext';
+import { thinkingStore } from '../stores/stores';
 
 const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
 
@@ -21,6 +22,7 @@ const NavBar = ({ chatHistoryOpen, setChatHistoryOpen }: NavBarProps) => {
 
   //  todo -refactor duplicate code in ChatHistory
   const startNewChat = () => {
+    thinkingStore.setText('');
     messageHistoryStore.reset();
     messageHistoryStore.addMessage({
       role: 'system' as const,

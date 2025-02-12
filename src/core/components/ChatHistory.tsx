@@ -16,6 +16,7 @@ import { useIsMobile } from '../../shared/theme/useIsMobile';
 import { TrashIcon } from '../assets/TrashIcon';
 import KavaAILogo from '../assets/KavaAILogo';
 import { Pencil } from 'lucide-react';
+import { thinkingStore } from '../stores/stores';
 
 interface ChatHistoryProps {
   setChatHistoryOpen: Dispatch<SetStateAction<boolean>>;
@@ -108,13 +109,19 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
   };
 
   const startNewChat = useCallback(() => {
+    thinkingStore.setText('');
     messageHistoryStore.reset();
     messageHistoryStore.addMessage({
       role: 'system' as const,
       content: modelConfig.systemPrompt,
     });
     setIsRequesting(false);
-  }, [messageHistoryStore, modelConfig.systemPrompt, setIsRequesting]);
+  }, [
+    messageHistoryStore,
+    modelConfig.systemPrompt,
+    setIsRequesting,
+    thinkingStore,
+  ]);
 
   const deleteConversation = useCallback(
     (id: string) => {
