@@ -66,7 +66,7 @@ export const baseTheme: Theme = {
   layout: {
     headerHeight: '60px',
     controlHeight: '100px',
-    sidebarWidth: '320px',
+    sidebarWidth: '260px',
   },
   colors: {
     bgPrimary: '#212121',
