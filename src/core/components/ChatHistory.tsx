@@ -265,8 +265,8 @@ const HistoryItem = memo(
     );
 
     const truncatedTitle = useMemo(
-      () => truncateTitle(title),
-      [title, truncateTitle],
+      () => truncateTitle(newTitle),
+      [newTitle, truncateTitle],
     );
 
     return (
