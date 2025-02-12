@@ -70,8 +70,8 @@
 }
 
 .dropdownMenu {
-  position: absolute;
-  top: 100%;
+  position: fixed;
+  top: 62px;
   left: 50%;
   transform: translateX(-50%);
   background-color: var(--colors-bgSecondary);
@@ -79,9 +79,11 @@
   border: 1px solid var(--colors-bgTertiary);
   display: flex;
   flex-direction: column;
-  width: 330px;
+  width: calc(100% - 32px);
+  max-width: 330px;
   margin-top: var(--spacing-xs);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
 }
 
 .dropdownItem {
@@ -95,6 +97,7 @@
   cursor: pointer;
   width: 100%;
   text-align: left;
+  min-height: 44px;
 }
 
 .dropdownItem:hover {
@@ -180,9 +183,12 @@
   }
 
   .dropdownMenu {
-    min-width: 330px;
+    position: absolute;
+    top: 100%;
     left: auto;
+    right: 0;
     transform: none;
+    width: 330px;
   }
 
   .hamburger {
