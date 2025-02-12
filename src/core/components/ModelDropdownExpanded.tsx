@@ -28,7 +28,7 @@ const ModelDropdownExpanded = ({ setDropdownOpen }: ModelDropdownProps) => {
         className={styles.dropdownItem}
         onClick={() => handleModelClick(model)}
         role="option"
-        disabled={disableOption}
+        // disabled={disableOption}
       >
         <ModelOptionIcon />
         <span>{model.name}</span>
