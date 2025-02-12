@@ -102,6 +102,7 @@
   align-items: center;
   cursor: pointer;
   color: var(--colors-textPrimary);
+  margin-top: var(--spacing-sm);
 
   &:hover {
     color: var(--colors-textMuted);
