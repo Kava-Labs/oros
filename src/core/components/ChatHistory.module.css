@@ -81,6 +81,15 @@
   flex: 1;
 }
 
+.chatHistoryTitleInput {
+  background-color: inherit;
+  width: 300px;
+  border: none;
+  height: 24px;
+  color: var(--colors-textPrimary);
+  outline: none;
+}
+
 .modelName {
   margin: 0;
   font-size: 12px;
@@ -93,7 +102,7 @@
   align-items: center;
 }
 
-.trashIconContainer {
+.iconsContainer {
   display: flex;
   align-items: center;
   padding-left: var(--spacing-sm);

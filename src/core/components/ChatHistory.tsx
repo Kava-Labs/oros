@@ -15,6 +15,7 @@ import NewChatIcon from '../assets/NewChatIcon';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
 import { TrashIcon } from '../assets/TrashIcon';
 import KavaAILogo from '../assets/KavaAILogo';
+import { Pencil } from 'lucide-react';
 
 interface ChatHistoryProps {
   setChatHistoryOpen: Dispatch<SetStateAction<boolean>>;
@@ -210,9 +211,43 @@ const HistoryItem = memo(
     const { messageHistoryStore } = useAppContext();
     const isSelected = messageHistoryStore.getConversationID() === id;
 
+    // *******************
+    const [editingTitle, setEditingTitle] = useState(false);
+    const [newTitle, setNewTitle] = useState(title);
+
+    useEffect(() => {
+      let tid: NodeJS.Timeout;
+      if (newTitle !== title) {
+        // user changed the title
+        // save to local storage
+        const conversations = JSON.parse(
+          localStorage.getItem('conversations') ?? '{}',
+        );
+        conversations[id].title = newTitle;
+        localStorage.setItem('conversations', JSON.stringify(conversations));
+        tid = setTimeout(() => {
+          // after saving, wait a bit and kick user out of editing state
+          setEditingTitle(false);
+        }, 1000);
+      } else if (editingTitle) {
+        // user clicked to edit title but made no changes
+        // after some time reset the edit state back to false
+        tid = setTimeout(() => {
+          setEditingTitle(false);
+        }, 5000);
+      }
+
+      return () => {
+        if (tid) {
+          clearTimeout(tid);
+        }
+      };
+    }, [newTitle, title, id, editingTitle]);
+    // *******************
+
     const truncateTitle = useCallback(
       (title: string) => {
-        const threshold = hover ? 32 : 36;
+        const threshold = hover ? 30 : 34;
 
         if (title.startsWith(`"`) || title.startsWith(`'`)) {
           title = title.slice(1);
@@ -242,22 +277,45 @@ const HistoryItem = memo(
         className={`${styles.chatHistoryItem} ${isSelected ? styles.selected : ''}`}
       >
         <div className={styles.chatHistoryContent}>
-          <p
-            onClick={() => handleChatHistoryClick(conversation)}
-            className={styles.chatHistoryTitle}
-          >
-            {truncatedTitle}
-          </p>
-        </div>
-        <div className={styles.trashIconContainer}>
-          {(hover || isMobile) && (
-            <TrashIcon
-              data-testid="delete-chat-history-entry-icon"
-              width="19px"
-              height="19px"
-              onClick={() => deleteConversation(id)}
+          {!editingTitle ? (
+            <p
+              onClick={() => handleChatHistoryClick(conversation)}
+              className={styles.chatHistoryTitle}
+            >
+              {truncatedTitle}
+            </p>
+          ) : (
+            <input
+              data-testid="edit-chat-history-title-input"
+              type="text"
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              onBlur={() => setEditingTitle(false)}
+              className={styles.chatHistoryTitleInput}
+              onKeyDown={({ key }) => {
+                if (key === 'Enter') setEditingTitle(false);
+              }}
             />
           )}
+        </div>
+        <div className={styles.iconsContainer}>
+          {(hover || isMobile) && !editingTitle ? (
+            <>
+              <Pencil
+                data-testid="edit-chat-history-entry-icon"
+                width="19px"
+                height="19px"
+                onClick={() => setEditingTitle(true)}
+              />
+              <div style={{ marginLeft: '2px', marginRight: '2px' }} />
+              <TrashIcon
+                data-testid="delete-chat-history-entry-icon"
+                width="19px"
+                height="19px"
+                onClick={() => deleteConversation(id)}
+              />
+            </>
+          ) : null}
         </div>
       </div>
     );
