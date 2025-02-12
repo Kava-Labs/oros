@@ -163,7 +163,7 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
         {!isMobile && (
           <div
             onClick={startNewChat}
-            data-testid="new-chat-container-button"
+            data-testid="new-chat-button"
             className={styles.newChatButtonAlignment}
           >
             <NewChatIcon />
