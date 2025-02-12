@@ -205,9 +205,9 @@
   display: flex;
   align-items: center;
   cursor: pointer;
-  color: var(--colors-textTertiary);
+  color: var(--colors-textPrimary);
 
   &:hover {
-    color: var(--colors-link);
+    color: var(--colors-textMuted);
   }
 }

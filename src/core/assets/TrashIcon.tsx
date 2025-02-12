@@ -14,7 +14,7 @@ export const TrashIcon = (props: React.SVGProps<SVGSVGElement>) => {
       viewBox="0 0 24 24"
       width={16}
       height={16}
-      color={hover ? colors.accent : colors.textPrimary}
+      color={hover ? colors.textMuted : colors.textPrimary}
       fill={'none'}
       {...props}
     >
