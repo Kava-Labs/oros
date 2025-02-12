@@ -210,19 +210,18 @@ const HistoryItem = memo(
     const truncateTitle = useCallback(
       (title: string) => {
         const threshold = hover ? 32 : 36;
-        let processedTitle = title;
 
-        if (processedTitle.startsWith(`"`) || processedTitle.startsWith(`'`)) {
-          processedTitle = processedTitle.slice(1);
+        if (title.startsWith(`"`) || title.startsWith(`'`)) {
+          title = title.slice(1);
         }
-        if (processedTitle.endsWith(`"`) || processedTitle.endsWith(`'`)) {
-          processedTitle = processedTitle.slice(0, -1);
+        if (title.endsWith(`"`) || title.endsWith(`'`)) {
+          title = title.slice(0, -1);
         }
-        if (processedTitle.length > threshold) {
-          processedTitle = processedTitle.slice(0, threshold) + '....';
+        if (title.length > threshold) {
+          title = title.slice(0, threshold) + '....';
         }
 
-        return processedTitle;
+        return title;
       },
       [hover],
     );
