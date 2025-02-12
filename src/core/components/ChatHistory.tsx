@@ -1,6 +1,6 @@
 import styles from './ChatHistory.module.css';
 import { ConversationHistory } from '../context/types';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import { useAppContext } from '../context/useAppContext';
 import NewChatIcon from '../assets/NewChatIcon';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
@@ -21,26 +21,17 @@ const getTimeGroup = (timestamp: number): string => {
     (now.getTime() - timestamp) / (1000 * 60 * 60 * 24),
   );
 
-  if (diffDays === 0) {
-    return 'Today';
-  } else if (diffDays === 1) {
-    return 'Yesterday';
-  } else if (diffDays <= 7) {
-    return 'Last week';
-  } else if (diffDays <= 14) {
-    return '2 weeks ago';
-  } else if (diffDays <= 21) {
-    return '3 weeks ago';
-  } else if (diffDays <= 28) {
-    return '4 weeks ago';
-  } else if (diffDays <= 60) {
-    return 'Last month';
-  } else if (diffDays <= 90) {
-    return '2 months ago';
-  } else {
-    const months = Math.floor(diffDays / 30);
-    return `${months} months ago`;
-  }
+  if (diffDays === 0) return 'Today';
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays <= 7) return 'Last week';
+  if (diffDays <= 14) return '2 weeks ago';
+  if (diffDays <= 21) return '3 weeks ago';
+  if (diffDays <= 28) return '4 weeks ago';
+  if (diffDays <= 60) return 'Last month';
+  if (diffDays <= 90) return '2 months ago';
+
+  const months = Math.floor(diffDays / 30);
+  return `${months} months ago`;
 };
 
 const groupConversations = (
@@ -61,10 +52,8 @@ const groupConversations = (
 };
 
 export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
-  const [groupedHistories, setGroupedHistories] =
-    useState<GroupedConversations>({});
   const [searchTerm, setSearchTerm] = useState('');
-
+  const [conversations, setConversations] = useState<ConversationHistory[]>([]);
   const {
     loadConversation,
     messageHistoryStore,
@@ -73,37 +62,31 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
   } = useAppContext();
   const isMobile = useIsMobile();
 
-  const conversations = Object.values(
-    JSON.parse(localStorage.getItem('conversations') ?? '{}'),
-  ) as ConversationHistory[];
+  useEffect(() => {
+    const loadConversations = () => {
+      const storedConversations = JSON.parse(
+        localStorage.getItem('conversations') ?? '{}',
+      );
+      setConversations(Object.values(storedConversations));
+    };
 
-  const handleSearchHistory = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const filteredConversations = conversations.filter((c) => {
-      const title = c.title.toLowerCase();
-      setSearchTerm(e.target.value.toLowerCase());
+    loadConversations();
+    const intervalId = setInterval(loadConversations, 1000);
 
-      return title.includes(searchTerm);
-    });
-    setGroupedHistories(groupConversations(filteredConversations));
+    return () => clearInterval(intervalId);
+  }, []);
+
+  const groupedHistories = useMemo(() => {
+    const filteredConversations = conversations.filter((c) =>
+      c.title.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+    return groupConversations(filteredConversations);
+  }, [conversations, searchTerm]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
   };
 
-  useEffect(() => {
-    if (searchTerm) {
-      return;
-    }
-    const load = () => {
-      setGroupedHistories(groupConversations(conversations));
-    };
-
-    load();
-    // we have to poll local storage
-    const id = setInterval(load, 1000);
-    return () => {
-      clearInterval(id);
-    };
-  }, [searchTerm]);
-
-  //  todo -refactor duplicate code in NavBar
   const startNewChat = useCallback(() => {
     messageHistoryStore.reset();
     messageHistoryStore.addMessage({
@@ -117,7 +100,7 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
     (id: string) => {
       const allConversations = JSON.parse(
         localStorage.getItem('conversations') ?? '{}',
-      ) as Record<string, ConversationHistory>;
+      );
 
       if (
         allConversations[id] &&
@@ -127,9 +110,8 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
       }
 
       delete allConversations[id];
-
       localStorage.setItem('conversations', JSON.stringify(allConversations));
-      setGroupedHistories(groupConversations(Object.values(allConversations)));
+      setConversations(Object.values(allConversations));
     },
     [messageHistoryStore, startNewChat],
   );
@@ -157,28 +139,34 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
         >
           <div className={styles.newChatButtonAlignment}>
             <NewChatIcon />
-            <input onChange={handleSearchHistory} value={searchTerm} />
+            <input
+              onChange={handleSearchChange}
+              value={searchTerm}
+              placeholder="Search conversations..."
+            />
             <p className={styles.newChatButtonText}>New Chat</p>
           </div>
         </button>
       )}
 
       <div data-testid="chat-history-section">
-        {Object.entries(groupedHistories).map(([timeGroup, conversations]) => (
-          <div key={timeGroup} className={styles.timeGroup}>
-            <h6 className={styles.timeGroupTitle}>{timeGroup}</h6>
-            <div className={styles.timeGroupContent}>
-              {conversations.map((conversation) => (
-                <HistoryItem
-                  key={conversation.id}
-                  conversation={conversation}
-                  handleChatHistoryClick={handleChatHistoryClick}
-                  deleteConversation={deleteConversation}
-                />
-              ))}
+        {Object.entries(groupedHistories).map(
+          ([timeGroup, groupConversations]) => (
+            <div key={timeGroup} className={styles.timeGroup}>
+              <h6 className={styles.timeGroupTitle}>{timeGroup}</h6>
+              <div className={styles.timeGroupContent}>
+                {groupConversations.map((conversation) => (
+                  <HistoryItem
+                    key={conversation.id}
+                    conversation={conversation}
+                    handleChatHistoryClick={handleChatHistoryClick}
+                    deleteConversation={deleteConversation}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ),
+        )}
       </div>
     </div>
   );
@@ -189,59 +177,71 @@ interface HistoryItemProps {
   deleteConversation: (id: string) => void;
 }
 
-const HistoryItem = ({
-  conversation,
-  handleChatHistoryClick,
-  deleteConversation,
-}: HistoryItemProps) => {
-  const { id, title } = conversation;
-  const isMobile = useIsMobile();
-  const [hover, setHover] = useState(false);
+const HistoryItem = React.memo(
+  ({
+    conversation,
+    handleChatHistoryClick,
+    deleteConversation,
+  }: HistoryItemProps) => {
+    const { id, title } = conversation;
+    const isMobile = useIsMobile();
+    const [hover, setHover] = useState(false);
+    const { messageHistoryStore } = useAppContext();
+    const isSelected = messageHistoryStore.getConversationID() === id;
 
-  const { messageHistoryStore } = useAppContext();
-  const isSelected = messageHistoryStore.getConversationID() === id;
+    const truncateTitle = useCallback(
+      (title: string) => {
+        const threshold = hover ? 32 : 36;
+        let processedTitle = title;
 
-  const truncateTitle = (title: string) => {
-    const threshold = hover ? 32 : 36;
+        if (processedTitle.startsWith(`"`) || processedTitle.startsWith(`'`)) {
+          processedTitle = processedTitle.slice(1);
+        }
+        if (processedTitle.endsWith(`"`) || processedTitle.endsWith(`'`)) {
+          processedTitle = processedTitle.slice(0, -1);
+        }
+        if (processedTitle.length > threshold) {
+          processedTitle = processedTitle.slice(0, threshold) + '....';
+        }
 
-    if (title.startsWith(`"`) || title.startsWith(`'`)) {
-      title = title.slice(1);
-    }
-    if (title.endsWith(`"`) || title.endsWith(`'`)) {
-      title = title.slice(0, -1);
-    }
-    if (title.length > threshold) {
-      title = title.slice(0, threshold) + '....';
-    }
+        return processedTitle;
+      },
+      [hover],
+    );
 
-    return title;
-  };
+    const truncatedTitle = useMemo(
+      () => truncateTitle(title),
+      [title, truncateTitle],
+    );
 
-  return (
-    <div
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      data-testid="chat-history-entry"
-      className={`${styles.chatHistoryItem} ${isSelected ? styles.selected : ''}`}
-    >
-      <div className={styles.chatHistoryContent}>
-        <p
-          onClick={() => handleChatHistoryClick(conversation)}
-          className={styles.chatHistoryTitle}
-        >
-          {truncateTitle(title)}
-        </p>
+    return (
+      <div
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+        data-testid="chat-history-entry"
+        className={`${styles.chatHistoryItem} ${isSelected ? styles.selected : ''}`}
+      >
+        <div className={styles.chatHistoryContent}>
+          <p
+            onClick={() => handleChatHistoryClick(conversation)}
+            className={styles.chatHistoryTitle}
+          >
+            {truncatedTitle}
+          </p>
+        </div>
+        <div className={styles.trashIconContainer}>
+          {(hover || isMobile) && (
+            <TrashIcon
+              data-testid="delete-chat-history-entry-icon"
+              width="19px"
+              height="19px"
+              onClick={() => deleteConversation(id)}
+            />
+          )}
+        </div>
       </div>
-      <div className={styles.trashIconContainer}>
-        {hover || isMobile ? (
-          <TrashIcon
-            data-testid="delete-chat-history-entry-icon"
-            width="19px"
-            height="19px"
-            onClick={() => deleteConversation(id)}
-          />
-        ) : null}
-      </div>
-    </div>
-  );
-};
+    );
+  },
+);
+
+HistoryItem.displayName = 'HistoryItem';
