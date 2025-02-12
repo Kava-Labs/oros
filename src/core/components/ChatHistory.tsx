@@ -1,6 +1,6 @@
 import styles from './ChatHistory.module.css';
 import { ConversationHistory } from '../context/types';
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useAppContext } from '../context/useAppContext';
 import NewChatIcon from '../assets/NewChatIcon';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
@@ -63,6 +63,7 @@ const groupConversations = (
 export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
   const [groupedHistories, setGroupedHistories] =
     useState<GroupedConversations>({});
+  const [searchTerm, setSearchTerm] = useState('');
 
   const {
     loadConversation,
@@ -72,20 +73,35 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
   } = useAppContext();
   const isMobile = useIsMobile();
 
+  const conversations = Object.values(
+    JSON.parse(localStorage.getItem('conversations') ?? '{}'),
+  ) as ConversationHistory[];
+
+  const handleSearchHistory = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const filteredConversations = conversations.filter((c) => {
+      const title = c.title.toLowerCase();
+      setSearchTerm(e.target.value.toLowerCase());
+
+      return title.includes(searchTerm);
+    });
+    setGroupedHistories(groupConversations(filteredConversations));
+  };
+
   useEffect(() => {
+    if (searchTerm) {
+      return;
+    }
     const load = () => {
-      const conversations = Object.values(
-        JSON.parse(localStorage.getItem('conversations') ?? '{}'),
-      ) as ConversationHistory[];
       setGroupedHistories(groupConversations(conversations));
     };
+
     load();
     // we have to poll local storage
     const id = setInterval(load, 1000);
     return () => {
       clearInterval(id);
     };
-  }, []);
+  }, [searchTerm]);
 
   //  todo -refactor duplicate code in NavBar
   const startNewChat = useCallback(() => {
@@ -141,6 +157,7 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
         >
           <div className={styles.newChatButtonAlignment}>
             <NewChatIcon />
+            <input onChange={handleSearchHistory} value={searchTerm} />
             <p className={styles.newChatButtonText}>New Chat</p>
           </div>
         </button>
