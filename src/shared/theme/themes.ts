@@ -16,6 +16,9 @@ export interface ThemeColors {
   accent: string;
   accentTransparent: string;
   accentBorder: string;
+  accentTwo?: string;
+  accentTwoTransparent?: string;
+  accentTwoBorder?: string;
   link: string;
   linkHover: string;
 }
@@ -66,6 +69,9 @@ export const baseTheme: Theme = {
     textMuted: 'rgb(150, 150, 150)',
     accent: 'rgb(255, 67, 62)',
     accentTransparent: 'rgba(255, 67, 62, 0.75)',
+    accentTwo: 'rgb(147, 130, 215)',
+    accentTwoTransparent: 'rgba(147, 130, 215, 0.75)',
+    accentTwoBorder: 'rgba(147, 130, 215, 0.2)',
     accentBorder: 'rgba(255, 67, 62, 0.2)',
     link: '#1e90ff',
     linkHover: '#87cefa',

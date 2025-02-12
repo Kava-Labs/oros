@@ -4,20 +4,6 @@ import styles from './ThinkingContent.module.css';
 import { BrainIcon } from '../assets/BrainIcon';
 import { useTheme } from '../../shared/theme/useTheme';
 
-const ThinkingDots = () => (
-  <div className={styles.dotsContainer}>
-    {[0, 1, 2].map((i) => (
-      <div
-        key={i}
-        className={styles.dot}
-        style={{
-          animationDelay: `${i * 200}ms`,
-        }}
-      />
-    ))}
-  </div>
-);
-
 interface ThinkingContentProps {
   content: string;
   isStreaming?: boolean;
@@ -78,16 +64,18 @@ export const ThinkingContent = ({
         className={styles.header}
       >
         <div
-          className={styles.iconContainer}
+          className={`${styles.iconContainer} ${
+            showLoadingState ? styles.pulsing : ''
+          }`}
           style={{
             background: isExpanded
-              ? 'var(--colors-accentBorder)'
+              ? 'var(--colors-accentTwoBorder)'
               : 'rgba(255, 67, 62, 0.1)',
           }}
         >
           <BrainIcon
-            color={colors.accent}
-            className={styles.icon}
+            color={colors.accentTwo}
+            className={`${styles.icon} ${showLoadingState ? styles.pulsing : ''}`}
             style={{
               opacity: isExpanded ? 1 : 0.7,
             }}
@@ -96,7 +84,6 @@ export const ThinkingContent = ({
 
         <span className={styles.headerText}>
           {showLoadingState ? 'Thinking' : 'Thinking Process'}
-          {showLoadingState && <ThinkingDots />}
         </span>
 
         <ChevronDown
