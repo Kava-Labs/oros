@@ -63,17 +63,17 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    const loadConversations = () => {
+    const load = () => {
       const storedConversations = JSON.parse(
         localStorage.getItem('conversations') ?? '{}',
       );
       setConversations(Object.values(storedConversations));
     };
+    load();
+    // we have to poll local storage
+    const id = setInterval(load, 1000);
 
-    loadConversations();
-    const intervalId = setInterval(loadConversations, 1000);
-
-    return () => clearInterval(intervalId);
+    return () => clearInterval(id);
   }, []);
 
   const groupedHistories = useMemo(() => {
