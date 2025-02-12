@@ -1,17 +1,18 @@
 import ModelDropdownButton from './ModelDropdownButton';
 import ModelDropdownExpanded from './ModelDropdownExpanded';
-import { useEffect, useState } from 'react';
-import styles from './NavBar.module.css';
+import { useEffect, useRef, useState } from 'react';
 
 const ModelSelector = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const selectorRef = useRef<HTMLDivElement>(null);
 
   // Handle closing dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const dropdown = document.querySelector(`.${styles.dropdownMenu}`);
-      console.log('dropdown', dropdown);
-      if (dropdown && !dropdown.contains(event.target as Node)) {
+      if (
+        selectorRef.current &&
+        !selectorRef.current.contains(event.target as Node)
+      ) {
         setDropdownOpen(false);
       }
     };
@@ -24,7 +25,7 @@ const ModelSelector = () => {
   }, [dropdownOpen]);
 
   return (
-    <>
+    <div ref={selectorRef}>
       <ModelDropdownButton
         dropdownOpen={dropdownOpen}
         setDropdownOpen={setDropdownOpen}
@@ -32,7 +33,7 @@ const ModelSelector = () => {
       {dropdownOpen && (
         <ModelDropdownExpanded setDropdownOpen={setDropdownOpen} />
       )}
-    </>
+    </div>
   );
 };
 
