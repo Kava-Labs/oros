@@ -1,6 +1,13 @@
 import styles from './ChatHistory.module.css';
 import { ConversationHistory } from '../context/types';
-import React, { useCallback, useEffect, useState, useMemo } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useState,
+  useMemo,
+  Dispatch,
+  SetStateAction,
+} from 'react';
 import { useAppContext } from '../context/useAppContext';
 import NewChatIcon from '../assets/NewChatIcon';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
@@ -8,7 +15,7 @@ import { TrashIcon } from '../assets/TrashIcon';
 import KavaAILogo from '../assets/KavaAILogo';
 
 interface ChatHistoryProps {
-  setChatHistoryOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setChatHistoryOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 type GroupedConversations = {
@@ -21,17 +28,26 @@ const getTimeGroup = (timestamp: number): string => {
     (now.getTime() - timestamp) / (1000 * 60 * 60 * 24),
   );
 
-  if (diffDays === 0) return 'Today';
-  if (diffDays === 1) return 'Yesterday';
-  if (diffDays <= 7) return 'Last week';
-  if (diffDays <= 14) return '2 weeks ago';
-  if (diffDays <= 21) return '3 weeks ago';
-  if (diffDays <= 28) return '4 weeks ago';
-  if (diffDays <= 60) return 'Last month';
-  if (diffDays <= 90) return '2 months ago';
-
-  const months = Math.floor(diffDays / 30);
-  return `${months} months ago`;
+  if (diffDays === 0) {
+    return 'Today';
+  } else if (diffDays === 1) {
+    return 'Yesterday';
+  } else if (diffDays <= 7) {
+    return 'Last week';
+  } else if (diffDays <= 14) {
+    return '2 weeks ago';
+  } else if (diffDays <= 21) {
+    return '3 weeks ago';
+  } else if (diffDays <= 28) {
+    return '4 weeks ago';
+  } else if (diffDays <= 60) {
+    return 'Last month';
+  } else if (diffDays <= 90) {
+    return '2 months ago';
+  } else {
+    const months = Math.floor(diffDays / 30);
+    return `${months} months ago`;
+  }
 };
 
 const groupConversations = (
@@ -100,7 +116,7 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
     (id: string) => {
       const allConversations = JSON.parse(
         localStorage.getItem('conversations') ?? '{}',
-      );
+      ) as Record<string, ConversationHistory>;
 
       if (
         allConversations[id] &&
@@ -186,6 +202,7 @@ const HistoryItem = React.memo(
     const { id, title } = conversation;
     const isMobile = useIsMobile();
     const [hover, setHover] = useState(false);
+
     const { messageHistoryStore } = useAppContext();
     const isSelected = messageHistoryStore.getConversationID() === id;
 
