@@ -164,6 +164,7 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
       )}
       <div className={styles.searchInputWrapper}>
         <textarea
+          data-testid="conversation-search-input"
           className={styles.searchInput}
           onChange={handleSearchChange}
           value={searchTerm}
