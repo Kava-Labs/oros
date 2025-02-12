@@ -22,7 +22,18 @@ export class EvmBalancesQuery implements ChainQuery<EvmBalanceQueryParams> {
   walletMustMatchChainID = false;
   needsWallet = [WalletTypes.METAMASK];
 
+  private isMobileDevice(): boolean {
+    // Use regex to detect mobile devices
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      window.navigator.userAgent,
+    );
+  }
+
   validate(params: EvmBalanceQueryParams, walletStore: WalletStore): boolean {
+    if (this.isMobileDevice()) {
+      throw new Error('Use a desktop device to connect a wallet');
+    }
+
     if (!walletStore.getSnapshot().isWalletConnected) {
       throw new Error('please connect to a compatible wallet');
     }

@@ -56,6 +56,13 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
     return this.hasValidWallet ? InProgressTxDisplay : ConnectWalletPrompt;
   }
 
+  private isMobileDevice(): boolean {
+    // Use regex to detect mobile devices
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      window.navigator.userAgent,
+    );
+  }
+
   private async validateBalance(
     params: {
       denom: string;
@@ -109,6 +116,10 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
     params: SendToolParams,
     walletStore: WalletStore,
   ): Promise<boolean> {
+    if (this.isMobileDevice()) {
+      throw new Error('Use a desktop device to connect a wallet');
+    }
+
     this.hasValidWallet = false;
     if (!walletStore.getSnapshot().isWalletConnected) {
       throw new Error('please connect to a compatible wallet');

@@ -240,7 +240,7 @@ describe('chat', () => {
       .getByRole('option')
       .filter({ hasText: 'General Reasoning' });
 
-    await expect(blockchainModel).toBeDisabled();
+    await expect(blockchainModel).toBeEnabled();
     await expect(reasoningModel).toBeEnabled();
 
     await context.close();
