@@ -16,11 +16,13 @@ interface NavBarProps {
 
 const NavBar = ({ chatHistoryOpen, setChatHistoryOpen }: NavBarProps) => {
   const showNavBar = !isInIframe() && FEAT_UPDATED_DESIGN;
-  const { messageHistoryStore, modelConfig, setIsRequesting } = useAppContext();
+  const { messageHistoryStore, modelConfig, setIsRequesting, thinkingStore } =
+    useAppContext();
   const isMobile = useIsMobile();
 
   //  todo -refactor duplicate code in ChatHistory
   const startNewChat = () => {
+    thinkingStore.setText('');
     messageHistoryStore.reset();
     messageHistoryStore.addMessage({
       role: 'system' as const,

@@ -77,6 +77,7 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
     loadConversation,
     messageHistoryStore,
     modelConfig,
+    thinkingStore,
     setIsRequesting,
   } = useAppContext();
   const isMobile = useIsMobile();
@@ -108,13 +109,19 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
   };
 
   const startNewChat = useCallback(() => {
+    thinkingStore.setText('');
     messageHistoryStore.reset();
     messageHistoryStore.addMessage({
       role: 'system' as const,
       content: modelConfig.systemPrompt,
     });
     setIsRequesting(false);
-  }, [messageHistoryStore, modelConfig.systemPrompt, setIsRequesting]);
+  }, [
+    messageHistoryStore,
+    modelConfig.systemPrompt,
+    setIsRequesting,
+    thinkingStore,
+  ]);
 
   const deleteConversation = useCallback(
     (id: string) => {
