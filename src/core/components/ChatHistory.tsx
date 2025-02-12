@@ -1,24 +1,16 @@
 import styles from './ChatHistory.module.css';
 import { ConversationHistory } from '../context/types';
-import {
-  useCallback,
-  useEffect,
-  useState,
-  useMemo,
-  Dispatch,
-  SetStateAction,
-  memo,
-  ChangeEvent,
-} from 'react';
+import { useCallback, useEffect, useState, useMemo, memo } from 'react';
 import { useAppContext } from '../context/useAppContext';
-import NewChatIcon from '../assets/NewChatIcon';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
 import { TrashIcon } from '../assets/TrashIcon';
 import KavaAILogo from '../assets/KavaAILogo';
 import { Pencil } from 'lucide-react';
+import { PenSquare } from 'lucide-react';
+import SearchModal from './SearchModal';
 
 interface ChatHistoryProps {
-  setChatHistoryOpen: Dispatch<SetStateAction<boolean>>;
+  setChatHistoryOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 type GroupedConversations = {
@@ -71,7 +63,6 @@ const groupConversations = (
 };
 
 export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
-  const [searchTerm, setSearchTerm] = useState('');
   const [conversations, setConversations] = useState<ConversationHistory[]>([]);
   const {
     loadConversation,
@@ -98,15 +89,8 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
   }, []);
 
   const groupedHistories = useMemo(() => {
-    const filteredConversations = conversations.filter((c) =>
-      c.title.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-    return groupConversations(filteredConversations);
-  }, [conversations, searchTerm]);
-
-  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-  };
+    return groupConversations(conversations);
+  }, [conversations]);
 
   const startNewChat = useCallback(() => {
     thinkingStore.setText('');
@@ -159,22 +143,22 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
         </div>
       )}
       <div className={styles.searchControls}>
-        <div className={styles.searchInputWrapper}>
-          <input
-            data-testid="conversation-search-input"
-            className={styles.searchInput}
-            onChange={handleSearchChange}
-            value={searchTerm}
-            placeholder="Search conversations..."
-          />
-        </div>
+        <SearchModal
+          conversations={conversations}
+          onConversationSelect={handleChatHistoryClick}
+        />
         {!isMobile && (
           <div
             onClick={startNewChat}
             data-testid="new-chat-button"
             className={styles.newChatButtonAlignment}
           >
-            <NewChatIcon />
+            <PenSquare
+              size={20}
+              className={styles.newChatButtonAlignment}
+              onClick={startNewChat}
+              data-testid="new-chat-button"
+            />
           </div>
         )}
       </div>
@@ -198,6 +182,7 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
     </div>
   );
 };
+
 interface HistoryItemProps {
   conversation: ConversationHistory;
   handleChatHistoryClick: (conversation: ConversationHistory) => void;
@@ -213,13 +198,11 @@ const HistoryItem = memo(
     const { id, title } = conversation;
     const isMobile = useIsMobile();
     const [hover, setHover] = useState(false);
+    const [editingTitle, setEditingTitle] = useState(false);
+    const [newTitle, setNewTitle] = useState(title);
 
     const { messageHistoryStore } = useAppContext();
     const isSelected = messageHistoryStore.getConversationID() === id;
-
-    // *******************
-    const [editingTitle, setEditingTitle] = useState(false);
-    const [newTitle, setNewTitle] = useState(title);
 
     useEffect(() => {
       let tid: NodeJS.Timeout;
@@ -249,7 +232,6 @@ const HistoryItem = memo(
         }
       };
     }, [newTitle, title, id, editingTitle]);
-    // *******************
 
     const truncateTitle = useCallback(
       (title: string) => {
@@ -328,3 +310,5 @@ const HistoryItem = memo(
     );
   },
 );
+
+export default ChatHistory;
