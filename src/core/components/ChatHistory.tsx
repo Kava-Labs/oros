@@ -211,6 +211,7 @@ const HistoryItem = memo(
     const { messageHistoryStore } = useAppContext();
     const isSelected = messageHistoryStore.getConversationID() === id;
 
+    // *******************
     const [editingTitle, setEditingTitle] = useState(false);
     const [newTitle, setNewTitle] = useState(title);
 
@@ -281,7 +282,7 @@ const HistoryItem = memo(
               onClick={() => handleChatHistoryClick(conversation)}
               className={styles.chatHistoryTitle}
             >
-              {truncateTitle(newTitle)}
+              {truncatedTitle}
             </p>
           ) : (
             <input
