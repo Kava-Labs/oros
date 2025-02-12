@@ -2,6 +2,12 @@ import { ComponentType } from 'react';
 import KavaAILogo from '../../core/assets/KavaAILogo';
 // import OrosLogo from '../../features/blockchain/assets/orosLogo.svg';
 
+export interface ThemeLayout {
+  headerHeight: string;
+  controlHeight: string;
+  sidebarWidth: string;
+}
+
 export interface ThemeColors {
   bgPrimary: string;
   bgSecondary: string;
@@ -46,6 +52,7 @@ export interface ThemeBorderRadius {
 }
 
 export interface Theme {
+  layout: ThemeLayout;
   colors: ThemeColors;
   typography: ThemeTypography;
   spacing: ThemeSpacing;
@@ -56,6 +63,11 @@ export interface Theme {
 
 // Base theme with shared styles
 export const baseTheme: Theme = {
+  layout: {
+    headerHeight: '60px',
+    controlHeight: '100px',
+    sidebarWidth: '320px',
+  },
   colors: {
     bgPrimary: '#212121',
     bgSecondary: '#1a1a1a',

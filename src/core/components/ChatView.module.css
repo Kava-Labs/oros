@@ -1,19 +1,96 @@
-#chatview {
-  align-items: center;
+.chatview {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  justify-content: center;
-  background: var(--colors-bgPrimary);
+  position: relative;
+  contain: layout;
 }
 
-#updatedChatView {
-  align-items: center;
+.chatHeader {
+  height: var(--layout-headerHeight);
+  background: var(--colors-bgPrimary);
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  flex-shrink: 0;
+}
+
+.scrollArea {
+  flex: 0;
   display: flex;
   flex-direction: column;
-  height: 90vh;
-  justify-content: center;
+  overflow-y: auto;
+  scrollbar-color: var(--colors-bgTertiary) var(--colors-bgPrimary);
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  min-height: 0;
+
+  padding-left: var(--spacing-sm);
+  padding-right: var(--spacing-sm);
+}
+
+.scrollArea.expand {
+  flex: 1;
+}
+
+.scrollContent {
+  width: 100%;
+  max-width: 768px;
+  margin: 0 auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.controlsContainer {
+  margin: auto;
+  width: 100%;
+  max-width: 768px;
+
+  padding-left: var(--spacing-sm);
+  padding-right: var(--spacing-sm);
+}
+
+.controlsContainer.hasMessages {
+  position: sticky;
+  bottom: 0;
+  margin: 0 auto;
   background: var(--colors-bgPrimary);
+  z-index: 90;
+}
+
+.startContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.controls {
+  height: var(--layout-controlHeight);
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.controls.hasMessages {
+  margin-top: auto;
+  margin-bottom: 0;
+  position: sticky;
+  bottom: 0;
+  z-index: 900;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: 768px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.inputContainer {
+  display: flex;
+  align-items: flex-start;
+  position: relative;
 }
 
 ::-webkit-scrollbar {
@@ -24,50 +101,6 @@
 ::-webkit-scrollbar-thumb {
   background-color: var(--colors-bgTertiary);
   border-radius: var(--borderRadius-md);
-}
-
-#startContainer {
-  max-width: 768px;
-  width: 100%;
-  padding: 0 var(--spacing-sm);
-  margin-top: -90px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-
-  @media (max-width: 768px) {
-    margin-top: -160px;
-  }
-}
-
-#start {
-  color: var(--colors-textPrimary);
-  margin: auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  max-width: 60%;
-
-  @media (max-width: 640px) {
-    max-width: 80%;
-  }
-
-  img {
-    height: 72px;
-    width: 72px;
-  }
-
-  h3 {
-    text-align: center;
-    margin-bottom: var(--spacing-sm);
-    margin-top: var(--spacing-sm);
-  }
-
-  h5 {
-    text-align: center;
-    margin-top: var(--spacing-xs);
-  }
 }
 
 .right {
@@ -142,23 +175,16 @@
   align-items: center;
   display: flex;
   flex-direction: column;
-  scrollbar-color: var(--colors-bgTertiary) var(--colors-bgPrimary);
-  overflow-y: scroll;
-  -webkit-overflow-scrolling: touch;
 }
 
 #conversation {
-  max-width: 768px;
   width: 100%;
   padding: 0 var(--spacing-sm);
-  height: 100%;
   display: flex;
   flex-direction: column;
 }
 
 #input {
-  min-height: 70px;
-  max-width: 768px;
   width: 100%;
   background-color: var(--colors-bgTertiary);
   border-radius: var(--borderRadius-md);
@@ -232,7 +258,7 @@
   justify-content: flex-end;
   align-items: center;
   margin: 0px;
-  z-index: 99;
+  z-index: 900;
 
   @media (max-width: 640px) {
     padding: var(--spacing-sm) var(--spacing-sm);

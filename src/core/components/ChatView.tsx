@@ -6,6 +6,7 @@ import { Conversation } from './Conversation';
 import { useAppContext } from '../context/useAppContext';
 import { isInIframe } from '../utils/isInIframe';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
+import { NavBar } from './NavBar';
 import type { ChatMessage } from '../stores/messageHistoryStore';
 import ModelSelector from './ModelSelector';
 
@@ -17,6 +18,10 @@ export interface ChatViewProps {
   onSubmit(value: string): void;
   onReset(): void;
   onCancel(): void;
+  onMenu(): void;
+  onNewChat(): void;
+  onPanelOpen(): void;
+  isPanelOpen: boolean;
   introText: string;
 }
 
@@ -28,6 +33,10 @@ export const ChatView = ({
   onSubmit,
   onReset,
   onCancel,
+  onMenu,
+  onNewChat,
+  onPanelOpen,
+  isPanelOpen,
   introText,
 }: ChatViewProps) => {
   const { isRequesting, modelConfig } = useAppContext();
@@ -157,8 +166,67 @@ export const ChatView = ({
   const showNavBar = !isIframe && FEAT_UPDATED_DESIGN;
 
   return (
+    <div className={styles.chatview} data-testid="chatview">
+      <div className={styles.chatHeader}>
+        <NavBar onPanelOpen={onPanelOpen} isPanelOpen={isPanelOpen} onMenu={onMenu} onNewChat={onNewChat} />
+      </div>
+
+        <div ref={containerRef} className={`${styles.scrollArea} ${hasMessages ? styles.expand : ''}`}>
+          <div className={styles.scrollContent}>
+
+          { hasMessages && (
+              <Conversation
+                messages={messages}
+                onRendered={handleContentRendered}
+              />
+          )}
+          </div>
+        </div>
+
+          <div className={`${styles.controlsContainer} ${hasMessages ? styles.hasMessages : ''}` } data-testid="controls">
+            { !hasMessages &&
+              <div className={styles.startContent}>
+                {Logo && <Logo width={isMobile ? 210 : 292} />}
+                <h5 className={styles.introText}>{introText}</h5>
+              </div>
+            }
+
+            <div className={styles.controls}>
+              <div className={styles.inputContainer}>
+                <textarea
+                  id={styles.input}
+                  data-testid="chat-view-input"
+                  rows={1}
+                  value={inputValue}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
+                  ref={inputRef}
+                  placeholder="Ask anything..."
+                ></textarea>
+
+                <button
+                  data-testid="chat-view-button"
+                  ref={buttonRef}
+                  id={styles.sendChatButton}
+                  type="submit"
+                  onClick={handleButtonClick}
+                  aria-label="Send Chat"
+                >
+                  {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
+                </button>
+              </div>
+
+              <span id={styles.importantInfo} data-testid="importantInfo">
+                <p>{cautionText}</p>
+              </span>
+        </div>
+      </div>
+    </div>
+  );
+
+  /*return (
     <div
-      id={showNavBar ? styles.updatedChatView : styles.chatview}
+      className={styles.chatView}
       data-testid="chatview"
     >
       {!isMobile && (
@@ -206,33 +274,8 @@ export const ChatView = ({
         data-testid="controls"
         className={hasMessages ? styles.inputNormal : styles.inputRaised}
       >
-        <div id={styles.inputContainer}>
-          <textarea
-            id={styles.input}
-            data-testid="chat-view-input"
-            rows={1}
-            value={inputValue}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            ref={inputRef}
-            placeholder="Ask anything..."
-          ></textarea>
-
-          <button
-            data-testid="chat-view-button"
-            ref={buttonRef}
-            id={styles.sendChatButton}
-            type="submit"
-            onClick={handleButtonClick}
-            aria-label="Send Chat"
-          >
-            {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
-          </button>
-        </div>
-        <span id={styles.importantInfo} data-testid="importantInfo">
-          <p>{cautionText}</p>
-        </span>
       </div>
     </div>
   );
+  */
 };

@@ -1,33 +1,81 @@
-.container {
-  display: flex;
-  flex-direction: column;
-  background-color: var(--colors-bgPrimary);
-}
-
 .nav {
+  height: 100%;
+  background: var(--colors-bgPrimary);
+
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  background-color: var(--colors-bgPrimary);
-  border-bottom: 1px solid var(--colors-borderSecondary);
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  padding-left: var(--spacing-md);
+  padding-right: var(--spacing-md);
 }
 
 .menu {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  border-bottom: 1px solid var(--colors-borderSecondary);
-  background-color: var(--colors-bgSecondary);
-}
+  width: 20px;
+  height: 16px;
 
-.hamburger {
-  padding: var(--spacing-md) 0 var(--spacing-md) var(--spacing-lg);
   display: flex;
+  justify-content: center;
   align-items: center;
 
   &:hover {
     cursor: pointer;
   }
+}
+
+.newChat {
+  width: 20px;
+  height: 21px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.panelOpen {
+  height: 20px;
+  width: 20px;
+  color: var(--colors-textSecondary);
+  display: none;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.panelOpen.showPanelOpen {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (min-width: 768px) {
+  .panelOpen {
+    display: block;
+  }
+
+  .menu {
+    display: none;
+  }
+
+  .newChat {
+    display: none;
+  }
+}
+
+
+.modelSelector {
+  width: 400px;
+  height: 40px;
+}
+
+
+.container {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--colors-bgPrimary);
 }
 
 .logo {
@@ -56,8 +104,6 @@
   color: var(--colors-textSecondary);
   cursor: pointer;
   border: none;
-  height: 62px;
-  width: 330px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -153,20 +199,6 @@
 }
 
 @media (min-width: 768px) {
-  .nav {
-    flex-direction: row;
-    justify-content: space-between;
-    padding: 12px 12px;
-    max-height: 89px;
-    border-bottom: 1px solid var(--colors-borderSecondary);
-  }
-
-  .menu {
-    width: auto;
-    border-bottom: none;
-    padding-left: var(--spacing-md);
-  }
-
   .logo {
     width: auto;
     padding: 0;
@@ -188,10 +220,6 @@
     transform: none;
     border: 1px solid var(--colors-bgTertiary);
     border-top: none;
-  }
-
-  .hamburger {
-    display: none;
   }
 
   .description {

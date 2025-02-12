@@ -6,65 +6,42 @@ import ModelSelector from './ModelSelector';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
 import NewChatIcon from '../assets/NewChatIcon';
 import { useAppContext } from '../context/useAppContext';
+import { PanelLeftOpen } from 'lucide-react';
 
 const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
 
 interface NavBarProps {
-  chatHistoryOpen: boolean;
-  setChatHistoryOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  onMenu(): void;
+  onNewChat(): void;
+  onPanelOpen(): void;
+  isPanelOpen: boolean;
 }
 
-const NavBar = ({ chatHistoryOpen, setChatHistoryOpen }: NavBarProps) => {
-  const showNavBar = !isInIframe() && FEAT_UPDATED_DESIGN;
-  const { messageHistoryStore, modelConfig, setIsRequesting, thinkingStore } =
-    useAppContext();
+export const NavBar = ({
+  onMenu,
+  onNewChat,
+  onPanelOpen,
+  isPanelOpen,
+}: NavBarProps) => {
   const isMobile = useIsMobile();
-
-  //  todo -refactor duplicate code in ChatHistory
-  const startNewChat = () => {
-    thinkingStore.setText('');
-    messageHistoryStore.reset();
-    messageHistoryStore.addMessage({
-      role: 'system' as const,
-      content: modelConfig.systemPrompt,
-    });
-    setIsRequesting(false);
-    setChatHistoryOpen(() => false);
-  };
-
-  if (!showNavBar) return null;
+  const showPanelOpen = !isMobile && !isPanelOpen;
 
   return (
-    <div className={styles.container}>
-      <nav className={styles.nav} role="navigation">
-        <div className={styles.menu}>
-          <div
-            className={styles.hamburger}
-            onClick={() => {
-              setChatHistoryOpen((prev) => !prev);
-            }}
-          >
-            <HamburgerIcon />
-          </div>
-          <div className={styles.logo}>
-            <KavaAILogo />
-          </div>
-          {isMobile && (
-            <div
-              onClick={startNewChat}
-              data-testid="new-chat-button"
-              className={styles.newChatIcon}
-            >
-              <NewChatIcon />
-            </div>
-          )}
-        </div>
-        {!chatHistoryOpen && (
-          <div className={styles.dropdownContainer}>
-            <ModelSelector />
-          </div>
-        )}
-      </nav>
+    <div className={`${styles.nav} ${showPanelOpen ? '' : ''}`}>
+      <PanelLeftOpen
+        className={`${styles.panelOpen} ${showPanelOpen ? styles.showPanelOpen : ''}`}
+        onClick={onPanelOpen}
+      />
+
+      <div className={styles.menu} onClick={onMenu}>
+        <HamburgerIcon />
+      </div>
+
+      <ModelSelector />
+
+      <div className={styles.newChat} onClick={onNewChat}>
+        <NewChatIcon />
+      </div>
     </div>
   );
 };
