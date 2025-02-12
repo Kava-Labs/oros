@@ -102,7 +102,7 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
     return groupConversations(filteredConversations);
   }, [conversations, searchTerm]);
 
-  const handleSearchChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
 
@@ -152,7 +152,7 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
       )}
       <div className={styles.searchControls}>
         <div className={styles.searchInputWrapper}>
-          <textarea
+          <input
             data-testid="conversation-search-input"
             className={styles.searchInput}
             onChange={handleSearchChange}
