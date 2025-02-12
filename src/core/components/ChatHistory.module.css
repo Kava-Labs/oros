@@ -1,6 +1,7 @@
 .chatHistoryContainer {
   border-right: 1px solid #3e3e3e;
   width: 332px;
+  background-color: var(--colors-bgSecondary);
   @media (max-width: 640px) {
     width: 100%;
   }
@@ -106,4 +107,9 @@
   &:hover {
     background-color: var(--colors-bgSecondary);
   }
+}
+
+.desktopLogo {
+  margin-top: 14px;
+  margin-left: 20px;
 }

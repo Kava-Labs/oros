@@ -17,6 +17,7 @@
   align-items: center;
   width: 100%;
   border-bottom: 1px solid var(--colors-borderSecondary);
+  background-color: var(--colors-bgSecondary);
 }
 
 .hamburger {
@@ -175,7 +176,7 @@
 
   .dropdown {
     width: 330px;
-    border: 1px solid var(--colors-textMuted);
+    border: 1px solid var(--colors-bgTertiary);
   }
 
   .dropdownMenu {
