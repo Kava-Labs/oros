@@ -1,7 +1,6 @@
 import ModelDropdownButton from './ModelDropdownButton';
 import ModelDropdownExpanded from './ModelDropdownExpanded';
 import { useEffect, useState } from 'react';
-import styles from './NavBar.module.css';
 
 const ModelSelector = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
