@@ -2,7 +2,7 @@ import styles from './NavBar.module.css';
 import { getAllModels, isBlockchainModelName } from '../config/models';
 import { ModelConfig } from '../types/models';
 import { useAppContext } from '../context/useAppContext';
-import { useIsMobile } from '../../shared/theme/useIsMobile';
+// import { useIsMobile } from '../../shared/theme/useIsMobile';
 import Tooltip from './Tooltip';
 
 interface ModelDropdownProps {
@@ -11,7 +11,7 @@ interface ModelDropdownProps {
 
 const ModelDropdownExpanded = ({ setDropdownOpen }: ModelDropdownProps) => {
   const { handleModelChange } = useAppContext();
-  const isMobile = useIsMobile();
+  // const isMobile = useIsMobile();
 
   const handleModelClick = (model: ModelConfig) => {
     handleModelChange(model.id);
@@ -20,7 +20,7 @@ const ModelDropdownExpanded = ({ setDropdownOpen }: ModelDropdownProps) => {
 
   const displayedModelOptions = getAllModels().map((model) => {
     const ModelOptionIcon = model.icon;
-    const disableOption = isMobile && isBlockchainModelName(model.id);
+    // const disableOption = isMobile && isBlockchainModelName(model.id);
 
     const modelButton = (
       <button
