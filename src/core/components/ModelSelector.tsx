@@ -9,8 +9,7 @@ const ModelSelector = () => {
   // Handle closing dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const dropdown = document.querySelector(`.${styles.dropdownMenu}`);
-      console.log('dropdown', dropdown);
+      const dropdown = document.querySelector(`#model-selector`);
       if (dropdown && !dropdown.contains(event.target as Node)) {
         setDropdownOpen(false);
       }
@@ -24,7 +23,7 @@ const ModelSelector = () => {
   }, [dropdownOpen]);
 
   return (
-    <>
+    <div id="model-selector">
       <ModelDropdownButton
         dropdownOpen={dropdownOpen}
         setDropdownOpen={setDropdownOpen}
@@ -32,7 +31,7 @@ const ModelSelector = () => {
       {dropdownOpen && (
         <ModelDropdownExpanded setDropdownOpen={setDropdownOpen} />
       )}
-    </>
+    </div>
   );
 };
 
