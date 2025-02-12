@@ -247,7 +247,7 @@ const HistoryItem = memo(
 
     const truncateTitle = useCallback(
       (title: string) => {
-        const threshold = hover ? 32 : 36;
+        const threshold = hover ? 30 : 34;
 
         if (title.startsWith(`"`) || title.startsWith(`'`)) {
           title = title.slice(1);
