@@ -136,7 +136,7 @@
 }
 
 #scrollContent {
-  margin-top: 60px;
+  margin-top: 100px;
   flex-grow: 1;
   width: 100%;
   align-items: center;
@@ -145,6 +145,13 @@
   scrollbar-color: var(--colors-bgTertiary) var(--colors-bgPrimary);
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
+
+  mask-image: linear-gradient(
+          to top,
+          black 0,
+          black calc(100% - 60px),
+          transparent 100%
+  );
 }
 
 #conversation {
