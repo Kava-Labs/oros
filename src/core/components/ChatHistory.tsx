@@ -150,26 +150,25 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
           <KavaAILogo />
         </div>
       )}
-      {!isMobile && (
-        <button
-          onClick={startNewChat}
-          className={styles.newChatButton}
-          data-testid="new-chat-container-button"
-        >
-          <div className={styles.newChatButtonAlignment}>
+      <div className={styles.searchControls}>
+        <div className={styles.searchInputWrapper}>
+          <textarea
+            data-testid="conversation-search-input"
+            className={styles.searchInput}
+            onChange={handleSearchChange}
+            value={searchTerm}
+            placeholder="Search conversations..."
+          />
+        </div>
+        {!isMobile && (
+          <div
+            onClick={startNewChat}
+            data-testid="new-chat-container-button"
+            className={styles.newChatButtonAlignment}
+          >
             <NewChatIcon />
-            <p className={styles.newChatButtonText}>New Chat</p>
           </div>
-        </button>
-      )}
-      <div className={styles.searchInputWrapper}>
-        <textarea
-          data-testid="conversation-search-input"
-          className={styles.searchInput}
-          onChange={handleSearchChange}
-          value={searchTerm}
-          placeholder="Search conversations..."
-        />
+        )}
       </div>
       <div data-testid="chat-history-section">
         {Object.entries(groupedHistories).map(([timeGroup, conversations]) => (

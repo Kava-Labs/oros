@@ -116,7 +116,7 @@
 
 .searchInput {
   height: 40px;
-  width: 90%;
+  width: 100%;
   background-color: var(--colors-bgTertiary);
   border-radius: var(--borderRadius-sm);
   border: none;
@@ -140,5 +140,13 @@
 
 .searchInputWrapper {
   margin-top: var(--spacing-md);
-  margin-left: var(--spacing-md);
+  width: 100%;
+  padding-right: var(--spacing-md);
+}
+
+.searchControls {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  padding: var(--spacing-md)
 }
