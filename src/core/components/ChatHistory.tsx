@@ -80,10 +80,10 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
 
   useEffect(() => {
     const load = () => {
-      const storedConversations = JSON.parse(
-        localStorage.getItem('conversations') ?? '{}',
-      );
-      setConversations(Object.values(storedConversations));
+      const storedConversations = Object.values(
+        JSON.parse(localStorage.getItem('conversations') ?? '{}'),
+      ) as ConversationHistory[];
+      setConversations(storedConversations);
     };
     load();
     // we have to poll local storage
