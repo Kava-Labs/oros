@@ -201,12 +201,13 @@
 }
 
 .newChatIcon {
-  padding: var(--spacing-md) var(--spacing-lg) var(--spacing-md) 0;
-  background: transparent;
-  border: none;
+  padding: var(--spacing-sm);
+  display: flex;
+  align-items: center;
   cursor: pointer;
+  color: var(--colors-textTertiary);
 
-  &:active {
-    opacity: 0.6;
+  &:hover {
+    color: var(--colors-link);
   }
 }

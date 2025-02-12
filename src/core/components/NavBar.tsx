@@ -48,13 +48,13 @@ const NavBar = ({ chatHistoryOpen, setChatHistoryOpen }: NavBarProps) => {
             <KavaAILogo />
           </div>
           {isMobile && (
-            <button
+            <div
               onClick={startNewChat}
               data-testid="new-chat-button"
               className={styles.newChatIcon}
             >
               <NewChatIcon />
-            </button>
+            </div>
           )}
         </div>
         {!chatHistoryOpen && (

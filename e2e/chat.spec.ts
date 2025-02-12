@@ -268,7 +268,7 @@ describe('chat', () => {
 
     expect(initialHistoryTitle).not.toBe('');
 
-    const newChatIcon = page.getByRole('button', { name: 'New Chat' });
+    const newChatIcon = page.getByTestId('new-chat-button');
     await newChatIcon.click();
 
     await chat.submitMessage(
