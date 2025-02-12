@@ -183,12 +183,11 @@
   }
 
   .dropdownMenu {
-    position: absolute;
-    top: 100%;
+    min-width: 330px;
     left: auto;
-    right: 0;
     transform: none;
-    width: 330px;
+    border: 1px solid var(--colors-bgTertiary);
+    border-top: none;
   }
 
   .hamburger {
