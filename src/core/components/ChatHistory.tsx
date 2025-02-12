@@ -198,11 +198,13 @@ const HistoryItem = memo(
     const { id, title } = conversation;
     const isMobile = useIsMobile();
     const [hover, setHover] = useState(false);
-    const [editingTitle, setEditingTitle] = useState(false);
-    const [newTitle, setNewTitle] = useState(title);
 
     const { messageHistoryStore } = useAppContext();
     const isSelected = messageHistoryStore.getConversationID() === id;
+
+    // *******************
+    const [editingTitle, setEditingTitle] = useState(false);
+    const [newTitle, setNewTitle] = useState(title);
 
     useEffect(() => {
       let tid: NodeJS.Timeout;
