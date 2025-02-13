@@ -11,7 +11,7 @@ import {
   useRef,
 } from 'react';
 import { useAppContext } from '../context/useAppContext';
-import { EllipsisVertical, Pencil, Trash2, X } from 'lucide-react';
+import { EllipsisVertical, Bot, Pencil, Trash2, X } from 'lucide-react';
 import {
   // formatConversationTitle,
   groupConversationsByTime,
@@ -86,24 +86,33 @@ export const ChatHistory = ({
   return (
     <div className={styles.chatHistoryContainer}>
       <div data-testid="chat-history-section">
-        {Object.entries(groupedHistories).map(([timeGroup, conversations]) => (
-          <div key={timeGroup} className={styles.timeGroup}>
-            <small className={styles.timeGroupTitle}>{timeGroup}</small>
-            <div className={styles.timeGroupContent}>
-              {conversations.map((conversation) => (
-                <HistoryItem
-                  key={conversation.id}
-                  conversation={conversation}
-                  handleChatHistoryClick={handleChatHistoryClick}
-                  deleteConversation={deleteConversation}
-                  isMenuOpen={openMenuId === conversation.id}
-                  onMenuToggle={handleMenuToggle}
-                  onMenuClose={() => setOpenMenuId(null)}
-                />
-              ))}
-            </div>
+        {conversations.length === 0 ? (
+          <div className={styles.emptyState}>
+            <Bot className={styles.emptyStateIcon} size={24} />
+            <small className={styles.emptyStateText}>
+              Start a new chat to begin
+            </small>
           </div>
-        ))}
+        ) : (
+          Object.entries(groupedHistories).map(([timeGroup, conversations]) => (
+            <div key={timeGroup} className={styles.timeGroup}>
+              <small className={styles.timeGroupTitle}>{timeGroup}</small>
+              <div className={styles.timeGroupContent}>
+                {conversations.map((conversation) => (
+                  <HistoryItem
+                    key={conversation.id}
+                    conversation={conversation}
+                    handleChatHistoryClick={handleChatHistoryClick}
+                    deleteConversation={deleteConversation}
+                    isMenuOpen={openMenuId === conversation.id}
+                    onMenuToggle={handleMenuToggle}
+                    onMenuClose={() => setOpenMenuId(null)}
+                  />
+                ))}
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
@@ -173,6 +182,12 @@ const HistoryItem = memo(
       [id],
     );
 
+    useEffect(() => {
+      if (newTitle !== title && editingTitle) {
+        saveToLocalStorage(newTitle);
+      }
+    }, [newTitle, title, editingTitle, saveToLocalStorage]);
+
     const handleSaveTitle = () => {
       const trimmedTitle = newTitle.trim();
       if (trimmedTitle === '') {
@@ -184,32 +199,7 @@ const HistoryItem = memo(
     };
 
     useEffect(() => {
-      let tid: NodeJS.Timeout;
-      if (newTitle !== title && editingTitle) {
-        // Save to localStorage while typing
-        saveToLocalStorage(newTitle);
-
-        // Set a timeout to exit edit mode
-        tid = setTimeout(() => {
-          setEditingTitle(false);
-        }, 1000);
-      } else if (editingTitle) {
-        // If no changes made, exit edit mode after longer delay
-        tid = setTimeout(() => {
-          setEditingTitle(false);
-        }, 5000);
-      }
-
-      return () => {
-        if (tid) {
-          clearTimeout(tid);
-        }
-      };
-    }, [newTitle, title, editingTitle, saveToLocalStorage]);
-
-    useEffect(() => {
       if (editingTitle) {
-        // Focus and select all text when edit mode is entered
         const input = inputRef.current;
         if (input) {
           input.focus();

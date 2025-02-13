@@ -38,6 +38,7 @@
   padding: var(--spacing-xs) var(--spacing-xs) var(--spacing-xs)
     var(--spacing-md);
   transition: background-color 0.2s ease;
+  gap: var(--spacing-xs);
 }
 
 .chatHistoryContent:hover {
@@ -95,7 +96,8 @@
 
 .chatHistoryTitleInput {
   background-color: inherit;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   border: none;
   height: 24px;
   color: var(--colors-textPrimary);
@@ -114,4 +116,27 @@
 
 .menuIcon {
   padding: var(--spacing-xs) 0 var(--spacing-xs) var(--spacing-xs);
+  padding: var(--spacing-xs);
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: calc(var(--spacing-md) * 8);
+  color: var(--colors-textMuted);
+  padding: var(--spacing-md);
+  text-align: center;
+}
+
+.emptyStateIcon {
+  margin-bottom: var(--spacing-sm);
+  opacity: 0.7;
+}
+
+.emptyStateText {
+  margin: 0;
+  text-transform: uppercase;
+  font-size: 12px; /* TODO: Replace with rem spacing from global css */
 }
