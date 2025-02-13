@@ -38,6 +38,7 @@ const SearchModal = ({
 
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
+      // Focus input when modal opens
       inputRef.current?.focus();
     }
 
@@ -101,7 +102,7 @@ const SearchModal = ({
             </div>
 
             <div className={styles.results}>
-              {Object.entries(groupedConversations).length === 0 ? (
+              {Object.keys(groupedConversations).length === 0 ? (
                 <div className={styles.noResults}>No results</div>
               ) : (
                 Object.entries(groupedConversations).map(

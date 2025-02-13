@@ -110,15 +110,14 @@
   line-height: var(--spacing-lg);
 }
 
-/* New snippet styling */
 .conversationSnippet {
   font-size: 1.2rem;
   color: var(--colors-textMuted);
   line-height: 1.5;
   word-wrap: break-word;
   overflow: hidden;
-  text-overflow: ellipsis; /* Ensures long text is truncated with ellipsis */
-  white-space: nowrap; /* Prevents snippet from wrapping into multiple lines */
+  text-overflow: ellipsis;
+  white-space: nowrap;
   margin-top: var(--spacing-xs);
 }
 
