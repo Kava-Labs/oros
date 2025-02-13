@@ -93,6 +93,10 @@ export const App = () => {
                 </div>
               )}
             </div>
+            <ChatHistory
+              onHistoryItemClick={setIsMobileSideBarOpen}
+              startNewChat={startNewChat}
+            />
           </div>
 
           <div className={styles.content}>

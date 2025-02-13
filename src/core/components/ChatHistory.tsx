@@ -12,27 +12,24 @@ import {
 import { useAppContext } from '../context/useAppContext';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
 import { TrashIcon } from '../assets/TrashIcon';
-import { Pencil } from 'lucide-react';
-import { PenSquare } from 'lucide-react';
-import SearchModal from './SearchModal';
+import { Pencil, Trash2 } from 'lucide-react';
 import {
   formatConversationTitle,
   groupConversationsByTime,
 } from '../utils/conversation/helpers';
+import ButtonIcon from './ButtonIcon';
 
 interface ChatHistoryProps {
-  setChatHistoryOpen: Dispatch<SetStateAction<boolean>>;
+  onHistoryItemClick: Dispatch<SetStateAction<boolean>>;
+  startNewChat(): void;
 }
 
-export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
+export const ChatHistory = ({
+  onHistoryItemClick,
+  startNewChat,
+}: ChatHistoryProps) => {
   const [conversations, setConversations] = useState<ConversationHistory[]>([]);
-  const {
-    loadConversation,
-    messageHistoryStore,
-    modelConfig,
-    thinkingStore,
-    setIsRequesting,
-  } = useAppContext();
+  const { loadConversation, messageHistoryStore } = useAppContext();
 
   useEffect(() => {
     const load = () => {
@@ -53,21 +50,6 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
     () => groupConversationsByTime(conversations),
     [conversations],
   );
-
-  const startNewChat = useCallback(() => {
-    thinkingStore.setText('');
-    messageHistoryStore.reset();
-    messageHistoryStore.addMessage({
-      role: 'system' as const,
-      content: modelConfig.systemPrompt,
-    });
-    setIsRequesting(false);
-  }, [
-    messageHistoryStore,
-    modelConfig.systemPrompt,
-    setIsRequesting,
-    thinkingStore,
-  ]);
 
   const deleteConversation = useCallback(
     (id: string) => {
@@ -92,33 +74,13 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
   const handleChatHistoryClick = useCallback(
     (conversation: ConversationHistory) => {
       loadConversation(conversation);
-      setChatHistoryOpen(false);
+      onHistoryItemClick(false);
     },
-    [loadConversation, setChatHistoryOpen],
+    [loadConversation, onHistoryItemClick],
   );
 
   return (
     <div className={styles.chatHistoryContainer}>
-      <div className={styles.searchControls}>
-        <SearchModal
-          conversations={conversations}
-          onConversationSelect={handleChatHistoryClick}
-        />
-        {!isMobile && (
-          <div
-            onClick={startNewChat}
-            data-testid="new-chat-button"
-            className={styles.newChatButtonAlignment}
-          >
-            <PenSquare
-              size={20}
-              className={styles.newChatButtonAlignment}
-              onClick={startNewChat}
-            />
-          </div>
-        )}
-      </div>
-
       <div data-testid="chat-history-section">
         {Object.entries(groupedHistories).map(([timeGroup, conversations]) => (
           <div key={timeGroup} className={styles.timeGroup}>
@@ -229,18 +191,28 @@ const HistoryItem = memo(
         <div className={styles.iconsContainer}>
           {(hover || isMobile) && !editingTitle ? (
             <>
-              <Pencil
-                className={styles.editIcon}
-                data-testid="edit-chat-history-entry-icon"
-                width="19px"
-                height="19px"
+              <ButtonIcon
+                icon={Pencil}
+                size={18}
+                tooltip={{
+                  text: 'Edit Title',
+                  position: 'bottom',
+                }}
+                aria-label="Edit Title"
                 onClick={() => setEditingTitle(true)}
               />
+
               <div className={styles.deleteIcon} />
-              <TrashIcon
+
+              <ButtonIcon
                 data-testid="delete-chat-history-entry-icon"
-                width="19px"
-                height="19px"
+                icon={Trash2}
+                size={18}
+                tooltip={{
+                  text: 'Delete Chat',
+                  position: 'bottom',
+                }}
+                aria-label="Delete Chat"
                 onClick={() => deleteConversation(id)}
               />
             </>

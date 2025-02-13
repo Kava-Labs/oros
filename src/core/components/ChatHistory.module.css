@@ -1,6 +1,5 @@
 .chatHistoryContainer {
-  border-right: 1px solid #3e3e3e;
-  width: 332px;
+  width: 100%;
   background-color: var(--colors-bgSecondary);
   @media (max-width: 640px) {
     width: 100%;
