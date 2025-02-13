@@ -10,6 +10,7 @@ import { isInIframe } from './core/utils/isInIframe';
 import { X as CloseX, PanelLeftClose } from 'lucide-react';
 import KavaAILogo from './core/assets/KavaAILogo';
 import ButtonIcon from './core/components/ButtonIcon';
+import { SearchChatButton } from './core/assets/SearchChatButton';
 
 const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
 const showHistorySidebar = !isInIframe() && FEAT_UPDATED_DESIGN;
@@ -64,26 +65,32 @@ export const App = () => {
             <div className={styles.sidebarHeader}>
               <KavaAILogo height={20} />
               {isMobile && isMobileSideBarOpen && (
-                <ButtonIcon
-                  icon={CloseX}
-                  tooltip={{
-                    text: 'Close Menu',
-                    position: 'bottom',
-                  }}
-                  aria-label="Close Menu"
-                  onClick={() => setIsMobileSideBarOpen(false)}
-                />
+                <div className={styles.buttonGroup}>
+                  <SearchChatButton onClick={() => {}} />
+                  <ButtonIcon
+                    icon={CloseX}
+                    tooltip={{
+                      text: 'Close Menu',
+                      position: 'bottom',
+                    }}
+                    aria-label="Close Menu"
+                    onClick={() => setIsMobileSideBarOpen(false)}
+                  />
+                </div>
               )}
               {!isMobile && !isDesktopSideBarHidden && (
-                <ButtonIcon
-                  icon={PanelLeftClose}
-                  tooltip={{
-                    text: 'Close Menu',
-                    position: 'bottom',
-                  }}
-                  aria-label="Close Menu"
-                  onClick={() => setIsDesktopSideBarHidden(true)}
-                />
+                <div className={styles.buttonGroup}>
+                  <SearchChatButton onClick={() => {}} />
+                  <ButtonIcon
+                    icon={PanelLeftClose}
+                    tooltip={{
+                      text: 'Close Menu',
+                      position: 'bottom',
+                    }}
+                    aria-label="Close Menu"
+                    onClick={() => setIsDesktopSideBarHidden(true)}
+                  />
+                </div>
               )}
             </div>
           </div>
