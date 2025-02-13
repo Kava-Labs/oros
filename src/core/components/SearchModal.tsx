@@ -3,6 +3,7 @@ import { Search, X } from 'lucide-react';
 import styles from './SearchModal.module.css';
 import { ConversationHistory } from '../context/types';
 import { useAppContext } from '../context/useAppContext';
+import { formatConversationTitle } from '../utils/formatConversationTitle';
 
 interface SearchModalProps {
   conversations: ConversationHistory[];
@@ -56,9 +57,13 @@ const SearchModal = ({
   };
 
   const groupedConversations = conversations
+    // First sort all conversations by timestamp
+    .sort((a, b) => b.lastSaved - a.lastSaved)
+    // Then filter based on search
     .filter((conv) =>
       conv.title.toLowerCase().includes(searchTerm.toLowerCase()),
     )
+    // Finally group them
     .reduce(
       (groups, conversation) => {
         const timeGroup = getTimeGroup(conversation.lastSaved);
@@ -139,7 +144,7 @@ const SearchModal = ({
                           onClick={() => handleConversationClick(conversation)}
                         >
                           <span className={styles.conversationTitle}>
-                            {conversation.title}
+                            {formatConversationTitle(conversation.title, 50)}
                           </span>
                         </div>
                       ))}

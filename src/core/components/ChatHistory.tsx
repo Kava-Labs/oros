@@ -8,6 +8,7 @@ import KavaAILogo from '../assets/KavaAILogo';
 import { Pencil } from 'lucide-react';
 import { PenSquare } from 'lucide-react';
 import SearchModal from './SearchModal';
+import { formatConversationTitle } from '../utils/formatConversationTitle';
 
 interface ChatHistoryProps {
   setChatHistoryOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -235,28 +236,9 @@ const HistoryItem = memo(
       };
     }, [newTitle, title, id, editingTitle]);
 
-    const truncateTitle = useCallback(
-      (title: string) => {
-        const threshold = hover ? 30 : 34;
-
-        if (title.startsWith(`"`) || title.startsWith(`'`)) {
-          title = title.slice(1);
-        }
-        if (title.endsWith(`"`) || title.endsWith(`'`)) {
-          title = title.slice(0, -1);
-        }
-        if (title.length > threshold) {
-          title = title.slice(0, threshold) + '....';
-        }
-
-        return title;
-      },
-      [hover],
-    );
-
     const truncatedTitle = useMemo(
-      () => truncateTitle(newTitle),
-      [newTitle, truncateTitle],
+      () => formatConversationTitle(newTitle, hover ? 30 : 34),
+      [newTitle, hover],
     );
 
     return (
