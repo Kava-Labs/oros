@@ -38,6 +38,7 @@ export const NavBar = ({
               />
             )}
             <NewChatButton onClick={onNewChat} />
+            <ModelSelector />
           </div>
         ) : (
           <div className={styles.menu} onClick={onMenu}>
@@ -46,9 +47,13 @@ export const NavBar = ({
         )}
       </div>
 
-      <ModelSelector />
+      <div className={styles.centerSection}>
+        {isMobile && <ModelSelector />}
+      </div>
 
-      {isMobile && <NewChatButton onClick={onNewChat} />}
+      <div className={styles.rightSection}>
+        {isMobile && <NewChatButton onClick={onNewChat} />}
+      </div>
     </div>
   );
 };
