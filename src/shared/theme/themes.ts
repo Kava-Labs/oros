@@ -45,6 +45,7 @@ export interface ThemeSpacing {
 }
 
 export interface ThemeBorderRadius {
+  xs: string;
   sm: string;
   md: string;
   lg: string;
@@ -102,6 +103,7 @@ export const baseTheme: Theme = {
     xl: '32px',
   },
   borderRadius: {
+    xs: '4px',
     sm: '8px',
     md: '16px',
     lg: '24px',

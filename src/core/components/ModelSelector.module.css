@@ -113,3 +113,12 @@
     margin-left: 0;
   }
 }
+
+.chatHistoryTitle:hover {
+  color: var(--colors-textPrimary);
+}
+
+.menuIcon:hover {
+  background-color: var(--colors-bgTertiary);
+  border-radius: var(--borderRadius-sm);
+}
