@@ -80,3 +80,8 @@
     display: none;
   }
 }
+
+.buttonGroup {
+  display: flex;
+  gap: var(--spacing-sm);
+}

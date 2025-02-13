@@ -1,22 +1,25 @@
-import { SquarePen } from 'lucide-react';
+import { TextSearch } from 'lucide-react';
 import ButtonIcon from '../components/ButtonIcon';
 import styles from './Button.module.css';
 
-interface NewChatButtonProps {
+interface SearchChatButtonProps {
   className?: string;
   onClick(): void;
 }
 
-export const NewChatButton = ({ className, onClick }: NewChatButtonProps) => {
+export const SearchChatButton = ({
+  className,
+  onClick,
+}: SearchChatButtonProps) => {
   return (
     <ButtonIcon
-      icon={SquarePen}
+      icon={TextSearch}
       className={`${styles.chatButton} ${className || ''}`}
       tooltip={{
-        text: 'New Chat',
+        text: 'Search History',
         position: 'bottom',
       }}
-      aria-label="New Chat"
+      aria-label="Search History"
       onClick={onClick}
     />
   );
