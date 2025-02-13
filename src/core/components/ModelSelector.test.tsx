@@ -3,7 +3,6 @@ import { ModelSelector } from './ModelSelector';
 import { useAppContext } from '../context/useAppContext';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
 import { getAllModels } from '../config/models';
-import { ComponentType } from 'react';
 import { vi } from 'vitest';
 
 // Mock the required modules and hooks
@@ -36,20 +35,6 @@ const mockBlockchainModel = {
   systemPrompt: 'blockchain system prompt',
   introText: 'blockchain intro text',
   inputPlaceholderText: 'blockchain placeholder',
-  components: {
-    transaction: {
-      inProgress: (() => null) as ComponentType<any>,
-      complete: (() => null) as ComponentType<any>,
-    },
-    query: {
-      inProgress: (() => null) as ComponentType<any>,
-      complete: (() => null) as ComponentType<any>,
-    },
-  },
-  messageProcessors: {
-    preProcess: (message: string) => message,
-    postProcess: (message: string) => message,
-  },
 };
 
 describe('ModelSelector', () => {
