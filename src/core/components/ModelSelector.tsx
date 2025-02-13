@@ -1,4 +1,4 @@
-import styles from './ModelDropdown.module.css';
+import styles from './ModelSelector.module.css';
 import { useEffect, useState } from 'react';
 import { useAppContext } from '../context/useAppContext';
 import { getAllModels } from '../config/models';
