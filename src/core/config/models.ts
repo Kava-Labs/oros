@@ -40,6 +40,28 @@ export const getAllModels = (): ModelConfig[] => {
   ];
 };
 
-export const DEFAULT_MODEL_NAME = import.meta.env.VITE_FEAT_UPDATED_DESIGN
-  ? 'deepseek-r1'
-  : 'gpt-4o';
+const defaultModelFromQueryParams = () => {
+  const params = new URLSearchParams(new URL(window.location.href).search);
+  let wantedModel = params.get('defaultModel');
+
+  if (wantedModel) {
+    if (wantedModel.includes("'")) wantedModel = wantedModel.replace(/'/g, '');
+    if (wantedModel.includes('"')) wantedModel = wantedModel.replace(/"/g, '');
+    for (const model of Object.values(blockchainModels)) {
+      if (model.name === wantedModel) return model.id;
+      if (model.id === wantedModel) return model.id;
+    }
+    for (const model of Object.values(reasoningModels)) {
+      if (model.name === wantedModel) return model.id;
+      if (model.id === wantedModel) return model.id;
+    }
+  }
+
+  return null;
+};
+
+export const DEFAULT_MODEL_NAME = defaultModelFromQueryParams()
+  ? defaultModelFromQueryParams()!
+  : import.meta.env.VITE_FEAT_UPDATED_DESIGN
+    ? 'deepseek-r1'
+    : 'gpt-4o';

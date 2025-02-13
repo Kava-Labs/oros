@@ -13,7 +13,6 @@ import { useMessageSaver } from './useMessageSaver';
 import { ConversationHistory } from './types';
 import { getToken } from '../../core/utils/token/token';
 import OpenAI from 'openai';
-import { isInIframe } from '../utils/isInIframe';
 
 let client: OpenAI | null = null;
 
@@ -42,7 +41,7 @@ export const AppContextProvider = ({
   );
 
   const [modelConfig, setModelConfig] = useState<ModelConfig>(() =>
-    getModelConfig(isInIframe() ? 'gpt-4o' : DEFAULT_MODEL_NAME),
+    getModelConfig(DEFAULT_MODEL_NAME),
   );
 
   // This callback would be passed to components that need to switch models
