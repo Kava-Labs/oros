@@ -13,7 +13,6 @@ import { useMessageSaver } from './useMessageSaver';
 import { ConversationHistory } from './types';
 import { getToken } from '../../core/utils/token/token';
 import OpenAI from 'openai';
-import { isInIframe } from '../utils/isInIframe';
 
 let client: OpenAI | null = null;
 
