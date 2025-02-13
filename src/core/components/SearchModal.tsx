@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import styles from './SearchModal.module.css';
 import { ConversationHistory } from '../context/types';
 import { useAppContext } from '../context/useAppContext';
@@ -97,6 +97,16 @@ const SearchModal = ({
       {isOpen && (
         <div className={styles.modalOverlay}>
           <div className={styles.modal} ref={modalRef}>
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                setSearchTerm('');
+              }}
+              className={`${styles.iconButton} ${styles.closeButton}`}
+              aria-label="Close search"
+            >
+              <X size={20} />
+            </button>
             <div className={styles.searchInputWrapper}>
               <input
                 ref={inputRef}
