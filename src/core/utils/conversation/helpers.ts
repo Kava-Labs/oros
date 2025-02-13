@@ -80,63 +80,91 @@ export const groupConversationsByTime = (
 export const groupAndFilterConversations = (
   conversations: ConversationHistory[],
   searchTerm = '',
-) => {
-  if (!searchTerm) return {};
+): Record<string, ConversationHistory[]> => {
+  // If no search term, return all conversations sorted by last saved
+  if (!searchTerm) {
+    return conversations.reduce(
+      (groups, conv) => {
+        const timeGroup = getTimeGroup(conv.lastSaved);
+        if (!groups[timeGroup]) groups[timeGroup] = [];
+        groups[timeGroup].push(conv);
+        return groups;
+      },
+      {} as Record<string, ConversationHistory[]>,
+    );
+  }
 
-  return conversations
-    .sort((a, b) => b.lastSaved - a.lastSaved)
+  // Filter and enhance conversations with search
+  const lowerSearchTerm = searchTerm.toLowerCase();
+  const filteredConversations = conversations
     .map((conv) => {
-      const lowerSearchTerm = searchTerm.toLowerCase();
       // Skip the system message (the first element) when checking the conversation content
       const messages =
         conv.conversation[0]?.role === 'system'
           ? conv.conversation.slice(1)
           : conv.conversation;
 
-      // Search through messages for content match
-      let matchFound = false;
-      let displayedPortion = '';
+      // Check for title match
+      const titleMatch = conv.title.toLowerCase().includes(lowerSearchTerm);
 
-      // First check for content match
-      for (const msg of messages) {
-        if (msg.content && typeof msg.content === 'string') {
-          const contentLower = msg.content.toLowerCase();
-          if (contentLower.includes(lowerSearchTerm)) {
+      // Check for content match
+      const contentMatch = messages.some(
+        (msg) =>
+          msg.role !== 'system' &&
+          typeof msg.content === 'string' &&
+          msg.content.toLowerCase().includes(lowerSearchTerm),
+      );
+
+      // If no match, return null
+      if (!titleMatch && !contentMatch) return null;
+
+      // Find and create displayed portion
+      let displayedPortion = '';
+      if (contentMatch) {
+        // Find the first message with a match and extract surrounding context
+        for (const msg of messages) {
+          if (
+            typeof msg.content === 'string' &&
+            msg.content.toLowerCase().includes(lowerSearchTerm)
+          ) {
             const words = msg.content.split(' ');
-            const start = words.findIndex((word) =>
+            const matchIndex = words.findIndex((word) =>
               word.toLowerCase().includes(lowerSearchTerm),
             );
+
+            // Get a snippet around the matched word
+            const start = Math.max(0, matchIndex - 2);
             displayedPortion = words.slice(start, start + 6).join(' ');
-            matchFound = true;
             break;
           }
         }
-      }
-
-      // If no content match, check for title match and display the first 6 words of the first user message
-      if (!matchFound && conv.title.toLowerCase().includes(lowerSearchTerm)) {
+      } else if (titleMatch) {
+        // If only title matches, get first user message snippet
         const firstUserMessage = messages.find((msg) => msg.role === 'user');
-        if (firstUserMessage && firstUserMessage.content) {
-          const initialUserContent = firstUserMessage.content as string;
-          displayedPortion = initialUserContent
+        if (firstUserMessage && typeof firstUserMessage.content === 'string') {
+          displayedPortion = firstUserMessage.content
             .split(' ')
             .slice(0, 6)
             .join(' ');
         }
       }
 
-      // If no match, return null
-      if (!matchFound && !conv.title.toLowerCase().includes(lowerSearchTerm)) {
-        return null;
-      }
-
-      return { ...conv, displayedTitle: conv.title, displayedPortion };
+      return {
+        ...conv,
+        displayedTitle: conv.title,
+        displayedPortion: displayedPortion || '',
+      };
     })
-    .filter(Boolean)
-    .reduce((groups, conv) => {
-      const timeGroup = getTimeGroup(conv!.lastSaved);
+    .filter(Boolean) as ConversationHistory[];
+
+  // Group filtered conversations
+  return filteredConversations.reduce(
+    (groups, conv) => {
+      const timeGroup = getTimeGroup(conv.lastSaved);
       if (!groups[timeGroup]) groups[timeGroup] = [];
-      groups[timeGroup].push(conv!);
+      groups[timeGroup].push(conv);
       return groups;
-    }, {} as GroupedConversations);
+    },
+    {} as Record<string, ConversationHistory[]>,
+  );
 };

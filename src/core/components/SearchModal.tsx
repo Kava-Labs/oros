@@ -10,7 +10,6 @@ interface SearchModalProps {
   onConversationSelect: (conversation: ConversationHistory) => void;
 }
 
-// Define a type for the returned filtered conversations
 interface FilteredConversation extends ConversationHistory {
   displayedTitle: string;
   displayedPortion: string;
@@ -47,10 +46,10 @@ const SearchModal = ({
     };
   }, [isOpen]);
 
-  const groupedConversations = groupAndFilterConversations(
-    conversations,
-    searchTerm,
-  ) as Record<string, FilteredConversation[]>;
+  // Modify the grouping logic to handle empty search term
+  const groupedConversations = searchTerm
+    ? groupAndFilterConversations(conversations, searchTerm)
+    : { Recent: conversations.sort((a, b) => b.lastSaved - a.lastSaved) };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
@@ -59,10 +58,26 @@ const SearchModal = ({
     }
   };
 
-  const handleConversationClick = (conversation: FilteredConversation) => {
-    onConversationSelect({ ...conversation, id: conversation.id });
+  const handleConversationClick = (conversation: ConversationHistory) => {
+    onConversationSelect(conversation);
     setIsOpen(false);
     setSearchTerm('');
+  };
+
+  const getDisplayedPortion = (conversation: ConversationHistory) => {
+    const messages =
+      conversation.conversation[0]?.role === 'system'
+        ? conversation.conversation.slice(1)
+        : conversation.conversation;
+
+    const firstUserMessage = messages.find((msg) => msg.role === 'user');
+    if (firstUserMessage && firstUserMessage.content) {
+      const content = Array.isArray(firstUserMessage.content)
+        ? firstUserMessage.content.map((part) => part).join('')
+        : firstUserMessage.content;
+      return content.slice(0, 100); // Show the first 100 characters
+    }
+    return '';
   };
 
   return (
@@ -101,9 +116,11 @@ const SearchModal = ({
             </div>
 
             <div className={styles.results}>
-              {Object.keys(groupedConversations).length === 0 ? (
+              {Object.entries(groupedConversations).length === 0 ? (
+                // If no matches found, display "No results"
                 <div className={styles.noResults}>No results</div>
               ) : (
+                // Display grouped conversations
                 Object.entries(groupedConversations).map(
                   ([timeGroup, convos]) => (
                     <div key={timeGroup} className={styles.timeGroup}>
@@ -115,10 +132,14 @@ const SearchModal = ({
                           onClick={() => handleConversationClick(conversation)}
                         >
                           <span className={styles.conversationTitle}>
-                            {conversation.displayedTitle}
+                            {conversation.title}
                           </span>
                           <p className={styles.conversationSnippet}>
-                            {conversation.displayedPortion}
+                            {searchTerm
+                              ? (conversation as FilteredConversation)
+                                  .displayedPortion ||
+                                getDisplayedPortion(conversation)
+                              : getDisplayedPortion(conversation)}
                           </p>
                         </div>
                       ))}
