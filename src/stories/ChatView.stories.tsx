@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 import { ChatView, ChatViewProps } from '../core/components/ChatView';
-import { mockChatMessages } from './mockdata';
+import { mockChatMessages, markDownSpecChatMessages } from './mockdata';
 import { defaultIntroText } from '../features/blockchain/config';
 import type { Decorator } from '@storybook/react';
 import { ThemeProvider } from '../shared/theme/themeProvider';
@@ -78,6 +78,18 @@ export const Primary: Story = {
     viewport: { defaultViewport: 'reset' },
   },
   args,
+};
+
+export const MarkdownSpec: Story = {
+  parameters: {
+    parameters: {
+      viewport: { defaultViewport: 'reset' },
+    },
+  },
+  args: {
+    ...args,
+    messages: markDownSpecChatMessages,
+  },
 };
 
 export const OnPhoneSmall: Story = {
