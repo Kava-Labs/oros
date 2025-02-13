@@ -94,10 +94,7 @@ export const groupAndFilterConversations = (
 
   const lowerSearchTerm = searchTerm.toLowerCase();
   const filteredConversations = conversations.filter((conv) => {
-    const messages =
-      conv.conversation[0]?.role === 'system'
-        ? conv.conversation.slice(1)
-        : conv.conversation;
+    const messages = removeInitialSystemMessage(conv);
 
     return (
       conv.title.toLowerCase().includes(lowerSearchTerm) ||
@@ -125,10 +122,7 @@ export const formatContentSnippet = (
   conversation: ConversationHistory,
   searchTerm: string = '',
 ): string => {
-  const messages =
-    conversation.conversation[0]?.role === 'system'
-      ? conversation.conversation.slice(1)
-      : conversation.conversation;
+  const messages = removeInitialSystemMessage(conversation);
 
   if (searchTerm) {
     const matchingMessage = messages.find(
@@ -185,4 +179,13 @@ export const highlightMatch = (
   const regex = new RegExp(`(${searchTerm})`, 'gi');
   //  '$1' let's us preserve the casing of the match
   return text.replace(regex, '<strong>$1</strong>');
+};
+
+/**
+ * Removes the system prompt from the conversation array since we don't include that when searching
+ */
+const removeInitialSystemMessage = (conversation: ConversationHistory) => {
+  return conversation.conversation[0]?.role === 'system'
+    ? conversation.conversation.slice(1)
+    : conversation.conversation;
 };
