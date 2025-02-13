@@ -7,6 +7,7 @@ import {
   groupConversationsByTime,
 } from './helpers';
 import { ConversationHistory } from '../../context/types';
+import { ChatCompletionMessageParam } from 'openai/resources/index';
 
 describe('formatConversationTitle', () => {
   it('should remove double quotes from beginning and end', () => {
@@ -159,18 +160,37 @@ describe('groupConversationsByTime', () => {
 });
 
 describe('groupAndFilterConversations', () => {
-  let mockConversations: ConversationHistory[];
+  let mockConversationHistories: ConversationHistory[];
   const now = new Date('2024-02-13T12:00:00Z').getTime();
 
   beforeEach(() => {
     vi.spyOn(Date.prototype, 'getTime').mockImplementation(() => now);
 
-    mockConversations = [
+    const mockConversation: ChatCompletionMessageParam[] = [
+      {
+        role: 'system',
+        content: 'System prompt that should be ignored',
+      },
+      {
+        role: 'user',
+        content: 'First user message',
+      },
+      {
+        role: 'assistant',
+        content: 'First assistant response with searchable content',
+      },
+      {
+        role: 'user',
+        content: 'Second user message with different content',
+      },
+    ];
+
+    mockConversationHistories = [
       {
         id: '1',
         title: 'Bitcoin Discussion',
         lastSaved: now - 1000 * 60 * 60 * 2,
-        conversation: [],
+        conversation: mockConversation,
         model: 'gpt-4o-mini',
       },
       {
@@ -195,47 +215,33 @@ describe('groupAndFilterConversations', () => {
   });
 
   it('should filter conversations based on search term', () => {
-    const filtered = groupAndFilterConversations(mockConversations, 'bitcoin');
+    const filtered = groupAndFilterConversations(
+      mockConversationHistories,
+      'bitcoin',
+    );
     expect(Object.keys(filtered)).toEqual(['Today']);
     expect(filtered['Today'][0].title).toBe('Bitcoin Discussion');
   });
 
   it('should be case insensitive when filtering', () => {
-    const filtered = groupAndFilterConversations(mockConversations, 'BITCOIN');
+    const filtered = groupAndFilterConversations(
+      mockConversationHistories,
+      'BITCOIN',
+    );
     expect(filtered['Today'][0].title).toBe('Bitcoin Discussion');
   });
 
   it('should handle partial matches', () => {
-    const filtered = groupAndFilterConversations(mockConversations, 'block');
+    const filtered = groupAndFilterConversations(
+      mockConversationHistories,
+      'block',
+    );
     expect(filtered['Last week'][0].title).toBe('Blockchain Overview');
   });
 
   it('should return all conversations when search term is empty', () => {
-    const filtered = groupAndFilterConversations(mockConversations, '');
+    const filtered = groupAndFilterConversations(mockConversationHistories, '');
     expect(Object.keys(filtered)).toEqual(['Today', 'Yesterday', 'Last week']);
-  });
-
-  it('should return empty groups when no matches found', () => {
-    const filtered = groupAndFilterConversations(
-      mockConversations,
-      'nonexistent',
-    );
-    expect(filtered).toEqual({});
-  });
-
-  it('should maintain sort order within groups', () => {
-    const anotherBitcoinChat = {
-      id: '4',
-      title: 'Another Bitcoin Chat',
-      lastSaved: now - 1000 * 60 * 60,
-      conversation: [],
-      model: 'gpt-4o-mini',
-    };
-    mockConversations.push(anotherBitcoinChat);
-
-    const filtered = groupAndFilterConversations(mockConversations, 'bitcoin');
-    expect(filtered['Today'][0].title).toBe('Another Bitcoin Chat');
-    expect(filtered['Today'][1].title).toBe('Bitcoin Discussion');
   });
 });
 

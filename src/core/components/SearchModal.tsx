@@ -104,7 +104,6 @@ const SearchModal = ({
                 // If no matches found, display "No results"
                 <div className={styles.noResults}>No results</div>
               ) : (
-                // Display grouped conversations
                 Object.entries(groupedConversations).map(
                   ([timeGroup, conversations]) => (
                     <div key={timeGroup} className={styles.timeGroup}>
