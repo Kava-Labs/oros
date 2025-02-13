@@ -7,8 +7,9 @@ import styles from './App.module.css';
 import { ChatHistory } from './core/components/ChatHistory';
 import { useIsMobile } from './shared/theme/useIsMobile';
 import { isInIframe } from './core/utils/isInIframe';
-import { X, PanelLeftClose } from 'lucide-react';
+import { X as CloseX, PanelLeftClose } from 'lucide-react';
 import KavaAILogo from './core/assets/KavaAILogo';
+import ButtonIcon from './core/components/ButtonIcon';
 
 const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
 const showHistorySidebar = !isInIframe() && FEAT_UPDATED_DESIGN;
@@ -28,7 +29,6 @@ export const App = () => {
     messageHistoryStore.getSnapshot,
   );
 
-
   const isMobile = useIsMobile();
 
   /*
@@ -42,17 +42,37 @@ export const App = () => {
     <>
       {isReady && (
         <div className={styles.app}>
-          <div className={`${styles.backdrop} ${isMobileSideBarOpen ? styles.isOpen : ''}`} onClick={() => setIsMobileSideBarOpen(false)}></div>
-          <div className={`${styles.sidebar} ${isMobileSideBarOpen ? styles.isOpen : ''} ${isDesktopSideBarHidden ? styles.isHidden : ''}`}>
-
+          <div
+            className={`${styles.backdrop} ${isMobileSideBarOpen ? styles.isOpen : ''}`}
+            onClick={() => setIsMobileSideBarOpen(false)}
+          ></div>
+          <div
+            className={`${styles.sidebar} ${isMobileSideBarOpen ? styles.isOpen : ''} ${isDesktopSideBarHidden ? styles.isHidden : ''}`}
+          >
             <div className={styles.sidebarHeader}>
-              <KavaAILogo height={20}/>
-              { isMobile &&
-              <X className={styles.closeIcon} onClick={() => setIsMobileSideBarOpen(false) }/>
-              }
-              { !isMobile &&
-              <PanelLeftClose className={styles.panelClose} onClick={() => setIsDesktopSideBarHidden(true) }/>
-              }
+              <KavaAILogo height={20} />
+              {isMobile && (
+                <ButtonIcon
+                  icon={CloseX}
+                  tooltip={{
+                    text: 'Close Menu',
+                    position: 'bottom',
+                  }}
+                  aria-label="Close Menu"
+                  onClick={() => setIsMobileSideBarOpen(false)}
+                />
+              )}
+              {!isMobile && (
+                <ButtonIcon
+                  icon={PanelLeftClose}
+                  tooltip={{
+                    text: 'Close Menu',
+                    position: 'bottom',
+                  }}
+                  aria-label="Close Menu"
+                  onClick={() => setIsDesktopSideBarHidden(true)}
+                />
+              )}
             </div>
           </div>
 
@@ -63,9 +83,9 @@ export const App = () => {
               messages={messages}
               onSubmit={handleChatCompletion}
               onReset={handleReset}
-              onMenu={() => setIsMobileSideBarOpen(true) }
+              onMenu={() => setIsMobileSideBarOpen(true)}
               onNewChat={() => {}}
-              onPanelOpen={() => setIsDesktopSideBarHidden(false) }
+              onPanelOpen={() => setIsDesktopSideBarHidden(false)}
               isPanelOpen={!isDesktopSideBarHidden}
               onCancel={handleCancel}
             />
