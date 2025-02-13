@@ -301,7 +301,7 @@ const HistoryItem = memo(
                 ) : (
                   <>
                     <Pencil size={16} />
-                    Edit
+                    Rename
                   </>
                 )}
               </button>
