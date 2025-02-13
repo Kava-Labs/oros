@@ -68,6 +68,7 @@ const SearchModal = ({
       <button
         className={styles.iconButton}
         onClick={() => setIsOpen(true)}
+        data-testid="search-conversation-button"
         aria-label="Search conversations"
       >
         <Search size={20} />
@@ -108,6 +109,7 @@ const SearchModal = ({
                       <h6 className={styles.timeGroupTitle}>{timeGroup}</h6>
                       {conversations.map((conversation) => (
                         <div
+                          data-testid="search-chat-history-entry"
                           key={conversation.id}
                           className={`${styles.conversationItem} ${
                             messageHistoryStore.getConversationID() ===

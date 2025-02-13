@@ -52,7 +52,7 @@ const NavBar = ({ chatHistoryOpen, setChatHistoryOpen }: NavBarProps) => {
           {isMobile && (
             <div
               onClick={startNewChat}
-              data-testid="mobile-new-chat-button"
+              data-testid="new-chat-button"
               className={styles.newChatIcon}
             >
               <NewChatIcon />

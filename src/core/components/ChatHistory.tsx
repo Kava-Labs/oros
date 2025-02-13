@@ -44,6 +44,7 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
       setConversations(storedConversations);
     };
     load();
+    // we have to poll local storage
     const id = setInterval(load, 1000);
     return () => {
       clearInterval(id);
