@@ -1,0 +1,10 @@
+.newChatButton {
+  display: flex;
+}
+
+@media (max-width: 767px) {
+  /* Only apply margin-left: auto on mobile */
+  .newChatButton {
+    margin-left: auto;
+  }
+}
