@@ -4,6 +4,7 @@ import ModelSelector from './ModelSelector';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
 import NewChatIcon from '../assets/NewChatIcon';
 import { PanelLeftOpen } from 'lucide-react';
+import ButtonIcon from './ButtonIcon';
 
 interface NavBarProps {
   onMenu(): void;
@@ -23,8 +24,14 @@ export const NavBar = ({
 
   return (
     <div className={`${styles.nav} ${showPanelOpen ? '' : ''}`}>
-      <PanelLeftOpen
+      <ButtonIcon
+        icon={PanelLeftOpen}
         className={`${styles.panelOpen} ${showPanelOpen ? styles.showPanelOpen : ''}`}
+        tooltip={{
+          text: 'Open Menu',
+          position: 'bottom',
+        }}
+        aria-label="Open Menu"
         onClick={onPanelOpen}
       />
 

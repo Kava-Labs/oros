@@ -38,9 +38,6 @@
 }
 
 .panelOpen {
-  height: 20px;
-  width: 20px;
-  color: var(--colors-textSecondary);
   display: none;
   visibility: hidden;
   opacity: 0;
@@ -48,15 +45,6 @@
   transition:
     opacity 0.1s,
     visibility 0.1s;
-
-  &:hover {
-    cursor: pointer;
-    color: white;
-  }
-
-  &:active {
-    opacity: 0.6;
-  }
 }
 
 .panelOpen.showPanelOpen {

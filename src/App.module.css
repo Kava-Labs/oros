@@ -37,26 +37,11 @@
   padding-right: var(--spacing-md);
 }
 
-.sidebarHeader .panelClose {
-  &:hover {
-    cursor: pointer;
-    color: white;
-  }
-
-  &:active {
-    opacity: 0.6;
-  }
-}
-
 .closeIcon {
-  height: 20px;
-  width: 20px;
   color: var(--colors-textSecondary);
 }
 
 .panelClose {
-  height: 20px;
-  width: 20px;
   color: var(--colors-textSecondary);
 }
 
