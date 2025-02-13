@@ -2,9 +2,7 @@ import {
   blockchainModels,
   SupportedBlockchainModels,
 } from '../../features/blockchain/config/models';
-import {
-  reasoningModels,
-} from '../../features/reasoning/config/models';
+import { reasoningModels } from '../../features/reasoning/config/models';
 import { ModelConfig, ModelRegistry, SupportedModels } from '../types/models';
 
 export const MODEL_REGISTRY: ModelRegistry = {
@@ -44,9 +42,11 @@ export const getAllModels = (): ModelConfig[] => {
 
 const defaultModelFromQueryParams = () => {
   const params = new URLSearchParams(new URL(window.location.href).search);
-  const wantedModel = params.get('defaultModel');
+  let wantedModel = params.get('defaultModel');
 
   if (wantedModel) {
+    if (wantedModel.includes("'")) wantedModel = wantedModel.replace(/'/g, '');
+    if (wantedModel.includes('"')) wantedModel = wantedModel.replace(/"/g, '');
     for (const model of Object.values(blockchainModels)) {
       if (model.name === wantedModel) return model.id;
       if (model.id === wantedModel) return model.id;
