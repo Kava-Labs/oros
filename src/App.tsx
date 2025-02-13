@@ -51,7 +51,7 @@ export const App = () => {
           >
             <div className={styles.sidebarHeader}>
               <KavaAILogo height={20} />
-              {isMobile && (
+              {isMobile && isMobileSideBarOpen && (
                 <ButtonIcon
                   icon={CloseX}
                   tooltip={{
@@ -62,7 +62,7 @@ export const App = () => {
                   onClick={() => setIsMobileSideBarOpen(false)}
                 />
               )}
-              {!isMobile && (
+              {!isMobile && !isDesktopSideBarHidden && (
                 <ButtonIcon
                   icon={PanelLeftClose}
                   tooltip={{
