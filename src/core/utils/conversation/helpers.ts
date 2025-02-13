@@ -177,8 +177,8 @@ export const groupAndFilterConversations = (
  * @param {ConversationHistory} conversation - The conversation history object to extract content from
  * @param {string} [searchTerm=''] - Optional search term to find matching content
  * @returns {string} A snippet of up to 100 characters that either:
- * - Starts with the matching search term, if found
- * - Shows the first user message if no search match or searching by title
+ * - Shows up to 3 words before the matching search term and the content after it
+ * - Shows first user message if search term is empty or only matches the title
  * - Returns empty string if no content is found
  */
 export const formatContentSnippet = (
@@ -201,10 +201,21 @@ export const formatContentSnippet = (
       const content = Array.isArray(matchingMessage.content)
         ? matchingMessage.content.map((part) => part).join('')
         : matchingMessage.content;
+
       const searchIndex = content
         .toLowerCase()
         .indexOf(searchTerm.toLowerCase());
-      return content.slice(searchIndex, searchIndex + 100);
+
+      // Find start of snippet considering up to 3 words before match
+      let snippetStart = searchIndex;
+      if (searchIndex > 0) {
+        const beforeMatch = content.slice(0, searchIndex).trim();
+        const precedingWords = beforeMatch.split(' ').slice(-3);
+        snippetStart = searchIndex - (precedingWords.join(' ').length + 1);
+        if (snippetStart < 0) snippetStart = 0;
+      }
+
+      return content.slice(snippetStart, snippetStart + 100).trim();
     }
   }
 

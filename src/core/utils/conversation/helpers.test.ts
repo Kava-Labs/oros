@@ -245,7 +245,7 @@ describe('groupAndFilterConversations', () => {
   });
 });
 
-describe('formatContentSnippet', () => {
+describe.only('formatContentSnippet', () => {
   const mockConversation: ConversationHistory = {
     id: 'test-id',
     title: 'Test Conversation',
@@ -271,9 +271,37 @@ describe('formatContentSnippet', () => {
     ],
   };
 
-  it('returns snippet starting with search term when found', () => {
-    const result = formatContentSnippet(mockConversation, 'assistant');
-    expect(result).toBe('assistant response with searchable content');
+  it('returns snippet starting with search term when found at start of message', () => {
+    const result = formatContentSnippet(mockConversation, 'First');
+    expect(result).toBe('First user message');
+  });
+
+  it('includes up to 3 words before search term when found mid-message', () => {
+    const conversationWithMidMatch: ConversationHistory = {
+      ...mockConversation,
+      conversation: [
+        {
+          role: 'assistant',
+          content: 'The quick brown fox jumps over the lazy dog',
+        },
+      ],
+    };
+    const result = formatContentSnippet(conversationWithMidMatch, 'jumps');
+    expect(result).toBe('quick brown fox jumps over the lazy dog');
+  });
+
+  it('includes fewer preceding words if not enough before match', () => {
+    const conversationWithShortPrefix: ConversationHistory = {
+      ...mockConversation,
+      conversation: [
+        {
+          role: 'assistant',
+          content: 'quick brown jumps over',
+        },
+      ],
+    };
+    const result = formatContentSnippet(conversationWithShortPrefix, 'jumps');
+    expect(result).toBe('quick brown jumps over');
   });
 
   it('returns first user message when no search term is provided (initial state before user types and all histories are shown)', () => {
@@ -287,8 +315,18 @@ describe('formatContentSnippet', () => {
   });
 
   it('is case insensitive for search matches', () => {
-    const result = formatContentSnippet(mockConversation, 'ASSISTANT');
-    expect(result).toBe('assistant response with searchable content');
+    let result = formatContentSnippet(mockConversation, 'JUMPS');
+    const conversationWithMidMatch: ConversationHistory = {
+      ...mockConversation,
+      conversation: [
+        {
+          role: 'assistant',
+          content: 'The quick brown fox jumps over the lazy dog',
+        },
+      ],
+    };
+    result = formatContentSnippet(conversationWithMidMatch, 'JUMPS');
+    expect(result).toBe('quick brown fox jumps over the lazy dog');
   });
 
   it('truncates long matches to 100 characters', () => {
@@ -297,12 +335,12 @@ describe('formatContentSnippet', () => {
       conversation: [
         {
           role: 'assistant',
-          content: 'match ' + 'a'.repeat(200),
+          content: 'preceding words match ' + 'a'.repeat(200),
         },
       ],
     };
     const result = formatContentSnippet(longConversation, 'match');
     expect(result.length).toBe(100);
-    expect(result.startsWith('match')).toBe(true);
+    expect(result).toContain('preceding words match');
   });
 });
