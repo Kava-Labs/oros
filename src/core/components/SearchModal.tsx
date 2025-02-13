@@ -3,7 +3,10 @@ import { Search, X } from 'lucide-react';
 import styles from './SearchModal.module.css';
 import { ConversationHistory } from '../context/types';
 import { useAppContext } from '../context/useAppContext';
-import { groupAndFilterConversations } from '../utils/conversation/helpers';
+import {
+  formatConversationTitle,
+  groupAndFilterConversations,
+} from '../utils/conversation/helpers';
 
 interface SearchModalProps {
   conversations: ConversationHistory[];
@@ -46,10 +49,10 @@ const SearchModal = ({
     };
   }, [isOpen]);
 
-  // Modify the grouping logic to handle empty search term
-  const groupedConversations = searchTerm
-    ? groupAndFilterConversations(conversations, searchTerm)
-    : { Recent: conversations.sort((a, b) => b.lastSaved - a.lastSaved) };
+  const groupedConversations = groupAndFilterConversations(
+    conversations,
+    searchTerm,
+  );
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
@@ -132,7 +135,7 @@ const SearchModal = ({
                           onClick={() => handleConversationClick(conversation)}
                         >
                           <span className={styles.conversationTitle}>
-                            {conversation.title}
+                            {formatConversationTitle(conversation.title, 60)}
                           </span>
                           <p className={styles.conversationSnippet}>
                             {searchTerm

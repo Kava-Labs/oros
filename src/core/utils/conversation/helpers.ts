@@ -75,13 +75,14 @@ export const groupConversationsByTime = (
  * Groups and filters conversations based on a search term
  * @param conversations - Array of conversation histories
  * @param searchTerm - Optional search term to filter conversations
+ * @param snippetLength - Optional number of words to include in the snippet (default: 6)
  * @returns An object with time period keys and filtered, sorted conversations as values
  */
 export const groupAndFilterConversations = (
   conversations: ConversationHistory[],
   searchTerm = '',
+  snippetLength = 6,
 ): Record<string, ConversationHistory[]> => {
-  // If no search term, return all conversations sorted by last saved
   if (!searchTerm) {
     return conversations.reduce(
       (groups, conv) => {
@@ -94,7 +95,6 @@ export const groupAndFilterConversations = (
     );
   }
 
-  // Filter and enhance conversations with search
   const lowerSearchTerm = searchTerm.toLowerCase();
   const filteredConversations = conversations
     .map((conv) => {
@@ -115,10 +115,8 @@ export const groupAndFilterConversations = (
           msg.content.toLowerCase().includes(lowerSearchTerm),
       );
 
-      // If no match, return null
       if (!titleMatch && !contentMatch) return null;
 
-      // Find and create displayed portion
       let displayedPortion = '';
       if (contentMatch) {
         // Find the first message with a match and extract surrounding context
@@ -133,25 +131,27 @@ export const groupAndFilterConversations = (
             );
 
             // Get a snippet around the matched word
-            const start = Math.max(0, matchIndex - 2);
-            displayedPortion = words.slice(start, start + 6).join(' ');
+            const snippetStart = Math.max(0, matchIndex - 2);
+            displayedPortion = words
+              .slice(snippetStart, snippetStart + snippetLength)
+              .join(' ');
             break;
           }
         }
       } else if (titleMatch) {
-        // If only title matches, get first user message snippet
+        // If only title matches, set the first user message as the snippet
         const firstUserMessage = messages.find((msg) => msg.role === 'user');
         if (firstUserMessage && typeof firstUserMessage.content === 'string') {
           displayedPortion = firstUserMessage.content
             .split(' ')
-            .slice(0, 6)
+            .slice(0, snippetLength)
             .join(' ');
         }
       }
 
       return {
         ...conv,
-        displayedTitle: conv.title,
+        displayedTitle: formatConversationTitle(conv.title, 30),
         displayedPortion: displayedPortion || '',
       };
     })
