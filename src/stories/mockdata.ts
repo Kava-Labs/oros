@@ -137,7 +137,7 @@ Lorem ipsum dolor sit amet [OpenAI][openai-link] consectetur.
 | adipiscing    | elit           | sed do       |
 | eiusmod       | tempor         | incididunt   |
 
----
+
 
 ## 8. Strikethrough
 
