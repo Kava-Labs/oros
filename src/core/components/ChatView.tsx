@@ -171,30 +171,31 @@ export const ChatView = ({
         <NavBar onPanelOpen={onPanelOpen} isPanelOpen={isPanelOpen} onMenu={onMenu} onNewChat={onNewChat} />
       </div>
 
-        <div ref={containerRef} className={`${styles.scrollArea} ${hasMessages ? styles.expand : ''}`}>
-          <div className={styles.scrollContent}>
-
-          { hasMessages && (
-              <Conversation
-                messages={messages}
-                onRendered={handleContentRendered}
-              />
-          )}
+        <div ref={containerRef} className={`${styles.scrollArea} ${hasMessages ? styles.fullHeight : ''}`}>
+          <div className={`${styles.scrollContent}`}>
+            { hasMessages && (
+                <Conversation
+                  messages={messages}
+                  onRendered={handleContentRendered}
+                />
+            )}
+            </div>
           </div>
-        </div>
 
-          <div className={`${styles.controlsContainer} ${hasMessages ? styles.hasMessages : ''}` } data-testid="controls">
+          <div className={`${styles.controlsContainer} ${hasMessages ? styles.positionSticky : ''}` } data-testid="controls">
             { !hasMessages &&
               <div className={styles.startContent}>
-                {Logo && <Logo width={isMobile ? 210 : 292} />}
-                <h5 className={styles.introText}>{introText}</h5>
+                <div className={styles.startLogoContainer}>
+                  {Logo && <Logo width={"100%"} height="auto" className={styles.startLogo} />}
+                </div>
+                <h1 className={styles.introText}>{introText}</h1>
               </div>
             }
 
             <div className={styles.controls}>
               <div className={styles.inputContainer}>
                 <textarea
-                  id={styles.input}
+                  className={styles.input}
                   data-testid="chat-view-input"
                   rows={1}
                   value={inputValue}
@@ -207,7 +208,7 @@ export const ChatView = ({
                 <button
                   data-testid="chat-view-button"
                   ref={buttonRef}
-                  id={styles.sendChatButton}
+                  className={styles.sendChatButton}
                   type="submit"
                   onClick={handleButtonClick}
                   aria-label="Send Chat"
@@ -216,66 +217,11 @@ export const ChatView = ({
                 </button>
               </div>
 
-              <span id={styles.importantInfo} data-testid="importantInfo">
+              <span className={styles.importantInfo} data-testid="importantInfo">
                 <p>{cautionText}</p>
               </span>
         </div>
       </div>
     </div>
   );
-
-  /*return (
-    <div
-      className={styles.chatView}
-      data-testid="chatview"
-    >
-      {!isMobile && (
-        <div className={styles.modelSelectorContainer}>
-          <ModelSelector />
-        </div>
-      )}
-      <div
-        ref={containerRef}
-        id={styles.scrollContent}
-        data-testid="scrollContent"
-      >
-        {hasMessages && (
-          <>
-            {isIframe && (
-              <div id={styles.stickyHeader}>
-                <button
-                  id={styles.resetButton}
-                  aria-label="Reset Chat"
-                  onClick={onReset}
-                >
-                  <ResetChatIcon color={colors.accentTransparent} />
-                </button>
-              </div>
-            )}
-
-            <Conversation
-              messages={messages}
-              onRendered={handleContentRendered}
-            />
-          </>
-        )}
-
-        {!hasMessages && (
-          <div id={styles.startContainer}>
-            <div id={styles.start} data-testid="start">
-              {Logo && <Logo width={isMobile ? 210 : 292} />}
-              <h5 className={styles.introText}>{introText}</h5>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div
-        data-testid="controls"
-        className={hasMessages ? styles.inputNormal : styles.inputRaised}
-      >
-      </div>
-    </div>
-  );
-  */
 };
