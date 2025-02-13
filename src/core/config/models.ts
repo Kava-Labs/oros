@@ -4,7 +4,6 @@ import {
 } from '../../features/blockchain/config/models';
 import {
   reasoningModels,
-  SupportedReasoningModels,
 } from '../../features/reasoning/config/models';
 import { ModelConfig, ModelRegistry, SupportedModels } from '../types/models';
 
