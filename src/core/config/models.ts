@@ -40,6 +40,20 @@ export const getAllModels = (): ModelConfig[] => {
   ];
 };
 
-export const DEFAULT_MODEL_NAME = import.meta.env.VITE_FEAT_UPDATED_DESIGN
-  ? 'deepseek-r1'
-  : 'gpt-4o';
+const defaultModel = () => {
+  const params = new URLSearchParams(new URL(window.location.href).search);
+  const wantedModel = params.get('defaultModel');
+  if (
+    (wantedModel && wantedModel === 'deepseek-r1') ||
+    wantedModel === 'gpt-4o'
+  ) {
+    return wantedModel;
+  }
+  return null;
+};
+
+export const DEFAULT_MODEL_NAME = defaultModel()
+  ? defaultModel()!
+  : import.meta.env.VITE_FEAT_UPDATED_DESIGN
+    ? 'deepseek-r1'
+    : 'gpt-4o';
