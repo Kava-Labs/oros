@@ -171,3 +171,50 @@ export const groupAndFilterConversations = (
     {} as Record<string, ConversationHistory[]>,
   );
 };
+
+/**
+ * Formats a snippet of conversation content based on search criteria or defaults to first user message
+ * @param {ConversationHistory} conversation - The conversation history object to extract content from
+ * @param {string} [searchTerm=''] - Optional search term to find matching content
+ * @returns {string} A snippet of up to 100 characters that either:
+ * - Starts with the matching search term, if found
+ * - Shows the first user message if no search match or searching by title
+ * - Returns empty string if no content is found
+ */
+export const formatContentSnippet = (
+  conversation: ConversationHistory,
+  searchTerm: string = '',
+) => {
+  const messages =
+    conversation.conversation[0]?.role === 'system'
+      ? conversation.conversation.slice(1)
+      : conversation.conversation;
+
+  if (searchTerm) {
+    const matchingMessage = messages.find(
+      (msg) =>
+        typeof msg.content === 'string' &&
+        msg.content.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+
+    if (matchingMessage && matchingMessage.content) {
+      const content = Array.isArray(matchingMessage.content)
+        ? matchingMessage.content.map((part) => part).join('')
+        : matchingMessage.content;
+      const searchIndex = content
+        .toLowerCase()
+        .indexOf(searchTerm.toLowerCase());
+      return content.slice(searchIndex, searchIndex + 100);
+    }
+  }
+
+  const firstUserMessage = messages.find((msg) => msg.role === 'user');
+  if (firstUserMessage && firstUserMessage.content) {
+    const content = Array.isArray(firstUserMessage.content)
+      ? firstUserMessage.content.map((part) => part).join('')
+      : firstUserMessage.content;
+    return content.slice(0, 100);
+  }
+
+  return '';
+};

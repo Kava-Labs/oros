@@ -5,17 +5,13 @@ import { ConversationHistory } from '../context/types';
 import { useAppContext } from '../context/useAppContext';
 import {
   formatConversationTitle,
+  formatContentSnippet,
   groupAndFilterConversations,
 } from '../utils/conversation/helpers';
 
 interface SearchModalProps {
   conversations: ConversationHistory[];
   onConversationSelect: (conversation: ConversationHistory) => void;
-}
-
-interface FilteredConversation extends ConversationHistory {
-  displayedTitle: string;
-  displayedPortion: string;
 }
 
 const SearchModal = ({
@@ -67,22 +63,6 @@ const SearchModal = ({
     setSearchTerm('');
   };
 
-  const getDisplayedPortion = (conversation: ConversationHistory) => {
-    const messages =
-      conversation.conversation[0]?.role === 'system'
-        ? conversation.conversation.slice(1)
-        : conversation.conversation;
-
-    const firstUserMessage = messages.find((msg) => msg.role === 'user');
-    if (firstUserMessage && firstUserMessage.content) {
-      const content = Array.isArray(firstUserMessage.content)
-        ? firstUserMessage.content.map((part) => part).join('')
-        : firstUserMessage.content;
-      return content.slice(0, 100); // Show the first 100 characters
-    }
-    return '';
-  };
-
   return (
     <div className={styles.container}>
       <button
@@ -126,10 +106,10 @@ const SearchModal = ({
               ) : (
                 // Display grouped conversations
                 Object.entries(groupedConversations).map(
-                  ([timeGroup, convos]) => (
+                  ([timeGroup, conversations]) => (
                     <div key={timeGroup} className={styles.timeGroup}>
                       <h6 className={styles.timeGroupTitle}>{timeGroup}</h6>
-                      {convos.map((conversation) => (
+                      {conversations.map((conversation) => (
                         <div
                           data-testid="search-chat-history-entry"
                           key={conversation.id}
@@ -140,17 +120,13 @@ const SearchModal = ({
                             data-testid="search-history-title"
                             className={styles.conversationTitle}
                           >
-                            {formatConversationTitle(conversation.title, 60)}
+                            {formatConversationTitle(conversation.title, 50)}
                           </span>
                           <p
                             data-testid="search-history-content"
                             className={styles.conversationSnippet}
                           >
-                            {searchTerm
-                              ? (conversation as FilteredConversation)
-                                  .displayedPortion ||
-                                getDisplayedPortion(conversation)
-                              : getDisplayedPortion(conversation)}
+                            {formatContentSnippet(conversation, searchTerm)}
                           </p>
                         </div>
                       ))}

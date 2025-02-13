@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
+  formatContentSnippet,
   formatConversationTitle,
   getTimeGroup,
   groupAndFilterConversations,
@@ -235,5 +236,67 @@ describe('groupAndFilterConversations', () => {
     const filtered = groupAndFilterConversations(mockConversations, 'bitcoin');
     expect(filtered['Today'][0].title).toBe('Another Bitcoin Chat');
     expect(filtered['Today'][1].title).toBe('Bitcoin Discussion');
+  });
+});
+
+describe('formatContentSnippet', () => {
+  const mockConversation: ConversationHistory = {
+    id: 'test-id',
+    title: 'Test Conversation',
+    model: 'test-model',
+    lastSaved: Date.now(),
+    conversation: [
+      {
+        role: 'system',
+        content: 'System prompt that should be ignored',
+      },
+      {
+        role: 'user',
+        content: 'First user message',
+      },
+      {
+        role: 'assistant',
+        content: 'First assistant response with searchable content',
+      },
+      {
+        role: 'user',
+        content: 'Second user message with different content',
+      },
+    ],
+  };
+
+  it('returns snippet starting with search term when found', () => {
+    const result = formatContentSnippet(mockConversation, 'assistant');
+    expect(result).toBe('assistant response with searchable content');
+  });
+
+  it('returns first user message when no search term is provided (initial state before user types and all histories are shown)', () => {
+    const result = formatContentSnippet(mockConversation);
+    expect(result).toBe('First user message');
+  });
+
+  it('returns first user message when matching by title only', () => {
+    const result = formatContentSnippet(mockConversation, 'Test');
+    expect(result).toBe('First user message');
+  });
+
+  it('is case insensitive for search matches', () => {
+    const result = formatContentSnippet(mockConversation, 'ASSISTANT');
+    expect(result).toBe('assistant response with searchable content');
+  });
+
+  it('truncates long matches to 100 characters', () => {
+    const longConversation: ConversationHistory = {
+      ...mockConversation,
+      conversation: [
+        {
+          role: 'assistant',
+          content: 'match ' + 'a'.repeat(200),
+        },
+      ],
+    };
+    const result = formatContentSnippet(longConversation, 'match');
+    expect(result.length).toBe(100);
+    expect(result.startsWith('match')).toBe(true);
   });
 });
