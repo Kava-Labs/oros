@@ -145,13 +145,6 @@
   scrollbar-color: var(--colors-bgTertiary) var(--colors-bgPrimary);
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
-
-  mask-image: linear-gradient(
-          to top,
-          black 0,
-          black calc(100% - 60px),
-          transparent 100%
-  );
 }
 
 #conversation {
