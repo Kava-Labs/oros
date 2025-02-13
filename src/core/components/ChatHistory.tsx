@@ -1,6 +1,14 @@
 import styles from './ChatHistory.module.css';
 import { ConversationHistory } from '../context/types';
-import { useCallback, useEffect, useState, useMemo, memo } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useState,
+  useMemo,
+  memo,
+  Dispatch,
+  SetStateAction,
+} from 'react';
 import { useAppContext } from '../context/useAppContext';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
 import { TrashIcon } from '../assets/TrashIcon';
@@ -8,60 +16,14 @@ import KavaAILogo from '../assets/KavaAILogo';
 import { Pencil } from 'lucide-react';
 import { PenSquare } from 'lucide-react';
 import SearchModal from './SearchModal';
-import { formatConversationTitle } from '../utils/formatConversationTitle';
+import {
+  formatConversationTitle,
+  groupConversationsByTime,
+} from '../utils/conversation/helpers';
 
 interface ChatHistoryProps {
-  setChatHistoryOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setChatHistoryOpen: Dispatch<SetStateAction<boolean>>;
 }
-
-type GroupedConversations = {
-  [key: string]: ConversationHistory[];
-};
-
-const getTimeGroup = (timestamp: number): string => {
-  const now = new Date();
-  const diffDays = Math.floor(
-    (now.getTime() - timestamp) / (1000 * 60 * 60 * 24),
-  );
-
-  if (diffDays === 0) {
-    return 'Today';
-  } else if (diffDays === 1) {
-    return 'Yesterday';
-  } else if (diffDays <= 7) {
-    return 'Last week';
-  } else if (diffDays <= 14) {
-    return '2 weeks ago';
-  } else if (diffDays <= 21) {
-    return '3 weeks ago';
-  } else if (diffDays <= 28) {
-    return '4 weeks ago';
-  } else if (diffDays <= 60) {
-    return 'Last month';
-  } else if (diffDays <= 90) {
-    return '2 months ago';
-  } else {
-    const months = Math.floor(diffDays / 30);
-    return `${months} months ago`;
-  }
-};
-
-const groupConversations = (
-  conversations: ConversationHistory[],
-): GroupedConversations => {
-  const sortedConversations = [...conversations].sort(
-    (a, b) => b.lastSaved - a.lastSaved,
-  );
-
-  return sortedConversations.reduce((groups, conversation) => {
-    const timeGroup = getTimeGroup(conversation.lastSaved);
-    if (!groups[timeGroup]) {
-      groups[timeGroup] = [];
-    }
-    groups[timeGroup].push(conversation);
-    return groups;
-  }, {} as GroupedConversations);
-};
 
 export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
   const [conversations, setConversations] = useState<ConversationHistory[]>([]);
@@ -82,16 +44,16 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
       setConversations(storedConversations);
     };
     load();
-    // we have to poll local storage
     const id = setInterval(load, 1000);
     return () => {
       clearInterval(id);
     };
   }, []);
 
-  const groupedHistories = useMemo(() => {
-    return groupConversations(conversations);
-  }, [conversations]);
+  const groupedHistories = useMemo(
+    () => groupConversationsByTime(conversations),
+    [conversations],
+  );
 
   const startNewChat = useCallback(() => {
     thinkingStore.setText('');

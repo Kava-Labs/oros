@@ -3,7 +3,10 @@ import { Search, X } from 'lucide-react';
 import styles from './SearchModal.module.css';
 import { ConversationHistory } from '../context/types';
 import { useAppContext } from '../context/useAppContext';
-import { formatConversationTitle } from '../utils/formatConversationTitle';
+import {
+  formatConversationTitle,
+  groupAndFilterConversations,
+} from '../utils/conversation/helpers';
 
 interface SearchModalProps {
   conversations: ConversationHistory[];
@@ -42,39 +45,10 @@ const SearchModal = ({
     };
   }, [isOpen]);
 
-  const getTimeGroup = (timestamp: number): string => {
-    const now = new Date();
-    const diffDays = Math.floor(
-      (now.getTime() - timestamp) / (1000 * 60 * 60 * 24),
-    );
-
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays <= 7) return 'Last week';
-    if (diffDays <= 14) return '2 weeks ago';
-    if (diffDays <= 30) return 'Last month';
-    return 'Older';
-  };
-
-  const groupedConversations = conversations
-    // First sort all conversations by timestamp
-    .sort((a, b) => b.lastSaved - a.lastSaved)
-    // Then filter based on search
-    .filter((conv) =>
-      conv.title.toLowerCase().includes(searchTerm.toLowerCase()),
-    )
-    // Finally group them
-    .reduce(
-      (groups, conversation) => {
-        const timeGroup = getTimeGroup(conversation.lastSaved);
-        if (!groups[timeGroup]) {
-          groups[timeGroup] = [];
-        }
-        groups[timeGroup].push(conversation);
-        return groups;
-      },
-      {} as Record<string, ConversationHistory[]>,
-    );
+  const groupedConversations = groupAndFilterConversations(
+    conversations,
+    searchTerm,
+  );
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
