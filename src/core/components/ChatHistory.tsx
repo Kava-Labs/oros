@@ -12,7 +12,6 @@ import {
 import { useAppContext } from '../context/useAppContext';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
 import { TrashIcon } from '../assets/TrashIcon';
-import KavaAILogo from '../assets/KavaAILogo';
 import { Pencil } from 'lucide-react';
 import { PenSquare } from 'lucide-react';
 import SearchModal from './SearchModal';
@@ -101,11 +100,6 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
 
   return (
     <div className={styles.chatHistoryContainer}>
-      {!isMobile && (
-        <div className={styles.desktopLogo}>
-          <KavaAILogo />
-        </div>
-      )}
       <div className={styles.searchControls}>
         <SearchModal
           conversations={conversations}
@@ -125,6 +119,7 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
           </div>
         )}
       </div>
+
       <div data-testid="chat-history-section">
         {Object.entries(groupedHistories).map(([timeGroup, conversations]) => (
           <div key={timeGroup} className={styles.timeGroup}>

@@ -1,71 +1,42 @@
 .nav {
   height: 100%;
   background: var(--colors-bgPrimary);
-
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-
   padding-left: var(--spacing-md);
   padding-right: var(--spacing-md);
+}
+
+.leftSection {
+  display: flex;
+  align-items: center;
+}
+
+.desktopControls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
 }
 
 .menu {
   width: 20px;
   height: 16px;
-
   display: flex;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
+}
 
-  &:hover {
-    cursor: pointer;
+@media (max-width: 767px) {
+  .desktopControls {
+    display: none;
   }
-}
-
-.newChat {
-  width: 20px;
-  height: 21px;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  &:hover {
-    cursor: pointer;
-  }
-}
-
-.panelOpen {
-  display: none;
-  visibility: hidden;
-  opacity: 0;
-
-  transition:
-    opacity 0.1s,
-    visibility 0.1s;
-}
-
-.panelOpen.showPanelOpen {
-  opacity: 1;
-  visibility: visible;
-
-  transition:
-    opacity 0.3s,
-    visibility 0s 0.1s;
 }
 
 @media (min-width: 768px) {
-  .panelOpen {
-    display: block;
-  }
-
   .menu {
-    display: none;
-  }
-
-  .newChat {
     display: none;
   }
 }
