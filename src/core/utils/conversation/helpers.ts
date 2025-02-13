@@ -80,18 +80,57 @@ export const groupConversationsByTime = (
 export const groupAndFilterConversations = (
   conversations: ConversationHistory[],
   searchTerm = '',
-): GroupedConversations => {
+) => {
+  if (!searchTerm) return {};
+
   return conversations
     .sort((a, b) => b.lastSaved - a.lastSaved)
-    .filter((conv) =>
-      conv.title.toLowerCase().includes(searchTerm.toLowerCase()),
-    )
-    .reduce((groups, conversation) => {
-      const timeGroup = getTimeGroup(conversation.lastSaved);
-      if (!groups[timeGroup]) {
-        groups[timeGroup] = [];
+    .map((conv) => {
+      // If conversation is invalid (null/undefined), skip it
+      if (!conv) return null;
+
+      const lowerSearchTerm = searchTerm.toLowerCase();
+      const messages =
+        conv.conversation[0]?.role === 'system'
+          ? conv.conversation.slice(1)
+          : conv.conversation;
+
+      for (const msg of messages) {
+        if (msg.content && typeof msg.content === 'string') {
+          const contentLower = msg.content.toLowerCase();
+          if (contentLower.includes(lowerSearchTerm)) {
+            const words = msg.content.split(' ');
+            const start = words.findIndex((word) =>
+              word.toLowerCase().includes(lowerSearchTerm),
+            );
+            const displayedPortion = words.slice(start, start + 6).join(' ');
+            return { ...conv, displayedTitle: conv.title, displayedPortion };
+          }
+        }
       }
-      groups[timeGroup].push(conversation);
+      if (conv.title.toLowerCase().includes(lowerSearchTerm)) {
+        const snippet = conv.conversation
+          .map((m) => m.content ?? '')
+          .join(' ')
+          .split(' ')
+          .slice(0, 6)
+          .join(' ');
+        return {
+          ...conv,
+          displayedTitle: conv.title,
+          displayedPortion: snippet,
+        };
+      }
+      return null;
+    })
+    .filter(Boolean) // Removes any null or undefined values from the array
+    .reduce((groups: GroupedConversations, conv) => {
+      // Check if conv is null before accessing properties
+      if (conv) {
+        const timeGroup = getTimeGroup(conv.lastSaved);
+        if (!groups[timeGroup]) groups[timeGroup] = [];
+        groups[timeGroup].push(conv);
+      }
       return groups;
     }, {} as GroupedConversations);
 };

@@ -3,14 +3,17 @@ import { Search, X } from 'lucide-react';
 import styles from './SearchModal.module.css';
 import { ConversationHistory } from '../context/types';
 import { useAppContext } from '../context/useAppContext';
-import {
-  formatConversationTitle,
-  groupAndFilterConversations,
-} from '../utils/conversation/helpers';
+import { groupAndFilterConversations } from '../utils/conversation/helpers';
 
 interface SearchModalProps {
   conversations: ConversationHistory[];
   onConversationSelect: (conversation: ConversationHistory) => void;
+}
+
+// Define a type for the returned filtered conversations
+interface FilteredConversation extends ConversationHistory {
+  displayedTitle: string;
+  displayedPortion: string;
 }
 
 const SearchModal = ({
@@ -36,7 +39,6 @@ const SearchModal = ({
 
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
-      // Focus input when modal opens
       inputRef.current?.focus();
     }
 
@@ -48,7 +50,7 @@ const SearchModal = ({
   const groupedConversations = groupAndFilterConversations(
     conversations,
     searchTerm,
-  );
+  ) as Record<string, FilteredConversation[]>;
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
@@ -57,8 +59,8 @@ const SearchModal = ({
     }
   };
 
-  const handleConversationClick = (conversation: ConversationHistory) => {
-    onConversationSelect(conversation);
+  const handleConversationClick = (conversation: FilteredConversation) => {
+    onConversationSelect({ ...conversation, id: conversation.id });
     setIsOpen(false);
     setSearchTerm('');
   };
@@ -68,7 +70,6 @@ const SearchModal = ({
       <button
         className={styles.iconButton}
         onClick={() => setIsOpen(true)}
-        data-testid="search-conversation-button"
         aria-label="Search conversations"
       >
         <Search size={20} />
@@ -104,24 +105,21 @@ const SearchModal = ({
                 <div className={styles.noResults}>No results</div>
               ) : (
                 Object.entries(groupedConversations).map(
-                  ([timeGroup, conversations]) => (
+                  ([timeGroup, convos]) => (
                     <div key={timeGroup} className={styles.timeGroup}>
                       <h6 className={styles.timeGroupTitle}>{timeGroup}</h6>
-                      {conversations.map((conversation) => (
+                      {convos.map((conversation) => (
                         <div
-                          data-testid="search-chat-history-entry"
                           key={conversation.id}
-                          className={`${styles.conversationItem} ${
-                            messageHistoryStore.getConversationID() ===
-                            conversation.id
-                              ? styles.selected
-                              : ''
-                          }`}
+                          className={`${styles.conversationItem} ${messageHistoryStore.getConversationID() === conversation.id ? styles.selected : ''}`}
                           onClick={() => handleConversationClick(conversation)}
                         >
                           <span className={styles.conversationTitle}>
-                            {formatConversationTitle(conversation.title, 50)}
+                            {conversation.displayedTitle}
                           </span>
+                          <p className={styles.conversationSnippet}>
+                            {conversation.displayedPortion}
+                          </p>
                         </div>
                       ))}
                     </div>
