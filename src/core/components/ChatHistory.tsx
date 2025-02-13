@@ -33,7 +33,6 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
     thinkingStore,
     setIsRequesting,
   } = useAppContext();
-  const isMobile = useIsMobile();
 
   useEffect(() => {
     const load = () => {

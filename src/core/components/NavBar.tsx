@@ -1,4 +1,3 @@
-// NavBar.tsx
 import styles from './NavBar.module.css';
 import HamburgerIcon from '../assets/HamburgerIcon';
 import ModelSelector from './ModelSelector';
