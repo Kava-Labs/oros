@@ -15,7 +15,7 @@ import { TrashIcon } from '../assets/TrashIcon';
 import KavaAILogo from '../assets/KavaAILogo';
 import { Pencil } from 'lucide-react';
 import { PenSquare } from 'lucide-react';
-import SearchModal from './SearchModal';
+import SearchChatHistory from './SearchChatHistory';
 import {
   formatConversationTitle,
   groupConversationsByTime,
@@ -107,7 +107,7 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
         </div>
       )}
       <div className={styles.searchControls}>
-        <SearchModal
+        <SearchChatHistory
           conversations={conversations}
           onConversationSelect={handleChatHistoryClick}
         />

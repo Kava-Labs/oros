@@ -15,7 +15,7 @@ interface SearchModalProps {
   onConversationSelect: (conversation: ConversationHistory) => void;
 }
 
-const SearchModal = ({
+const SearchChatHistory = ({
   conversations,
   onConversationSelect,
 }: SearchModalProps) => {
@@ -150,4 +150,4 @@ const SearchModal = ({
   );
 };
 
-export default SearchModal;
+export default SearchChatHistory;
