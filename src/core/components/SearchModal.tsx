@@ -86,6 +86,7 @@ const SearchModal = ({
   return (
     <div className={styles.container}>
       <button
+        data-testid="search-conversation-button"
         className={styles.iconButton}
         onClick={() => setIsOpen(true)}
         aria-label="Search conversations"
@@ -130,14 +131,21 @@ const SearchModal = ({
                       <h6 className={styles.timeGroupTitle}>{timeGroup}</h6>
                       {convos.map((conversation) => (
                         <div
+                          data-testid="search-chat-history-entry"
                           key={conversation.id}
                           className={`${styles.conversationItem} ${messageHistoryStore.getConversationID() === conversation.id ? styles.selected : ''}`}
                           onClick={() => handleConversationClick(conversation)}
                         >
-                          <span className={styles.conversationTitle}>
+                          <span
+                            data-testid="search-history-title"
+                            className={styles.conversationTitle}
+                          >
                             {formatConversationTitle(conversation.title, 60)}
                           </span>
-                          <p className={styles.conversationSnippet}>
+                          <p
+                            data-testid="search-history-content"
+                            className={styles.conversationSnippet}
+                          >
                             {searchTerm
                               ? (conversation as FilteredConversation)
                                   .displayedPortion ||

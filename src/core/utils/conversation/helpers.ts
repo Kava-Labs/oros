@@ -118,8 +118,9 @@ export const groupAndFilterConversations = (
       if (!titleMatch && !contentMatch) return null;
 
       let displayedPortion = '';
+      // Prioritize content match if exists
       if (contentMatch) {
-        // Find the first message with a match and extract surrounding context
+        // Find the first message with a match and ensure the snippet starts with the matched term
         for (const msg of messages) {
           if (
             typeof msg.content === 'string' &&
@@ -130,16 +131,18 @@ export const groupAndFilterConversations = (
               word.toLowerCase().includes(lowerSearchTerm),
             );
 
-            // Get a snippet around the matched word
-            const snippetStart = Math.max(0, matchIndex - 2);
+            // Calculate snippet start to ensure matched term is at the beginning
+            const snippetStart = Math.max(0, matchIndex);
             displayedPortion = words
               .slice(snippetStart, snippetStart + snippetLength)
               .join(' ');
             break;
           }
         }
-      } else if (titleMatch) {
-        // If only title matches, set the first user message as the snippet
+      }
+
+      // If no content match or displayedPortion is empty, use first user message
+      if (!displayedPortion) {
         const firstUserMessage = messages.find((msg) => msg.role === 'user');
         if (firstUserMessage && typeof firstUserMessage.content === 'string') {
           displayedPortion = firstUserMessage.content
