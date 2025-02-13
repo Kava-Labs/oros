@@ -180,7 +180,6 @@
   }
 }
 
-
 #inputContainer {
   width: 100%;
   max-width: 768px;
@@ -347,7 +346,38 @@ li {
   z-index: 100;
 }
 
-.left h1, .left h2, .left h3, .left h4, .left h5, .left h6,
-.right h1, .right h2, .right h3, .right h4, .right h5, .right h6 {
+.left h1,
+.left h2,
+.left h3,
+.left h4,
+.left h5,
+.left h6,
+.right h1,
+.right h2,
+.right h3,
+.right h4,
+.right h5,
+.right h6 {
   margin-top: 2rem;
+}
+
+.left table {
+  background-color: transparent;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.left td,
+th {
+  border-right: 0.1rem solid #dcdcdc;
+  padding: 0.8rem 1.2rem;
+}
+
+.left td {
+  border-top: 0.1rem solid #dcdcdc;
+}
+
+.left td:last-child,
+th:last-child {
+  border-right: 0;
 }
