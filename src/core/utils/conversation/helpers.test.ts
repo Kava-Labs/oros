@@ -245,7 +245,7 @@ describe('groupAndFilterConversations', () => {
   });
 });
 
-describe.only('formatContentSnippet', () => {
+describe('formatContentSnippet', () => {
   const mockConversation: ConversationHistory = {
     id: 'test-id',
     title: 'Test Conversation',

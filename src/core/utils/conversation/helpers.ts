@@ -78,98 +78,38 @@ export const groupConversationsByTime = (
  * @param snippetLength - Optional number of words to include in the snippet (default: 6)
  * @returns An object with time period keys and filtered, sorted conversations as values
  */
+/**
+ * Groups and filters conversations based on search term
+ * @param conversations Array of conversations to process
+ * @param searchTerm Optional term to filter by
+ * @returns Time-grouped conversations, filtered by search term if provided
+ */
 export const groupAndFilterConversations = (
   conversations: ConversationHistory[],
   searchTerm = '',
-  snippetLength = 6,
-): Record<string, ConversationHistory[]> => {
+): GroupedConversations => {
   if (!searchTerm) {
-    return conversations.reduce(
-      (groups, conv) => {
-        const timeGroup = getTimeGroup(conv.lastSaved);
-        if (!groups[timeGroup]) groups[timeGroup] = [];
-        groups[timeGroup].push(conv);
-        return groups;
-      },
-      {} as Record<string, ConversationHistory[]>,
-    );
+    return groupConversationsByTime(conversations);
   }
 
   const lowerSearchTerm = searchTerm.toLowerCase();
-  const filteredConversations = conversations
-    .map((conv) => {
-      // Skip the system message (the first element) when checking the conversation content
-      const messages =
-        conv.conversation[0]?.role === 'system'
-          ? conv.conversation.slice(1)
-          : conv.conversation;
+  const filteredConversations = conversations.filter((conv) => {
+    const messages =
+      conv.conversation[0]?.role === 'system'
+        ? conv.conversation.slice(1)
+        : conv.conversation;
 
-      // Check for title match
-      const titleMatch = conv.title.toLowerCase().includes(lowerSearchTerm);
-
-      // Check for content match
-      const contentMatch = messages.some(
+    return (
+      conv.title.toLowerCase().includes(lowerSearchTerm) ||
+      messages.some(
         (msg) =>
-          msg.role !== 'system' &&
           typeof msg.content === 'string' &&
           msg.content.toLowerCase().includes(lowerSearchTerm),
-      );
+      )
+    );
+  });
 
-      if (!titleMatch && !contentMatch) return null;
-
-      let displayedPortion = '';
-      // Prioritize content match if exists
-      if (contentMatch) {
-        // Find the first message with a match and ensure the snippet starts with the matched term
-        for (const msg of messages) {
-          if (
-            typeof msg.content === 'string' &&
-            msg.content.toLowerCase().includes(lowerSearchTerm)
-          ) {
-            const words = msg.content.split(' ');
-            const matchIndex = words.findIndex((word) =>
-              word.toLowerCase().includes(lowerSearchTerm),
-            );
-
-            // Calculate snippet start to ensure matched term is at the beginning
-            const snippetStart = Math.max(0, matchIndex);
-            displayedPortion = words
-              .slice(snippetStart, snippetStart + snippetLength)
-              .join(' ');
-            break;
-          }
-        }
-      }
-
-      // If no content match or displayedPortion is empty, use first user message
-      if (!displayedPortion) {
-        const firstUserMessage = messages.find((msg) => msg.role === 'user');
-        if (firstUserMessage && typeof firstUserMessage.content === 'string') {
-          displayedPortion = firstUserMessage.content
-            .split(' ')
-            .slice(0, snippetLength)
-            .join(' ');
-        }
-      }
-
-      return {
-        ...conv,
-        displayedTitle: formatConversationTitle(conv.title, 30),
-        displayedPortion: displayedPortion || '',
-      };
-    })
-    .filter(Boolean) as ConversationHistory[];
-
-  // Group filtered conversations
-  return filteredConversations.reduce(
-    (groups, conv) => {
-      const timeGroup = getTimeGroup(conv.lastSaved);
-      if (!groups[timeGroup]) groups[timeGroup] = [];
-      groups[timeGroup].push(conv);
-      return groups;
-    },
-    {} as Record<string, ConversationHistory[]>,
-  );
+  return groupConversationsByTime(filteredConversations);
 };
 
 /**
@@ -184,7 +124,7 @@ export const groupAndFilterConversations = (
 export const formatContentSnippet = (
   conversation: ConversationHistory,
   searchTerm: string = '',
-) => {
+): string => {
   const messages =
     conversation.conversation[0]?.role === 'system'
       ? conversation.conversation.slice(1)
@@ -228,4 +168,21 @@ export const formatContentSnippet = (
   }
 
   return '';
+};
+
+/**
+ * Wraps matched text in a string with <strong> tags, preserving case
+ * @param text - The full text to search within
+ * @param searchTerm - The term to wrap in bold tags
+ * @returns The text with matched terms wrapped in <strong> tags if searchTerm is at least 2 characters, otherwise returns original text
+ */
+export const highlightMatch = (
+  text: string,
+  searchTerm: string = '',
+): string => {
+  if (!searchTerm || searchTerm.length < 2) return text;
+
+  const regex = new RegExp(`(${searchTerm})`, 'gi');
+  //  '$1' let's us preserve the casing of the match
+  return text.replace(regex, '<strong>$1</strong>');
 };

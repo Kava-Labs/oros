@@ -7,6 +7,7 @@ import {
   formatConversationTitle,
   formatContentSnippet,
   groupAndFilterConversations,
+  highlightMatch,
 } from '../utils/conversation/helpers';
 
 interface SearchModalProps {
@@ -101,7 +102,6 @@ const SearchModal = ({
 
             <div className={styles.results}>
               {Object.entries(groupedConversations).length === 0 ? (
-                // If no matches found, display "No results"
                 <div className={styles.noResults}>No results</div>
               ) : (
                 Object.entries(groupedConversations).map(
@@ -118,15 +118,23 @@ const SearchModal = ({
                           <span
                             data-testid="search-history-title"
                             className={styles.conversationTitle}
-                          >
-                            {formatConversationTitle(conversation.title, 50)}
-                          </span>
+                            dangerouslySetInnerHTML={{
+                              __html: highlightMatch(
+                                formatConversationTitle(conversation.title, 50),
+                                searchTerm,
+                              ),
+                            }}
+                          />
                           <p
                             data-testid="search-history-content"
                             className={styles.conversationSnippet}
-                          >
-                            {formatContentSnippet(conversation, searchTerm)}
-                          </p>
+                            dangerouslySetInnerHTML={{
+                              __html: highlightMatch(
+                                formatContentSnippet(conversation, searchTerm),
+                                searchTerm,
+                              ),
+                            }}
+                          />
                         </div>
                       ))}
                     </div>
