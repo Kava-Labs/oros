@@ -429,25 +429,25 @@ describe('chat', () => {
 
     await chat.goto();
 
-    const historyEntries = page.getByTestId('chat-history-entry');
-    await expect(historyEntries).toHaveCount(3);
+    const searchButton = page.getByTestId('search-conversation-button');
+    await searchButton.click();
 
-    // Search for first three letters of "Blockchain Discussion"
-    const searchInput = page.getByTestId('conversation-search-input');
+    const modalEntries = page.getByTestId('search-chat-history-entry');
+    await expect(modalEntries).toHaveCount(3);
+
+    const searchInput = page.getByPlaceholder('Search conversations...');
     await searchInput.fill('Blo');
 
-    const filteredEntries = page.getByTestId('chat-history-entry');
+    const filteredEntries = page.getByTestId('search-chat-history-entry');
     await expect(filteredEntries).toHaveCount(1);
-
-    const remainingEntry = filteredEntries.first();
-    await expect(remainingEntry).toHaveText('Blockchain Discussion');
+    await expect(filteredEntries.first()).toHaveText('Blockchain Discussion');
 
     // Clear the search & verify all conversations are visible again
     await searchInput.clear();
+    await expect(page.getByTestId('search-chat-history-entry')).toHaveCount(3);
 
-    await expect(page.getByTestId('chat-history-entry')).toHaveCount(3);
-
-    const titles = await page.getByTestId('chat-history-entry').all();
-    expect(titles).toHaveLength(3);
+    // Test closing by clicking outside
+    await page.mouse.click(0, 0);
+    await expect(searchInput).not.toBeVisible();
   });
 });

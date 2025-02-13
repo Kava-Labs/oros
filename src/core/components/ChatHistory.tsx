@@ -5,73 +5,27 @@ import {
   useEffect,
   useState,
   useMemo,
+  memo,
   Dispatch,
   SetStateAction,
-  memo,
-  ChangeEvent,
 } from 'react';
 import { useAppContext } from '../context/useAppContext';
-import NewChatIcon from '../assets/NewChatIcon';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
 import { TrashIcon } from '../assets/TrashIcon';
 import KavaAILogo from '../assets/KavaAILogo';
 import { Pencil } from 'lucide-react';
+import { PenSquare } from 'lucide-react';
+import SearchModal from './SearchModal';
+import {
+  formatConversationTitle,
+  groupConversationsByTime,
+} from '../utils/conversation/helpers';
 
 interface ChatHistoryProps {
   setChatHistoryOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-type GroupedConversations = {
-  [key: string]: ConversationHistory[];
-};
-
-const getTimeGroup = (timestamp: number): string => {
-  const now = new Date();
-  const diffDays = Math.floor(
-    (now.getTime() - timestamp) / (1000 * 60 * 60 * 24),
-  );
-
-  if (diffDays === 0) {
-    return 'Today';
-  } else if (diffDays === 1) {
-    return 'Yesterday';
-  } else if (diffDays <= 7) {
-    return 'Last week';
-  } else if (diffDays <= 14) {
-    return '2 weeks ago';
-  } else if (diffDays <= 21) {
-    return '3 weeks ago';
-  } else if (diffDays <= 28) {
-    return '4 weeks ago';
-  } else if (diffDays <= 60) {
-    return 'Last month';
-  } else if (diffDays <= 90) {
-    return '2 months ago';
-  } else {
-    const months = Math.floor(diffDays / 30);
-    return `${months} months ago`;
-  }
-};
-
-const groupConversations = (
-  conversations: ConversationHistory[],
-): GroupedConversations => {
-  const sortedConversations = [...conversations].sort(
-    (a, b) => b.lastSaved - a.lastSaved,
-  );
-
-  return sortedConversations.reduce((groups, conversation) => {
-    const timeGroup = getTimeGroup(conversation.lastSaved);
-    if (!groups[timeGroup]) {
-      groups[timeGroup] = [];
-    }
-    groups[timeGroup].push(conversation);
-    return groups;
-  }, {} as GroupedConversations);
-};
-
 export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
-  const [searchTerm, setSearchTerm] = useState('');
   const [conversations, setConversations] = useState<ConversationHistory[]>([]);
   const {
     loadConversation,
@@ -97,16 +51,10 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
     };
   }, []);
 
-  const groupedHistories = useMemo(() => {
-    const filteredConversations = conversations.filter((c) =>
-      c.title.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-    return groupConversations(filteredConversations);
-  }, [conversations, searchTerm]);
-
-  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-  };
+  const groupedHistories = useMemo(
+    () => groupConversationsByTime(conversations),
+    [conversations],
+  );
 
   const startNewChat = useCallback(() => {
     thinkingStore.setText('');
@@ -159,22 +107,21 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
         </div>
       )}
       <div className={styles.searchControls}>
-        <div className={styles.searchInputWrapper}>
-          <input
-            data-testid="conversation-search-input"
-            className={styles.searchInput}
-            onChange={handleSearchChange}
-            value={searchTerm}
-            placeholder="Search conversations..."
-          />
-        </div>
+        <SearchModal
+          conversations={conversations}
+          onConversationSelect={handleChatHistoryClick}
+        />
         {!isMobile && (
           <div
             onClick={startNewChat}
             data-testid="new-chat-button"
             className={styles.newChatButtonAlignment}
           >
-            <NewChatIcon />
+            <PenSquare
+              size={20}
+              className={styles.newChatButtonAlignment}
+              onClick={startNewChat}
+            />
           </div>
         )}
       </div>
@@ -198,6 +145,7 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
     </div>
   );
 };
+
 interface HistoryItemProps {
   conversation: ConversationHistory;
   handleChatHistoryClick: (conversation: ConversationHistory) => void;
@@ -249,30 +197,10 @@ const HistoryItem = memo(
         }
       };
     }, [newTitle, title, id, editingTitle]);
-    // *******************
-
-    const truncateTitle = useCallback(
-      (title: string) => {
-        const threshold = hover ? 30 : 34;
-
-        if (title.startsWith(`"`) || title.startsWith(`'`)) {
-          title = title.slice(1);
-        }
-        if (title.endsWith(`"`) || title.endsWith(`'`)) {
-          title = title.slice(0, -1);
-        }
-        if (title.length > threshold) {
-          title = title.slice(0, threshold) + '....';
-        }
-
-        return title;
-      },
-      [hover],
-    );
 
     const truncatedTitle = useMemo(
-      () => truncateTitle(newTitle),
-      [newTitle, truncateTitle],
+      () => formatConversationTitle(newTitle, hover ? 30 : 34),
+      [newTitle, hover],
     );
 
     return (
@@ -328,3 +256,5 @@ const HistoryItem = memo(
     );
   },
 );
+
+export default ChatHistory;
