@@ -556,4 +556,24 @@ describe('chat', () => {
     await page.mouse.click(0, 0);
     await expect(searchInput).not.toBeVisible();
   });
+
+  test('search modal shows "No results" when no conversations exist', async ({
+    page,
+  }) => {
+    const chat = new Chat(page);
+
+    await chat.goto();
+
+    //  explicitly removing any conversations from local storage, simulating a new user
+    //  or if a user clears their browser cache
+    await page.addInitScript(() => {
+      localStorage.removeItem('conversations');
+    });
+
+    const searchButton = page.getByTestId('search-conversation-button');
+    await searchButton.click();
+
+    const noResults = page.getByText('No results');
+    await expect(noResults).toBeVisible();
+  });
 });
