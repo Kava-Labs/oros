@@ -37,14 +37,6 @@
   padding-right: var(--spacing-md);
 }
 
-.closeIcon {
-  color: var(--colors-textSecondary);
-}
-
-.panelClose {
-  color: var(--colors-textSecondary);
-}
-
 .backdrop {
   position: fixed;
   top: 0;
