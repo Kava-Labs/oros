@@ -429,11 +429,13 @@ describe('chat', () => {
 
     await chat.goto();
 
+    await page.getByRole('button', { name: 'Search conversations' }).click();
+
     const historyEntries = page.getByTestId('chat-history-entry');
     await expect(historyEntries).toHaveCount(3);
 
     // Search for first three letters of "Blockchain Discussion"
-    const searchInput = page.getByTestId('conversation-search-input');
+    const searchInput = page.getByPlaceholder('Search conversations...');
     await searchInput.fill('Blo');
 
     const filteredEntries = page.getByTestId('chat-history-entry');
@@ -444,8 +446,11 @@ describe('chat', () => {
 
     // Clear the search & verify all conversations are visible again
     await searchInput.clear();
-
     await expect(page.getByTestId('chat-history-entry')).toHaveCount(3);
+
+    await page.getByRole('button', { name: 'Search conversations' }).click();
+    await page.getByRole('button', { name: 'Close search' }).click();
+    await expect(searchInput).not.toBeVisible();
 
     const titles = await page.getByTestId('chat-history-entry').all();
     expect(titles).toHaveLength(3);

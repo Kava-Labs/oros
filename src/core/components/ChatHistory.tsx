@@ -158,7 +158,6 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
               size={20}
               className={styles.newChatButtonAlignment}
               onClick={startNewChat}
-              data-testid="new-chat-button"
             />
           </div>
         )}
