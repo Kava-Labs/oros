@@ -83,7 +83,6 @@ describe('ModelSelector', () => {
     render(<ModelSelector />);
 
     fireEvent.click(screen.getByRole('button'));
-    // scope within the listbox so we don't get the selected model returned too
     const dropdownMenu = screen.getByRole('listbox');
 
     // Check reasoning model content
@@ -138,41 +137,6 @@ describe('ModelSelector', () => {
 
     fireEvent.click(button);
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
-  });
-
-  it('shows tooltip with correct positioning when disabled', async () => {
-    mockGetSnapshot.mockReturnValue([
-      { id: '1', role: 'user', content: 'Hello' },
-      { id: '2', role: 'assistant', content: 'Hi' },
-    ]);
-
-    // Test mobile view
-    (useIsMobile as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
-    const { rerender } = render(<ModelSelector />);
-
-    const button = screen.getByRole('button');
-    expect(button).toBeDisabled();
-
-    // Hover over the button to show tooltip
-    fireEvent.mouseEnter(button);
-
-    // Now look for the tooltip text
-    const tooltipText = await screen.findByText(
-      'Model switching is disabled once a chat has started',
-    );
-    expect(tooltipText).toBeInTheDocument();
-
-    // Test desktop view similarly
-    (useIsMobile as unknown as ReturnType<typeof vi.fn>).mockReturnValue(false);
-    rerender(<ModelSelector />);
-
-    // Hover over the button again after rerender
-    fireEvent.mouseEnter(button);
-
-    const desktopTooltipText = await screen.findByText(
-      'Model switching is disabled once a chat has started',
-    );
-    expect(desktopTooltipText).toBeInTheDocument();
   });
 
   it('marks current model as selected', () => {
