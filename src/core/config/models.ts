@@ -40,7 +40,7 @@ export const getAllModels = (): ModelConfig[] => {
   ];
 };
 
-const defaultModel = () => {
+const defaultModelFromQueryParams = () => {
   const params = new URLSearchParams(new URL(window.location.href).search);
   const wantedModel = params.get('defaultModel');
   if (
@@ -52,8 +52,8 @@ const defaultModel = () => {
   return null;
 };
 
-export const DEFAULT_MODEL_NAME = defaultModel()
-  ? defaultModel()!
+export const DEFAULT_MODEL_NAME = defaultModelFromQueryParams()
+  ? defaultModelFromQueryParams()!
   : import.meta.env.VITE_FEAT_UPDATED_DESIGN
     ? 'deepseek-r1'
     : 'gpt-4o';
