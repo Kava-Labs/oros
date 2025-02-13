@@ -1,10 +1,10 @@
 import styles from './NavBar.module.css';
 import HamburgerIcon from '../assets/HamburgerIcon';
-import ModelSelector from './ModelSelector';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
 import { PanelLeftOpen } from 'lucide-react';
 import ButtonIcon from './ButtonIcon';
 import { NewChatButton } from '../assets/NewChatButton';
+import { ModelSelector } from './ModelSelector';
 
 interface NavBarProps {
   onMenu(): void;
