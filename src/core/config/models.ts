@@ -2,7 +2,10 @@ import {
   blockchainModels,
   SupportedBlockchainModels,
 } from '../../features/blockchain/config/models';
-import { reasoningModels } from '../../features/reasoning/config/models';
+import {
+  reasoningModels,
+  SupportedReasoningModels,
+} from '../../features/reasoning/config/models';
 import { ModelConfig, ModelRegistry, SupportedModels } from '../types/models';
 
 export const MODEL_REGISTRY: ModelRegistry = {
@@ -43,12 +46,18 @@ export const getAllModels = (): ModelConfig[] => {
 const defaultModelFromQueryParams = () => {
   const params = new URLSearchParams(new URL(window.location.href).search);
   const wantedModel = params.get('defaultModel');
-  if (
-    (wantedModel && wantedModel === 'deepseek-r1') ||
-    wantedModel === 'gpt-4o'
-  ) {
-    return wantedModel;
+
+  if (wantedModel) {
+    for (const model of Object.values(blockchainModels)) {
+      if (model.name === wantedModel) return model.id;
+      if (model.id === wantedModel) return model.id;
+    }
+    for (const model of Object.values(reasoningModels)) {
+      if (model.name === wantedModel) return model.id;
+      if (model.id === wantedModel) return model.id;
+    }
   }
+
   return null;
 };
 
