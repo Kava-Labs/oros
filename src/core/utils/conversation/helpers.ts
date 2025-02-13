@@ -86,15 +86,18 @@ export const groupAndFilterConversations = (
   return conversations
     .sort((a, b) => b.lastSaved - a.lastSaved)
     .map((conv) => {
-      // If conversation is invalid (null/undefined), skip it
-      if (!conv) return null;
-
       const lowerSearchTerm = searchTerm.toLowerCase();
+      // Skip the system message (the first element) when checking the conversation content
       const messages =
         conv.conversation[0]?.role === 'system'
           ? conv.conversation.slice(1)
           : conv.conversation;
 
+      // Search through messages for content match
+      let matchFound = false;
+      let displayedPortion = '';
+
+      // First check for content match
       for (const msg of messages) {
         if (msg.content && typeof msg.content === 'string') {
           const contentLower = msg.content.toLowerCase();
@@ -103,34 +106,37 @@ export const groupAndFilterConversations = (
             const start = words.findIndex((word) =>
               word.toLowerCase().includes(lowerSearchTerm),
             );
-            const displayedPortion = words.slice(start, start + 6).join(' ');
-            return { ...conv, displayedTitle: conv.title, displayedPortion };
+            displayedPortion = words.slice(start, start + 6).join(' ');
+            matchFound = true;
+            break;
           }
         }
       }
-      if (conv.title.toLowerCase().includes(lowerSearchTerm)) {
-        const snippet = conv.conversation
-          .map((m) => m.content ?? '')
-          .join(' ')
-          .split(' ')
-          .slice(0, 6)
-          .join(' ');
-        return {
-          ...conv,
-          displayedTitle: conv.title,
-          displayedPortion: snippet,
-        };
+
+      // If no content match, check for title match and display the first 6 words of the first user message
+      if (!matchFound && conv.title.toLowerCase().includes(lowerSearchTerm)) {
+        const firstUserMessage = messages.find((msg) => msg.role === 'user');
+        if (firstUserMessage && firstUserMessage.content) {
+          const initialUserContent = firstUserMessage.content as string;
+          displayedPortion = initialUserContent
+            .split(' ')
+            .slice(0, 6)
+            .join(' ');
+        }
       }
-      return null;
+
+      // If no match, return null
+      if (!matchFound && !conv.title.toLowerCase().includes(lowerSearchTerm)) {
+        return null;
+      }
+
+      return { ...conv, displayedTitle: conv.title, displayedPortion };
     })
-    .filter(Boolean) // Removes any null or undefined values from the array
-    .reduce((groups: GroupedConversations, conv) => {
-      // Check if conv is null before accessing properties
-      if (conv) {
-        const timeGroup = getTimeGroup(conv.lastSaved);
-        if (!groups[timeGroup]) groups[timeGroup] = [];
-        groups[timeGroup].push(conv);
-      }
+    .filter(Boolean)
+    .reduce((groups, conv) => {
+      const timeGroup = getTimeGroup(conv!.lastSaved);
+      if (!groups[timeGroup]) groups[timeGroup] = [];
+      groups[timeGroup].push(conv!);
       return groups;
     }, {} as GroupedConversations);
 };
