@@ -442,7 +442,7 @@ describe('chat', () => {
     await expect(filteredEntries).toHaveCount(1);
     await expect(filteredEntries.first()).toHaveText('Blockchain Discussion');
 
-    // Clear the input and see all results come back
+    // Clear the search & verify all conversations are visible again
     await searchInput.clear();
     await expect(page.getByTestId('search-chat-history-entry')).toHaveCount(3);
 
