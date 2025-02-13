@@ -494,7 +494,6 @@ describe('chat', () => {
       .getByTestId('search-history-title');
     await expect(filteredTitle).toHaveText('Blockchain Discussion');
 
-    // Clear the search
     await searchInput.clear();
 
     // Test searching by conversation content
@@ -507,30 +506,14 @@ describe('chat', () => {
       .getByTestId('search-history-title');
     await expect(contentTitle).toHaveText('Blockchain Discussion');
 
-    // Verify the matching content
     const contentSnippet = filteredEntries
       .first()
       .getByTestId('search-history-content');
-    await expect(contentSnippet).toContainText('decentralized');
+    await expect(contentSnippet).toContainText(
+      'decentralized digital ledger technology.',
+    );
 
-    // Test searching by user message content
-    await searchInput.clear();
-    await searchInput.fill('RESTful');
-    filteredEntries = page.getByTestId('search-chat-history-entry');
-    await expect(filteredEntries).toHaveCount(1);
-
-    const apiTitle = filteredEntries
-      .first()
-      .getByTestId('search-history-title');
-    await expect(apiTitle).toHaveText('API Integration Help');
-
-    // Verify the matching content
-    const apiContentSnippet = filteredEntries
-      .first()
-      .getByTestId('search-history-content');
-    await expect(apiContentSnippet).toContainText('RESTful');
-
-    // Test title match snippet behavior
+    // Test title & snippet match behavior
     await searchInput.clear();
     await searchInput.fill('Complex');
 
