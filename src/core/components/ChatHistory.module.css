@@ -12,6 +12,7 @@
   color: var(--colors-textTertiary);
   font-size: 10px; /* TODO: Replace with rem spacing from global css */
   font-weight: var(--typography-fontWeightSemibold);
+  text-transform: uppercase;
 }
 
 .timeGroupContent {
