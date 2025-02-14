@@ -59,6 +59,7 @@ export const App = () => {
             className={`${styles.backdrop} ${isMobileSideBarOpen ? styles.isOpen : ''}`}
             onClick={() => setIsMobileSideBarOpen(false)}
           ></div>
+
           <div
             className={`${styles.sidebar} ${isMobileSideBarOpen ? styles.isOpen : ''} ${isDesktopSideBarHidden ? styles.isHidden : ''}`}
           >
@@ -93,10 +94,13 @@ export const App = () => {
                 </div>
               )}
             </div>
-            <ChatHistory
-              onHistoryItemClick={setIsMobileSideBarOpen}
-              startNewChat={startNewChat}
-            />
+
+            <div className={styles.sidebarContent}>
+              <ChatHistory
+                onHistoryItemClick={setIsMobileSideBarOpen}
+                startNewChat={startNewChat}
+              />
+            </div>
           </div>
 
           <div className={styles.content}>

@@ -18,6 +18,7 @@ body {
   min-height: 100dvh;
   font-size: 1.6rem;
   font-weight: var(--typography-fontWeightLight);
+  scrollbar-color: var(--colors-bgTertiary) var(--colors-bgPrimary);
 }
 
 p,
@@ -150,3 +151,14 @@ code {
   white-space: pre-wrap;
   word-break: break-word;
 }
+
+::-webkit-scrollbar {
+  background-color: var(--colors-bgPrimary);
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--colors-bgTertiary);
+  border-radius: var(--borderRadius-md);
+}
+
