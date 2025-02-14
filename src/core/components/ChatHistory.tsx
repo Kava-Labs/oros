@@ -131,6 +131,17 @@ const HistoryItem = memo(
     const isSelected = messageHistoryStore.getConversationID() === id;
     const hasEdits = newTitle !== title;
 
+    const handleSaveTitle = useCallback(() => {
+      const trimmedTitle = newTitle.trim();
+      if (trimmedTitle === '') {
+        setNewTitle(title); // Reset to original title if empty
+      } else {
+        saveToLocalStorage(trimmedTitle);
+        setNewTitle(trimmedTitle);
+      }
+      setEditingTitle(false);
+    }, [newTitle, title]);
+
     useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
         const target = event.target as Node;
@@ -142,20 +153,16 @@ const HistoryItem = memo(
           return;
         }
 
-        if (editingTitle && hasEdits) {
+        if (editingTitle) {
           handleSaveTitle();
-        } else if (editingTitle) {
-          setEditingTitle(false);
-          setNewTitle(title);
         }
-
         onMenuClose();
       };
 
       document.addEventListener('mousedown', handleClickOutside);
       return () =>
         document.removeEventListener('mousedown', handleClickOutside);
-    }, [editingTitle, hasEdits]);
+    }, [editingTitle, newTitle, title, handleSaveTitle]);
 
     const saveToLocalStorage = useCallback(
       (newValue: string) => {
@@ -167,22 +174,6 @@ const HistoryItem = memo(
       },
       [id],
     );
-
-    useEffect(() => {
-      if (newTitle !== title && editingTitle) {
-        saveToLocalStorage(newTitle);
-      }
-    }, [newTitle, title, editingTitle, saveToLocalStorage]);
-
-    const handleSaveTitle = () => {
-      const trimmedTitle = newTitle.trim();
-      if (trimmedTitle === '') {
-        setNewTitle(title);
-      } else if (trimmedTitle !== title) {
-        saveToLocalStorage(trimmedTitle);
-      }
-      setEditingTitle(false);
-    };
 
     useEffect(() => {
       if (editingTitle) {
