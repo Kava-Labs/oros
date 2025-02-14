@@ -37,7 +37,7 @@
   background: var(--colors-bgPrimary);
   position: sticky;
   top: 0;
-  z-index: 90;
+  z-index: 50;
   flex-shrink: 0;
 }
 
@@ -67,7 +67,7 @@
   margin: auto;
   max-width: 768px;
   width: 100%;
-  z-index: 90;
+  z-index: 40;
   background: var(--colors-bgPrimary);
   padding-left: var(--spacing-sm);
   padding-right: var(--spacing-sm);
