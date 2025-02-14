@@ -1,7 +1,6 @@
 import styles from './NavBar.module.css';
-import HamburgerIcon from '../assets/HamburgerIcon';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
-import { PanelLeftOpen } from 'lucide-react';
+import { Menu, PanelLeftOpen } from 'lucide-react';
 import ButtonIcon from './ButtonIcon';
 import { NewChatButton } from '../assets/NewChatButton';
 import { ModelSelector } from './ModelSelector';
@@ -41,8 +40,17 @@ export const NavBar = ({
             <ModelSelector />
           </div>
         ) : (
-          <div className={styles.menu} onClick={onMenu}>
-            <HamburgerIcon />
+          <div className={styles.menu}>
+            <ButtonIcon
+              icon={Menu}
+              size={24}
+              tooltip={{
+                text: 'Menu',
+                position: 'bottom',
+              }}
+              aria-label="Toggle Menu"
+              onClick={onMenu}
+            />
           </div>
         )}
       </div>
