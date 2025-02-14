@@ -1,6 +1,6 @@
 import type { Preview } from '@storybook/react';
 
-import '../src/global.css';
+import '../src/shared/theme/global.css';
 
 import '@fontsource/inter/300.css';
 import '@fontsource/inter/300-italic.css';
