@@ -24,7 +24,6 @@ export const ChatHistory = ({
   onHistoryItemClick,
   startNewChat,
 }: ChatHistoryProps) => {
-  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const {
     loadConversation,
     messageHistoryStore,
@@ -65,9 +64,8 @@ export const ChatHistory = ({
     [loadConversation, onHistoryItemClick],
   );
 
-  const handleMenuToggle = (id: string) => {
-    setOpenMenuId(openMenuId === id ? null : id);
-  };
+  // Single state for tracking which menu is open
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
   return (
     <div className={styles.chatHistoryContainer}>
@@ -91,8 +89,14 @@ export const ChatHistory = ({
                     handleChatHistoryClick={handleChatHistoryClick}
                     deleteConversation={deleteConversation}
                     isMenuOpen={openMenuId === conversation.id}
-                    onMenuToggle={handleMenuToggle}
-                    onMenuClose={() => setOpenMenuId(null)}
+                    onMenuClick={() => {
+                      // First set the new menu ID, then close the old one
+                      const newMenuId =
+                        openMenuId === conversation.id ? null : conversation.id;
+                      requestAnimationFrame(() => {
+                        setOpenMenuId(newMenuId);
+                      });
+                    }}
                   />
                 ))}
               </div>
@@ -109,8 +113,7 @@ interface HistoryItemProps {
   handleChatHistoryClick: (conversation: ConversationHistory) => void;
   deleteConversation: (id: string) => void;
   isMenuOpen: boolean;
-  onMenuToggle: (id: string) => void;
-  onMenuClose: () => void;
+  onMenuClick: () => void;
 }
 
 const HistoryItem = memo(
@@ -119,50 +122,26 @@ const HistoryItem = memo(
     handleChatHistoryClick,
     deleteConversation,
     isMenuOpen,
-    onMenuToggle,
-    onMenuClose,
+    onMenuClick,
   }: HistoryItemProps) => {
     const { id, title } = conversation;
-    const [editingTitle, setEditingTitle] = useState(false);
-    const [newTitle, setNewTitle] = useState(title);
-    const menuRef = useRef<HTMLDivElement>(null);
-    const inputRef = useRef<HTMLInputElement>(null);
     const { messageHistoryStore } = useAppContext();
     const isSelected = messageHistoryStore.getConversationID() === id;
-    const hasEdits = newTitle !== title;
+    const [editingTitle, setEditingTitle] = useState(false);
+    const [newTitle, setNewTitle] = useState(title);
 
-    const handleSaveTitle = useCallback(() => {
-      const trimmedTitle = newTitle.trim();
-      if (trimmedTitle === '') {
-        setNewTitle(title); // Reset to original title if empty
-      } else {
-        saveToLocalStorage(trimmedTitle);
-        setNewTitle(trimmedTitle);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    const handleMenuClick = (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (editingTitle) {
+        setEditingTitle(false);
+        setNewTitle(title);
       }
-      setEditingTitle(false);
-    }, [newTitle, title]);
-
-    useEffect(() => {
-      const handleClickOutside = (event: MouseEvent) => {
-        const target = event.target as Node;
-        const isClickInsideMenu = menuRef.current?.contains(target);
-        const isClickInsideInput = inputRef.current?.contains(target);
-        const isClickOnButton = (target as HTMLElement).closest('button');
-
-        if (isClickInsideMenu || isClickInsideInput || isClickOnButton) {
-          return;
-        }
-
-        if (editingTitle) {
-          handleSaveTitle();
-        }
-        onMenuClose();
-      };
-
-      document.addEventListener('mousedown', handleClickOutside);
-      return () =>
-        document.removeEventListener('mousedown', handleClickOutside);
-    }, [editingTitle, newTitle, title, handleSaveTitle]);
+      onMenuClick();
+    };
 
     const saveToLocalStorage = useCallback(
       (newValue: string) => {
@@ -175,22 +154,42 @@ const HistoryItem = memo(
       [id],
     );
 
-    useEffect(() => {
-      if (editingTitle) {
-        const input = inputRef.current;
-        if (input) {
-          input.focus();
-          input.select();
-        }
+    const handleSaveTitle = useCallback(() => {
+      const trimmedTitle = newTitle.trim();
+      if (trimmedTitle === '') {
+        setNewTitle(title);
+      } else {
+        saveToLocalStorage(trimmedTitle);
+        setNewTitle(trimmedTitle);
       }
-    }, [editingTitle]);
+      setEditingTitle(false);
+    }, [newTitle, title, saveToLocalStorage]);
 
-    const handleMenuClick = (e: React.MouseEvent) => {
+    useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+        const target = event.target as Node;
+
+        // Don't handle click outside when clicking menu buttons
+        const isMenuButtonClick = (target as Element).closest(
+          '[data-menu-button="true"]',
+        );
+        if (isMenuButtonClick) return;
+
+        if (containerRef.current && !containerRef.current.contains(target)) {
+          if (editingTitle) {
+            handleSaveTitle();
+          }
+        }
+      };
+
+      document.addEventListener('mousedown', handleClickOutside);
+      return () =>
+        document.removeEventListener('mousedown', handleClickOutside);
+    }, [editingTitle, handleSaveTitle]);
+
+    const handleDelete = (e: React.MouseEvent) => {
       e.stopPropagation();
-      if (editingTitle && hasEdits) {
-        handleSaveTitle();
-      }
-      onMenuToggle(id);
+      deleteConversation(id);
     };
 
     const handleEdit = (e: React.MouseEvent) => {
@@ -200,13 +199,7 @@ const HistoryItem = memo(
         setEditingTitle(false);
       } else {
         setEditingTitle(true);
-        setTimeout(() => inputRef.current?.focus(), 0);
       }
-    };
-
-    const handleDelete = (e: React.MouseEvent) => {
-      e.stopPropagation();
-      deleteConversation(id);
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -219,70 +212,80 @@ const HistoryItem = memo(
       }
     };
 
+    useEffect(() => {
+      if (editingTitle) {
+        const input = inputRef.current;
+        if (input) {
+          input.focus();
+          input.select();
+        }
+      }
+    }, [editingTitle]);
+
     return (
       <div
-        className={`${styles.chatHistoryItem} ${isSelected ? styles.selected : ''} ${isMenuOpen ? styles.expanded : ''}`}
+        ref={containerRef}
+        className={`${styles.chatHistoryItem} ${isSelected ? styles.selected : ''}`}
       >
-        <div
-          className={styles.chatHistoryContent}
-          onClick={() => !editingTitle && handleChatHistoryClick(conversation)}
-        >
-          {!editingTitle ? (
-            <small className={styles.chatHistoryTitle}>{newTitle}</small>
-          ) : (
-            <input
-              ref={inputRef}
-              type="text"
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-              onKeyDown={handleKeyDown}
-              onFocus={(e) => e.target.select()}
-              className={styles.chatHistoryTitleInput}
-              onClick={(e) => e.stopPropagation()}
-            />
-          )}
-          <div ref={menuRef}>
-            <ButtonIcon
-              className={styles.menuIcon}
-              icon={EllipsisVertical}
-              size={20}
-              tooltip={{
-                text: 'Chat Options',
-                position: 'bottom',
-              }}
-              aria-label="ChatOptions"
-              onClick={handleMenuClick}
-            />
+        <div className={styles.chatHistoryContent}>
+          <div
+            className={styles.titleContainer}
+            onClick={() => handleChatHistoryClick(conversation)}
+          >
+            {editingTitle ? (
+              <input
+                ref={inputRef}
+                type="text"
+                value={newTitle}
+                onChange={(e) => setNewTitle(e.target.value)}
+                onKeyDown={handleKeyDown}
+                className={styles.chatHistoryTitleInput}
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              />
+            ) : (
+              <small>{title}</small>
+            )}
           </div>
+          <ButtonIcon
+            className={styles.menuIcon}
+            icon={EllipsisVertical}
+            size={20}
+            tooltip={{
+              text: 'Chat Options',
+              position: 'bottom',
+            }}
+            data-menu-button="true"
+            aria-label="ChatOptions"
+            onClick={handleMenuClick}
+          />
         </div>
-
-        {isMenuOpen && (
-          <div className={styles.menuWrapper}>
-            <div className={styles.dropdownMenu}>
-              <button className={styles.menuItem} onClick={handleEdit}>
-                {editingTitle ? (
-                  <>
-                    <X size={16} />
-                    Cancel
-                  </>
-                ) : (
-                  <>
-                    <Pencil size={16} />
-                    Rename
-                  </>
-                )}
-              </button>
-              <button
-                className={styles.menuItem}
-                data-delete="true"
-                onClick={handleDelete}
-              >
-                <Trash2 size={16} />
-                Delete
-              </button>
-            </div>
-          </div>
-        )}
+        <div
+          className={`${styles.buttonContainer} ${isMenuOpen ? styles.show : ''}`}
+        >
+          <button className={styles.menuButton} onClick={handleEdit}>
+            {editingTitle ? (
+              <>
+                <X size={16} />
+                <span>Cancel</span>
+              </>
+            ) : (
+              <>
+                <Pencil size={16} />
+                <span>Rename</span>
+              </>
+            )}
+          </button>
+          <button
+            className={`${styles.menuButton} ${styles.deleteButton}`}
+            data-delete="true"
+            onClick={handleDelete}
+          >
+            <Trash2 size={16} />
+            <span>Delete</span>
+          </button>
+        </div>
       </div>
     );
   },

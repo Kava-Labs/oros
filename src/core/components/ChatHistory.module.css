@@ -3,6 +3,28 @@
   background-color: var(--colors-bgSecondary);
 }
 
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: calc(var(--spacing-md) * 8);
+  color: var(--colors-textMuted);
+  padding: var(--spacing-md);
+  text-align: center;
+}
+
+.emptyStateIcon {
+  margin-bottom: var(--spacing-sm);
+  opacity: 0.7;
+}
+
+.emptyStateText {
+  margin: 0;
+  text-transform: uppercase;
+  font-size: 12px; /* TODO: Replace with rem spacing from global css */
+}
+
 .timeGroup {
   margin-bottom: var(--spacing-md);
 }
@@ -48,27 +70,33 @@
   background-color: var(--colors-bgPrimary);
 }
 
-.chatHistoryTitle {
-  margin: 0;
+.selected .chatHistoryContent:hover {
+  background-color: var(--colors-bgTertiary);
+}
+
+.titleContainer {
+  flex: 1;
+  min-width: 0;
   cursor: pointer;
-  color: var(--colors-textPrimary);
-  white-space: nowrap;
+}
+
+.titleContainer small {
+  display: block;
   overflow: hidden;
   text-overflow: ellipsis;
-  flex: 1;
+  white-space: nowrap;
 }
 
-.menuWrapper {
+.buttonContainer {
+  display: none;
   width: 100%;
-  background-color: var(--colors-bgSecondary);
 }
 
-.dropdownMenu {
-  width: 100%;
+.buttonContainer.show {
   display: flex;
 }
 
-.menuItem {
+.menuButton {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -81,15 +109,15 @@
   border: none;
 }
 
-.menuItem:hover {
+.menuButton:hover {
   background-color: var(--colors-bgTertiary);
 }
 
-.menuItem[data-delete='true'] {
+.menuButton[data-delete='true'] {
   color: var(--colors-accentTransparent);
 }
 
-.menuItem[data-delete='true'] svg {
+.menuButton[data-delete='true'] svg {
   color: var(--colors-accentTransparent);
 }
 
@@ -111,50 +139,4 @@
 .chatHistoryTitleInput:focus {
   background-color: rgba(130, 162, 215, 0.1);
   box-shadow: 0 0 0 2px rgba(130, 162, 215, 0.3);
-}
-
-.menuIcon {
-  padding: var(--spacing-xs) 0 var(--spacing-xs) var(--spacing-xs);
-  padding: var(--spacing-xs);
-}
-
-.emptyState {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: calc(var(--spacing-md) * 8);
-  color: var(--colors-textMuted);
-  padding: var(--spacing-md);
-  text-align: center;
-}
-
-.emptyStateIcon {
-  margin-bottom: var(--spacing-sm);
-  opacity: 0.7;
-}
-
-.emptyStateText {
-  margin: 0;
-  text-transform: uppercase;
-  font-size: 12px; /* TODO: Replace with rem spacing from global css */
-}
-
-@media (hover: hover) {
-  .menuIcon {
-    opacity: 0;
-    transition: opacity 0.2s ease;
-  }
-
-  .chatHistoryContent:hover .menuIcon {
-    opacity: 1;
-  }
-
-  .selected .menuIcon {
-    opacity: 1;
-  }
-
-  .expanded .menuIcon {
-    opacity: 1;
-  }
 }
