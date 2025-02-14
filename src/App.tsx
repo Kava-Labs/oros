@@ -19,7 +19,9 @@ export const App = () => {
     isReady,
     modelConfig,
     messageHistoryStore,
+    thinkingStore,
     handleChatCompletion,
+    setIsRequesting,
     handleReset,
     handleCancel,
   } = useAppContext();
@@ -28,6 +30,16 @@ export const App = () => {
     messageHistoryStore.subscribe,
     messageHistoryStore.getSnapshot,
   );
+
+  const startNewChat = () => {
+    thinkingStore.setText('');
+    messageHistoryStore.reset();
+    messageHistoryStore.addMessage({
+      role: 'system' as const,
+      content: modelConfig.systemPrompt,
+    });
+    setIsRequesting(false);
+  };
 
   const isMobile = useIsMobile();
 
@@ -84,7 +96,7 @@ export const App = () => {
               onSubmit={handleChatCompletion}
               onReset={handleReset}
               onMenu={() => setIsMobileSideBarOpen(true)}
-              onNewChat={() => {}}
+              onNewChat={startNewChat}
               onPanelOpen={() => setIsDesktopSideBarHidden(false)}
               isPanelOpen={!isDesktopSideBarHidden}
               onCancel={handleCancel}
