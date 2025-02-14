@@ -8,16 +8,6 @@
   min-height: 0;
 }
 
-::-webkit-scrollbar {
-  background-color: var(--colors-bgPrimary);
-  width: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: var(--colors-bgTertiary);
-  border-radius: var(--borderRadius-md);
-}
-
 .scrollContainer {
   position: relative;
 
@@ -30,6 +20,17 @@
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
+
+.scrollContainer::-webkit-scrollbar {
+  background-color: var(--colors-bgPrimary);
+  width: 10px;
+}
+
+.scrollContainer::-webkit-scrollbar-thumb {
+  background-color: var(--colors-bgTertiary);
+  border-radius: var(--borderRadius-md);
+}
+
 
 .chatHeader {
   height: var(--layout-headerHeight);
