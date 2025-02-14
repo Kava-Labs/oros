@@ -74,6 +74,8 @@
   flex-direction: column;
   min-height: 0;
   gap: var(--spacing-xs);
+
+  padding-bottom: var(--spacing-xs);
 }
 
 .controlsContainer.positionSticky {
