@@ -138,3 +138,22 @@
   text-transform: uppercase;
   font-size: 12px; /* TODO: Replace with rem spacing from global css */
 }
+
+@media (hover: hover) {
+  .menuIcon {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .chatHistoryContent:hover .menuIcon {
+    opacity: 1;
+  }
+
+  .selected .menuIcon {
+    opacity: 1;
+  }
+
+  .expanded .menuIcon {
+    opacity: 1;
+  }
+}
