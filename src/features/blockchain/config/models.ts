@@ -21,7 +21,7 @@ export const blockchainModels: Record<
     id: 'gpt-4o',
     name: 'Blockchain Instruct',
     icon: OrosIcon,
-    description: 'Blockchain Execution Model',
+    description: 'Blockchain Execution',
     tools: messageRegistry.getToolDefinitions(),
     systemPrompt: messageRegistry.getSystemPrompt(),
     introText: messageRegistry.getIntroText(),

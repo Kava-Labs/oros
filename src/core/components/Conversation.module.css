@@ -1,0 +1,87 @@
+.right {
+  flex-shrink: 0;
+  border-radius: var(--borderRadius-md);
+  background: var(--colors-bgTertiary);
+  color: var(--colors-textPrimary);
+  padding: var(--spacing-lg);
+  margin-left: auto;
+  margin-top: var(--borderRadius-sm);
+  max-width: 80%;
+}
+
+.left {
+  flex-shrink: 0;
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) 0px;
+  color: var(--colors-textPrimary);
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+}
+
+.assistantContainer {
+  width: 100%;
+}
+
+.progressStream {
+  .content {
+    color: var(--colors-textTertiary);
+    font-size: 1.5rem;
+
+    p::after {
+      content: '.';
+      animation: dots 1.5s steps(5, end) infinite;
+    }
+  }
+}
+
+@keyframes dots {
+  0%,
+  20% {
+    content: '.';
+  }
+  40% {
+    content: '..';
+  }
+  60% {
+    content: '...';
+  }
+  80%,
+  100% {
+    content: '';
+  }
+}
+
+.conversationChatIcon {
+  height: 40px;
+  width: 40px;
+  margin-right: var(--spacing-md);
+  object-fit: contain;
+  aspect-ratio: 1 / 1;
+  transform-origin: center;
+}
+
+.conversationContainer {
+  width: 100%;
+  display: flex;
+  padding: 0 var(--spacing-sm);
+  flex-direction: column;
+}
+
+/** Basic list wrapping **/
+li {
+  overflow-wrap: break-word;
+}
+
+.copyIconContainer {
+  display: flex;
+  margin-top: var(--spacing-sm);
+  height: var(--spacing-md);
+}
+
+.modelSelectorContainer {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 100;
+}

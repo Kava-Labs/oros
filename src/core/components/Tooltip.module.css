@@ -13,3 +13,9 @@
   border-radius: var(--borderRadius-sm);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
+
+.tooltipContainer {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--colors-bgPrimary);
+}

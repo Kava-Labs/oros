@@ -8,68 +8,34 @@ import {
   memo,
   Dispatch,
   SetStateAction,
+  useRef,
 } from 'react';
 import { useAppContext } from '../context/useAppContext';
-import { useIsMobile } from '../../shared/theme/useIsMobile';
-import { TrashIcon } from '../assets/TrashIcon';
-import KavaAILogo from '../assets/KavaAILogo';
-import { Pencil } from 'lucide-react';
-import { PenSquare } from 'lucide-react';
-import SearchModal from './SearchModal';
-import {
-  formatConversationTitle,
-  groupConversationsByTime,
-} from '../utils/conversation/helpers';
+import { EllipsisVertical, Bot, Pencil, Trash2, X } from 'lucide-react';
+import { groupConversationsByTime } from '../utils/conversation/helpers';
+import ButtonIcon from './ButtonIcon';
 
 interface ChatHistoryProps {
-  setChatHistoryOpen: Dispatch<SetStateAction<boolean>>;
+  onHistoryItemClick: Dispatch<SetStateAction<boolean>>;
+  startNewChat(): void;
 }
 
-export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
-  const [conversations, setConversations] = useState<ConversationHistory[]>([]);
+export const ChatHistory = ({
+  onHistoryItemClick,
+  startNewChat,
+}: ChatHistoryProps) => {
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const {
     loadConversation,
     messageHistoryStore,
-    modelConfig,
-    thinkingStore,
-    setIsRequesting,
+    conversations,
+    hasConversations,
   } = useAppContext();
-  const isMobile = useIsMobile();
-
-  useEffect(() => {
-    const load = () => {
-      const storedConversations = Object.values(
-        JSON.parse(localStorage.getItem('conversations') ?? '{}'),
-      ) as ConversationHistory[];
-      setConversations(storedConversations);
-    };
-    load();
-    // we have to poll local storage
-    const id = setInterval(load, 1000);
-    return () => {
-      clearInterval(id);
-    };
-  }, []);
 
   const groupedHistories = useMemo(
     () => groupConversationsByTime(conversations),
     [conversations],
   );
-
-  const startNewChat = useCallback(() => {
-    thinkingStore.setText('');
-    messageHistoryStore.reset();
-    messageHistoryStore.addMessage({
-      role: 'system' as const,
-      content: modelConfig.systemPrompt,
-    });
-    setIsRequesting(false);
-  }, [
-    messageHistoryStore,
-    modelConfig.systemPrompt,
-    setIsRequesting,
-    thinkingStore,
-  ]);
 
   const deleteConversation = useCallback(
     (id: string) => {
@@ -86,7 +52,7 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
 
       delete allConversations[id];
       localStorage.setItem('conversations', JSON.stringify(allConversations));
-      setConversations(Object.values(allConversations));
+      setOpenMenuId(null);
     },
     [messageHistoryStore, startNewChat],
   );
@@ -94,53 +60,45 @@ export const ChatHistory = ({ setChatHistoryOpen }: ChatHistoryProps) => {
   const handleChatHistoryClick = useCallback(
     (conversation: ConversationHistory) => {
       loadConversation(conversation);
-      setChatHistoryOpen(false);
+      onHistoryItemClick(false);
     },
-    [loadConversation, setChatHistoryOpen],
+    [loadConversation, onHistoryItemClick],
   );
+
+  const handleMenuToggle = (id: string) => {
+    setOpenMenuId(openMenuId === id ? null : id);
+  };
 
   return (
     <div className={styles.chatHistoryContainer}>
-      {!isMobile && (
-        <div className={styles.desktopLogo}>
-          <KavaAILogo />
-        </div>
-      )}
-      <div className={styles.searchControls}>
-        <SearchModal
-          conversations={conversations}
-          onConversationSelect={handleChatHistoryClick}
-        />
-        {!isMobile && (
-          <div
-            onClick={startNewChat}
-            data-testid="new-chat-button"
-            className={styles.newChatButtonAlignment}
-          >
-            <PenSquare
-              size={20}
-              className={styles.newChatButtonAlignment}
-              onClick={startNewChat}
-            />
-          </div>
-        )}
-      </div>
       <div data-testid="chat-history-section">
-        {Object.entries(groupedHistories).map(([timeGroup, conversations]) => (
-          <div key={timeGroup} className={styles.timeGroup}>
-            <h6 className={styles.timeGroupTitle}>{timeGroup}</h6>
-            <div className={styles.timeGroupContent}>
-              {conversations.map((conversation) => (
-                <HistoryItem
-                  key={conversation.id}
-                  conversation={conversation}
-                  handleChatHistoryClick={handleChatHistoryClick}
-                  deleteConversation={deleteConversation}
-                />
-              ))}
-            </div>
+        {!hasConversations ? (
+          <div className={styles.emptyState}>
+            <Bot className={styles.emptyStateIcon} size={24} />
+            <small className={styles.emptyStateText}>
+              Start a new chat to begin
+            </small>
           </div>
-        ))}
+        ) : (
+          Object.entries(groupedHistories).map(([timeGroup, conversations]) => (
+            <div key={timeGroup} className={styles.timeGroup}>
+              <small className={styles.timeGroupTitle}>{timeGroup}</small>
+              <div className={styles.timeGroupContent}>
+                {conversations.map((conversation) => (
+                  <HistoryItem
+                    key={conversation.id}
+                    conversation={conversation}
+                    handleChatHistoryClick={handleChatHistoryClick}
+                    deleteConversation={deleteConversation}
+                    isMenuOpen={openMenuId === conversation.id}
+                    onMenuToggle={handleMenuToggle}
+                    onMenuClose={() => setOpenMenuId(null)}
+                  />
+                ))}
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
@@ -150,6 +108,9 @@ interface HistoryItemProps {
   conversation: ConversationHistory;
   handleChatHistoryClick: (conversation: ConversationHistory) => void;
   deleteConversation: (id: string) => void;
+  isMenuOpen: boolean;
+  onMenuToggle: (id: string) => void;
+  onMenuClose: () => void;
 }
 
 const HistoryItem = memo(
@@ -157,101 +118,171 @@ const HistoryItem = memo(
     conversation,
     handleChatHistoryClick,
     deleteConversation,
+    isMenuOpen,
+    onMenuToggle,
+    onMenuClose,
   }: HistoryItemProps) => {
     const { id, title } = conversation;
-    const isMobile = useIsMobile();
-    const [hover, setHover] = useState(false);
-
-    const { messageHistoryStore } = useAppContext();
-    const isSelected = messageHistoryStore.getConversationID() === id;
-
-    // *******************
     const [editingTitle, setEditingTitle] = useState(false);
     const [newTitle, setNewTitle] = useState(title);
+    const menuRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const { messageHistoryStore } = useAppContext();
+    const isSelected = messageHistoryStore.getConversationID() === id;
+    const hasEdits = newTitle !== title;
+
+    const handleSaveTitle = useCallback(() => {
+      const trimmedTitle = newTitle.trim();
+      if (trimmedTitle === '') {
+        setNewTitle(title); // Reset to original title if empty
+      } else {
+        saveToLocalStorage(trimmedTitle);
+        setNewTitle(trimmedTitle);
+      }
+      setEditingTitle(false);
+    }, [newTitle, title]);
 
     useEffect(() => {
-      let tid: NodeJS.Timeout;
-      if (newTitle !== title) {
-        // user changed the title
-        // save to local storage
+      const handleClickOutside = (event: MouseEvent) => {
+        const target = event.target as Node;
+        const isClickInsideMenu = menuRef.current?.contains(target);
+        const isClickInsideInput = inputRef.current?.contains(target);
+        const isClickOnButton = (target as HTMLElement).closest('button');
+
+        if (isClickInsideMenu || isClickInsideInput || isClickOnButton) {
+          return;
+        }
+
+        if (editingTitle) {
+          handleSaveTitle();
+        }
+        onMenuClose();
+      };
+
+      document.addEventListener('mousedown', handleClickOutside);
+      return () =>
+        document.removeEventListener('mousedown', handleClickOutside);
+    }, [editingTitle, newTitle, title, handleSaveTitle]);
+
+    const saveToLocalStorage = useCallback(
+      (newValue: string) => {
         const conversations = JSON.parse(
           localStorage.getItem('conversations') ?? '{}',
         );
-        conversations[id].title = newTitle;
+        conversations[id].title = newValue;
         localStorage.setItem('conversations', JSON.stringify(conversations));
-        tid = setTimeout(() => {
-          // after saving, wait a bit and kick user out of editing state
-          setEditingTitle(false);
-        }, 1000);
-      } else if (editingTitle) {
-        // user clicked to edit title but made no changes
-        // after some time reset the edit state back to false
-        tid = setTimeout(() => {
-          setEditingTitle(false);
-        }, 5000);
-      }
-
-      return () => {
-        if (tid) {
-          clearTimeout(tid);
-        }
-      };
-    }, [newTitle, title, id, editingTitle]);
-
-    const truncatedTitle = useMemo(
-      () => formatConversationTitle(newTitle, hover ? 30 : 34),
-      [newTitle, hover],
+      },
+      [id],
     );
+
+    useEffect(() => {
+      if (editingTitle) {
+        const input = inputRef.current;
+        if (input) {
+          input.focus();
+          input.select();
+        }
+      }
+    }, [editingTitle]);
+
+    const handleMenuClick = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (editingTitle && hasEdits) {
+        handleSaveTitle();
+      }
+      onMenuToggle(id);
+    };
+
+    const handleEdit = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (editingTitle) {
+        setNewTitle(title);
+        setEditingTitle(false);
+      } else {
+        setEditingTitle(true);
+        setTimeout(() => inputRef.current?.focus(), 0);
+      }
+    };
+
+    const handleDelete = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      deleteConversation(id);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+      e.stopPropagation();
+      if (e.key === 'Enter') {
+        handleSaveTitle();
+      } else if (e.key === 'Escape') {
+        setNewTitle(title);
+        setEditingTitle(false);
+      }
+    };
 
     return (
       <div
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
-        data-testid="chat-history-entry"
-        className={`${styles.chatHistoryItem} ${isSelected ? styles.selected : ''}`}
+        className={`${styles.chatHistoryItem} ${isSelected ? styles.selected : ''} ${isMenuOpen ? styles.expanded : ''}`}
       >
-        <div className={styles.chatHistoryContent}>
+        <div
+          className={styles.chatHistoryContent}
+          onClick={() => !editingTitle && handleChatHistoryClick(conversation)}
+        >
           {!editingTitle ? (
-            <p
-              onClick={() => handleChatHistoryClick(conversation)}
-              className={styles.chatHistoryTitle}
-            >
-              {truncatedTitle}
-            </p>
+            <small className={styles.chatHistoryTitle}>{newTitle}</small>
           ) : (
             <input
-              data-testid="edit-chat-history-title-input"
+              ref={inputRef}
               type="text"
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
-              onBlur={() => setEditingTitle(false)}
+              onKeyDown={handleKeyDown}
+              onFocus={(e) => e.target.select()}
               className={styles.chatHistoryTitleInput}
-              onKeyDown={({ key }) => {
-                if (key === 'Enter') setEditingTitle(false);
-              }}
+              onClick={(e) => e.stopPropagation()}
             />
           )}
+          <div ref={menuRef}>
+            <ButtonIcon
+              className={styles.menuIcon}
+              icon={EllipsisVertical}
+              size={20}
+              tooltip={{
+                text: 'Chat Options',
+                position: 'bottom',
+              }}
+              aria-label="ChatOptions"
+              onClick={handleMenuClick}
+            />
+          </div>
         </div>
-        <div className={styles.iconsContainer}>
-          {(hover || isMobile) && !editingTitle ? (
-            <>
-              <Pencil
-                className={styles.editIcon}
-                data-testid="edit-chat-history-entry-icon"
-                width="19px"
-                height="19px"
-                onClick={() => setEditingTitle(true)}
-              />
-              <div className={styles.deleteIcon} />
-              <TrashIcon
-                data-testid="delete-chat-history-entry-icon"
-                width="19px"
-                height="19px"
-                onClick={() => deleteConversation(id)}
-              />
-            </>
-          ) : null}
-        </div>
+
+        {isMenuOpen && (
+          <div className={styles.menuWrapper}>
+            <div className={styles.dropdownMenu}>
+              <button className={styles.menuItem} onClick={handleEdit}>
+                {editingTitle ? (
+                  <>
+                    <X size={16} />
+                    Cancel
+                  </>
+                ) : (
+                  <>
+                    <Pencil size={16} />
+                    Rename
+                  </>
+                )}
+              </button>
+              <button
+                className={styles.menuItem}
+                data-delete="true"
+                onClick={handleDelete}
+              >
+                <Trash2 size={16} />
+                Delete
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     );
   },

@@ -11,9 +11,9 @@ export const useTheme = () => {
 
   // Destructure theme to make properties like `colors` directly accessible
   const {
-    theme: { colors, typography, spacing, borderRadius, logo },
+    theme: { layout, colors, typography, spacing, borderRadius, logo },
   } = context;
 
   // Return the destructured properties for direct use
-  return { colors, typography, spacing, borderRadius, logo };
+  return { layout, colors, typography, spacing, borderRadius, logo };
 };

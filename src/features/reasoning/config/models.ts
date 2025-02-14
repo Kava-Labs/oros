@@ -16,7 +16,7 @@ export const reasoningModels: Record<
     id: 'deepseek-r1',
     name: 'General Reasoning',
     icon: KavaIcon,
-    description: 'Logical Analysis Engine',
+    description: 'Logical Analysis',
     tools: [],
     systemPrompt: defaultSystemPrompt,
     introText: defaultIntroText,

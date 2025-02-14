@@ -33,6 +33,10 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
     return {
       ...baseTheme,
       ...selectedTheme,
+      layout: {
+        ...baseTheme.layout,
+        ...selectedTheme.layout,
+      },
       colors: {
         ...baseTheme.colors,
         ...selectedTheme.colors,

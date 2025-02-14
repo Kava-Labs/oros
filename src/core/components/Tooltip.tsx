@@ -26,7 +26,7 @@ const Tooltip = ({ content, children, topMargin }: TooltipProps) => {
 
   return (
     <div
-      className={styles.container}
+      className={styles.tooltipContainer}
       onMouseEnter={() => setShow(true)}
       onMouseLeave={() => setShow(false)}
       ref={targetRef}

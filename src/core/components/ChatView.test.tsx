@@ -40,8 +40,11 @@ describe('ChatView', () => {
     cautionText: '',
     introText: 'Foobar',
     onSubmit: () => {},
-    onReset: () => {},
     onCancel: () => {},
+    onMenu: () => {},
+    onNewChat: () => {},
+    onPanelOpen: () => {},
+    isPanelOpen: false,
   };
 
   test('input is focused by default', () => {

@@ -1,36 +1,40 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import styles from './ChatView.module.css';
-import { CancelChatIcon, ResetChatIcon, SendChatIcon } from '../assets';
+import { CancelChatIcon, SendChatIcon } from '../assets';
 import { useTheme } from '../../shared/theme/useTheme';
 import { Conversation } from './Conversation';
 import { useAppContext } from '../context/useAppContext';
-import { isInIframe } from '../utils/isInIframe';
-import { useIsMobile } from '../../shared/theme/useIsMobile';
+import { NavBar } from './NavBar';
 import type { ChatMessage } from '../stores/messageHistoryStore';
-import ModelSelector from './ModelSelector';
-
-const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
+import { useMessageHistory } from '../hooks/useMessageHistory';
 
 export interface ChatViewProps {
   messages: ChatMessage[];
   cautionText: string;
   onSubmit(value: string): void;
-  onReset(): void;
   onCancel(): void;
+  onMenu(): void;
+  onNewChat(): void;
+  onPanelOpen(): void;
+  isPanelOpen: boolean;
   introText: string;
 }
 
-const DEFAULT_HEIGHT = '70px';
+const DEFAULT_HEIGHT = '30px';
 
 export const ChatView = ({
   messages,
   cautionText,
   onSubmit,
-  onReset,
   onCancel,
+  onMenu,
+  onNewChat,
+  onPanelOpen,
+  isPanelOpen,
   introText,
 }: ChatViewProps) => {
   const { isRequesting, modelConfig } = useAppContext();
+  const { hasMessages } = useMessageHistory();
   const [inputValue, setInputValue] = useState('');
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -75,9 +79,6 @@ export const ChatView = ({
       return () => container.removeEventListener('scroll', handleScroll);
     }
   }, [handleScroll]);
-
-  const hasMessages =
-    messages.filter((message) => message.role != 'system').length > 0;
 
   const handleContentRendered = useCallback(() => {
     if (!containerRef.current) return;
@@ -143,7 +144,7 @@ export const ChatView = ({
     }
   };
 
-  const { colors, logo: Logo } = useTheme();
+  const { logo: Logo } = useTheme();
 
   useEffect(() => {
     if (inputRef.current) {
@@ -151,87 +152,86 @@ export const ChatView = ({
     }
   }, []);
 
-  const isIframe = isInIframe();
-  const isMobile = useIsMobile();
-
-  const showNavBar = !isIframe && FEAT_UPDATED_DESIGN;
-
   return (
-    <div
-      id={showNavBar ? styles.updatedChatView : styles.chatview}
-      data-testid="chatview"
-    >
-      {!isMobile && (
-        <div className={styles.modelSelectorContainer}>
-          <ModelSelector />
+    <div className={styles.chatview} data-testid="chatview">
+      <div ref={containerRef} className={styles.scrollContainer}>
+        <div className={styles.chatHeader}>
+          <NavBar
+            onPanelOpen={onPanelOpen}
+            isPanelOpen={isPanelOpen}
+            onMenu={onMenu}
+            onNewChat={onNewChat}
+          />
         </div>
-      )}
-      <div
-        ref={containerRef}
-        id={styles.scrollContent}
-        data-testid="scrollContent"
-      >
-        {hasMessages && (
-          <>
-            {isIframe && (
-              <div id={styles.stickyHeader}>
-                <button
-                  id={styles.resetButton}
-                  aria-label="Reset Chat"
-                  onClick={onReset}
-                >
-                  <ResetChatIcon color={colors.accentTransparent} />
-                </button>
+
+        <div className={styles.chatContainer}>
+          <div
+            className={`${styles.chatContent} ${hasMessages ? styles.fullHeight : ''}`}
+          >
+            {hasMessages && (
+              <Conversation
+                messages={messages}
+                onRendered={handleContentRendered}
+              />
+            )}
+          </div>
+
+          <div
+            className={`${styles.controlsContainer} ${hasMessages ? styles.positionSticky : ''}`}
+            data-testid="controls"
+          >
+            {!hasMessages && (
+              <div className={styles.startContent}>
+                <div className={styles.startLogoContainer}>
+                  {Logo && (
+                    <Logo
+                      width={'100%'}
+                      height="auto"
+                      className={styles.startLogo}
+                    />
+                  )}
+                </div>
+                <h1 className={styles.introText}>{introText}</h1>
               </div>
             )}
 
-            <Conversation
-              messages={messages}
-              onRendered={handleContentRendered}
-            />
-          </>
-        )}
+            <div className={styles.controls}>
+              <div className={styles.inputContainer}>
+                <textarea
+                  className={styles.input}
+                  data-testid="chat-view-input"
+                  rows={1}
+                  value={inputValue}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
+                  ref={inputRef}
+                  placeholder="Ask anything..."
+                ></textarea>
+              </div>
 
-        {!hasMessages && (
-          <div id={styles.startContainer}>
-            <div id={styles.start} data-testid="start">
-              {Logo && <Logo width={isMobile ? 210 : 292} />}
-              <h5 className={styles.introText}>{introText}</h5>
+              <div className={styles.buttonContainer}>
+                <button
+                  data-testid="chat-view-button"
+                  ref={buttonRef}
+                  className={styles.sendChatButton}
+                  type="submit"
+                  onClick={handleButtonClick}
+                  aria-label="Send Chat"
+                  disabled={!isRequesting && inputValue.length === 0}
+                >
+                  {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
+                </button>
+              </div>
+            </div>
+
+            <div
+              className={styles.importantInfo}
+              data-testid="importantInfo"
+            >
+              <span>{cautionText}</span>
             </div>
           </div>
-        )}
-      </div>
-
-      <div
-        data-testid="controls"
-        className={hasMessages ? styles.inputNormal : styles.inputRaised}
-      >
-        <div id={styles.inputContainer}>
-          <textarea
-            id={styles.input}
-            data-testid="chat-view-input"
-            rows={1}
-            value={inputValue}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            ref={inputRef}
-            placeholder="Ask anything..."
-          ></textarea>
-
-          <button
-            data-testid="chat-view-button"
-            ref={buttonRef}
-            id={styles.sendChatButton}
-            type="submit"
-            onClick={handleButtonClick}
-            aria-label="Send Chat"
-          >
-            {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
-          </button>
         </div>
-        <span id={styles.importantInfo} data-testid="importantInfo">
-          <p>{cautionText}</p>
-        </span>
       </div>
     </div>
   );

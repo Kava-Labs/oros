@@ -1,33 +1,28 @@
-.container {
+.nav {
+  height: 100%;
+  background: var(--colors-bgPrimary);
   display: flex;
-  flex-direction: column;
-  background-color: var(--colors-bgPrimary);
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: var(--spacing-sm);
+  padding-right: var(--spacing-sm);
 }
 
-.nav {
+.leftSection {
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  background-color: var(--colors-bgPrimary);
-  border-bottom: 1px solid var(--colors-borderSecondary);
+  align-items: center;
+}
+
+.desktopControls {
+  display: none;
 }
 
 .menu {
   display: flex;
+  justify-content: center;
   align-items: center;
-  width: 100%;
-  border-bottom: 1px solid var(--colors-borderSecondary);
-  background-color: var(--colors-bgSecondary);
-}
-
-.hamburger {
-  padding: var(--spacing-md) 0 var(--spacing-md) var(--spacing-lg);
-  display: flex;
-  align-items: center;
-
-  &:hover {
-    cursor: pointer;
-  }
+  cursor: pointer;
 }
 
 .logo {
@@ -38,133 +33,27 @@
   justify-content: center;
 }
 
-.dropdownContainer {
-  position: relative;
+.centerSection {
+  flex: 1;
   display: flex;
   justify-content: center;
-  width: 100%;
-  height: 62px;
-}
-
-.dropdown {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: 0 var(--spacing-md);
-  background-color: var(--colors-bgPrimary);
-  border-radius: var(--borderRadius-sm);
-  color: var(--colors-textSecondary);
-  cursor: pointer;
-  border: none;
-  height: 62px;
-  width: 330px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: opacity 0.2s ease, background-color 0.2s ease;
-}
-
-.dropdown:disabled {
-  opacity: 0.6;
-  background-color: var(--colors-bgTertiary);
-}
-
-.dropdownMenu {
-  position: fixed;
-  top: 62px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: var(--colors-bgSecondary);
-  border-radius: var(--borderRadius-sm);
-  border: 1px solid var(--colors-bgTertiary);
-  display: flex;
-  flex-direction: column;
-  width: calc(100% - 32px);
-  max-width: 330px;
-  margin-top: var(--spacing-xs);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-}
-
-.dropdownItem {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: 10px var(--spacing-md);
-  background-color: var(--colors-bgPrimary);
-  color: var(--colors-textSecondary);
-  border: none;
-  cursor: pointer;
-  width: 100%;
-  text-align: left;
-  min-height: 44px;
-}
-
-.dropdownItem:hover {
-  background-color: var(--colors-bgTertiary);
-}
-
-.dropdownItem:disabled {
-  opacity: 0.5;
-  background-color: var(--colors-bgPrimary);
-}
-
-.dropdownItem:disabled:hover {
-  background-color: var(--colors-bgPrimary);
-}
-
-.arrowDown {
-  transform: rotate(0deg);
-  transition: transform 0.2s ease-in-out;
-}
-
-.arrowUp {
-  transform: rotate(180deg);
-  transition: transform 0.2s ease-in-out;
-}
-
-.modelOption {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  flex: 1;
   align-items: center;
 }
 
-.modelInfo {
+.rightSection {
   display: flex;
-  gap: var(--spacing-sm);
   align-items: center;
 }
 
-.nameContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.nameContainer h6 {
-  font-weight: var(--typography-fontWeightRegular);
-  margin-bottom: 0px;
-}
-
-.description {
-  display: none;
-}
-
+/* Desktop styles */
 @media (min-width: 768px) {
-  .nav {
-    flex-direction: row;
-    justify-content: space-between;
-    padding: 12px 12px;
-    max-height: 89px;
-    border-bottom: 1px solid var(--colors-borderSecondary);
+  .menu {
+    display: none;
   }
 
-  .menu {
-    width: auto;
-    border-bottom: none;
-    padding-left: var(--spacing-md);
+  .desktopControls {
+    display: flex;
+    align-items: center;
   }
 
   .logo {
@@ -172,42 +61,7 @@
     padding: 0;
   }
 
-  .dropdownContainer {
-    justify-content: flex-end;
-    width: auto;
-  }
-
-  .dropdown {
-    width: 330px;
-    border: 1px solid var(--colors-bgTertiary);
-  }
-
-  .dropdownMenu {
-    min-width: 330px;
-    left: auto;
-    transform: none;
-    border: 1px solid var(--colors-bgTertiary);
-    border-top: none;
-  }
-
-  .hamburger {
-    display: none;
-  }
-
-  .description {
-    display: block;
-    font-weight: var(--typography-fontWeightLight);
-  }
-}
-
-.newChatIcon {
-  padding: var(--spacing-sm);
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  color: var(--colors-textPrimary);
-
-  &:hover {
-    color: var(--colors-textMuted);
+  .newChatDesktop {
+    margin-right: var(--spacing-sm);
   }
 }

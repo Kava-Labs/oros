@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { AppContext } from './AppContext';
 import { OperationRegistry } from '../../features/blockchain/services/registry';
 import { WalletStore } from '../../features/blockchain/stores/walletStore';
@@ -47,11 +47,43 @@ export const AppContextProvider = ({
     initializeMessageRegistry(),
   );
 
+  const [conversations, setConversations] = useState<ConversationHistory[]>(
+    () => {
+      const stored = localStorage.getItem('conversations');
+      if (!stored) return [];
+      try {
+        return Object.values(JSON.parse(stored)) as ConversationHistory[];
+      } catch (e) {
+        console.error('Error parsing conversations:', e);
+        return [];
+      }
+    },
+  );
+
   const [modelConfig, setModelConfig] = useState<ModelConfig>(() =>
     getModelConfig(DEFAULT_MODEL_NAME),
   );
 
-  // This callback would be passed to components that need to switch models
+  // Poll for conversation changes
+  useEffect(() => {
+    const load = () => {
+      const storedConversations = Object.values(
+        JSON.parse(localStorage.getItem('conversations') ?? '{}'),
+      ) as ConversationHistory[];
+      setConversations(storedConversations);
+    };
+
+    const id = setInterval(load, 1000);
+    return () => {
+      clearInterval(id);
+    };
+  }, []);
+
+  const hasConversations = useMemo(
+    () => conversations.length > 0,
+    [conversations],
+  );
+
   const handleModelChange = useCallback(
     (modelName: SupportedModels) => {
       const newConfig = getModelConfig(modelName);
@@ -218,6 +250,8 @@ export const AppContextProvider = ({
         isRequesting,
         setIsRequesting,
         isOperationValidated,
+        conversations,
+        hasConversations,
       }}
     >
       {children}

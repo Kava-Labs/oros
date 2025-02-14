@@ -1,4 +1,4 @@
-import styles from './ChatView.module.css';
+import styles from './Conversation.module.css';
 import { Content } from './Content';
 import { StreamingText } from './StreamingText';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
@@ -18,7 +18,6 @@ import {
   OperationType,
 } from '../../features/blockchain/types/chain';
 import KavaIcon from '../assets/KavaIcon';
-import { isInIframe } from '../utils/isInIframe';
 import AssistantMessage from './AssistantMessage';
 import { ThinkingContent } from './ThinkingContent';
 import type { ChatMessage } from '../stores/messageHistoryStore';
@@ -43,11 +42,7 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
   } = useAppContext();
 
   return (
-    <div
-      id={styles.conversation}
-      data-testid="conversation"
-      style={{ marginTop: !isInIframe() ? '24px' : '-10px' }}
-    >
+    <div className={styles.conversationContainer} data-testid="conversation">
       {messages.map((message, index) => {
         if (message.role === 'user') {
           return (
@@ -136,7 +131,7 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
           <KavaIcon className={styles.conversationChatIcon} />
 
           <div className={styles.assistantContainer}>
-            <div id={styles.progressStream}>
+            <div className={styles.progressStream}>
               <StreamingText store={progressStore} onRendered={onRendered}>
                 {StreamingTextContent}
               </StreamingText>
