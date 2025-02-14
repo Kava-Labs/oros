@@ -18,6 +18,13 @@ export class MessageHistoryStore {
   private currentValue: ChatMessage[] = [];
   private listeners: Set<Listener> = new Set();
 
+  public hasUserMessages(): boolean {
+    return (
+      this.currentValue.filter((message) => message.role !== 'system').length >
+      0
+    );
+  }
+
   public addMessage(msg: ChatMessage) {
     const newMessages = [...this.currentValue, msg];
     this.currentValue = newMessages;

@@ -1,13 +1,14 @@
 import { SquarePen } from 'lucide-react';
 import ButtonIcon from '../components/ButtonIcon';
 import styles from './Button.module.css';
+import type { ButtonIconProps } from '../components/ButtonIcon';
 
-interface NewChatButtonProps {
-  className?: string;
-  onClick(): void;
-}
+type NewChatButtonProps = Omit<ButtonIconProps, 'icon' | 'aria-label'>;
 
-export const NewChatButton = ({ className, onClick }: NewChatButtonProps) => {
+export const NewChatButton = ({
+  className,
+  ...buttonProps
+}: NewChatButtonProps) => {
   return (
     <ButtonIcon
       icon={SquarePen}
@@ -17,7 +18,7 @@ export const NewChatButton = ({ className, onClick }: NewChatButtonProps) => {
         position: 'bottom',
       }}
       aria-label="New Chat"
-      onClick={onClick}
+      {...buttonProps}
     />
   );
 };

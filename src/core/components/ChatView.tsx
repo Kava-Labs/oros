@@ -6,7 +6,7 @@ import { Conversation } from './Conversation';
 import { useAppContext } from '../context/useAppContext';
 import { NavBar } from './NavBar';
 import type { ChatMessage } from '../stores/messageHistoryStore';
-import ModelSelector from './ModelSelector';
+import { useMessageHistory } from '../hooks/useMessageHistory';
 
 export interface ChatViewProps {
   messages: ChatMessage[];
@@ -36,6 +36,7 @@ export const ChatView = ({
   introText,
 }: ChatViewProps) => {
   const { isRequesting, modelConfig } = useAppContext();
+  const { hasMessages } = useMessageHistory();
   const [inputValue, setInputValue] = useState('');
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -83,9 +84,6 @@ export const ChatView = ({
       return () => container.removeEventListener('scroll', handleScroll);
     }
   }, [handleScroll]);
-
-  const hasMessages =
-    messages.filter((message) => message.role != 'system').length > 0;
 
   const handleContentRendered = useCallback(() => {
     if (!containerRef.current) return;

@@ -14,7 +14,7 @@ interface TooltipProps {
   delay?: number;
 }
 
-interface ButtonIconProps
+export interface ButtonIconProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon: LucideIcon;
   tooltip?: TooltipProps | string;
