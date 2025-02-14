@@ -1,18 +1,13 @@
-import { useRef, useEffect, useCallback, useState } from 'react';
+import { useState } from 'react';
 import { ChatView } from './core/components/ChatView';
 import { defaultCautionText } from './features/blockchain/config/prompts/defaultPrompts';
 import { useAppContext } from './core/context/useAppContext';
-import { OperationResult } from './features/blockchain/types/chain';
-import { ExecuteOperation } from './core/context/types';
 import styles from './App.module.css';
 import { ChatHistory } from './core/components/ChatHistory';
 import { useIsMobile } from './shared/theme/useIsMobile';
-import { ModelConfig } from './core/types/models';
-import OpenAI from 'openai';
 import { X as CloseX, PanelLeftClose } from 'lucide-react';
 import KavaAILogo from './core/assets/KavaAILogo';
 import ButtonIcon from './core/components/ButtonIcon';
-import { SearchChatButton } from './core/assets/SearchChatButton';
 import { useMessageHistory } from './core/hooks/useMessageHistory';
 
 export const App = () => {
@@ -23,9 +18,7 @@ export const App = () => {
     thinkingStore,
     handleChatCompletion,
     setIsRequesting,
-    handleReset,
     handleCancel,
-    hasConversations,
   } = useAppContext();
   const { messages } = useMessageHistory();
 
@@ -65,10 +58,10 @@ export const App = () => {
               <KavaAILogo height={20} />
               {isMobile && isMobileSideBarOpen && (
                 <div className={styles.buttonGroup}>
-                  <SearchChatButton
+                  {/* <SearchChatButton
                     onClick={() => {}}
                     disabled={!hasConversations}
-                  />
+                  /> */}
                   <ButtonIcon
                     icon={CloseX}
                     tooltip={{
@@ -82,10 +75,10 @@ export const App = () => {
               )}
               {!isMobile && !isDesktopSideBarHidden && (
                 <div className={styles.buttonGroup}>
-                  <SearchChatButton
+                  {/* <SearchChatButton
                     onClick={() => {}}
                     disabled={!hasConversations}
-                  />
+                  /> */}
                   <ButtonIcon
                     icon={PanelLeftClose}
                     tooltip={{

@@ -31,7 +31,6 @@ export type AppContextType = {
   modelConfig: ModelConfig;
   handleModelChange: (modelName: SupportedModels) => void;
   executeOperation: ExecuteOperation;
-  loadConversation: (convoHistory: ConversationHistory) => void;
   handleReset: () => void;
   handleChatCompletion: (value: string) => void;
   handleCancel: () => void;
