@@ -4,13 +4,9 @@ import { CancelChatIcon, ResetChatIcon, SendChatIcon } from '../assets';
 import { useTheme } from '../../shared/theme/useTheme';
 import { Conversation } from './Conversation';
 import { useAppContext } from '../context/useAppContext';
-import { isInIframe } from '../utils/isInIframe';
-import { useIsMobile } from '../../shared/theme/useIsMobile';
 import { NavBar } from './NavBar';
 import type { ChatMessage } from '../stores/messageHistoryStore';
 import ModelSelector from './ModelSelector';
-
-const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
 
 export interface ChatViewProps {
   messages: ChatMessage[];
@@ -65,7 +61,10 @@ export const ChatView = ({
 
   const scrollToBottom = useCallback(() => {
     if (!containerRef.current) return;
+    console.log("content rendered");
+    console.log(containerRef.current.scrollHeight);
     containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    console.log(containerRef.current.scrollTop)
   }, []);
 
   // Reset textarea height when input is cleared
@@ -160,26 +159,22 @@ export const ChatView = ({
     }
   }, []);
 
-  const isIframe = isInIframe();
-  const isMobile = useIsMobile();
-
-  const showNavBar = !isIframe && FEAT_UPDATED_DESIGN;
-
   return (
     <div className={styles.chatview} data-testid="chatview">
-      <div className={styles.chatHeader}>
-        <NavBar onPanelOpen={onPanelOpen} isPanelOpen={isPanelOpen} onMenu={onMenu} onNewChat={onNewChat} />
-      </div>
+      <div ref={containerRef} className={styles.scrollContainer}>
 
-        <div ref={containerRef} className={`${styles.scrollArea} ${hasMessages ? styles.fullHeight : ''}`}>
-          <div className={`${styles.scrollContent}`}>
+        <div className={styles.chatHeader}>
+          <NavBar onPanelOpen={onPanelOpen} isPanelOpen={isPanelOpen} onMenu={onMenu} onNewChat={onNewChat} />
+        </div>
+
+        <div className={styles.chatContainer}>
+          <div className={`${styles.chatContent} ${hasMessages ? styles.fullHeight: ''}`}>
             { hasMessages && (
-                <Conversation
-                  messages={messages}
-                  onRendered={handleContentRendered}
-                />
+              <Conversation
+                messages={messages}
+                onRendered={handleContentRendered}
+              />
             )}
-            </div>
           </div>
 
           <div className={`${styles.controlsContainer} ${hasMessages ? styles.positionSticky : ''}` } data-testid="controls">
@@ -220,6 +215,9 @@ export const ChatView = ({
               <span className={styles.importantInfo} data-testid="importantInfo">
                 <p>{cautionText}</p>
               </span>
+            </div>
+
+          </div>
         </div>
       </div>
     </div>
