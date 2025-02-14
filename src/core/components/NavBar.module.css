@@ -54,11 +54,14 @@
   .desktopControls {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
   }
 
   .logo {
     width: auto;
     padding: 0;
+  }
+
+  .newChatDesktop {
+    margin-right: var(--spacing-sm);
   }
 }
