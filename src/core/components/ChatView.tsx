@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import styles from './ChatView.module.css';
-import { CancelChatIcon, ResetChatIcon, SendChatIcon } from '../assets';
+import { CancelChatIcon, SendChatIcon } from '../assets';
 import { useTheme } from '../../shared/theme/useTheme';
 import { Conversation } from './Conversation';
 import { useAppContext } from '../context/useAppContext';
@@ -12,7 +12,6 @@ export interface ChatViewProps {
   messages: ChatMessage[];
   cautionText: string;
   onSubmit(value: string): void;
-  onReset(): void;
   onCancel(): void;
   onMenu(): void;
   onNewChat(): void;
@@ -27,7 +26,6 @@ export const ChatView = ({
   messages,
   cautionText,
   onSubmit,
-  onReset,
   onCancel,
   onMenu,
   onNewChat,
@@ -62,10 +60,7 @@ export const ChatView = ({
 
   const scrollToBottom = useCallback(() => {
     if (!containerRef.current) return;
-    console.log('content rendered');
-    console.log(containerRef.current.scrollHeight);
     containerRef.current.scrollTop = containerRef.current.scrollHeight;
-    console.log(containerRef.current.scrollTop);
   }, []);
 
   // Reset textarea height when input is cleared
@@ -149,7 +144,7 @@ export const ChatView = ({
     }
   };
 
-  const { colors, logo: Logo } = useTheme();
+  const { logo: Logo } = useTheme();
 
   useEffect(() => {
     if (inputRef.current) {
