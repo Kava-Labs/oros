@@ -1,7 +1,9 @@
 .dropdownContainer {
   position: relative;
   display: inline-block;
-  width: 15rem;
+  width: 90vw;
+  max-width: 15rem;
+  margin-left: 0;
   /* ensures content doesn't get cut off */
   min-width: min-content;
 }
@@ -116,14 +118,6 @@
   margin-top: var(--spacing-xs);
 }
 
-@media (max-width: 768px) {
-  .dropdownContainer {
-    width: 90vw;
-    max-width: 15rem;
-    margin-left: 0;
-  }
-}
-
 .chatHistoryTitle:hover {
   color: var(--colors-textPrimary);
 }
@@ -131,4 +125,12 @@
 .menuIcon:hover {
   background-color: var(--colors-bgTertiary);
   border-radius: var(--borderRadius-sm);
+}
+
+/* Desktop styles */
+@media (min-width: 769px) {
+  .dropdownContainer {
+    width: 15rem;
+    margin-left: initial;
+  }
 }
