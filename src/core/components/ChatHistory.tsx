@@ -247,7 +247,7 @@ const HistoryItem = memo(
               icon={EllipsisVertical}
               size={20}
               tooltip={{
-                text: 'Chat Options',
+                text: 'Options',
                 position: 'bottom',
               }}
               aria-label="ChatOptions"

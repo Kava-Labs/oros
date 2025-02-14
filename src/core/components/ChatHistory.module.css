@@ -116,7 +116,7 @@
 
 .menuIcon {
   padding: var(--spacing-xs) 0 var(--spacing-xs) var(--spacing-xs);
-  padding: var(--spacing-xs);
+  margin-right: 0.9rem;
 }
 
 .emptyState {
