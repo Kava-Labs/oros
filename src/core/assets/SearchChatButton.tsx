@@ -1,15 +1,15 @@
 import { TextSearch } from 'lucide-react';
 import ButtonIcon from '../components/ButtonIcon';
 import styles from './Button.module.css';
+import type { ButtonIconProps } from '../components/ButtonIcon';
 
-interface SearchChatButtonProps {
-  className?: string;
-  onClick(): void;
-}
+// Only need to specify props specific to SearchChatButton
+// Omit the required props from ButtonIcon that we're providing
+type SearchChatButtonProps = Omit<ButtonIconProps, 'icon' | 'aria-label'>;
 
 export const SearchChatButton = ({
   className,
-  onClick,
+  ...buttonProps
 }: SearchChatButtonProps) => {
   return (
     <ButtonIcon
@@ -20,7 +20,7 @@ export const SearchChatButton = ({
         position: 'bottom',
       }}
       aria-label="Search History"
-      onClick={onClick}
+      {...buttonProps}
     />
   );
 };

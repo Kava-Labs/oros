@@ -11,6 +11,7 @@ import { X as CloseX, PanelLeftClose } from 'lucide-react';
 import KavaAILogo from './core/assets/KavaAILogo';
 import ButtonIcon from './core/components/ButtonIcon';
 import { SearchChatButton } from './core/assets/SearchChatButton';
+import { useMessageHistory } from './core/hooks/useMessageHistory';
 
 const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
 const showHistorySidebar = !isInIframe() && FEAT_UPDATED_DESIGN;
@@ -26,11 +27,7 @@ export const App = () => {
     handleReset,
     handleCancel,
   } = useAppContext();
-
-  const messages = useSyncExternalStore(
-    messageHistoryStore.subscribe,
-    messageHistoryStore.getSnapshot,
-  );
+  const { messages, hasMessages } = useMessageHistory();
 
   const startNewChat = () => {
     thinkingStore.setText('');
@@ -67,7 +64,7 @@ export const App = () => {
               <KavaAILogo height={20} />
               {isMobile && isMobileSideBarOpen && (
                 <div className={styles.buttonGroup}>
-                  <SearchChatButton onClick={() => {}} />
+                  <SearchChatButton onClick={() => {}} disabled={true} />
                   <ButtonIcon
                     icon={CloseX}
                     tooltip={{
@@ -81,7 +78,7 @@ export const App = () => {
               )}
               {!isMobile && !isDesktopSideBarHidden && (
                 <div className={styles.buttonGroup}>
-                  <SearchChatButton onClick={() => {}} />
+                  <SearchChatButton onClick={() => {}} disabled={true} />
                   <ButtonIcon
                     icon={PanelLeftClose}
                     tooltip={{
