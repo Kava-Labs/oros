@@ -20,26 +20,16 @@ const SearchChatHistory = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        modalRef.current &&
-        !modalRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-        setSearchTerm('');
-      }
-    };
-
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
       // Focus input when modal opens
       inputRef.current?.focus();
     }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
   }, [isOpen]);
+
+  const handleClose = () => {
+    setIsOpen(false);
+    setSearchTerm('');
+  };
 
   return (
     <div className={styles.container}>
@@ -53,13 +43,7 @@ const SearchChatHistory = ({
       </button>
 
       {isOpen && (
-        <ModalWrapper
-          modalRef={modalRef}
-          onCloseClick={() => {
-            setIsOpen(false);
-            setSearchTerm('');
-          }}
-        >
+        <ModalWrapper modalRef={modalRef} onClose={handleClose}>
           <SearchModalBody
             conversations={conversations}
             onConversationSelect={onConversationSelect}
