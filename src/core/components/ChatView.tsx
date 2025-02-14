@@ -20,7 +20,7 @@ export interface ChatViewProps {
   introText: string;
 }
 
-const DEFAULT_HEIGHT = '70px';
+const DEFAULT_HEIGHT = '30px';
 
 export const ChatView = ({
   messages,
@@ -207,7 +207,9 @@ export const ChatView = ({
                   ref={inputRef}
                   placeholder="Ask anything..."
                 ></textarea>
+              </div>
 
+              <div className={styles.buttonContainer}>
                 <button
                   data-testid="chat-view-button"
                   ref={buttonRef}
@@ -220,13 +222,13 @@ export const ChatView = ({
                   {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
                 </button>
               </div>
+            </div>
 
-              <span
-                className={styles.importantInfo}
-                data-testid="importantInfo"
-              >
-                <p>{cautionText}</p>
-              </span>
+            <div
+              className={styles.importantInfo}
+              data-testid="importantInfo"
+            >
+              <span>{cautionText}</span>
             </div>
           </div>
         </div>
