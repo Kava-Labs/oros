@@ -14,7 +14,7 @@
   flex: 1;
 
   overflow-x: hidden;
-  overflow-y: scroll;
+  overflow-y: auto;
 
   scrollbar-color: var(--colors-bgTertiary) var(--colors-bgPrimary);
   -webkit-overflow-scrolling: touch;
