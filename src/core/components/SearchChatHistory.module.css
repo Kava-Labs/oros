@@ -19,6 +19,7 @@
   color: var(--colors-textMuted);
 }
 
+/* Modal - Mobile First */
 .modalOverlay {
   position: fixed;
   top: 0;
@@ -55,7 +56,6 @@
 
 .searchInputWrapper {
   padding: var(--spacing-md);
-  border-bottom: 1px solid var(--colors-borderSecondary);
 }
 
 .searchInput {
@@ -90,7 +90,7 @@
 }
 
 .conversationItem {
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-sm);
   cursor: pointer;
   border-radius: var(--borderRadius-sm);
   margin: 2px var(--spacing-xs);
@@ -102,7 +102,7 @@
 
 .conversationTitle {
   color: var(--colors-textPrimary);
-  line-height: var(--spacing-lg);
+  font-size: 1.4rem;
 }
 
 .conversationSnippet {
@@ -129,6 +129,7 @@
   font-size: 1.5rem;
 }
 
+/* Desktop Styles */
 @media (min-width: 640px) {
   .modalOverlay {
     background-color: rgba(0, 0, 0, 0.5);
@@ -146,5 +147,9 @@
 
   .closeButton {
     display: none;
+  }
+
+  .searchInputWrapper {
+    border-bottom: 1px solid var(--colors-borderSecondary);
   }
 }
