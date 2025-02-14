@@ -36,9 +36,8 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-
   padding-left: var(--spacing-md);
-  padding-right: var(--spacing-md);
+  padding-right: calc(var(--spacing-md) - var(--spacing-sm));
 }
 
 .sidebarContent {
@@ -107,5 +106,5 @@
 
 .buttonGroup {
   display: flex;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-xs);
 }
