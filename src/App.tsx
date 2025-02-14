@@ -1,20 +1,19 @@
-import { useEffect, useSyncExternalStore, useState } from 'react';
+import { useRef, useEffect, useCallback, useState } from 'react';
 import { ChatView } from './core/components/ChatView';
 import { defaultCautionText } from './features/blockchain/config/prompts/defaultPrompts';
 import { useAppContext } from './core/context/useAppContext';
-import MobileNav from './core/components/NavBar';
+import { OperationResult } from './features/blockchain/types/chain';
+import { ExecuteOperation } from './core/context/types';
 import styles from './App.module.css';
 import { ChatHistory } from './core/components/ChatHistory';
 import { useIsMobile } from './shared/theme/useIsMobile';
-import { isInIframe } from './core/utils/isInIframe';
+import { ModelConfig } from './core/types/models';
+import OpenAI from 'openai';
 import { X as CloseX, PanelLeftClose } from 'lucide-react';
 import KavaAILogo from './core/assets/KavaAILogo';
 import ButtonIcon from './core/components/ButtonIcon';
 import { SearchChatButton } from './core/assets/SearchChatButton';
 import { useMessageHistory } from './core/hooks/useMessageHistory';
-
-const FEAT_UPDATED_DESIGN = import.meta.env.VITE_FEAT_UPDATED_DESIGN;
-const showHistorySidebar = !isInIframe() && FEAT_UPDATED_DESIGN;
 
 export const App = () => {
   const {
