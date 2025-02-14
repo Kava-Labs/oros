@@ -43,7 +43,6 @@ export const NavBar = ({
           <div className={styles.menu}>
             <ButtonIcon
               icon={Menu}
-              size={24}
               tooltip={{
                 text: 'Menu',
                 position: 'bottom',
