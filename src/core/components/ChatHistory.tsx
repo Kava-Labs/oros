@@ -172,20 +172,13 @@ const HistoryItem = memo(
     useEffect(() => {
       let tid: NodeJS.Timeout;
       if (newTitle !== title) {
-        // user changed the title
-        // save to local storage
         const conversations = JSON.parse(
           localStorage.getItem('conversations') ?? '{}',
         );
-        conversations[id].title = newTitle;
-        localStorage.setItem('conversations', JSON.stringify(conversations));
-        tid = setTimeout(() => {
-          // after saving, wait a bit and kick user out of editing state
-          setEditingTitle(false);
-        }, 1000);
-      } else if (editingTitle) {
-        // user clicked to edit title but made no changes
-        // after some time reset the edit state back to false
+        setNewTitle((prev) => conversations[id].title ?? prev);
+      }
+
+      if (editingTitle) {
         tid = setTimeout(() => {
           setEditingTitle(false);
         }, 5000);
@@ -202,6 +195,25 @@ const HistoryItem = memo(
       () => formatConversationTitle(newTitle, hover ? 30 : 34),
       [newTitle, hover],
     );
+
+    const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setNewTitle((prevTitle) => {
+        let newTitle = e.target.value;
+        try {
+          const conversations = JSON.parse(
+            localStorage.getItem('conversations') ?? '{}',
+          );
+          conversations[id].title = newTitle;
+          localStorage.setItem('conversations', JSON.stringify(conversations));
+        } catch (err) {
+          // local storage failed
+          console.error(err);
+          newTitle = prevTitle;
+        }
+
+        return newTitle;
+      });
+    };
 
     return (
       <div
@@ -223,7 +235,7 @@ const HistoryItem = memo(
               data-testid="edit-chat-history-title-input"
               type="text"
               value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
+              onChange={handleTitleChange}
               onBlur={() => setEditingTitle(false)}
               className={styles.chatHistoryTitleInput}
               onKeyDown={({ key }) => {

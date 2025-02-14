@@ -16,46 +16,54 @@ export const useMessageSaver = (
       const messages = messageHistoryStore.getSnapshot();
       const id = messageHistoryStore.getConversationID();
 
-      if (messages.length >= 3) {
-        const firstUserMessage = messages.find((msg) => msg.role === 'user');
-        if (!firstUserMessage) return;
-        const { content } = firstUserMessage;
+      const firstUserMessage = messages.find((msg) => msg.role === 'user');
+      if (!firstUserMessage) return;
 
-        const allConversations: Record<string, ConversationHistory> =
-          JSON.parse(localStorage.getItem('conversations') ?? '{}');
+      const hasAssistantResponse =
+        messages.find((msg) => msg.role === 'assistant') !== undefined;
 
-        // Check if this is an existing conversation
-        const existingConversation = allConversations[id];
+      const allConversations: Record<string, ConversationHistory> = JSON.parse(
+        localStorage.getItem('conversations') ?? '{}',
+      );
 
-        // Initialize message count for this conversation if it doesn't exist
-        if (!prevMessageCountRef.current[id]) {
-          prevMessageCountRef.current[id] = existingConversation
-            ? existingConversation.conversation.length
-            : messages.length;
-        }
+      // Check if this is an existing conversation
+      const existingConversation = allConversations[id];
 
-        // Determine if new messages were added to an existing conversation
-        const hasNewMessages =
-          existingConversation &&
-          messages.length > prevMessageCountRef.current[id];
+      // Initialize message count for this conversation if it doesn't exist
+      if (!prevMessageCountRef.current[id]) {
+        prevMessageCountRef.current[id] = existingConversation
+          ? existingConversation.conversation.length
+          : messages.length;
+      }
 
-        // Update the message count reference
-        prevMessageCountRef.current[id] = messages.length;
+      // Determine if new messages were added to an existing conversation
+      const hasNewMessages =
+        existingConversation &&
+        messages.length > prevMessageCountRef.current[id];
 
-        // Only update lastSaved if new messages were added to an existing conversation
-        const lastSaved = hasNewMessages
-          ? new Date().valueOf()
-          : (existingConversation?.lastSaved ?? new Date().valueOf());
+      // Update the message count reference
+      prevMessageCountRef.current[id] = messages.length;
 
-        const history: ConversationHistory = {
-          id,
-          model: existingConversation ? existingConversation.model : modelID,
-          title: content as string, // fallback value
-          conversation: messages,
-          lastSaved,
-        };
+      // Only update lastSaved if new messages were added to an existing conversation
+      const lastSaved = hasNewMessages
+        ? new Date().valueOf()
+        : (existingConversation?.lastSaved ?? new Date().valueOf());
 
-        if (!existingConversation) {
+      const history: ConversationHistory = {
+        id,
+        model: existingConversation ? existingConversation.model : modelID,
+        title: firstUserMessage.content as string, // default value
+        conversation: messages,
+        lastSaved,
+      };
+
+      if (hasAssistantResponse) {
+        // no generated title yet
+        console.log(
+          { hasAssistantResponse },
+          allConversations[id].title === firstUserMessage.content,
+        );
+        if (allConversations[id].title === firstUserMessage.content) {
           try {
             const data = await client.chat.completions.create({
               stream: false,
@@ -83,19 +91,19 @@ export const useMessageSaver = (
             });
 
             history.title =
-              data.choices[0].message.content ?? (content as string);
+              data.choices[0].message.content ??
+              (firstUserMessage.content as string);
           } catch (err) {
-            history.title = content as string;
             console.error(err);
           }
         } else {
           // keep the generated title
           history.title = allConversations[id].title;
         }
-
-        allConversations[id] = history;
-        localStorage.setItem('conversations', JSON.stringify(allConversations));
       }
+
+      allConversations[id] = history;
+      localStorage.setItem('conversations', JSON.stringify(allConversations));
     };
 
     // subscribe to the store within the useEffect instead of using useSyncExternalStore
