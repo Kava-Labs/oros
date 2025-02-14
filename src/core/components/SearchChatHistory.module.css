@@ -19,7 +19,6 @@
   color: var(--colors-textMuted);
 }
 
-/* Modal - Mobile First */
 .modalOverlay {
   position: fixed;
   top: 0;
@@ -129,7 +128,6 @@
   font-size: 1.5rem;
 }
 
-/* Desktop Styles */
 @media (min-width: 640px) {
   .modalOverlay {
     background-color: rgba(0, 0, 0, 0.5);
