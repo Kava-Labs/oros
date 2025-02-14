@@ -1,22 +1,29 @@
-.right {
+.conversationContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-md);
+}
+
+.userInputContainer {
   flex-shrink: 0;
   border-radius: var(--borderRadius-md);
   background: var(--colors-bgTertiary);
   color: var(--colors-textPrimary);
-  padding: var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-md) var(--spacing-xs);
   margin-left: auto;
-  margin-top: var(--borderRadius-sm);
+  margin-bottom: var(--spacing-lg);
   max-width: 80%;
 }
 
-.left {
+.assistantOutputContainer {
   flex-shrink: 0;
-  margin-top: var(--spacing-lg);
-  padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) 0px;
   color: var(--colors-textPrimary);
   display: flex;
   flex-direction: row;
   align-items: start;
+  margin-bottom: var(--spacing-sm);
 }
 
 .assistantContainer {
@@ -59,13 +66,6 @@
   object-fit: contain;
   aspect-ratio: 1 / 1;
   transform-origin: center;
-}
-
-.conversationContainer {
-  width: 100%;
-  display: flex;
-  padding: 0 var(--spacing-sm);
-  flex-direction: column;
 }
 
 /** Basic list wrapping **/
