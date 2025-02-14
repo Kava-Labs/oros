@@ -27,23 +27,13 @@ export const ChatHistory = ({
   onHistoryItemClick,
   startNewChat,
 }: ChatHistoryProps) => {
-  const [conversations, setConversations] = useState<ConversationHistory[]>([]);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
-  const { loadConversation, messageHistoryStore } = useAppContext();
-
-  useEffect(() => {
-    const load = () => {
-      const storedConversations = Object.values(
-        JSON.parse(localStorage.getItem('conversations') ?? '{}'),
-      ) as ConversationHistory[];
-      setConversations(storedConversations);
-    };
-    load();
-    const id = setInterval(load, 1000);
-    return () => {
-      clearInterval(id);
-    };
-  }, []);
+  const {
+    loadConversation,
+    messageHistoryStore,
+    conversations,
+    hasConversations,
+  } = useAppContext();
 
   const groupedHistories = useMemo(
     () => groupConversationsByTime(conversations),
@@ -65,7 +55,6 @@ export const ChatHistory = ({
 
       delete allConversations[id];
       localStorage.setItem('conversations', JSON.stringify(allConversations));
-      setConversations(Object.values(allConversations));
       setOpenMenuId(null);
     },
     [messageHistoryStore, startNewChat],
@@ -86,7 +75,7 @@ export const ChatHistory = ({
   return (
     <div className={styles.chatHistoryContainer}>
       <div data-testid="chat-history-section">
-        {conversations.length === 0 ? (
+        {!hasConversations ? (
           <div className={styles.emptyState}>
             <Bot className={styles.emptyStateIcon} size={24} />
             <small className={styles.emptyStateText}>

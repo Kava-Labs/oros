@@ -26,8 +26,9 @@ export const App = () => {
     setIsRequesting,
     handleReset,
     handleCancel,
+    hasConversations,
   } = useAppContext();
-  const { messages, hasMessages } = useMessageHistory();
+  const { messages } = useMessageHistory();
 
   const startNewChat = () => {
     thinkingStore.setText('');
@@ -64,7 +65,10 @@ export const App = () => {
               <KavaAILogo height={20} />
               {isMobile && isMobileSideBarOpen && (
                 <div className={styles.buttonGroup}>
-                  <SearchChatButton onClick={() => {}} disabled={true} />
+                  <SearchChatButton
+                    onClick={() => {}}
+                    disabled={!hasConversations}
+                  />
                   <ButtonIcon
                     icon={CloseX}
                     tooltip={{
@@ -78,7 +82,10 @@ export const App = () => {
               )}
               {!isMobile && !isDesktopSideBarHidden && (
                 <div className={styles.buttonGroup}>
-                  <SearchChatButton onClick={() => {}} disabled={true} />
+                  <SearchChatButton
+                    onClick={() => {}}
+                    disabled={!hasConversations}
+                  />
                   <ButtonIcon
                     icon={PanelLeftClose}
                     tooltip={{
