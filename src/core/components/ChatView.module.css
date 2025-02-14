@@ -1,38 +1,11 @@
 .chatview {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
   position: relative;
   contain: layout;
-}
 
-.chatHeader {
-  height: var(--layout-headerHeight);
-  background: var(--colors-bgPrimary);
-  position: sticky;
-  top: 0;
-  z-index: 90;
-  flex-shrink: 0;
-}
-
-.scrollArea {
   display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  scrollbar-color: var(--colors-bgTertiary) var(--colors-bgPrimary);
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-  min-height: 0;
-  transition: flex 0.3s ease;
-
-  padding-left: var(--spacing-sm);
-  padding-right: var(--spacing-sm);
-
-  container-type: inline-size;
-}
-
-.scrollArea.fullHeight {
   flex: 1;
+  flex-direction: column;
+  min-height: 0;
 }
 
 ::-webkit-scrollbar {
@@ -45,19 +18,54 @@
   border-radius: var(--borderRadius-md);
 }
 
-.scrollContent {
-  width: 100%;
-  max-width: 768px;
-  margin: 0 auto;
+.scrollContainer {
+  position: relative;
+
+  flex: 1;
+
+  overflow-x: hidden;
+  overflow-y: scroll;
+
+  scrollbar-color: var(--colors-bgTertiary) var(--colors-bgPrimary);
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.chatHeader {
+  height: var(--layout-headerHeight);
+  background: var(--colors-bgPrimary);
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  flex-shrink: 0;
+}
+
+.chatContainer {
+  min-height: calc(100% - var(--layout-headerHeight));
   display: flex;
   flex-direction: column;
-  min-height: 0;
+}
+
+.chatContent {
+  display: flex;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 768px;
+  flex-direction: column;
+  transition: flex 0.3s ease;
+
+  padding-left: var(--spacing-sm);
+  padding-right: var(--spacing-sm);
+}
+
+.chatContent.fullHeight {
+  flex: 1;
 }
 
 .controlsContainer {
   margin: auto;
-  width: 100%;
   max-width: 768px;
+  width: 100%;
   z-index: 90;
   background: var(--colors-bgPrimary);
   padding-left: var(--spacing-sm);
