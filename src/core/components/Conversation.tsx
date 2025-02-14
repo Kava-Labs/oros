@@ -46,7 +46,7 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
       {messages.map((message, index) => {
         if (message.role === 'user') {
           return (
-            <div key={index} className={styles.right}>
+            <div key={index} className={styles.userInputContainer}>
               <Content
                 role={message.role}
                 content={message.content as string}
@@ -127,7 +127,7 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
         return null;
       })}
       {isRequesting && (
-        <div className={styles.left}>
+        <div className={styles.assistantOutputContainer}>
           <KavaIcon className={styles.conversationChatIcon} />
 
           <div className={styles.assistantContainer}>
@@ -155,7 +155,7 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
         </div>
       )}
       {errorText.length > 0 && (
-        <div className={styles.left}>
+        <div className={styles.assistantOutputContainer}>
           <KavaIcon className={styles.conversationChatIcon} />
           <div className={styles.assistantContainer}>
             <Content

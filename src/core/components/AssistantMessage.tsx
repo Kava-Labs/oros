@@ -62,7 +62,7 @@ const AssistantMessage = ({
 
   return (
     <div
-      className={styles.left}
+      className={styles.assistantOutputContainer}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
