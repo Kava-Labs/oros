@@ -1,14 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Search, X } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Search } from 'lucide-react';
 import styles from './SearchChatHistory.module.css';
 import { ConversationHistory } from '../context/types';
-import { useAppContext } from '../context/useAppContext';
-import {
-  formatConversationTitle,
-  formatContentSnippet,
-  groupAndFilterConversations,
-  highlightMatch,
-} from '../utils/conversation/helpers';
+import ModalWrapper from './ModalWrapper';
+import SearchModalBody from './SearchModalBody';
 
 interface SearchModalProps {
   conversations: ConversationHistory[];
@@ -23,7 +18,6 @@ const SearchChatHistory = ({
   const [searchTerm, setSearchTerm] = useState('');
   const modalRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const { messageHistoryStore } = useAppContext();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -47,24 +41,6 @@ const SearchChatHistory = ({
     };
   }, [isOpen]);
 
-  const groupedConversations = groupAndFilterConversations(
-    conversations,
-    searchTerm,
-  );
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      setIsOpen(false);
-      setSearchTerm('');
-    }
-  };
-
-  const handleConversationClick = (conversation: ConversationHistory) => {
-    onConversationSelect(conversation);
-    setIsOpen(false);
-    setSearchTerm('');
-  };
-
   return (
     <div className={styles.container}>
       <button
@@ -77,74 +53,21 @@ const SearchChatHistory = ({
       </button>
 
       {isOpen && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modal} ref={modalRef}>
-            <button
-              onClick={() => {
-                setIsOpen(false);
-                setSearchTerm('');
-              }}
-              className={`${styles.iconButton} ${styles.closeButton}`}
-              aria-label="Close search"
-            >
-              <X size={20} />
-            </button>
-            <div className={styles.searchInputWrapper}>
-              <input
-                ref={inputRef}
-                type="text"
-                className={styles.searchInput}
-                placeholder="Search conversations..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyDown={handleKeyDown}
-              />
-            </div>
-
-            <div className={styles.results}>
-              {Object.keys(groupedConversations).length === 0 ? (
-                <div className={styles.noResults}>No results</div>
-              ) : (
-                Object.entries(groupedConversations).map(
-                  ([timeGroup, conversations]) => (
-                    <div key={timeGroup} className={styles.timeGroup}>
-                      <h6 className={styles.timeGroupTitle}>{timeGroup}</h6>
-                      {conversations.map((conversation) => (
-                        <div
-                          data-testid="search-chat-history-entry"
-                          key={conversation.id}
-                          className={`${styles.conversationItem} ${messageHistoryStore.getConversationID() === conversation.id ? styles.selected : ''}`}
-                          onClick={() => handleConversationClick(conversation)}
-                        >
-                          <span
-                            data-testid="search-history-title"
-                            className={styles.conversationTitle}
-                            dangerouslySetInnerHTML={{
-                              __html: highlightMatch(
-                                formatConversationTitle(conversation.title, 50),
-                                searchTerm,
-                              ),
-                            }}
-                          />
-                          <p
-                            data-testid="search-history-content"
-                            className={styles.conversationSnippet}
-                            dangerouslySetInnerHTML={{
-                              __html: highlightMatch(
-                                formatContentSnippet(conversation, searchTerm),
-                                searchTerm,
-                              ),
-                            }}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  ),
-                )
-              )}
-            </div>
-          </div>
-        </div>
+        <ModalWrapper
+          modalRef={modalRef}
+          onCloseClick={() => {
+            setIsOpen(false);
+            setSearchTerm('');
+          }}
+        >
+          <SearchModalBody
+            conversations={conversations}
+            onConversationSelect={onConversationSelect}
+            setIsOpen={setIsOpen}
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+          />
+        </ModalWrapper>
       )}
     </div>
   );
