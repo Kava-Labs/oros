@@ -43,4 +43,7 @@ export type AppContextType = {
   progressStore: TextStreamStore;
   messageHistoryStore: MessageHistoryStore;
   isOperationValidated: boolean;
+  loadConversation: (convoHistory: ConversationHistory) => void;
+  conversations: ConversationHistory[];
+  hasConversations: boolean;
 };
