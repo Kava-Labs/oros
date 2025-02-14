@@ -1,6 +1,6 @@
 .content p {
   margin-bottom: 0.5rem;
-  line-height: 1.75rem;
+  line-height: 1.75;
 }
 
 .content p:not(:first-child) {
