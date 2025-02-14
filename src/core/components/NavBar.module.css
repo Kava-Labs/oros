@@ -5,8 +5,8 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding-left: var(--spacing-md);
-  padding-right: var(--spacing-md);
+  padding-left: var(--spacing-sm);
+  padding-right: var(--spacing-sm);
 }
 
 .leftSection {
@@ -19,8 +19,6 @@
 }
 
 .menu {
-  width: 20px;
-  height: 16px;
   display: flex;
   justify-content: center;
   align-items: center;
