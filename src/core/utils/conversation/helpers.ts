@@ -75,23 +75,117 @@ export const groupConversationsByTime = (
  * Groups and filters conversations based on a search term
  * @param conversations - Array of conversation histories
  * @param searchTerm - Optional search term to filter conversations
+ * @param snippetLength - Optional number of words to include in the snippet (default: 6)
  * @returns An object with time period keys and filtered, sorted conversations as values
+ */
+/**
+ * Groups and filters conversations based on search term
+ * @param conversations Array of conversations to process
+ * @param searchTerm Optional term to filter by
+ * @returns Time-grouped conversations, filtered by search term if provided
  */
 export const groupAndFilterConversations = (
   conversations: ConversationHistory[],
   searchTerm = '',
 ): GroupedConversations => {
-  return conversations
-    .sort((a, b) => b.lastSaved - a.lastSaved)
-    .filter((conv) =>
-      conv.title.toLowerCase().includes(searchTerm.toLowerCase()),
-    )
-    .reduce((groups, conversation) => {
-      const timeGroup = getTimeGroup(conversation.lastSaved);
-      if (!groups[timeGroup]) {
-        groups[timeGroup] = [];
+  if (!searchTerm) {
+    return groupConversationsByTime(conversations);
+  }
+
+  const lowerSearchTerm = searchTerm.toLowerCase();
+  const filteredConversations = conversations.filter((conv) => {
+    const messages = removeInitialSystemMessage(conv);
+
+    return (
+      conv.title.toLowerCase().includes(lowerSearchTerm) ||
+      messages.some(
+        (msg) =>
+          typeof msg.content === 'string' &&
+          msg.content.toLowerCase().includes(lowerSearchTerm),
+      )
+    );
+  });
+
+  return groupConversationsByTime(filteredConversations);
+};
+
+/**
+ * Formats a snippet of conversation content based on search criteria or defaults to first user message
+ * @param {ConversationHistory} conversation - The conversation history object to extract content from
+ * @param {string} [searchTerm=''] - Optional search term to find matching content
+ * @returns {string} A snippet of up to 100 characters that either:
+ * - Shows up to 3 words before the matching search term and the content after it
+ * - Shows first user message if search term is empty or only matches the title
+ * - Returns empty string if no content is found
+ */
+export const formatContentSnippet = (
+  conversation: ConversationHistory,
+  searchTerm: string = '',
+): string => {
+  const messages = removeInitialSystemMessage(conversation);
+
+  if (searchTerm) {
+    const matchingMessage = messages.find(
+      (msg) =>
+        typeof msg.content === 'string' &&
+        msg.content.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+
+    if (matchingMessage && matchingMessage.content) {
+      const content = Array.isArray(matchingMessage.content)
+        ? matchingMessage.content.map((part) => part).join('')
+        : matchingMessage.content;
+
+      const searchIndex = content
+        .toLowerCase()
+        .indexOf(searchTerm.toLowerCase());
+
+      // Find start of snippet considering up to 3 words before match
+      let snippetStart = searchIndex;
+      if (searchIndex > 0) {
+        const beforeMatch = content.slice(0, searchIndex).trim();
+        const precedingWords = beforeMatch.split(' ').slice(-3);
+        snippetStart = searchIndex - (precedingWords.join(' ').length + 1);
+        if (snippetStart < 0) snippetStart = 0;
       }
-      groups[timeGroup].push(conversation);
-      return groups;
-    }, {} as GroupedConversations);
+
+      return content.slice(snippetStart, snippetStart + 100).trim();
+    }
+  }
+
+  const firstUserMessage = messages.find((msg) => msg.role === 'user');
+  if (firstUserMessage && firstUserMessage.content) {
+    const content = Array.isArray(firstUserMessage.content)
+      ? firstUserMessage.content.map((part) => part).join('')
+      : firstUserMessage.content;
+    return content.slice(0, 100);
+  }
+
+  return '';
+};
+
+/**
+ * Wraps matched text in a string with <strong> tags, preserving case
+ * @param text - The full text to search within
+ * @param searchTerm - The term to wrap in bold tags
+ * @returns The text with matched terms wrapped in <strong> tags if searchTerm is at least 2 characters, otherwise returns original text
+ */
+export const highlightMatch = (
+  text: string,
+  searchTerm: string = '',
+): string => {
+  if (!searchTerm || searchTerm.length < 2) return text;
+
+  const regex = new RegExp(`(${searchTerm})`, 'gi');
+  //  '$1' let's us preserve the casing of the match
+  return text.replace(regex, '<strong>$1</strong>');
+};
+
+/**
+ * Removes the system prompt from the conversation array since we don't include that when searching
+ */
+const removeInitialSystemMessage = (conversation: ConversationHistory) => {
+  return conversation.conversation[0]?.role === 'system'
+    ? conversation.conversation.slice(1)
+    : conversation.conversation;
 };

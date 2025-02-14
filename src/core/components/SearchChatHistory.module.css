@@ -30,6 +30,7 @@
   justify-content: center;
   align-items: flex-start;
   z-index: 1000;
+  pointer-events: auto;
 }
 
 .modal {
@@ -65,7 +66,6 @@
   border-radius: var(--borderRadius-sm);
   padding: 0 var(--spacing-md);
   color: var(--colors-textPrimary);
-  font-size: 1.5rem;
 }
 
 .searchInput:focus {
@@ -87,14 +87,10 @@
 .timeGroupTitle {
   margin: var(--spacing-xs) var(--spacing-sm);
   color: var(--colors-textTertiary);
-  font-size: 1.5rem;
-  font-weight: var(--typography-fontWeightSemibold);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .conversationItem {
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-sm);
   cursor: pointer;
   border-radius: var(--borderRadius-sm);
   margin: 2px var(--spacing-xs);
@@ -106,8 +102,18 @@
 
 .conversationTitle {
   color: var(--colors-textPrimary);
-  font-size: var(--spacing-md);
-  line-height: var(--spacing-lg);
+  font-size: 1.4rem;
+}
+
+.conversationSnippet {
+  font-size: 1.2rem;
+  color: var(--colors-textMuted);
+  line-height: 1.5;
+  word-wrap: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: var(--spacing-xs);
 }
 
 .selected {
@@ -134,11 +140,15 @@
     height: 40rem;
     max-width: 90vw;
     border-radius: var(--borderRadius-md);
-    border: 1px solid var(--colors-borderPrimary);
+    background-color: var(--colors-bgTertiary);
     top: -5vh;
   }
 
   .closeButton {
     display: none;
+  }
+
+  .searchInputWrapper {
+    border-bottom: 1px solid var(--colors-borderSecondary);
   }
 }

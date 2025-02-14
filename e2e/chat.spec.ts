@@ -384,6 +384,12 @@ describe('chat', () => {
     const chat = new Chat(page);
 
     await page.addInitScript(() => {
+      const systemPrompt = {
+        role: 'system',
+        content:
+          'You are an AI assistant knowledgeable about blockchain technologies.',
+      };
+
       localStorage.setItem(
         'conversations',
         JSON.stringify({
@@ -392,9 +398,16 @@ describe('chat', () => {
             model: 'test-model',
             title: 'Blockchain Discussion',
             conversation: [
+              systemPrompt,
               {
                 role: 'user',
-                content: 'Tell me about blockchain',
+                content:
+                  'Tell me about blockchain technology and its applications',
+              },
+              {
+                role: 'assistant',
+                content:
+                  'Blockchain is a decentralized digital ledger technology.',
               },
             ],
             lastSaved: Date.now(),
@@ -404,9 +417,15 @@ describe('chat', () => {
             model: 'test-model',
             title: 'Machine Learning Chat',
             conversation: [
+              systemPrompt,
               {
                 role: 'user',
-                content: 'Explain ML concepts',
+                content: 'Explain machine learning algorithms',
+              },
+              {
+                role: 'assistant',
+                content:
+                  'Machine learning involves training models to make predictions.',
               },
             ],
             lastSaved: Date.now() - 1000,
@@ -416,12 +435,40 @@ describe('chat', () => {
             model: 'test-model',
             title: 'API Integration Help',
             conversation: [
+              systemPrompt,
               {
                 role: 'user',
-                content: 'How to integrate APIs',
+                content: 'How to integrate RESTful APIs effectively',
+              },
+              {
+                role: 'assistant',
+                content:
+                  'API integration involves connecting different software systems.',
               },
             ],
             lastSaved: Date.now() - 2000,
+          },
+          'test-id-4': {
+            id: 'test-id-4',
+            model: 'test-model',
+            title: 'Complex Search Scenario',
+            conversation: [
+              systemPrompt,
+              {
+                role: 'user',
+                content: 'Initial question about general topics',
+              },
+              {
+                role: 'assistant',
+                content: 'Search functionality can be complex and nuanced.',
+              },
+              {
+                role: 'user',
+                content:
+                  'Now I want to discuss advanced search functionality in depth',
+              },
+            ],
+            lastSaved: Date.now() - 3000,
           },
         }),
       );
@@ -433,21 +480,100 @@ describe('chat', () => {
     await searchButton.click();
 
     const modalEntries = page.getByTestId('search-chat-history-entry');
-    await expect(modalEntries).toHaveCount(3);
+    await expect(modalEntries).toHaveCount(4);
 
+    // Test searching by title
     const searchInput = page.getByPlaceholder('Search conversations...');
     await searchInput.fill('Blo');
 
-    const filteredEntries = page.getByTestId('search-chat-history-entry');
+    let filteredEntries = page.getByTestId('search-chat-history-entry');
     await expect(filteredEntries).toHaveCount(1);
-    await expect(filteredEntries.first()).toHaveText('Blockchain Discussion');
+
+    const filteredTitle = filteredEntries
+      .first()
+      .getByTestId('search-history-title');
+    await expect(filteredTitle).toHaveText('Blockchain Discussion');
+
+    await searchInput.clear();
+
+    // Test searching by conversation content
+    await searchInput.fill('decentralized');
+    filteredEntries = page.getByTestId('search-chat-history-entry');
+    await expect(filteredEntries).toHaveCount(1);
+
+    const contentTitle = filteredEntries
+      .first()
+      .getByTestId('search-history-title');
+    await expect(contentTitle).toHaveText('Blockchain Discussion');
+
+    const contentSnippet = filteredEntries
+      .first()
+      .getByTestId('search-history-content');
+    await expect(contentSnippet).toContainText(
+      'decentralized digital ledger technology.',
+    );
+
+    // Test title & snippet match behavior
+    await searchInput.clear();
+    await searchInput.fill('Complex');
+
+    filteredEntries = page.getByTestId('search-chat-history-entry');
+    await expect(filteredEntries).toHaveCount(1);
+
+    const titleMatchTitle = filteredEntries
+      .first()
+      .getByTestId('search-history-title');
+    await expect(titleMatchTitle).toHaveText('Complex Search Scenario');
+
+    const titleMatchSnippet = filteredEntries
+      .first()
+      .getByTestId('search-history-content');
+    await expect(titleMatchSnippet).toContainText('complex and nuanced');
+
+    // Test content match in second user message
+    await searchInput.clear();
+    await searchInput.fill('advanced');
+    filteredEntries = page.getByTestId('search-chat-history-entry');
+    await expect(filteredEntries).toHaveCount(1);
+
+    const contentMatchTitle = filteredEntries
+      .first()
+      .getByTestId('search-history-title');
+    await expect(contentMatchTitle).toHaveText('Complex Search Scenario');
+
+    const contentMatchSnippet = filteredEntries
+      .first()
+      .getByTestId('search-history-content');
+    await expect(contentMatchSnippet).toContainText(
+      'advanced search functionality in depth',
+    );
 
     // Clear the search & verify all conversations are visible again
     await searchInput.clear();
-    await expect(page.getByTestId('search-chat-history-entry')).toHaveCount(3);
+    await expect(page.getByTestId('search-chat-history-entry')).toHaveCount(4);
 
     // Test closing by clicking outside
     await page.mouse.click(0, 0);
     await expect(searchInput).not.toBeVisible();
+  });
+
+  test('search modal shows "No results" when no conversations exist', async ({
+    page,
+  }) => {
+    const chat = new Chat(page);
+
+    await chat.goto();
+
+    //  explicitly removing any conversations from local storage, simulating a new user
+    //  or if a user clears their browser cache
+    await page.addInitScript(() => {
+      localStorage.removeItem('conversations');
+    });
+
+    const searchButton = page.getByTestId('search-conversation-button');
+    await searchButton.click();
+
+    const noResults = page.getByText('No results');
+    await expect(noResults).toBeVisible();
   });
 });
