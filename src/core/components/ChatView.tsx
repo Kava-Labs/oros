@@ -61,10 +61,10 @@ export const ChatView = ({
 
   const scrollToBottom = useCallback(() => {
     if (!containerRef.current) return;
-    console.log("content rendered");
+    console.log('content rendered');
     console.log(containerRef.current.scrollHeight);
     containerRef.current.scrollTop = containerRef.current.scrollHeight;
-    console.log(containerRef.current.scrollTop)
+    console.log(containerRef.current.scrollTop);
   }, []);
 
   // Reset textarea height when input is cleared
@@ -162,14 +162,20 @@ export const ChatView = ({
   return (
     <div className={styles.chatview} data-testid="chatview">
       <div ref={containerRef} className={styles.scrollContainer}>
-
         <div className={styles.chatHeader}>
-          <NavBar onPanelOpen={onPanelOpen} isPanelOpen={isPanelOpen} onMenu={onMenu} onNewChat={onNewChat} />
+          <NavBar
+            onPanelOpen={onPanelOpen}
+            isPanelOpen={isPanelOpen}
+            onMenu={onMenu}
+            onNewChat={onNewChat}
+          />
         </div>
 
         <div className={styles.chatContainer}>
-          <div className={`${styles.chatContent} ${hasMessages ? styles.fullHeight: ''}`}>
-            { hasMessages && (
+          <div
+            className={`${styles.chatContent} ${hasMessages ? styles.fullHeight : ''}`}
+          >
+            {hasMessages && (
               <Conversation
                 messages={messages}
                 onRendered={handleContentRendered}
@@ -177,15 +183,24 @@ export const ChatView = ({
             )}
           </div>
 
-          <div className={`${styles.controlsContainer} ${hasMessages ? styles.positionSticky : ''}` } data-testid="controls">
-            { !hasMessages &&
+          <div
+            className={`${styles.controlsContainer} ${hasMessages ? styles.positionSticky : ''}`}
+            data-testid="controls"
+          >
+            {!hasMessages && (
               <div className={styles.startContent}>
                 <div className={styles.startLogoContainer}>
-                  {Logo && <Logo width={"100%"} height="auto" className={styles.startLogo} />}
+                  {Logo && (
+                    <Logo
+                      width={'100%'}
+                      height="auto"
+                      className={styles.startLogo}
+                    />
+                  )}
                 </div>
                 <h1 className={styles.introText}>{introText}</h1>
               </div>
-            }
+            )}
 
             <div className={styles.controls}>
               <div className={styles.inputContainer}>
@@ -207,16 +222,19 @@ export const ChatView = ({
                   type="submit"
                   onClick={handleButtonClick}
                   aria-label="Send Chat"
+                  disabled={!isRequesting && inputValue.length === 0}
                 >
                   {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
                 </button>
               </div>
 
-              <span className={styles.importantInfo} data-testid="importantInfo">
+              <span
+                className={styles.importantInfo}
+                data-testid="importantInfo"
+              >
                 <p>{cautionText}</p>
               </span>
             </div>
-
           </div>
         </div>
       </div>
