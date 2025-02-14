@@ -30,6 +30,7 @@ export const App = () => {
   const { messages } = useMessageHistory();
 
   const startNewChat = () => {
+    handleCancel();
     thinkingStore.setText('');
     messageHistoryStore.reset();
     messageHistoryStore.addMessage({
@@ -112,7 +113,6 @@ export const App = () => {
               cautionText={defaultCautionText}
               messages={messages}
               onSubmit={handleChatCompletion}
-              onReset={handleReset}
               onMenu={() => setIsMobileSideBarOpen(true)}
               onNewChat={startNewChat}
               onPanelOpen={() => setIsDesktopSideBarHidden(false)}
