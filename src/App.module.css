@@ -49,7 +49,7 @@
   margin-right: var(--spacing-xs);
 
   overflow-x: hidden;
-  overflow-y: scroll;
+  overflow-y: auto;
 
   scrollbar-color: var(--colors-bgTertiary) var(--colors-bgSecondary);
   -webkit-overflow-scrolling: touch;
