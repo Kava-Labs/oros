@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { MessageHistoryStore } from '../stores/messageHistoryStore';
 import { ConversationHistory } from './types';
 import OpenAI from 'openai';
+import { formatConversationTitle } from '../utils/conversation/helpers';
 
 export const useMessageSaver = (
   messageHistoryStore: MessageHistoryStore,
@@ -63,11 +64,11 @@ export const useMessageSaver = (
                 {
                   role: 'system',
                   content:
-                    'your task is to generate a title for a conversation using 4 to 5 words',
+                    'your task is to generate a title for a conversation using 3 to 4 words',
                 },
                 {
                   role: 'user',
-                  content: `Please generate a title for this conversation (max 5 words):
+                  content: `Please generate a title for this conversation (max 4 words):
                   ${messages.map((msg) => {
                     // only keep user/assistant messages
                     if (msg.role !== 'user' && msg.role !== 'assistant') return;
@@ -82,14 +83,16 @@ export const useMessageSaver = (
               model: 'gpt-4o-mini',
             });
 
-            history.title =
+            // Apply truncation only when we get the AI-generated title
+            const generatedTitle =
               data.choices[0].message.content ?? (content as string);
+            history.title = formatConversationTitle(generatedTitle, 34);
           } catch (err) {
             history.title = content as string;
             console.error(err);
           }
         } else {
-          // keep the generated title
+          // keep the existing title without any truncation
           history.title = allConversations[id].title;
         }
 

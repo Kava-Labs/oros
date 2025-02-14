@@ -12,10 +12,7 @@ import {
 } from 'react';
 import { useAppContext } from '../context/useAppContext';
 import { EllipsisVertical, Bot, Pencil, Trash2, X } from 'lucide-react';
-import {
-  // formatConversationTitle,
-  groupConversationsByTime,
-} from '../utils/conversation/helpers';
+import { groupConversationsByTime } from '../utils/conversation/helpers';
 import ButtonIcon from './ButtonIcon';
 
 interface ChatHistoryProps {
