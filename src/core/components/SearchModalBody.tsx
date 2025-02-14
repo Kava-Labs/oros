@@ -15,6 +15,7 @@ interface SearchModalBodyProps {
   setIsOpen: (isOpen: boolean) => void;
   searchTerm: string;
   setSearchTerm: (searchTerm: string) => void;
+  onClose: () => void;
 }
 
 const SearchModalBody = ({
@@ -75,7 +76,7 @@ const SearchModalBody = ({
                     className={`${styles.conversationItem} ${messageHistoryStore.getConversationID() === conversation.id ? styles.selected : ''}`}
                     onClick={() => handleConversationClick(conversation)}
                   >
-                    <span
+                    <p
                       data-testid="search-history-title"
                       className={styles.conversationTitle}
                       dangerouslySetInnerHTML={{

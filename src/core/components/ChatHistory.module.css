@@ -1,5 +1,4 @@
 .chatHistoryContainer {
-  border-right: 1px solid #3e3e3e;
   width: 332px;
   background-color: var(--colors-bgSecondary);
   @media (max-width: 640px) {
@@ -39,10 +38,7 @@
 .timeGroupTitle {
   margin: var(--spacing-xs) var(--spacing-md);
   color: var(--colors-textTertiary);
-  font-size: 10px;
   font-weight: var(--typography-fontWeightSemibold);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .timeGroupContent {

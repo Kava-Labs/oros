@@ -55,6 +55,7 @@
 
 .searchInputWrapper {
   padding: var(--spacing-md);
+  border-bottom: 1px solid var(--colors-borderSecondary);
 }
 
 .searchInput {
@@ -65,7 +66,6 @@
   border-radius: var(--borderRadius-sm);
   padding: 0 var(--spacing-md);
   color: var(--colors-textPrimary);
-  font-size: 1.5rem;
 }
 
 .searchInput:focus {
@@ -87,10 +87,6 @@
 .timeGroupTitle {
   margin: var(--spacing-xs) var(--spacing-sm);
   color: var(--colors-textTertiary);
-  font-size: 1.5rem;
-  font-weight: var(--typography-fontWeightSemibold);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .conversationItem {
@@ -106,7 +102,6 @@
 
 .conversationTitle {
   color: var(--colors-textPrimary);
-  font-size: var(--spacing-md);
   line-height: var(--spacing-lg);
 }
 
@@ -145,7 +140,7 @@
     height: 40rem;
     max-width: 90vw;
     border-radius: var(--borderRadius-md);
-    border: 1px solid var(--colors-borderPrimary);
+    background-color: var(--colors-bgTertiary);
     top: -5vh;
   }
 

@@ -50,6 +50,7 @@ const SearchChatHistory = ({
             setIsOpen={setIsOpen}
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
+            onClose={handleClose}
           />
         </ModalWrapper>
       )}
