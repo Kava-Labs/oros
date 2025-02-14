@@ -21,16 +21,14 @@
   overscroll-behavior: contain;
 }
 
-.scrollContainer::-webkit-scrollbar {
+.scrollContainer::-webkit-scrollbar-track {
   background-color: var(--colors-bgPrimary);
-  width: 10px;
 }
 
 .scrollContainer::-webkit-scrollbar-thumb {
   background-color: var(--colors-bgTertiary);
   border-radius: var(--borderRadius-md);
 }
-
 
 .chatHeader {
   height: var(--layout-headerHeight);
@@ -71,6 +69,11 @@
   background: var(--colors-bgPrimary);
   padding-left: var(--spacing-sm);
   padding-right: var(--spacing-sm);
+
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  gap: var(--spacing-xs);
 }
 
 .controlsContainer.positionSticky {
@@ -93,6 +96,7 @@
 .introText {
   color: var(--colors-textSecondary);
   font-size: 2.8rem;
+  margin-bottom: 0rem;
 }
 
 @media (max-width: 768px) {
@@ -105,31 +109,53 @@
 }
 
 .controls {
-  min-height: var(--layout-controlHeight);
+  display: flex;
+  flex-direction: row;
   flex-shrink: 0;
-  width: 100%;
+
+  background-color: var(--colors-bgTertiary);
+  border-radius: var(--borderRadius-md);
+
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-md);
+
+  gap: var(--spacing-md);
 }
 
 .inputContainer {
   display: flex;
   align-items: flex-start;
   position: relative;
+  min-height: 0;
+
+  flex: 1;
+}
+
+.buttonContainer {
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: flex-end;
 }
 
 .input {
   width: 100%;
-  background-color: var(--colors-bgTertiary);
-  border-radius: var(--borderRadius-md);
+
+  background-color: transparent;
   border: none;
-  padding: var(--spacing-md);
   color: var(--colors-textPrimary);
   font-family: inherit;
   font-weight: inherit;
-  font-size: 18px; /* Explicit font size */
-  line-height: 1.5; /* Ensure proper alignment with font size */
+  font-size: 1.6rem; /* Explicit font size */
   overflow-y: auto; /* Enable vertical scrolling if needed */
   resize: none; /* Disable manual resizing */
   text-wrap: wrap;
+  min-height: 30px;
+  padding-top: 4px;
+
+  scrollbar-color: var(--colors-textMuted) var(--colors-bgTertiary);
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 
   &:focus {
     border: none;
@@ -138,10 +164,20 @@
   }
 }
 
+.input::placeholder {
+  font-size: 1.6rem;
+}
+
+.input::-webkit-scrollbar-track {
+  background-color: var(--colors-bgTertiary);
+}
+
+.input::-webkit-scrollbar-thumb {
+  background-color: var(--colors-textMuted);
+  border-radius: var(--borderRadius-md);
+}
+
 .sendChatButton {
-  position: absolute;
-  right: 10px;
-  bottom: 20px;
   width: 30px;
   height: 30px;
   padding: 0;
@@ -172,9 +208,7 @@
 }
 
 .importantInfo {
-  margin-top: var(--spacing-xs);
-  /* custom font-size for chat warning */
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   text-align: center;
   color: var(--colors-textMuted);
 }
