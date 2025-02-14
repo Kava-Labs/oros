@@ -44,8 +44,7 @@ h5,
 h6 {
   text-wrap: balance;
   font-weight: var(--typography-fontWeightLight);
-  margin-bottom: 2rem;
-  margin-top: 0;
+  margin: 0;
 }
 
 p {
