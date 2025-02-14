@@ -58,12 +58,12 @@
 
 .content td,
 th {
-  border-right: 0.1rem solid #dcdcdc;
+  border-right: 0.1rem solid var(--colors-borderSecondary);
   padding: 0.8rem 1.2rem;
 }
 
 .content td {
-  border-top: 0.1rem solid #dcdcdc;
+  border-top: 0.1rem solid var(--colors-borderSecondary);
 }
 
 .content td:last-child,
@@ -77,4 +77,3 @@ th:last-child {
   margin-bottom: 3rem;
   margin-top: 3rem;
 }
-
