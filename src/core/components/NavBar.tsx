@@ -36,7 +36,10 @@ export const NavBar = ({
                 onClick={onPanelOpen}
               />
             )}
-            <NewChatButton onClick={onNewChat} />
+            <NewChatButton
+              onClick={onNewChat}
+              className={styles.newChatDesktop}
+            />
             <ModelSelector />
           </div>
         ) : (
