@@ -18,7 +18,6 @@ import {
   OperationType,
 } from '../../features/blockchain/types/chain';
 import KavaIcon from '../assets/KavaIcon';
-import { isInIframe } from '../utils/isInIframe';
 import AssistantMessage from './AssistantMessage';
 import { ThinkingContent } from './ThinkingContent';
 import type { ChatMessage } from '../stores/messageHistoryStore';
@@ -43,10 +42,7 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
   } = useAppContext();
 
   return (
-    <div
-      className={styles.conversationContainer}
-      data-testid="conversation"
-    >
+    <div className={styles.conversationContainer} data-testid="conversation">
       {messages.map((message, index) => {
         if (message.role === 'user') {
           return (
