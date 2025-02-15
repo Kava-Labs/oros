@@ -581,7 +581,9 @@ describe('chat', () => {
     await expect(searchInput).not.toBeVisible();
   });
 
-  test('search modal button is disabled', async ({ page }) => {
+  test('search modal button is disabled for a user with no history', async ({
+    page,
+  }) => {
     const chat = new Chat(page);
 
     await chat.goto();
