@@ -47,20 +47,18 @@ const SearchChatHistory = ({
         disabled={!hasConversations}
       />
 
-      <ModalWrapper
-        modalRef={modalRef}
-        onClose={handleClose}
-        isOpen={isChatHistoryOpen}
-      >
-        <SearchModalBody
-          conversations={conversations}
-          onConversationSelect={onConversationSelect}
-          setIsOpen={setIsChatHistoryOpen}
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          onClose={handleClose}
-        />
-      </ModalWrapper>
+      {isChatHistoryOpen && (
+        <ModalWrapper modalRef={modalRef} onClose={handleClose}>
+          <SearchModalBody
+            conversations={conversations}
+            onConversationSelect={onConversationSelect}
+            setIsOpen={setIsChatHistoryOpen}
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            onClose={handleClose}
+          />
+        </ModalWrapper>
+      )}
     </div>
   );
 };

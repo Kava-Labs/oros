@@ -8,7 +8,6 @@ interface ModalWrapperProps {
   modalRef: RefObject<HTMLDivElement | null>;
   onClose: () => void;
   closeOnOutsideClick?: boolean;
-  isOpen: boolean;
 }
 
 const ModalWrapper = ({
@@ -16,7 +15,6 @@ const ModalWrapper = ({
   modalRef,
   onClose,
   closeOnOutsideClick = true,
-  isOpen,
 }: ModalWrapperProps) => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -35,8 +33,6 @@ const ModalWrapper = ({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [closeOnOutsideClick, onClose, modalRef]);
-
-  if (!isOpen) return null;
 
   return ReactDOM.createPortal(
     <div className={styles.modalOverlay}>
