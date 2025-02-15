@@ -37,12 +37,12 @@ export const App = () => {
   const isMobile = useIsMobile();
 
   /*
-   * Supports seperate memorization of sidebar state between mobile and desktop
+   * Supports separate memorization of sidebar & history search states between mobile and desktop
    */
+  const [isHistorySearchOpen, setIsHistorySearchOpen] = useState(false);
   const [isMobileSideBarOpen, setIsMobileSideBarOpen] = useState(false);
   // TODO: Support a collapse sidebar button
   const [isDesktopSideBarHidden, setIsDesktopSideBarHidden] = useState(false);
-  const [isHistorySearchOpen, setIsHistorySearchOpen] = useState(false);
 
   return (
     <>

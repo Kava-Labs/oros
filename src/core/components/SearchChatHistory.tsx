@@ -24,9 +24,16 @@ const SearchChatHistory = ({
 
   useEffect(() => {
     if (isChatHistoryOpen) {
+      // Focus input when modal opens
       inputRef.current?.focus();
     }
   }, [isChatHistoryOpen]);
+
+  useEffect(() => {
+    if (isChatHistoryOpen) {
+      setIsMobileSideBarOpen(true);
+    }
+  });
 
   const handleClose = () => {
     setIsChatHistoryOpen(false);
