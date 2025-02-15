@@ -1,0 +1,143 @@
+.dropdownContainer {
+  position: relative;
+  display: inline-block;
+  width: 90vw;
+  max-width: 15rem;
+  margin-left: 0;
+  /* ensures content doesn't get cut off */
+  min-width: min-content;
+}
+
+.dropdownButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-sm);
+  background-color: var(--colors-bgPrimary);
+  /* keep the border for spacing alignment but don't show it */
+  border: 1px solid transparent;
+  border-radius: var(--borderRadius-sm);
+  color: var(--colors-textSecondary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.dropdownButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.dropdownButton:hover:not(:disabled) {
+  background-color: var(--colors-bgTertiary);
+}
+
+.dropdownButton[aria-expanded='true'] {
+  background-color: var(--colors-bgTertiary);
+}
+
+.modelInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex: 1;
+}
+
+.arrow {
+  transition: transform 0.2s ease;
+}
+
+.arrowOpen {
+  transform: rotate(180deg);
+}
+
+.dropdownMenu {
+  width: 100%;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--colors-bgSecondary);
+  border-radius: var(--borderRadius-sm);
+  border: 1px solid var(--colors-bgTertiary);
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--spacing-xs);
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  white-space: nowrap;
+}
+
+.dropdownItem {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-sm);
+  border: none;
+  border-radius: 0;
+  background: none;
+  color: var(--colors-textSecondary);
+  cursor: pointer;
+  text-align: left;
+}
+
+.dropdownItem:hover:not(:disabled) {
+  background-color: var(--colors-bgTertiary);
+}
+
+.dropdownItem:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dropdownItem:first-child {
+  border-top-left-radius: calc(var(--borderRadius-sm) - 1px);
+  border-top-right-radius: calc(var(--borderRadius-sm) - 1px);
+}
+
+.dropdownItem:last-child {
+  border-bottom-left-radius: calc(var(--borderRadius-sm) - 1px);
+  border-bottom-right-radius: calc(var(--borderRadius-sm) - 1px);
+}
+
+.menuItemContent {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.textContent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-size: 1.33333rem;
+  line-height: normal;
+  font-weight: var(--typography-fontWeightRegular);
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+.menuItemDescription {
+  font-size: 0.85em; /* TODO adjust the globa.css file to accommodate and remove me */
+  color: var(--colors-textTertiary);
+  margin-top: var(--spacing-xs);
+}
+
+.chatHistoryTitle:hover {
+  color: var(--colors-textPrimary);
+}
+
+.menuIcon:hover {
+  background-color: var(--colors-bgTertiary);
+  border-radius: var(--borderRadius-sm);
+}
+
+/* Desktop styles */
+@media (min-width: 769px) {
+  .dropdownContainer {
+    width: 15rem;
+    margin-left: initial;
+  }
+}

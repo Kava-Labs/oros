@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
 import { ClipboardCheck, Copy } from 'lucide-react';
-import styles from './ChatView.module.css';
+import styles from './Conversation.module.css';
 import KavaIcon from '../assets/KavaIcon';
 import { Content } from './Content';
 import { ThinkingContent } from './ThinkingContent';
+import ButtonIcon from './ButtonIcon';
 
 const AssistantMessage = ({
   content,
@@ -37,12 +38,12 @@ const AssistantMessage = ({
   const copyIcon = useMemo(
     () =>
       !copied ? (
-        <Copy
-          width="20px"
-          cursor="pointer"
+        <ButtonIcon
+          icon={Copy}
+          aria-label="Copy Chat"
           onClick={() => {
             try {
-              window.navigator.clipboard.writeText(content);
+              window.navigator.clipboard.writeText(content.trim());
               setCopied(true);
             } catch (err) {
               console.error(err);
@@ -50,9 +51,9 @@ const AssistantMessage = ({
           }}
         />
       ) : (
-        <ClipboardCheck
-          width="20px"
-          cursor="pointer"
+        <ButtonIcon
+          icon={ClipboardCheck}
+          aria-label="Chat Copied"
           onClick={() => setCopied(false)}
         />
       ),
@@ -61,7 +62,7 @@ const AssistantMessage = ({
 
   return (
     <div
-      className={styles.left}
+      className={styles.assistantOutputContainer}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >

@@ -1,0 +1,105 @@
+/* ButtonIcon.module.css */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: var(--spacing-xs);
+  border: none;
+  border-radius: var(--borderRadius-sm);
+  background: transparent;
+  color: var(--colors-textSecondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.button:hover {
+  background-color: var(--colors-bgTertiary);
+  color: var(--colors-textPrimary);
+}
+
+.button:active {
+  background-color: var(--colors-bgQuaternary);
+}
+
+.button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tooltip {
+  position: absolute;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--borderRadius-sm);
+  font-family: var(--typography-fontFamilyBase);
+  font-size: 0.875rem;
+  white-space: nowrap;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  background-color: var(--colors-bgQuaternary);
+  color: var(--colors-textPrimary);
+  border: 1px solid var(--colors-borderSecondary);
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease,
+    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 50;
+}
+
+/* Only show tooltip on button hover */
+.button:not(.disabled):hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Hide tooltip on disabled buttons */
+.button.disabled .tooltip {
+  display: none;
+}
+
+/* Tooltip positions with animations */
+.tooltipTop {
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(5px);
+  margin-bottom: var(--spacing-xs);
+}
+
+.tooltipBottom {
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-5px);
+  margin-top: var(--spacing-xs);
+}
+
+.tooltipLeft {
+  right: 100%;
+  top: 50%;
+  transform: translateX(5px) translateY(-50%);
+  margin-right: var(--spacing-xs);
+}
+
+.tooltipRight {
+  left: 100%;
+  top: 50%;
+  transform: translateX(-5px) translateY(-50%);
+  margin-left: var(--spacing-xs);
+}
+
+/* Hover animations */
+.button:hover .tooltipTop {
+  transform: translateX(-50%) translateY(0);
+}
+
+.button:hover .tooltipBottom {
+  transform: translateX(-50%) translateY(0);
+}
+
+.button:hover .tooltipLeft {
+  transform: translateX(0) translateY(-50%);
+}
+
+.button:hover .tooltipRight {
+  transform: translateX(0) translateY(-50%);
+}

@@ -99,11 +99,9 @@ export class Chat {
   }
 
   async switchToBlockchainModel() {
-    const modelDropdownButton = this.page.getByRole('button', {
-      name: 'Select model',
-    });
-    await modelDropdownButton.click();
-    const blockchainModelOption = this.page.getByRole('option').first();
-    await blockchainModelOption.click();
+    await this.page.getByRole('combobox', { name: 'Select Model' }).click();
+    await this.page
+      .getByRole('option', { name: 'Blockchain Instruct' })
+      .click();
   }
 }

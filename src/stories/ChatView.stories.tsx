@@ -67,9 +67,12 @@ const args: ChatViewProps = {
   introText: defaultIntroText,
   messages: mockChatMessages,
   onSubmit: fn(),
-  onReset: fn(),
   onCancel: fn(),
   cautionText: '',
+  onMenu: fn(),
+  onNewChat: fn(),
+  onPanelOpen: fn(),
+  isPanelOpen: false,
 };
 
 // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args

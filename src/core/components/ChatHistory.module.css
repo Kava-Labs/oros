@@ -1,34 +1,28 @@
 .chatHistoryContainer {
-  width: 332px;
+  width: 100%;
   background-color: var(--colors-bgSecondary);
-  @media (max-width: 640px) {
-    width: 100%;
-  }
 }
 
-.newChatButton {
-  width: calc(100% - var(--spacing-md) * 2);
-  height: 48px;
-  text-align: left;
-  border-radius: var(--borderRadius-sm);
-  border: 1px solid var(--colors-borderPrimary);
-  margin: var(--spacing-md);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: var(--colors-bgPrimary);
-  cursor: pointer;
-
-  &:hover {
-    background-color: var(--colors-bgTertiary);
-  }
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: calc(var(--spacing-md) * 8);
+  color: var(--colors-textMuted);
+  padding: var(--spacing-md);
+  text-align: center;
 }
 
-.newChatButtonText {
-  padding-left: var(--spacing-md);
-  display: inline;
-  font-size: 16px;
-  line-height: 24px;
-  color: var(--colors-textSecondary);
+.emptyStateIcon {
+  margin-bottom: var(--spacing-sm);
+  opacity: 0.7;
+}
+
+.emptyStateText {
   margin: 0;
+  text-transform: uppercase;
+  font-size: 12px; /* TODO: Replace with rem spacing from global css */
 }
 
 .timeGroup {
@@ -38,139 +32,111 @@
 .timeGroupTitle {
   margin: var(--spacing-xs) var(--spacing-md);
   color: var(--colors-textTertiary);
+  font-size: 10px; /* TODO: Replace with rem spacing from global css */
   font-weight: var(--typography-fontWeightSemibold);
+  text-transform: uppercase;
 }
 
 .timeGroupContent {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
 }
 
 .chatHistoryItem {
-  width: calc(100% - var(--spacing-md) * 1.5);
-  border-radius: var(--spacing-sm);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
+  width: 100%;
   color: var(--colors-textSecondary);
-  margin: 0 var(--spacing-sm);
-  font-size: 14px;
-  line-height: 22px;
-  padding: var(--spacing-sm);
-
-  &:hover {
-    background-color: var(--colors-bgTertiary);
-  }
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
 
 .chatHistoryContent {
   display: flex;
-  flex-direction: column;
-  margin-bottom: 1.6rem;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: var(--spacing-xs) var(--spacing-xs) var(--spacing-xs)
+    var(--spacing-md);
+  transition: background-color 0.2s ease;
+  gap: var(--spacing-xs);
 }
 
-.chatHistoryTitle {
-  margin: 0;
-  cursor: pointer;
-  color: var(--colors-textPrimary);
+.chatHistoryContent:hover {
+  background-color: var(--colors-bgTertiary);
+}
+
+.selected .chatHistoryContent {
+  background-color: var(--colors-bgPrimary);
+}
+
+.selected .chatHistoryContent:hover {
+  background-color: var(--colors-bgTertiary);
+}
+
+.titleContainer {
   flex: 1;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.titleContainer small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.buttonContainer {
+  display: none;
+  width: 100%;
+}
+
+.buttonContainer.show {
+  display: flex;
+}
+
+.menuButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  color: var(--colors-textPrimary);
+  cursor: pointer;
+  flex: 1;
+  background: none;
+  border: none;
+}
+
+.menuButton:hover {
+  background-color: var(--colors-bgTertiary);
+}
+
+.menuButton[data-delete='true'] {
+  color: var(--colors-accentTransparent);
+}
+
+.menuButton[data-delete='true'] svg {
+  color: var(--colors-accentTransparent);
 }
 
 .chatHistoryTitleInput {
   background-color: inherit;
-  width: 300px;
+  flex: 1;
+  min-width: 0;
   border: none;
   height: 24px;
   color: var(--colors-textPrimary);
   outline: none;
+  padding: 0 0 0 var(--spacing-sm);
+  /* - margin to offset the padding to keep text position */
+  margin-left: calc(var(--spacing-sm) * -1);
+  border-radius: var(--borderRadius-xs);
+  transition: background-color 0.2s ease;
 }
 
-.modelName {
-  margin: 0;
-  font-size: 12px;
-  color: var(--colors-textTertiary);
-  opacity: 0.8;
-}
-
-.newChatButtonAlignment {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  color: var(--colors-textPrimary);
-
-  &:hover {
-    color: var(--colors-textMuted);
-  }
-}
-
-.iconsContainer {
-  display: flex;
-  align-items: center;
-  padding-left: var(--spacing-sm);
-}
-
-.selected {
-  background-color: var(--colors-bgSecondary);
-  border: 1px solid var(--colors-bgSecondary);
-
-  /* Override hover state when selected */
-  &:hover {
-    background-color: var(--colors-bgSecondary);
-  }
-}
-
-.desktopLogo {
-  margin-top: 14px;
-  margin-left: 20px;
-}
-
-.searchInput {
-  height: 40px;
-  width: 100%;
-  background-color: var(--colors-bgTertiary);
-  border-radius: var(--borderRadius-sm);
-  border: none;
-  /* Remove top/bottom padding and use line-height for vertical centering */
-  padding: 0 var(--spacing-sm);
-  /* Set line-height equal to height for perfect vertical centering */
-  line-height: 40px;
-  color: var(--colors-textPrimary);
-  font-family: inherit;
-  font-weight: inherit;
-  overflow-y: auto;
-  resize: none;
-  text-wrap: wrap;
-
-  &:focus {
-    border: none;
-    outline: none;
-    caret-color: white;
-  }
-}
-
-.searchInputWrapper {
-  margin-top: var(--spacing-md);
-  width: 100%;
-  padding-right: var(--spacing-md);
-}
-
-.searchControls {
-  display: flex;
-  width: 100%;
-  padding: var(--spacing-md);
-}
-
-.deleteIcon {
-  margin-left: 2px;
-  margin-right: 2px;
-}
-
-.editIcon {
-  color: var(--colors-textPrimary);
-
-  &:hover {
-    color: var(--colors-textMuted);
-  }
+.chatHistoryTitleInput:focus {
+  background-color: rgba(130, 162, 215, 0.1);
+  box-shadow: 0 0 0 2px rgba(130, 162, 215, 0.3);
 }

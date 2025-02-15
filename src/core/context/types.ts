@@ -31,7 +31,6 @@ export type AppContextType = {
   modelConfig: ModelConfig;
   handleModelChange: (modelName: SupportedModels) => void;
   executeOperation: ExecuteOperation;
-  loadConversation: (convoHistory: ConversationHistory) => void;
   handleReset: () => void;
   handleChatCompletion: (value: string) => void;
   handleCancel: () => void;
@@ -43,4 +42,7 @@ export type AppContextType = {
   progressStore: TextStreamStore;
   messageHistoryStore: MessageHistoryStore;
   isOperationValidated: boolean;
+  loadConversation: (convoHistory: ConversationHistory) => void;
+  conversations: ConversationHistory[];
+  hasConversations: boolean;
 };
