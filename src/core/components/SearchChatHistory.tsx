@@ -1,20 +1,25 @@
 import { useState, useRef, useEffect } from 'react';
-import { Search } from 'lucide-react';
 import styles from './SearchChatHistory.module.css';
-import { ConversationHistory } from '../context/types';
 import ModalWrapper from './ModalWrapper';
 import SearchModalBody from './SearchModalBody';
+import { useAppContext } from '../context/useAppContext';
+import { SearchChatButton } from '../assets/SearchChatButton';
 
 interface SearchModalProps {
-  conversations: ConversationHistory[];
-  onConversationSelect: (conversation: ConversationHistory) => void;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+  // conversations: ConversationHistory[];
+  // onConversationSelect: (conversation: ConversationHistory) => void;
 }
 
 const SearchChatHistory = ({
-  conversations,
-  onConversationSelect,
+  isOpen,
+  setIsOpen,
+  // conversations,
+  // onConversationSelect,
 }: SearchModalProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const { conversations, hasConversations, loadConversation } = useAppContext();
+  // const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const modalRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -33,20 +38,16 @@ const SearchChatHistory = ({
 
   return (
     <div className={styles.container}>
-      <button
-        data-testid="search-conversation-button"
-        className={styles.iconButton}
+      <SearchChatButton
         onClick={() => setIsOpen(true)}
-        aria-label="Search conversations"
-      >
-        <Search size={20} />
-      </button>
+        disabled={!hasConversations}
+      />
 
       {isOpen && (
         <ModalWrapper modalRef={modalRef} onClose={handleClose}>
           <SearchModalBody
             conversations={conversations}
-            onConversationSelect={onConversationSelect}
+            onConversationSelect={loadConversation}
             setIsOpen={setIsOpen}
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}

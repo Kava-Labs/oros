@@ -9,6 +9,7 @@ import { X as CloseX, PanelLeftClose } from 'lucide-react';
 import KavaAILogo from './core/assets/KavaAILogo';
 import ButtonIcon from './core/components/ButtonIcon';
 import { useMessageHistory } from './core/hooks/useMessageHistory';
+import SearchChatHistory from './core/components/SearchChatHistory';
 
 export const App = () => {
   const {
@@ -41,6 +42,7 @@ export const App = () => {
   const [isMobileSideBarOpen, setIsMobileSideBarOpen] = useState(false);
   // TODO: Support a collapse sidebar button
   const [isDesktopSideBarHidden, setIsDesktopSideBarHidden] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
@@ -58,10 +60,7 @@ export const App = () => {
               <KavaAILogo height={20} />
               {isMobile && isMobileSideBarOpen && (
                 <div className={styles.buttonGroup}>
-                  {/* <SearchChatButton
-                    onClick={() => {}}
-                    disabled={!hasConversations}
-                  /> */}
+                  <SearchChatHistory isOpen={isOpen} setIsOpen={setIsOpen} />
                   <ButtonIcon
                     icon={CloseX}
                     tooltip={{
@@ -75,10 +74,7 @@ export const App = () => {
               )}
               {!isMobile && !isDesktopSideBarHidden && (
                 <div className={styles.buttonGroup}>
-                  {/* <SearchChatButton
-                    onClick={() => {}}
-                    disabled={!hasConversations}
-                  /> */}
+                  <SearchChatHistory isOpen={isOpen} setIsOpen={setIsOpen} />
                   <ButtonIcon
                     icon={PanelLeftClose}
                     tooltip={{
