@@ -4,13 +4,10 @@ import ModalWrapper from './ModalWrapper';
 import SearchModalBody from './SearchModalBody';
 import { useAppContext } from '../context/useAppContext';
 import { SearchChatButton } from '../assets/SearchChatButton';
-import ReactDOM from 'react-dom';
 
 interface SearchModalProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  // conversations: ConversationHistory[];
-  // onConversationSelect: (conversation: ConversationHistory) => void;
 }
 
 const SearchChatHistory = ({ isOpen, setIsOpen }: SearchModalProps) => {
@@ -21,7 +18,6 @@ const SearchChatHistory = ({ isOpen, setIsOpen }: SearchModalProps) => {
 
   useEffect(() => {
     if (isOpen) {
-      // Focus input when modal opens
       inputRef.current?.focus();
     }
   }, [isOpen]);
@@ -38,24 +34,16 @@ const SearchChatHistory = ({ isOpen, setIsOpen }: SearchModalProps) => {
         disabled={!hasConversations}
       />
 
-      {isOpen &&
-        ReactDOM.createPortal(
-          <div className={styles.modalOverlay}>
-            <div className={styles.modal}>
-              <ModalWrapper modalRef={modalRef} onClose={handleClose}>
-                <SearchModalBody
-                  conversations={conversations}
-                  onConversationSelect={loadConversation}
-                  setIsOpen={setIsOpen}
-                  searchTerm={searchTerm}
-                  setSearchTerm={setSearchTerm}
-                  onClose={handleClose}
-                />
-              </ModalWrapper>
-            </div>
-          </div>,
-          document.body,
-        )}
+      <ModalWrapper modalRef={modalRef} onClose={handleClose} isOpen={isOpen}>
+        <SearchModalBody
+          conversations={conversations}
+          onConversationSelect={loadConversation}
+          setIsOpen={setIsOpen}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          onClose={handleClose}
+        />
+      </ModalWrapper>
     </div>
   );
 };
