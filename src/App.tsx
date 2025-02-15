@@ -63,6 +63,7 @@ export const App = () => {
                   <SearchChatHistory
                     isOpen={isHistorySearchOpen}
                     setIsOpen={setIsHistorySearchOpen}
+                    setIsMobileSideBarOpen={setIsMobileSideBarOpen}
                   />
                   <ButtonIcon
                     icon={CloseX}
@@ -80,6 +81,7 @@ export const App = () => {
                   <SearchChatHistory
                     isOpen={isHistorySearchOpen}
                     setIsOpen={setIsHistorySearchOpen}
+                    setIsMobileSideBarOpen={setIsMobileSideBarOpen}
                   />
                   <ButtonIcon
                     icon={PanelLeftClose}

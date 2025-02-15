@@ -9,9 +9,14 @@ import { ConversationHistory } from '../context/types';
 interface SearchModalProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  setIsMobileSideBarOpen: (i: boolean) => void;
 }
 
-const SearchChatHistory = ({ isOpen, setIsOpen }: SearchModalProps) => {
+const SearchChatHistory = ({
+  isOpen,
+  setIsOpen,
+  setIsMobileSideBarOpen,
+}: SearchModalProps) => {
   const { conversations, hasConversations, loadConversation } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
   const modalRef = useRef<HTMLDivElement>(null);
@@ -31,6 +36,8 @@ const SearchChatHistory = ({ isOpen, setIsOpen }: SearchModalProps) => {
   const onConversationSelect = (conversationHistory: ConversationHistory) => {
     loadConversation(conversationHistory);
     setIsOpen(false);
+    //  on mobile we want to get the user back to the chat view after selection
+    setIsMobileSideBarOpen(false);
   };
 
   return (
