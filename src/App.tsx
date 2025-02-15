@@ -9,7 +9,7 @@ import { X as CloseX, PanelLeftClose } from 'lucide-react';
 import KavaAILogo from './core/assets/KavaAILogo';
 import ButtonIcon from './core/components/ButtonIcon';
 import { useMessageHistory } from './core/hooks/useMessageHistory';
-import SearchChatHistory from './core/components/SearchChatHistory';
+import SearchHistory from './core/components/SearchHistory';
 
 export const App = () => {
   const {
@@ -39,7 +39,7 @@ export const App = () => {
   /*
    * Supports separate memorization of sidebar & history search states between mobile and desktop
    */
-  const [isHistorySearchOpen, setIsHistorySearchOpen] = useState(false);
+  const [isSearchHistoryOpen, setIsSearchHistoryOpen] = useState(false);
   const [isMobileSideBarOpen, setIsMobileSideBarOpen] = useState(false);
   // TODO: Support a collapse sidebar button
   const [isDesktopSideBarHidden, setIsDesktopSideBarHidden] = useState(false);
@@ -60,9 +60,9 @@ export const App = () => {
               <KavaAILogo height={20} />
               {isMobile && isMobileSideBarOpen && (
                 <div className={styles.buttonGroup}>
-                  <SearchChatHistory
-                    isChatHistoryOpen={isHistorySearchOpen}
-                    setIsChatHistoryOpen={setIsHistorySearchOpen}
+                  <SearchHistory
+                    isSearchHistoryOpen={isSearchHistoryOpen}
+                    setIsSearchHistoryOpen={setIsSearchHistoryOpen}
                     setIsMobileSideBarOpen={setIsMobileSideBarOpen}
                   />
                   <ButtonIcon
@@ -78,9 +78,9 @@ export const App = () => {
               )}
               {!isMobile && !isDesktopSideBarHidden && (
                 <div className={styles.buttonGroup}>
-                  <SearchChatHistory
-                    isChatHistoryOpen={isHistorySearchOpen}
-                    setIsChatHistoryOpen={setIsHistorySearchOpen}
+                  <SearchHistory
+                    isSearchHistoryOpen={isSearchHistoryOpen}
+                    setIsSearchHistoryOpen={setIsSearchHistoryOpen}
                     setIsMobileSideBarOpen={setIsMobileSideBarOpen}
                   />
                   <ButtonIcon

@@ -18,7 +18,7 @@ interface SearchModalBodyProps {
   onClose: () => void;
 }
 
-const SearchModalBody = ({
+const SearchHistoryModalBody = ({
   conversations,
   onConversationSelect,
   setIsOpen,
@@ -107,4 +107,4 @@ const SearchModalBody = ({
   );
 };
 
-export default SearchModalBody;
+export default SearchHistoryModalBody;

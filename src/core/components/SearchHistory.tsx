@@ -1,20 +1,20 @@
 import { useState, useRef, useEffect } from 'react';
 import styles from './SearchChatHistory.module.css';
 import ModalWrapper from './ModalWrapper';
-import SearchModalBody from './SearchModalBody';
+import SearchHistoryModalBody from './SearchHistoryModalBody';
 import { useAppContext } from '../context/useAppContext';
-import { SearchChatButton } from '../assets/SearchChatButton';
+import { SearchHistoryButton } from '../assets/SearchHistoryButton';
 import { ConversationHistory } from '../context/types';
 
 interface SearchModalProps {
-  isChatHistoryOpen: boolean;
-  setIsChatHistoryOpen: (i: boolean) => void;
+  isSearchHistoryOpen: boolean;
+  setIsSearchHistoryOpen: (i: boolean) => void;
   setIsMobileSideBarOpen: (i: boolean) => void;
 }
 
-const SearchChatHistory = ({
-  isChatHistoryOpen,
-  setIsChatHistoryOpen,
+const SearchHistory = ({
+  isSearchHistoryOpen,
+  setIsSearchHistoryOpen,
   setIsMobileSideBarOpen,
 }: SearchModalProps) => {
   const { conversations, hasConversations, loadConversation } = useAppContext();
@@ -23,7 +23,7 @@ const SearchChatHistory = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (isChatHistoryOpen) {
+    if (isSearchHistoryOpen) {
       // Focus input when modal opens
       inputRef.current?.focus();
       //  mobile sidebar is closed by default and that contains the component that mounts the search modal,
@@ -31,33 +31,33 @@ const SearchChatHistory = ({
       //  stays open on screen resize
       // setIsMobileSideBarOpen(true);
     }
-  }, [isChatHistoryOpen, setIsMobileSideBarOpen]);
+  }, [isSearchHistoryOpen, setIsMobileSideBarOpen]);
 
   const handleClose = () => {
-    setIsChatHistoryOpen(false);
+    setIsSearchHistoryOpen(false);
     setSearchTerm('');
   };
 
   const onConversationSelect = (conversationHistory: ConversationHistory) => {
     loadConversation(conversationHistory);
-    setIsChatHistoryOpen(false);
+    setIsSearchHistoryOpen(false);
     //  on mobile we want to get the user back to the chat view after selection
     setIsMobileSideBarOpen(false);
   };
 
   return (
     <div className={styles.container}>
-      <SearchChatButton
-        onClick={() => setIsChatHistoryOpen(true)}
+      <SearchHistoryButton
+        onClick={() => setIsSearchHistoryOpen(true)}
         disabled={!hasConversations}
       />
 
-      {isChatHistoryOpen && (
+      {isSearchHistoryOpen && (
         <ModalWrapper modalRef={modalRef} onClose={handleClose}>
-          <SearchModalBody
+          <SearchHistoryModalBody
             conversations={conversations}
             onConversationSelect={onConversationSelect}
-            setIsOpen={setIsChatHistoryOpen}
+            setIsOpen={setIsSearchHistoryOpen}
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
             onClose={handleClose}
@@ -68,4 +68,4 @@ const SearchChatHistory = ({
   );
 };
 
-export default SearchChatHistory;
+export default SearchHistory;
