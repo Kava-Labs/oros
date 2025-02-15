@@ -63,51 +63,51 @@ describe('ModelSelector', () => {
   it('renders with initial closed state', () => {
     render(<ModelSelector />);
 
-    const button = screen.getByRole('button');
-    expect(button).toBeInTheDocument();
-    expect(button).toHaveAttribute('aria-expanded', 'false');
+    const combobox = screen.getByRole('combobox', { name: 'Select Model' });
+    expect(combobox).toBeInTheDocument();
+    expect(combobox).toHaveAttribute('aria-expanded', 'false');
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
   });
 
   it('opens dropdown menu when clicked', () => {
     render(<ModelSelector />);
 
-    const button = screen.getByRole('button');
-    fireEvent.click(button);
+    const combobox = screen.getByRole('combobox', { name: 'Select Model' });
+    fireEvent.click(combobox);
 
-    expect(button).toHaveAttribute('aria-expanded', 'true');
+    expect(combobox).toHaveAttribute('aria-expanded', 'true');
     expect(screen.getByRole('listbox')).toBeInTheDocument();
   });
 
   it('displays all model options with correct content', () => {
     render(<ModelSelector />);
 
-    fireEvent.click(screen.getByRole('button'));
+    fireEvent.click(screen.getByRole('combobox', { name: 'Select Model' }));
     const dropdownMenu = screen.getByRole('listbox');
 
     // Check reasoning model content
-    expect(within(dropdownMenu).getAllByText('General Reasoning')).toHaveLength(
-      1,
-    );
-    expect(within(dropdownMenu).getAllByText('Logical Analysis')).toHaveLength(
-      1,
-    );
-    expect(within(dropdownMenu).getAllByTestId('kava-icon')).toHaveLength(1);
+    expect(
+      within(dropdownMenu).getByText('General Reasoning'),
+    ).toBeInTheDocument();
+    expect(
+      within(dropdownMenu).getByText('Logical Analysis'),
+    ).toBeInTheDocument();
+    expect(within(dropdownMenu).getByTestId('kava-icon')).toBeInTheDocument();
 
     // Check blockchain model content
     expect(
-      within(dropdownMenu).getAllByText('Blockchain Instruct'),
-    ).toHaveLength(1);
+      within(dropdownMenu).getByText('Blockchain Instruct'),
+    ).toBeInTheDocument();
     expect(
-      within(dropdownMenu).getAllByText('Blockchain Execution'),
-    ).toHaveLength(1);
-    expect(within(dropdownMenu).getAllByTestId('oros-icon')).toHaveLength(1);
+      within(dropdownMenu).getByText('Blockchain Execution'),
+    ).toBeInTheDocument();
+    expect(within(dropdownMenu).getByTestId('oros-icon')).toBeInTheDocument();
   });
 
   it('selects a model when clicked', () => {
     render(<ModelSelector />);
 
-    fireEvent.click(screen.getByRole('button'));
+    fireEvent.click(screen.getByRole('combobox', { name: 'Select Model' }));
     fireEvent.click(screen.getByText('Blockchain Instruct'));
 
     expect(mockHandleModelChange).toHaveBeenCalledWith('gpt-4o');
@@ -117,7 +117,7 @@ describe('ModelSelector', () => {
   it('closes dropdown when clicking outside', () => {
     render(<ModelSelector />);
 
-    fireEvent.click(screen.getByRole('button'));
+    fireEvent.click(screen.getByRole('combobox', { name: 'Select Model' }));
     expect(screen.getByRole('listbox')).toBeInTheDocument();
 
     fireEvent.mouseDown(document.body);
@@ -132,17 +132,17 @@ describe('ModelSelector', () => {
 
     render(<ModelSelector />);
 
-    const button = screen.getByRole('button');
-    expect(button).toBeDisabled();
+    const combobox = screen.getByRole('combobox', { name: 'Select Model' });
+    expect(combobox).toBeDisabled();
 
-    fireEvent.click(button);
+    fireEvent.click(combobox);
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
   });
 
   it('marks current model as selected', () => {
     render(<ModelSelector />);
 
-    fireEvent.click(screen.getByRole('button'));
+    fireEvent.click(screen.getByRole('combobox', { name: 'Select Model' }));
 
     const options = screen.getAllByRole('option');
     const reasoningOption = options.find((option) =>
@@ -150,6 +150,50 @@ describe('ModelSelector', () => {
     );
 
     expect(reasoningOption).toHaveAttribute('aria-selected', 'true');
+  });
+
+  it('supports keyboard navigation with arrow keys', async () => {
+    render(<ModelSelector />);
+
+    // Open the dropdown
+    const combobox = screen.getByRole('combobox', { name: 'Select Model' });
+    fireEvent.click(combobox);
+    expect(combobox).toHaveAttribute('aria-expanded', 'true');
+
+    // Wait for dropdown to render
+    await screen.findByRole('listbox');
+
+    // Get all options
+    const options = await screen.findAllByRole('option');
+    expect(options).toHaveLength(2);
+
+    // Move selection to first option
+    fireEvent.keyDown(combobox, { key: 'ArrowDown' });
+
+    // Wait for React state update
+    const blockchainOption = await screen.findByRole('option', {
+      name: 'Blockchain Instruct',
+    });
+
+    expect(blockchainOption).toHaveAttribute('aria-selected', 'true');
+    expect(document.activeElement).toBe(blockchainOption);
+
+    // Move selection to second option
+    fireEvent.keyDown(options[0], { key: 'ArrowDown' });
+
+    // Wait for second option to be selected
+    const generalReasoningOption = await screen.findByRole('option', {
+      name: 'General Reasoning',
+    });
+
+    expect(generalReasoningOption).toHaveAttribute('aria-selected', 'true');
+    expect(document.activeElement).toBe(generalReasoningOption);
+
+    // Press Enter to select the model
+    fireEvent.keyDown(blockchainOption, { key: 'Enter' });
+
+    // Ensure correct model was selected
+    expect(mockHandleModelChange).toHaveBeenCalledWith('gpt-4o');
   });
 
   it('displays correct icon for selected model', () => {

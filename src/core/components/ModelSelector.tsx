@@ -7,12 +7,14 @@ import { SupportedModels } from '../types/models';
 export const ModelSelector = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(0); // For keyboard navigation
+
   const { modelConfig, messageHistoryStore, handleModelChange } =
     useAppContext();
   const SelectedModelIcon = modelConfig.icon;
+  const models = getAllModels();
 
-  // Check for existing messages
-  // Handle disabled state based on message history
+  // Check for existing messages to determine disabled state
   const messages = messageHistoryStore.getSnapshot();
   const hasUserMessages = messages.length > 1;
 
@@ -40,9 +42,42 @@ export const ModelSelector = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen]);
 
+  // Handle model selection
   const handleItemClick = (modelId: SupportedModels) => {
     handleModelChange(modelId);
     setIsOpen(false);
+  };
+
+  // Handle keyboard navigation
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (!isOpen) return;
+
+    event.preventDefault();
+    let newIndex = highlightedIndex;
+
+    switch (event.key) {
+      case 'ArrowDown':
+        newIndex = (highlightedIndex + 1) % models.length;
+        break;
+      case 'ArrowUp':
+        newIndex = (highlightedIndex - 1 + models.length) % models.length;
+        break;
+      case 'Enter':
+      case ' ':
+        handleItemClick(models[highlightedIndex].id);
+        setIsOpen(false);
+        return;
+      case 'Escape':
+        setIsOpen(false);
+        return;
+      default:
+        return;
+    }
+
+    setHighlightedIndex(newIndex);
+
+    // Move focus to the new highlighted item
+    document.getElementById(`model-${newIndex}`)?.focus();
   };
 
   return (
@@ -52,7 +87,10 @@ export const ModelSelector = () => {
         onClick={() => !isDisabled && setIsOpen(!isOpen)}
         disabled={isDisabled}
         aria-expanded={isOpen}
-        aria-haspopup="true"
+        aria-haspopup="listbox"
+        aria-label="Select Model"
+        role="combobox"
+        onKeyDown={handleKeyDown}
       >
         <div className={styles.modelInfo}>
           <SelectedModelIcon />
@@ -76,16 +114,27 @@ export const ModelSelector = () => {
       </button>
 
       {isOpen && (
-        <div className={styles.dropdownMenu} role="listbox">
-          {getAllModels().map((model) => {
+        <div
+          className={styles.dropdownMenu}
+          role="listbox"
+          aria-activedescendant={`model-${highlightedIndex}`}
+          onKeyDown={handleKeyDown}
+        >
+          {models.map((model, index) => {
             const ModelIcon = model.icon;
-            const menuItem = (
-              <button
+            return (
+              <div
                 key={model.id}
-                className={styles.dropdownItem}
+                id={`model-${index}`}
+                className={`${styles.dropdownItem} ${index === highlightedIndex ? styles.highlighted : ''}`}
                 onClick={() => handleItemClick(model.id)}
+                onKeyDown={(event) =>
+                  event.key === 'Enter' && handleItemClick(model.id)
+                }
                 role="option"
-                aria-selected={model.id === modelConfig.id}
+                aria-selected={index === highlightedIndex ? 'true' : 'false'}
+                aria-label={model.name}
+                tabIndex={-1} // the selected one gets focus first
               >
                 <div className={styles.menuItemContent}>
                   <ModelIcon />
@@ -98,10 +147,8 @@ export const ModelSelector = () => {
                     )}
                   </div>
                 </div>
-              </button>
+              </div>
             );
-
-            return menuItem;
           })}
         </div>
       )}

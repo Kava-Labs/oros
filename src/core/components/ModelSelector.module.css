@@ -72,7 +72,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-sm);
   border: none;
   border-radius: 0;
   background: none;
@@ -110,6 +110,13 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  font-size: 1.33333rem;
+  line-height: normal;
+  font-weight: var(--typography-fontWeightRegular);
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
 }
 
 .menuItemDescription {
