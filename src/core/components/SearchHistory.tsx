@@ -6,7 +6,7 @@ import { useAppContext } from '../context/useAppContext';
 import { SearchHistoryButton } from '../assets/SearchHistoryButton';
 import { ConversationHistory } from '../context/types';
 
-interface SearchModalProps {
+interface SearchHistoryProps {
   isSearchHistoryOpen: boolean;
   setIsSearchHistoryOpen: (i: boolean) => void;
   setIsMobileSideBarOpen: (i: boolean) => void;
@@ -16,7 +16,7 @@ const SearchHistory = ({
   isSearchHistoryOpen,
   setIsSearchHistoryOpen,
   setIsMobileSideBarOpen,
-}: SearchModalProps) => {
+}: SearchHistoryProps) => {
   const { conversations, hasConversations, loadConversation } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
   const modalRef = useRef<HTMLDivElement>(null);

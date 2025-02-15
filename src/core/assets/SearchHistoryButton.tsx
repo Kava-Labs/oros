@@ -5,15 +5,12 @@ import type { ButtonIconProps } from '../components/ButtonIcon';
 
 // Only need to specify props specific to SearchChatButton
 // Omit the required props from ButtonIcon that we're providing
-type SearchChatHistoryButtonProps = Omit<
-  ButtonIconProps,
-  'icon' | 'aria-label'
->;
+type SearchHistoryButtonProps = Omit<ButtonIconProps, 'icon' | 'aria-label'>;
 
 export const SearchHistoryButton = ({
   className,
   ...buttonProps
-}: SearchChatHistoryButtonProps) => {
+}: SearchHistoryButtonProps) => {
   return (
     <ButtonIcon
       icon={TextSearch}
