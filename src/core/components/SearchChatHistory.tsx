@@ -4,6 +4,7 @@ import ModalWrapper from './ModalWrapper';
 import SearchModalBody from './SearchModalBody';
 import { useAppContext } from '../context/useAppContext';
 import { SearchChatButton } from '../assets/SearchChatButton';
+import { ConversationHistory } from '../context/types';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -27,6 +28,11 @@ const SearchChatHistory = ({ isOpen, setIsOpen }: SearchModalProps) => {
     setSearchTerm('');
   };
 
+  const onConversationSelect = (conversationHistory: ConversationHistory) => {
+    loadConversation(conversationHistory);
+    setIsOpen(false);
+  };
+
   return (
     <div className={styles.container}>
       <SearchChatButton
@@ -37,7 +43,7 @@ const SearchChatHistory = ({ isOpen, setIsOpen }: SearchModalProps) => {
       <ModalWrapper modalRef={modalRef} onClose={handleClose} isOpen={isOpen}>
         <SearchModalBody
           conversations={conversations}
-          onConversationSelect={loadConversation}
+          onConversationSelect={onConversationSelect}
           setIsOpen={setIsOpen}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
