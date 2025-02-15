@@ -252,10 +252,10 @@ const HistoryItem = memo(
             className={styles.menuIcon}
             icon={EllipsisVertical}
             size={20}
-            tooltip={{
-              text: 'Chat Options',
-              position: 'bottom',
-            }}
+            // tooltip={{
+            //   text: 'Chat Options',
+            //   position: 'bottom',
+            // }}
             data-menu-button="true"
             aria-label="Chat Options"
             onClick={handleMenuClick}
