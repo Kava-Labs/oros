@@ -42,7 +42,7 @@ export const App = () => {
   const [isMobileSideBarOpen, setIsMobileSideBarOpen] = useState(false);
   // TODO: Support a collapse sidebar button
   const [isDesktopSideBarHidden, setIsDesktopSideBarHidden] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isHistorySearchOpen, setIsHistorySearchOpen] = useState(false);
 
   return (
     <>
@@ -60,7 +60,10 @@ export const App = () => {
               <KavaAILogo height={20} />
               {isMobile && isMobileSideBarOpen && (
                 <div className={styles.buttonGroup}>
-                  <SearchChatHistory isOpen={isOpen} setIsOpen={setIsOpen} />
+                  <SearchChatHistory
+                    isOpen={isHistorySearchOpen}
+                    setIsOpen={setIsHistorySearchOpen}
+                  />
                   <ButtonIcon
                     icon={CloseX}
                     tooltip={{
@@ -74,7 +77,10 @@ export const App = () => {
               )}
               {!isMobile && !isDesktopSideBarHidden && (
                 <div className={styles.buttonGroup}>
-                  <SearchChatHistory isOpen={isOpen} setIsOpen={setIsOpen} />
+                  <SearchChatHistory
+                    isOpen={isHistorySearchOpen}
+                    setIsOpen={setIsHistorySearchOpen}
+                  />
                   <ButtonIcon
                     icon={PanelLeftClose}
                     tooltip={{
