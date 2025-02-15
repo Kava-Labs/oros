@@ -25,11 +25,13 @@
   left: 0;
   right: 0;
   bottom: 0;
+  width: 100vw;
+  height: 100vh;
   background-color: var(--colors-bgSecondary);
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  z-index: 1000;
+  z-index: 9999;
   pointer-events: auto;
 }
 

@@ -4,6 +4,7 @@ import ModalWrapper from './ModalWrapper';
 import SearchModalBody from './SearchModalBody';
 import { useAppContext } from '../context/useAppContext';
 import { SearchChatButton } from '../assets/SearchChatButton';
+import ReactDOM from 'react-dom';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -12,14 +13,8 @@ interface SearchModalProps {
   // onConversationSelect: (conversation: ConversationHistory) => void;
 }
 
-const SearchChatHistory = ({
-  isOpen,
-  setIsOpen,
-  // conversations,
-  // onConversationSelect,
-}: SearchModalProps) => {
+const SearchChatHistory = ({ isOpen, setIsOpen }: SearchModalProps) => {
   const { conversations, hasConversations, loadConversation } = useAppContext();
-  // const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const modalRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -43,18 +38,24 @@ const SearchChatHistory = ({
         disabled={!hasConversations}
       />
 
-      {isOpen && (
-        <ModalWrapper modalRef={modalRef} onClose={handleClose}>
-          <SearchModalBody
-            conversations={conversations}
-            onConversationSelect={loadConversation}
-            setIsOpen={setIsOpen}
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            onClose={handleClose}
-          />
-        </ModalWrapper>
-      )}
+      {isOpen &&
+        ReactDOM.createPortal(
+          <div className={styles.modalOverlay}>
+            <div className={styles.modal}>
+              <ModalWrapper modalRef={modalRef} onClose={handleClose}>
+                <SearchModalBody
+                  conversations={conversations}
+                  onConversationSelect={loadConversation}
+                  setIsOpen={setIsOpen}
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                  onClose={handleClose}
+                />
+              </ModalWrapper>
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 };
