@@ -140,3 +140,15 @@
   background-color: rgba(130, 162, 215, 0.1);
   box-shadow: 0 0 0 2px rgba(130, 162, 215, 0.3);
 }
+
+@media (min-width: 768px) {
+  .menuIcon {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .chatHistoryContent:hover .menuIcon {
+    opacity: 1;
+    visibility: visible;
+  }
+}

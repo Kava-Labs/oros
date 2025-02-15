@@ -1,6 +1,5 @@
 import { TextSearch } from 'lucide-react';
 import ButtonIcon from '../components/ButtonIcon';
-import styles from './Button.module.css';
 import type { ButtonIconProps } from '../components/ButtonIcon';
 
 // Only need to specify props specific to SearchChatButton
@@ -14,7 +13,7 @@ export const SearchChatButton = ({
   return (
     <ButtonIcon
       icon={TextSearch}
-      className={`${styles.chatButton} ${className || ''}`}
+      className={`${className || ''}`}
       tooltip={{
         text: 'Search History',
         position: 'bottom',
