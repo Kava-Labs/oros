@@ -224,10 +224,7 @@ export const ChatView = ({
               </div>
             </div>
 
-            <div
-              className={styles.importantInfo}
-              data-testid="importantInfo"
-            >
+            <div className={styles.importantInfo} data-testid="importantInfo">
               <span>{cautionText}</span>
             </div>
           </div>

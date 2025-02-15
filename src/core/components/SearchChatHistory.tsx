@@ -29,14 +29,9 @@ const SearchChatHistory = ({
       //  mobile sidebar is closed by default and that contains the component that mounts the search modal,
       //  but if a user has opened chat history search from a larger screen, then we should update that so search modal
       //  stays open on screen resize
-      setIsMobileSideBarOpen(true);
+      // setIsMobileSideBarOpen(true);
     }
   }, [isChatHistoryOpen, setIsMobileSideBarOpen]);
-
-  useEffect(() => {
-    if (isChatHistoryOpen) {
-    }
-  });
 
   const handleClose = () => {
     setIsChatHistoryOpen(false);

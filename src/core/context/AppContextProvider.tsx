@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useMemo,
+} from 'react';
 import { AppContext } from './AppContext';
 import { OperationRegistry } from '../../features/blockchain/services/registry';
 import { WalletStore } from '../../features/blockchain/stores/walletStore';
