@@ -245,7 +245,7 @@ const HistoryItem = memo(
                 }}
               />
             ) : (
-              <small>{title}</small>
+              <small data-testid="chat-history-entry">{title}</small>
             )}
           </div>
           <ButtonIcon
@@ -257,7 +257,7 @@ const HistoryItem = memo(
               position: 'bottom',
             }}
             data-menu-button="true"
-            aria-label="ChatOptions"
+            aria-label="Chat Options"
             onClick={handleMenuClick}
           />
         </div>
@@ -281,6 +281,7 @@ const HistoryItem = memo(
             className={`${styles.menuButton} ${styles.deleteButton}`}
             data-delete="true"
             onClick={handleDelete}
+            aria-label="Delete Chat"
           >
             <Trash2 size={16} />
             <span>Delete</span>

@@ -48,11 +48,7 @@ describe('chat', () => {
     expect(responseText).toMatch(/THIS IS A TEST/i);
   });
 
-  test.skip('check balances', async ({
-    page,
-    context,
-    metaMaskExtensionId,
-  }) => {
+  test('check balances', async ({ page, context, metaMaskExtensionId }) => {
     test.setTimeout(90 * 1000);
 
     const chat = new Chat(page);
@@ -79,13 +75,13 @@ describe('chat', () => {
     await chat.waitForAssistantResponse();
 
     const amountElement = await page.getByTestId('TKAVA-query-amount');
-    const amountText = await amountElement.textContent();
+    const amountText = (await amountElement.textContent()) || '';
 
     const amount = parseFloat(amountText.replace(/,/g, ''));
     expect(amount).toBeGreaterThan(1000);
   });
 
-  test.skip('send tx (native asset)', async ({
+  test('send tx (native asset)', async ({
     page,
     context,
     metaMaskExtensionId,
@@ -129,7 +125,7 @@ describe('chat', () => {
 
     expect(Number(txValue) / KAVA_EVM_DECIMALS).toBe(0.12345);
   });
-  test.skip('send tx (non-native asset)', async ({
+  test('send tx (non-native asset)', async ({
     page,
     context,
     metaMaskExtensionId,
@@ -258,7 +254,7 @@ describe('chat', () => {
     await context.close();
   });
 
-  test.skip('chat history', async ({ page }) => {
+  test('chat history', async ({ page }) => {
     test.setTimeout(90 * 1000);
 
     const chat = new Chat(page);
@@ -281,7 +277,7 @@ describe('chat', () => {
 
     expect(initialHistoryTitle).not.toBe('');
 
-    const newChatIcon = page.getByTestId('new-chat-button');
+    const newChatIcon = page.getByRole('button', { name: 'New Chat' });
     await newChatIcon.click();
 
     await chat.submitMessage(
@@ -337,27 +333,35 @@ describe('chat', () => {
     expect(secondHistoryTitle).not.toBe('');
     expect(secondHistoryTitle).not.toBe(initialHistoryTitle);
 
-    let historyEntries = await page.getByTestId('chat-history-entry').all();
-    expect(historyEntries).toHaveLength(2);
+    let historyEntryTexts = await page.getByTestId('chat-history-entry').all();
+    expect(historyEntryTexts).toHaveLength(2);
 
-    let deleteIcon = page.getByTestId('delete-chat-history-entry-icon').first();
-    await deleteIcon.waitFor({ state: 'visible' });
-    await deleteIcon.click({ force: true });
+    const chatOptionButtons = await page.getByLabel('Chat Options').all();
+    expect(chatOptionButtons).toHaveLength(2);
 
-    historyEntries = await page.getByTestId('chat-history-entry').all();
-    expect(historyEntries).toHaveLength(1);
+    // Get the first chat history entry Chat Option button
+    const firstChatOptionButton = chatOptionButtons[0];
 
-    //  click on the chat to bring it into focus so the delete icon can be found
-    await historyEntries[0].click();
+    // Find and click the "Chat Options" button inside the first entry
+    await firstChatOptionButton.click();
 
-    deleteIcon = page.getByTestId('delete-chat-history-entry-icon').first();
-    await deleteIcon.waitFor({ state: 'visible' });
-    await deleteIcon.click({ force: true });
+    await page.locator(`[aria-label="Delete Chat"]`).first().click();
+    await historyEntryTexts[1].waitFor({ state: 'detached' });
+    historyEntryTexts = await page.getByTestId('chat-history-entry').all();
 
-    historyEntries = await page.getByTestId('chat-history-entry').all();
-    expect(historyEntries).toHaveLength(0);
+    expect(historyEntryTexts).toHaveLength(1);
+
+    // Get the only remaining chat history entry Chat Option button
+    const lastChatOptionButton = chatOptionButtons[0];
+
+    // Find and click the "Chat Options" button inside the first entry
+    await lastChatOptionButton.click();
+    await page.locator(`[aria-label="Delete Chat"]`).first().click();
+    await historyEntryTexts[0].waitFor({ state: 'detached' });
+    historyEntryTexts = await page.getByTestId('chat-history-entry').all();
+    expect(historyEntryTexts).toHaveLength(0);
   });
-  test.skip('conversation history from local storage populates the UI', async ({
+  test('conversation history from local storage populates the UI', async ({
     page,
   }) => {
     const chat = new Chat(page);
