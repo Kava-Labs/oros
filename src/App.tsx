@@ -61,8 +61,8 @@ export const App = () => {
               {isMobile && isMobileSideBarOpen && (
                 <div className={styles.buttonGroup}>
                   <SearchChatHistory
-                    isOpen={isHistorySearchOpen}
-                    setIsOpen={setIsHistorySearchOpen}
+                    isChatHistoryOpen={isHistorySearchOpen}
+                    setIsChatHistoryOpen={setIsHistorySearchOpen}
                     setIsMobileSideBarOpen={setIsMobileSideBarOpen}
                   />
                   <ButtonIcon
@@ -79,8 +79,8 @@ export const App = () => {
               {!isMobile && !isDesktopSideBarHidden && (
                 <div className={styles.buttonGroup}>
                   <SearchChatHistory
-                    isOpen={isHistorySearchOpen}
-                    setIsOpen={setIsHistorySearchOpen}
+                    isChatHistoryOpen={isHistorySearchOpen}
+                    setIsChatHistoryOpen={setIsHistorySearchOpen}
                     setIsMobileSideBarOpen={setIsMobileSideBarOpen}
                   />
                   <ButtonIcon

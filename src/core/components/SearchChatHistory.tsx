@@ -7,14 +7,14 @@ import { SearchChatButton } from '../assets/SearchChatButton';
 import { ConversationHistory } from '../context/types';
 
 interface SearchModalProps {
-  isOpen: boolean;
-  setIsOpen: (isOpen: boolean) => void;
+  isChatHistoryOpen: boolean;
+  setIsChatHistoryOpen: (i: boolean) => void;
   setIsMobileSideBarOpen: (i: boolean) => void;
 }
 
 const SearchChatHistory = ({
-  isOpen,
-  setIsOpen,
+  isChatHistoryOpen,
+  setIsChatHistoryOpen,
   setIsMobileSideBarOpen,
 }: SearchModalProps) => {
   const { conversations, hasConversations, loadConversation } = useAppContext();
@@ -23,19 +23,19 @@ const SearchChatHistory = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (isOpen) {
+    if (isChatHistoryOpen) {
       inputRef.current?.focus();
     }
-  }, [isOpen]);
+  }, [isChatHistoryOpen]);
 
   const handleClose = () => {
-    setIsOpen(false);
+    setIsChatHistoryOpen(false);
     setSearchTerm('');
   };
 
   const onConversationSelect = (conversationHistory: ConversationHistory) => {
     loadConversation(conversationHistory);
-    setIsOpen(false);
+    setIsChatHistoryOpen(false);
     //  on mobile we want to get the user back to the chat view after selection
     setIsMobileSideBarOpen(false);
   };
@@ -43,15 +43,19 @@ const SearchChatHistory = ({
   return (
     <div className={styles.container}>
       <SearchChatButton
-        onClick={() => setIsOpen(true)}
+        onClick={() => setIsChatHistoryOpen(true)}
         disabled={!hasConversations}
       />
 
-      <ModalWrapper modalRef={modalRef} onClose={handleClose} isOpen={isOpen}>
+      <ModalWrapper
+        modalRef={modalRef}
+        onClose={handleClose}
+        isOpen={isChatHistoryOpen}
+      >
         <SearchModalBody
           conversations={conversations}
           onConversationSelect={onConversationSelect}
-          setIsOpen={setIsOpen}
+          setIsOpen={setIsChatHistoryOpen}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
           onClose={handleClose}
