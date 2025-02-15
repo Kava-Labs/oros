@@ -31,7 +31,7 @@ const SearchChatHistory = ({
       //  stays open on screen resize
       setIsMobileSideBarOpen(true);
     }
-  }, [isChatHistoryOpen]);
+  }, [isChatHistoryOpen, setIsMobileSideBarOpen]);
 
   useEffect(() => {
     if (isChatHistoryOpen) {
