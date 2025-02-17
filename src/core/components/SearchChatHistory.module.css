@@ -141,7 +141,6 @@
   transform: translateY(-50%);
   color: var(--colors-textMuted);
   cursor: pointer;
-  /* Add padding for hover area */
   padding: var(--spacing-sm);
   height: 4rem;
   width: 4rem;

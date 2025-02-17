@@ -1,5 +1,5 @@
 import styles from './SearchChatHistory.module.css';
-import { X as CloseX } from 'lucide-react';
+import { X } from 'lucide-react';
 import { ReactNode, RefObject, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import ButtonIcon from './ButtonIcon';
@@ -40,7 +40,7 @@ const ModalWrapper = ({
       <div className={styles.modal} ref={modalRef}>
         <ButtonIcon
           className={`${styles.iconButton} ${styles.closeButton}`}
-          icon={CloseX}
+          icon={X}
           aria-label="Close search modal"
           onClick={onClose}
         />
