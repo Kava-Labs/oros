@@ -32,7 +32,7 @@
 .timeGroupTitle {
   margin: var(--spacing-xs) var(--spacing-md);
   color: var(--colors-textTertiary);
-  font-size: 10px; /* TODO: Replace with rem spacing from global css */
+  font-size: 1rem; /* TODO: Replace with rem spacing from global css */
   font-weight: var(--typography-fontWeightSemibold);
   text-transform: uppercase;
 }

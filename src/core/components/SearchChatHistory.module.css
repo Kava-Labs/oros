@@ -89,6 +89,8 @@
 .timeGroupTitle {
   margin: var(--spacing-sm) var(--spacing-sm);
   color: var(--colors-textTertiary);
+  font-size: 1rem;
+  text-transform: uppercase;
 }
 
 .conversationItem {
