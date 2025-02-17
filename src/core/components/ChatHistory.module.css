@@ -78,6 +78,7 @@
   flex: 1;
   min-width: 0;
   cursor: pointer;
+  display: flex;
 }
 
 .titleContainer small {
