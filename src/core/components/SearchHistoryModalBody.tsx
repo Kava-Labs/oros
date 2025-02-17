@@ -68,7 +68,7 @@ const SearchHistoryModalBody = ({
           Object.entries(groupedConversations).map(
             ([timeGroup, conversations]) => (
               <div key={timeGroup} className={styles.timeGroup}>
-                <h6 className={styles.timeGroupTitle}>{timeGroup}</h6>
+                <small className={styles.timeGroupTitle}>{timeGroup}</small>
                 {conversations.map((conversation) => (
                   <div
                     data-testid="search-chat-history-entry"

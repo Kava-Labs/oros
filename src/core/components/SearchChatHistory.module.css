@@ -87,7 +87,7 @@
 }
 
 .timeGroupTitle {
-  margin: var(--spacing-xs) var(--spacing-sm);
+  margin: var(--spacing-sm) var(--spacing-sm);
   color: var(--colors-textTertiary);
 }
 
@@ -95,7 +95,6 @@
   padding: var(--spacing-sm) var(--spacing-sm);
   cursor: pointer;
   border-radius: var(--borderRadius-sm);
-  margin: 2px var(--spacing-xs);
 }
 
 .conversationItem:hover {
