@@ -3,7 +3,6 @@ import styles from './SearchChatHistory.module.css';
 import ModalWrapper from './ModalWrapper';
 import SearchHistoryModalBody from './SearchHistoryModalBody';
 import { useAppContext } from '../context/useAppContext';
-import { SearchHistoryButton } from '../assets/SearchHistoryButton';
 import { ConversationHistory } from '../context/types';
 
 interface SearchHistoryProps {
@@ -12,12 +11,12 @@ interface SearchHistoryProps {
   setIsMobileSideBarOpen: (i: boolean) => void;
 }
 
-const SearchHistory = ({
+const SearchHistoryModal = ({
   isSearchHistoryOpen,
   setIsSearchHistoryOpen,
   setIsMobileSideBarOpen,
 }: SearchHistoryProps) => {
-  const { conversations, hasConversations, loadConversation } = useAppContext();
+  const { conversations, loadConversation } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
   const modalRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -47,11 +46,6 @@ const SearchHistory = ({
 
   return (
     <div className={styles.container}>
-      <SearchHistoryButton
-        onClick={() => setIsSearchHistoryOpen(true)}
-        disabled={!hasConversations}
-      />
-
       {isSearchHistoryOpen && (
         <ModalWrapper modalRef={modalRef} onClose={handleClose}>
           <SearchHistoryModalBody
@@ -68,4 +62,4 @@ const SearchHistory = ({
   );
 };
 
-export default SearchHistory;
+export default SearchHistoryModal;

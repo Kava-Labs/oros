@@ -9,7 +9,7 @@ import { X as CloseX, PanelLeftClose } from 'lucide-react';
 import KavaAILogo from './core/assets/KavaAILogo';
 import ButtonIcon from './core/components/ButtonIcon';
 import { useMessageHistory } from './core/hooks/useMessageHistory';
-import SearchHistory from './core/components/SearchHistory';
+import { SearchHistoryButton } from './core/assets/SearchHistoryButton';
 
 export const App = () => {
   const {
@@ -20,6 +20,7 @@ export const App = () => {
     handleChatCompletion,
     setIsRequesting,
     handleCancel,
+    hasConversations,
   } = useAppContext();
   const { messages } = useMessageHistory();
 
@@ -60,7 +61,8 @@ export const App = () => {
               <KavaAILogo height={20} />
               {isMobile && isMobileSideBarOpen && (
                 <div className={styles.buttonGroup}>
-                  <SearchHistory
+                  <SearchHistoryButton
+                    disabled={!hasConversations}
                     isSearchHistoryOpen={isSearchHistoryOpen}
                     setIsSearchHistoryOpen={setIsSearchHistoryOpen}
                     setIsMobileSideBarOpen={setIsMobileSideBarOpen}
@@ -78,7 +80,8 @@ export const App = () => {
               )}
               {!isMobile && !isDesktopSideBarHidden && (
                 <div className={styles.buttonGroup}>
-                  <SearchHistory
+                  <SearchHistoryButton
+                    disabled={!hasConversations}
                     isSearchHistoryOpen={isSearchHistoryOpen}
                     setIsSearchHistoryOpen={setIsSearchHistoryOpen}
                     setIsMobileSideBarOpen={setIsMobileSideBarOpen}
