@@ -18,7 +18,7 @@ interface SearchModalBodyProps {
   onClose: () => void;
 }
 
-const SearchModalBody = ({
+const SearchHistoryModalBody = ({
   conversations,
   onConversationSelect,
   setIsOpen,
@@ -68,7 +68,7 @@ const SearchModalBody = ({
           Object.entries(groupedConversations).map(
             ([timeGroup, conversations]) => (
               <div key={timeGroup} className={styles.timeGroup}>
-                <h6 className={styles.timeGroupTitle}>{timeGroup}</h6>
+                <small className={styles.timeGroupTitle}>{timeGroup}</small>
                 {conversations.map((conversation) => (
                   <div
                     data-testid="search-chat-history-entry"
@@ -107,4 +107,4 @@ const SearchModalBody = ({
   );
 };
 
-export default SearchModalBody;
+export default SearchHistoryModalBody;

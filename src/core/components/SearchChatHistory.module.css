@@ -25,11 +25,13 @@
   left: 0;
   right: 0;
   bottom: 0;
+  width: 100vw;
+  height: 100vh;
   background-color: var(--colors-bgSecondary);
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  z-index: 1000;
+  z-index: 9999;
   pointer-events: auto;
 }
 
@@ -85,15 +87,16 @@
 }
 
 .timeGroupTitle {
-  margin: var(--spacing-xs) var(--spacing-sm);
+  margin: var(--spacing-sm) var(--spacing-sm);
   color: var(--colors-textTertiary);
+  font-size: 1rem;
+  text-transform: uppercase;
 }
 
 .conversationItem {
   padding: var(--spacing-sm) var(--spacing-sm);
   cursor: pointer;
   border-radius: var(--borderRadius-sm);
-  margin: 2px var(--spacing-xs);
 }
 
 .conversationItem:hover {

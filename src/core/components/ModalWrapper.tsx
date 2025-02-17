@@ -1,6 +1,7 @@
 import styles from './SearchChatHistory.module.css';
 import { X } from 'lucide-react';
 import { ReactNode, RefObject, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 
 interface ModalWrapperProps {
   children: ReactNode;
@@ -33,7 +34,7 @@ const ModalWrapper = ({
     };
   }, [closeOnOutsideClick, onClose, modalRef]);
 
-  return (
+  return ReactDOM.createPortal(
     <div className={styles.modalOverlay}>
       <div className={styles.modal} ref={modalRef}>
         <button
@@ -45,7 +46,8 @@ const ModalWrapper = ({
         </button>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 };
 

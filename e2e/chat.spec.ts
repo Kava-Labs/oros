@@ -397,7 +397,7 @@ describe('chat', () => {
     await expect(historyEntry).toHaveText('Test Conversation Title');
   });
 
-  test.skip('conversation search functionality', async ({ page }) => {
+  test('conversation search functionality', async ({ page }) => {
     const chat = new Chat(page);
 
     await page.addInitScript(() => {
@@ -493,7 +493,7 @@ describe('chat', () => {
 
     await chat.goto();
 
-    const searchButton = page.getByTestId('search-conversation-button');
+    const searchButton = page.getByRole('button', { name: 'Search History' });
     await searchButton.click();
 
     const modalEntries = page.getByTestId('search-chat-history-entry');
@@ -569,12 +569,19 @@ describe('chat', () => {
     await searchInput.clear();
     await expect(page.getByTestId('search-chat-history-entry')).toHaveCount(4);
 
+    //  Test no results
+    await searchInput.clear();
+    await searchInput.fill('asdfffewf');
+
+    const noResults = page.getByText('No results');
+    await expect(noResults).toBeVisible();
+
     // Test closing by clicking outside
     await page.mouse.click(0, 0);
     await expect(searchInput).not.toBeVisible();
   });
 
-  test.skip('search modal shows "No results" when no conversations exist', async ({
+  test('search modal button is disabled for a user with no history', async ({
     page,
   }) => {
     const chat = new Chat(page);
@@ -587,10 +594,7 @@ describe('chat', () => {
       localStorage.removeItem('conversations');
     });
 
-    const searchButton = page.getByTestId('search-conversation-button');
-    await searchButton.click();
-
-    const noResults = page.getByText('No results');
-    await expect(noResults).toBeVisible();
+    const searchButton = page.getByRole('button', { name: 'Search History' });
+    await expect(searchButton).toBeDisabled();
   });
 });

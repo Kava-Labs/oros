@@ -9,6 +9,7 @@ import { X as CloseX, PanelLeftClose } from 'lucide-react';
 import KavaAILogo from './core/assets/KavaAILogo';
 import ButtonIcon from './core/components/ButtonIcon';
 import { useMessageHistory } from './core/hooks/useMessageHistory';
+import { SearchHistoryButton } from './core/assets/SearchHistoryButton';
 
 export const App = () => {
   const {
@@ -19,6 +20,7 @@ export const App = () => {
     handleChatCompletion,
     setIsRequesting,
     handleCancel,
+    hasConversations,
   } = useAppContext();
   const { messages } = useMessageHistory();
 
@@ -36,8 +38,9 @@ export const App = () => {
   const isMobile = useIsMobile();
 
   /*
-   * Supports seperate memorization of sidebar state between mobile and desktop
+   * Supports separate memorization of sidebar & history search states between mobile and desktop
    */
+  const [isSearchHistoryOpen, setIsSearchHistoryOpen] = useState(false);
   const [isMobileSideBarOpen, setIsMobileSideBarOpen] = useState(false);
   // TODO: Support a collapse sidebar button
   const [isDesktopSideBarHidden, setIsDesktopSideBarHidden] = useState(false);
@@ -58,10 +61,12 @@ export const App = () => {
               <KavaAILogo height={20} />
               {isMobile && isMobileSideBarOpen && (
                 <div className={styles.buttonGroup}>
-                  {/* <SearchChatButton
-                    onClick={() => {}}
+                  <SearchHistoryButton
                     disabled={!hasConversations}
-                  /> */}
+                    isSearchHistoryOpen={isSearchHistoryOpen}
+                    setIsSearchHistoryOpen={setIsSearchHistoryOpen}
+                    setIsMobileSideBarOpen={setIsMobileSideBarOpen}
+                  />
                   <ButtonIcon
                     icon={CloseX}
                     tooltip={{
@@ -75,10 +80,12 @@ export const App = () => {
               )}
               {!isMobile && !isDesktopSideBarHidden && (
                 <div className={styles.buttonGroup}>
-                  {/* <SearchChatButton
-                    onClick={() => {}}
+                  <SearchHistoryButton
                     disabled={!hasConversations}
-                  /> */}
+                    isSearchHistoryOpen={isSearchHistoryOpen}
+                    setIsSearchHistoryOpen={setIsSearchHistoryOpen}
+                    setIsMobileSideBarOpen={setIsMobileSideBarOpen}
+                  />
                   <ButtonIcon
                     icon={PanelLeftClose}
                     tooltip={{
