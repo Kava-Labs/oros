@@ -68,7 +68,7 @@ const SearchHistoryModalBody = ({
           onChange={(e) => setSearchTerm(e.target.value)}
           onKeyDown={handleKeyDown}
         />
-        {/*Mobile design has a header with close icon*/}
+        {/*Mobile design uses the close icon within ModalWrapper*/}
         {!isMobile && (
           <ButtonIcon
             className={styles.searchCloseIcon}
