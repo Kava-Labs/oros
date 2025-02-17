@@ -597,4 +597,55 @@ describe('chat', () => {
     const searchButton = page.getByRole('button', { name: 'Search History' });
     await expect(searchButton).toBeDisabled();
   });
+
+  test('handles new chat titles and model switching correctly', async ({
+    page,
+  }) => {
+    test.setTimeout(90 * 1000);
+    const chat = new Chat(page);
+    await chat.goto();
+
+    // Verify initial "New Chat" entry
+    const initialHistoryEntry = page.getByTestId('chat-history-entry').first();
+    await expect(initialHistoryEntry).toHaveText('New Chat');
+
+    //  switch models and verify that we don't add another new chat entry
+    await chat.switchToBlockchainModel();
+
+    const initialHistoryEntries = await page
+      .getByTestId('chat-history-entry')
+      .all();
+    expect(initialHistoryEntries).toHaveLength(1);
+
+    // Send a message and verify title gets updated
+    await chat.submitMessage(
+      'This is an automated test suite, please respond with the exact text: THIS IS A TEST',
+    );
+    await chat.waitForStreamToFinish();
+    await chat.waitForAssistantResponse();
+
+    // Allow the title to get updated from the default placeholder
+    await expect(initialHistoryEntry).not.toHaveText('New Chat', {
+      timeout: 10000,
+    });
+
+    //  Get the updated (non-placeholder) title
+    const updatedHistoryTitle = await initialHistoryEntry.textContent();
+
+    const newChatButton = page.getByRole('button', { name: 'New Chat' });
+    await newChatButton.click();
+    //  reverse-sorted by time, so new entries are always first
+    const newHistoryEntry = page.getByTestId('chat-history-entry').first();
+    await expect(newHistoryEntry).toHaveText('New Chat');
+    const previousChatWithTitle = page.getByTestId('chat-history-entry').nth(1);
+    await expect(previousChatWithTitle).toHaveText(updatedHistoryTitle);
+
+    // Switch models back and forth and verify we don't get multiple "New Chat" entries
+    await chat.switchToBlockchainModel();
+    await chat.switchToReasoningModel();
+    await chat.switchToBlockchainModel();
+
+    const historyEntries = await page.getByTestId('chat-history-entry').all();
+    expect(historyEntries).toHaveLength(2);
+  });
 });

@@ -104,4 +104,9 @@ export class Chat {
       .getByRole('option', { name: 'Blockchain Instruct' })
       .click();
   }
+
+  async switchToReasoningModel() {
+    await this.page.getByRole('combobox', { name: 'Select Model' }).click();
+    await this.page.getByRole('option', { name: 'General Reasoning' }).click();
+  }
 }
