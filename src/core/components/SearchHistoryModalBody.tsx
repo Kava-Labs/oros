@@ -8,6 +8,9 @@ import {
 import React, { useRef } from 'react';
 import { ConversationHistory } from '../context/types';
 import { useAppContext } from '../context/useAppContext';
+import { useIsMobile } from '../../shared/theme/useIsMobile';
+import { X as CloseX } from 'lucide-react';
+import ButtonIcon from './ButtonIcon';
 
 interface SearchModalBodyProps {
   conversations: ConversationHistory[];
@@ -41,11 +44,17 @@ const SearchHistoryModalBody = ({
     }
   };
 
-  const handleConversationClick = (conversation: ConversationHistory) => {
-    onConversationSelect(conversation);
+  const closeModalAndResetInput = () => {
     setIsOpen(false);
     setSearchTerm('');
   };
+
+  const handleConversationClick = (conversation: ConversationHistory) => {
+    onConversationSelect(conversation);
+    closeModalAndResetInput();
+  };
+
+  const isMobile = useIsMobile();
 
   return (
     <>
@@ -59,6 +68,15 @@ const SearchHistoryModalBody = ({
           onChange={(e) => setSearchTerm(e.target.value)}
           onKeyDown={handleKeyDown}
         />
+        {/*Mobile design has a header with close icon*/}
+        {!isMobile && (
+          <ButtonIcon
+            className={styles.searchCloseIcon}
+            icon={CloseX}
+            aria-label="Close Search modal"
+            onClick={closeModalAndResetInput}
+          />
+        )}
       </div>
 
       <div className={styles.results}>
