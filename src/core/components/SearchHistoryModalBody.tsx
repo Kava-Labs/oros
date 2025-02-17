@@ -73,7 +73,7 @@ const SearchHistoryModalBody = ({
           <ButtonIcon
             className={styles.searchCloseIcon}
             icon={CloseX}
-            aria-label="Close Search modal"
+            aria-label="Close search modal"
             onClick={closeModalAndResetInput}
           />
         )}

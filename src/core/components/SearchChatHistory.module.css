@@ -5,7 +5,7 @@
 .iconButton {
   background: none;
   border: none;
-  color: var(--colors-textPrimary);
+  color: var(--colors-textSecondary);
   cursor: pointer;
   padding: var(--spacing-sm);
   display: flex;
@@ -16,7 +16,7 @@
 }
 
 .iconButton:hover {
-  color: var(--colors-textMuted);
+  color: var(--colors-textPrimary);
 }
 
 .modalOverlay {

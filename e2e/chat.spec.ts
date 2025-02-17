@@ -576,7 +576,14 @@ describe('chat', () => {
     const noResults = page.getByText('No results');
     await expect(noResults).toBeVisible();
 
-    // Test closing by clicking outside
+    //  Close with icon
+    const closeIcon = page.getByRole('button', { name: 'Close search modal' });
+    await closeIcon.click();
+    await expect(searchInput).not.toBeVisible();
+
+    // Reopen modal & test closing by clicking outside
+    await searchButton.click();
+
     await page.mouse.click(0, 0);
     await expect(searchInput).not.toBeVisible();
   });
