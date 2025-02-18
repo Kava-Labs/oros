@@ -4,7 +4,7 @@ import { ConversationHistory } from './types';
 import OpenAI from 'openai';
 import { formatConversationTitle } from '../utils/conversation/helpers';
 
-const PLACEHOLDER_CHAT_TITLE = 'New Chat';
+export const PLACEHOLDER_CHAT_TITLE = 'New Chat';
 
 export const useMessageSaver = (
   messageHistoryStore: MessageHistoryStore,
