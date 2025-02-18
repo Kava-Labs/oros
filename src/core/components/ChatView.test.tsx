@@ -42,7 +42,6 @@ describe('ChatView', () => {
     onSubmit: () => {},
     onCancel: () => {},
     onMenu: () => {},
-    onNewChat: () => {},
     onPanelOpen: () => {},
     isPanelOpen: false,
   };

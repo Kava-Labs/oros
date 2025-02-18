@@ -30,7 +30,7 @@ const SearchHistoryModalBody = ({
 }: SearchModalBodyProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { messageHistoryStore } = useAppContext();
+  const { conversationID } = useAppContext();
 
   const groupedConversations = groupAndFilterConversations(
     conversations,
@@ -91,7 +91,7 @@ const SearchHistoryModalBody = ({
                   <div
                     data-testid="search-chat-history-entry"
                     key={conversation.id}
-                    className={`${styles.conversationItem} ${messageHistoryStore.getConversationID() === conversation.id ? styles.selected : ''}`}
+                    className={`${styles.conversationItem} ${conversationID === conversation.id ? styles.selected : ''}`}
                     onClick={() => handleConversationClick(conversation)}
                   >
                     <p

@@ -20,16 +20,27 @@ export type ConversationHistory = {
   lastSaved: number;
 };
 
+export type ActiveConversation = {
+  conversationID: string;
+  messageStore: TextStreamStore;
+  progressStore: TextStreamStore;
+  thinkingStore: TextStreamStore;
+  errorStore: TextStreamStore;
+  messageHistoryStore: MessageHistoryStore;
+  toolCallStreamStore: ToolCallStreamStore;
+  isRequesting: boolean;
+};
+
 export type AppContextType = {
-  errorText: string;
-  setErrorText: React.Dispatch<React.SetStateAction<string>>;
+  conversationID: string;
   isReady: boolean;
   setIsReady: React.Dispatch<React.SetStateAction<boolean>>;
   isRequesting: boolean;
-  setIsRequesting: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsRequesting: (isRequesting: boolean) => void;
   registry: OperationRegistry<unknown>;
   modelConfig: ModelConfig;
   handleModelChange: (modelName: SupportedModels) => void;
+  startNewChat: () => void;
   executeOperation: ExecuteOperation;
   handleReset: () => void;
   handleChatCompletion: (value: string) => void;
@@ -39,6 +50,7 @@ export type AppContextType = {
   thinkingStore: TextStreamStore;
   messageStore: TextStreamStore;
   toolCallStreamStore: ToolCallStreamStore;
+  errorStore: TextStreamStore;
   progressStore: TextStreamStore;
   messageHistoryStore: MessageHistoryStore;
   isOperationValidated: boolean;

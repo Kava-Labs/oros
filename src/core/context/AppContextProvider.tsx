@@ -16,7 +16,7 @@ import { useExecuteOperation } from './useExecuteOperation';
 import { DEFAULT_MODEL_NAME, getModelConfig } from '../config/models';
 import { SupportedModels, ModelConfig } from '../types/models';
 import { useMessageSaver } from './useMessageSaver';
-import { ConversationHistory } from './types';
+import { ActiveConversation, ConversationHistory } from './types';
 import { getToken } from '../../core/utils/token/token';
 import OpenAI from 'openai';
 import {
@@ -26,17 +26,31 @@ import {
 } from '../utils/streamUtils';
 import { OperationResult } from '../../features/blockchain/types/chain';
 import { ExecuteOperation } from '../../core/context/types';
+import { v4 as uuidv4 } from 'uuid';
 
 let client: OpenAI | null = null;
+
+const newConversation = () => {
+  return {
+    conversationID: uuidv4(),
+    messageStore: new TextStreamStore(),
+    thinkingStore: new TextStreamStore(),
+    progressStore: new TextStreamStore(),
+    errorStore: new TextStreamStore(),
+    messageHistoryStore: new MessageHistoryStore(),
+    toolCallStreamStore: new ToolCallStreamStore(),
+    isRequesting: false,
+  };
+};
 
 export const AppContextProvider = ({
   children,
   walletStore,
-  messageStore,
-  toolCallStreamStore,
-  progressStore,
-  messageHistoryStore,
-  thinkingStore,
+  // messageStore,
+  // toolCallStreamStore,
+  // progressStore,
+  // messageHistoryStore,
+  // thinkingStore,
 }: {
   children: React.ReactNode;
   walletStore: WalletStore;
@@ -46,12 +60,43 @@ export const AppContextProvider = ({
   progressStore: TextStreamStore;
   messageHistoryStore: MessageHistoryStore;
 }) => {
-  const [errorText, setErrorText] = useState('');
-  const [isRequesting, setIsRequesting] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [registry] = useState<OperationRegistry<unknown>>(() =>
     initializeMessageRegistry(),
   );
+
+  const [conversation, setConversation] = useState<ActiveConversation>(() =>
+    newConversation(),
+  );
+
+  const {
+    conversationID,
+    isRequesting,
+    messageHistoryStore,
+    toolCallStreamStore,
+    messageStore,
+    progressStore,
+    thinkingStore,
+    errorStore,
+  } = conversation;
+
+  const activeConversationsRef = useRef<Map<string, ActiveConversation>>(null);
+  useEffect(() => {
+    activeConversationsRef.current = new Map();
+    const convo = newConversation();
+    activeConversationsRef.current.set(convo.conversationID, convo);
+  }, []);
+
+  const setIsRequesting = useCallback((isRequesting: boolean) => {
+    setConversation((prev) => {
+      const newConversation = { ...prev, isRequesting };
+      activeConversationsRef.current?.set(
+        newConversation.conversationID,
+        newConversation,
+      );
+      return newConversation;
+    });
+  }, []);
 
   const [conversations, setConversations] = useState<ConversationHistory[]>(
     () => {
@@ -107,17 +152,40 @@ export const AppContextProvider = ({
     walletStore,
   );
 
-  useMessageSaver(messageHistoryStore, modelConfig.id, client!);
+  useMessageSaver(messageHistoryStore, modelConfig.id, conversationID, client!);
 
   const loadConversation = useCallback(
     (convoHistory: ConversationHistory) => {
       handleModelChange(convoHistory.model as SupportedModels);
-      messageHistoryStore.loadConversation(convoHistory);
-      setErrorText('');
-      progressStore.setText('');
+      let activeConversation = activeConversationsRef.current?.get(
+        convoHistory.id,
+      );
+
+      if (!activeConversation) {
+        activeConversation = newConversation();
+        activeConversation.messageHistoryStore.loadConversation(convoHistory);
+        activeConversationsRef.current?.set(
+          activeConversation.conversationID,
+          activeConversation,
+        );
+      }
+      setConversation(activeConversation);
     },
-    [messageHistoryStore, handleModelChange, progressStore],
+    [handleModelChange],
   );
+
+  const startNewChat = useCallback(() => {
+    activeConversationsRef.current?.set(
+      conversation.conversationID,
+      conversation,
+    );
+    const newChatConversation = newConversation();
+    setConversation(newChatConversation);
+    activeConversationsRef.current?.set(
+      newChatConversation.conversationID,
+      newChatConversation,
+    );
+  }, [conversation]);
 
   useEffect(() => {
     try {
@@ -172,7 +240,8 @@ export const AppContextProvider = ({
       // and all follow ups have been completed.
       try {
         //  clear any existing error
-        setErrorText('');
+        // setErrorText('');
+        conversation.errorStore.setText('');
 
         await doChat(
           controller,
@@ -196,7 +265,8 @@ export const AppContextProvider = ({
           errorMessage = 'You clicked cancel - please try again';
         }
 
-        setErrorText(errorMessage);
+        // setErrorText(errorMessage);
+        conversation.errorStore.setText(errorMessage);
       } finally {
         setIsRequesting(false);
         controllerRef.current = null;
@@ -204,7 +274,7 @@ export const AppContextProvider = ({
     },
     [
       isRequesting,
-      setErrorText,
+      conversation,
       setIsRequesting,
       executeOperation,
       modelConfig,
@@ -234,6 +304,7 @@ export const AppContextProvider = ({
   return (
     <AppContext.Provider
       value={{
+        conversationID,
         client,
         messageHistoryStore,
         messageStore,
@@ -242,15 +313,15 @@ export const AppContextProvider = ({
         toolCallStreamStore,
         modelConfig,
         handleModelChange,
+        startNewChat,
         handleReset,
         handleCancel,
         handleChatCompletion,
         thinkingStore,
+        errorStore,
         loadConversation,
         executeOperation,
         registry,
-        errorText,
-        setErrorText,
         isReady,
         setIsReady,
         isRequesting,

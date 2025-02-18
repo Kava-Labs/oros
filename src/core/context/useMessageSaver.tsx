@@ -7,6 +7,7 @@ import { formatConversationTitle } from '../utils/conversation/helpers';
 export const useMessageSaver = (
   messageHistoryStore: MessageHistoryStore,
   modelID: string,
+  conversationID: string,
   client: OpenAI,
 ) => {
   // Keep track of the conversation length to detect new messages
@@ -15,7 +16,6 @@ export const useMessageSaver = (
   useEffect(() => {
     const onChange = async () => {
       const messages = messageHistoryStore.getSnapshot();
-      const id = messageHistoryStore.getConversationID();
 
       if (messages.length >= 3) {
         const firstUserMessage = messages.find((msg) => msg.role === 'user');
@@ -26,11 +26,11 @@ export const useMessageSaver = (
           JSON.parse(localStorage.getItem('conversations') ?? '{}');
 
         // Check if this is an existing conversation
-        const existingConversation = allConversations[id];
+        const existingConversation = allConversations[conversationID];
 
         // Initialize message count for this conversation if it doesn't exist
-        if (!prevMessageCountRef.current[id]) {
-          prevMessageCountRef.current[id] = existingConversation
+        if (!prevMessageCountRef.current[conversationID]) {
+          prevMessageCountRef.current[conversationID] = existingConversation
             ? existingConversation.conversation.length
             : messages.length;
         }
@@ -38,10 +38,10 @@ export const useMessageSaver = (
         // Determine if new messages were added to an existing conversation
         const hasNewMessages =
           existingConversation &&
-          messages.length > prevMessageCountRef.current[id];
+          messages.length > prevMessageCountRef.current[conversationID];
 
         // Update the message count reference
-        prevMessageCountRef.current[id] = messages.length;
+        prevMessageCountRef.current[conversationID] = messages.length;
 
         // Only update lastSaved if new messages were added to an existing conversation
         const lastSaved = hasNewMessages
@@ -49,7 +49,7 @@ export const useMessageSaver = (
           : (existingConversation?.lastSaved ?? new Date().valueOf());
 
         const history: ConversationHistory = {
-          id,
+          id: conversationID,
           model: existingConversation ? existingConversation.model : modelID,
           title: content as string, // fallback value
           conversation: messages,
@@ -93,10 +93,10 @@ export const useMessageSaver = (
           }
         } else {
           // keep the existing title without any truncation
-          history.title = allConversations[id].title;
+          history.title = allConversations[conversationID].title;
         }
 
-        allConversations[id] = history;
+        allConversations[conversationID] = history;
         localStorage.setItem('conversations', JSON.stringify(allConversations));
       }
     };
@@ -105,5 +105,5 @@ export const useMessageSaver = (
     // this is to prevent re-renders of the caller using this hook
     const unsubscribe = messageHistoryStore.subscribe(onChange);
     return () => unsubscribe();
-  }, [messageHistoryStore, modelID, client]);
+  }, [messageHistoryStore, modelID, client, conversationID]);
 };

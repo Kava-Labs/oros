@@ -70,7 +70,6 @@ const args: ChatViewProps = {
   onCancel: fn(),
   cautionText: '',
   onMenu: fn(),
-  onNewChat: fn(),
   onPanelOpen: fn(),
   isPanelOpen: false,
 };

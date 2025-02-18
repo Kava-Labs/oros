@@ -62,6 +62,7 @@ describe('useMessageSaver', () => {
       useMessageSaver(
         mockMessageHistoryStore as unknown as MessageHistoryStore,
         'test-model',
+        '',
         mockClient,
       ),
     );
@@ -87,6 +88,7 @@ describe('useMessageSaver', () => {
       useMessageSaver(
         mockMessageHistoryStore as unknown as MessageHistoryStore,
         'test-model',
+        '',
         mockClient,
       ),
     );
@@ -133,6 +135,7 @@ describe('useMessageSaver', () => {
       useMessageSaver(
         mockMessageHistoryStore as unknown as MessageHistoryStore,
         'test-model',
+        '',
         mockClient,
       ),
     );
@@ -183,6 +186,7 @@ describe('useMessageSaver', () => {
       useMessageSaver(
         mockMessageHistoryStore as unknown as MessageHistoryStore,
         'test-model',
+        '',
         mockClient,
       ),
     );
