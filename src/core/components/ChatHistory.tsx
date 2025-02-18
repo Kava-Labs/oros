@@ -158,11 +158,23 @@ const HistoryItem = memo(
       const trimmedTitle = newTitle.trim();
       if (trimmedTitle === '') {
         setNewTitle(title);
-      } else {
-        saveToLocalStorage(trimmedTitle);
-        setNewTitle(trimmedTitle);
+        return;
       }
+
+      //  Update UI first
+      setNewTitle(trimmedTitle);
       setEditingTitle(false);
+
+      //  Defer storage update
+      //  Updating long history in local storage first
+      //  and then updating the UI can cause a lag
+      Promise.resolve().then(() => {
+        try {
+          saveToLocalStorage(trimmedTitle);
+        } catch (error) {
+          console.error('Error saving to localStorage:', error);
+        }
+      });
     }, [newTitle, title, saveToLocalStorage]);
 
     useEffect(() => {
@@ -245,17 +257,13 @@ const HistoryItem = memo(
                 }}
               />
             ) : (
-              <small data-testid="chat-history-entry">{title}</small>
+              <small data-testid="chat-history-entry">{newTitle}</small>
             )}
           </div>
           <ButtonIcon
             className={styles.menuIcon}
             icon={EllipsisVertical}
             size={20}
-            // tooltip={{
-            //   text: 'Chat Options',
-            //   position: 'bottom',
-            // }}
             data-menu-button="true"
             aria-label="Chat Options"
             onClick={handleMenuClick}
