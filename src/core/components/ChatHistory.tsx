@@ -14,6 +14,7 @@ import { useAppContext } from '../context/useAppContext';
 import { EllipsisVertical, Bot, Pencil, Trash2, X } from 'lucide-react';
 import { groupConversationsByTime } from '../utils/conversation/helpers';
 import ButtonIcon from './ButtonIcon';
+import _ from 'lodash';
 
 interface ChatHistoryProps {
   onHistoryItemClick: Dispatch<SetStateAction<boolean>>;
@@ -132,44 +133,95 @@ const HistoryItem = memo(
 
     const containerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+    const titleRef = useRef(title);
+
+    // Memoize the save function that occurs
+    const debouncedSave = useMemo(
+      () =>
+        _.debounce((id: string, newValue: string) => {
+          try {
+            const conversations = JSON.parse(
+              localStorage.getItem('conversations') ?? '{}',
+            );
+            conversations[id].title = newValue;
+            localStorage.setItem(
+              'conversations',
+              JSON.stringify(conversations),
+            );
+          } catch (error) {
+            console.error('Error saving to localStorage:', error);
+          }
+        }, 100),
+      [], // Empty deps since we want this to be created only once
+    );
+
+    // Cleanup debounce on unmount
+    useEffect(() => {
+      return () => {
+        debouncedSave.cancel();
+      };
+    }, [debouncedSave]);
+
+    const handleSaveTitle = useCallback(() => {
+      const trimmedTitle = newTitle.trim();
+      if (trimmedTitle === '') {
+        setNewTitle(titleRef.current);
+        setEditingTitle(false);
+        return;
+      }
+
+      //  update the UI immediately
+      setNewTitle(trimmedTitle);
+      setEditingTitle(false);
+      titleRef.current = trimmedTitle;
+
+      //  so we aren't blocked by the storage updatex
+      debouncedSave(id, trimmedTitle);
+    }, [newTitle, id, debouncedSave]);
 
     const handleMenuClick = (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
       if (editingTitle) {
         setEditingTitle(false);
-        setNewTitle(title);
+        setNewTitle(titleRef.current);
       }
       onMenuClick();
     };
 
-    const saveToLocalStorage = useCallback(
-      (newValue: string) => {
-        const conversations = JSON.parse(
-          localStorage.getItem('conversations') ?? '{}',
-        );
-        conversations[id].title = newValue;
-        localStorage.setItem('conversations', JSON.stringify(conversations));
-      },
-      [id],
-    );
-
-    const handleSaveTitle = useCallback(() => {
-      const trimmedTitle = newTitle.trim();
-      if (trimmedTitle === '') {
-        setNewTitle(title);
+    const handleEdit = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (editingTitle) {
+        setNewTitle(titleRef.current);
+        setEditingTitle(false);
       } else {
-        saveToLocalStorage(trimmedTitle);
-        setNewTitle(trimmedTitle);
+        setEditingTitle(true);
       }
-      setEditingTitle(false);
-    }, [newTitle, title, saveToLocalStorage]);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+      e.stopPropagation();
+      if (e.key === 'Enter') {
+        handleSaveTitle();
+      } else if (e.key === 'Escape') {
+        setNewTitle(titleRef.current);
+        setEditingTitle(false);
+      }
+    };
+
+    useEffect(() => {
+      if (editingTitle) {
+        const input = inputRef.current;
+        if (input) {
+          input.focus();
+          input.select();
+        }
+      }
+    }, [editingTitle]);
 
     useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
         const target = event.target as Node;
-
-        // Don't handle click outside when clicking menu buttons
         const isMenuButtonClick = (target as Element).closest(
           '[data-menu-button="true"]',
         );
@@ -186,41 +238,6 @@ const HistoryItem = memo(
       return () =>
         document.removeEventListener('mousedown', handleClickOutside);
     }, [editingTitle, handleSaveTitle]);
-
-    const handleDelete = (e: React.MouseEvent) => {
-      e.stopPropagation();
-      deleteConversation(id);
-    };
-
-    const handleEdit = (e: React.MouseEvent) => {
-      e.stopPropagation();
-      if (editingTitle) {
-        setNewTitle(title);
-        setEditingTitle(false);
-      } else {
-        setEditingTitle(true);
-      }
-    };
-
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-      e.stopPropagation();
-      if (e.key === 'Enter') {
-        handleSaveTitle();
-      } else if (e.key === 'Escape') {
-        setNewTitle(title);
-        setEditingTitle(false);
-      }
-    };
-
-    useEffect(() => {
-      if (editingTitle) {
-        const input = inputRef.current;
-        if (input) {
-          input.focus();
-          input.select();
-        }
-      }
-    }, [editingTitle]);
 
     return (
       <div
@@ -245,17 +262,13 @@ const HistoryItem = memo(
                 }}
               />
             ) : (
-              <small data-testid="chat-history-entry">{title}</small>
+              <small data-testid="chat-history-entry">{newTitle}</small>
             )}
           </div>
           <ButtonIcon
             className={styles.menuIcon}
             icon={EllipsisVertical}
             size={20}
-            // tooltip={{
-            //   text: 'Chat Options',
-            //   position: 'bottom',
-            // }}
             data-menu-button="true"
             aria-label="Chat Options"
             onClick={handleMenuClick}
@@ -280,7 +293,10 @@ const HistoryItem = memo(
           <button
             className={`${styles.menuButton} ${styles.deleteButton}`}
             data-delete="true"
-            onClick={handleDelete}
+            onClick={(e) => {
+              e.stopPropagation();
+              deleteConversation(id);
+            }}
             aria-label="Delete Chat"
           >
             <Trash2 size={16} />
