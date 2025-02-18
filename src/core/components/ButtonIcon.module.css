@@ -13,15 +13,6 @@
   transition: all 0.2s ease;
 }
 
-.button:hover {
-  background-color: var(--colors-bgTertiary);
-  color: var(--colors-textPrimary);
-}
-
-.button:active {
-  background-color: var(--colors-bgQuaternary);
-}
-
 .button.disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -45,12 +36,6 @@
     visibility 0.2s ease,
     transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 50;
-}
-
-/* Only show tooltip on button hover */
-.button:not(.disabled):hover .tooltip {
-  visibility: visible;
-  opacity: 1;
 }
 
 /* Hide tooltip on disabled buttons */
@@ -87,19 +72,38 @@
   margin-left: var(--spacing-xs);
 }
 
-/* Hover animations */
-.button:hover .tooltipTop {
-  transform: translateX(-50%) translateY(0);
+@media (hover: hover) {
+  .button:hover {
+    background-color: var(--colors-bgTertiary);
+    color: var(--colors-textPrimary);
+  }
+
+  /* Only show tooltip on button hover */
+  .button:not(.disabled):hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  /* Hover animations */
+  .button:hover .tooltipTop {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .button:hover .tooltipBottom {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .button:hover .tooltipLeft {
+    transform: translateX(0) translateY(-50%);
+  }
+
+  .button:hover .tooltipRight {
+    transform: translateX(0) translateY(-50%);
+  }
 }
 
-.button:hover .tooltipBottom {
-  transform: translateX(-50%) translateY(0);
-}
-
-.button:hover .tooltipLeft {
-  transform: translateX(0) translateY(-50%);
-}
-
-.button:hover .tooltipRight {
-  transform: translateX(0) translateY(-50%);
+@media (hover: none) {
+  .button:active {
+    background-color: var(--colors-bgQuaternary);
+  }
 }
