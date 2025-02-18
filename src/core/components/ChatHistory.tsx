@@ -134,6 +134,27 @@ const HistoryItem = memo(
     const containerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
+    const handleMenuClick = (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (editingTitle) {
+        setEditingTitle(false);
+        setNewTitle(title);
+      }
+      onMenuClick();
+    };
+
+    const saveToLocalStorage = useCallback(
+      (newValue: string) => {
+        const conversations = JSON.parse(
+          localStorage.getItem('conversations') ?? '{}',
+        );
+        conversations[id].title = newValue;
+        localStorage.setItem('conversations', JSON.stringify(conversations));
+      },
+      [id],
+    );
+
     const handleSaveTitle = useCallback(() => {
       const trimmedTitle = newTitle.trim();
       if (trimmedTitle === '') {
@@ -151,26 +172,32 @@ const HistoryItem = memo(
       //  and then updating the UI can cause a lag
       Promise.resolve().then(() => {
         try {
-          const conversations = JSON.parse(
-            localStorage.getItem('conversations') ?? '{}',
-          );
-          conversations[id].title = trimmedTitle;
-          localStorage.setItem('conversations', JSON.stringify(conversations));
+          saveToLocalStorage(trimmedTitle);
         } catch (error) {
           console.error('Error saving to localStorage:', error);
         }
       });
     }, [newTitle, id, title]);
 
-    const handleMenuClick = (e: React.MouseEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (editingTitle) {
-        setEditingTitle(false);
-        setNewTitle(title);
-      }
-      onMenuClick();
-    };
+    useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+        const target = event.target as Node;
+        const isMenuButtonClick = (target as Element).closest(
+          '[data-menu-button="true"]',
+        );
+        if (isMenuButtonClick) return;
+
+        if (containerRef.current && !containerRef.current.contains(target)) {
+          if (editingTitle) {
+            handleSaveTitle();
+          }
+        }
+      };
+
+      document.addEventListener('mousedown', handleClickOutside);
+      return () =>
+        document.removeEventListener('mousedown', handleClickOutside);
+    }, [editingTitle, handleSaveTitle]);
 
     const handleEdit = (e: React.MouseEvent) => {
       e.stopPropagation();
@@ -201,26 +228,6 @@ const HistoryItem = memo(
         }
       }
     }, [editingTitle]);
-
-    useEffect(() => {
-      const handleClickOutside = (event: MouseEvent) => {
-        const target = event.target as Node;
-        const isMenuButtonClick = (target as Element).closest(
-          '[data-menu-button="true"]',
-        );
-        if (isMenuButtonClick) return;
-
-        if (containerRef.current && !containerRef.current.contains(target)) {
-          if (editingTitle) {
-            handleSaveTitle();
-          }
-        }
-      };
-
-      document.addEventListener('mousedown', handleClickOutside);
-      return () =>
-        document.removeEventListener('mousedown', handleClickOutside);
-    }, [editingTitle, handleSaveTitle]);
 
     return (
       <div
