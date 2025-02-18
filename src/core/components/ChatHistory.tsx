@@ -133,58 +133,41 @@ const HistoryItem = memo(
 
     const containerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
-    const titleRef = useRef(title);
-
-    // Memoize the save function that occurs
-    const debouncedSave = useMemo(
-      () =>
-        _.debounce((id: string, newValue: string) => {
-          try {
-            const conversations = JSON.parse(
-              localStorage.getItem('conversations') ?? '{}',
-            );
-            conversations[id].title = newValue;
-            localStorage.setItem(
-              'conversations',
-              JSON.stringify(conversations),
-            );
-          } catch (error) {
-            console.error('Error saving to localStorage:', error);
-          }
-        }, 100),
-      [], // Empty deps since we want this to be created only once
-    );
-
-    // Cleanup debounce on unmount
-    useEffect(() => {
-      return () => {
-        debouncedSave.cancel();
-      };
-    }, [debouncedSave]);
 
     const handleSaveTitle = useCallback(() => {
       const trimmedTitle = newTitle.trim();
       if (trimmedTitle === '') {
-        setNewTitle(titleRef.current);
+        setNewTitle(title);
         setEditingTitle(false);
         return;
       }
 
-      //  update the UI immediately
+      //  Update UI first
       setNewTitle(trimmedTitle);
       setEditingTitle(false);
-      titleRef.current = trimmedTitle;
 
-      //  so we aren't blocked by the storage updatex
-      debouncedSave(id, trimmedTitle);
-    }, [newTitle, id, debouncedSave]);
+      //  Defer storage update
+      //  Updating long history in local storage first
+      //  and then updating the UI can cause a lag
+      Promise.resolve().then(() => {
+        try {
+          const conversations = JSON.parse(
+            localStorage.getItem('conversations') ?? '{}',
+          );
+          conversations[id].title = trimmedTitle;
+          localStorage.setItem('conversations', JSON.stringify(conversations));
+        } catch (error) {
+          console.error('Error saving to localStorage:', error);
+        }
+      });
+    }, [newTitle, id, title]);
 
     const handleMenuClick = (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
       if (editingTitle) {
         setEditingTitle(false);
-        setNewTitle(titleRef.current);
+        setNewTitle(title);
       }
       onMenuClick();
     };
@@ -192,7 +175,7 @@ const HistoryItem = memo(
     const handleEdit = (e: React.MouseEvent) => {
       e.stopPropagation();
       if (editingTitle) {
-        setNewTitle(titleRef.current);
+        setNewTitle(title);
         setEditingTitle(false);
       } else {
         setEditingTitle(true);
@@ -204,7 +187,7 @@ const HistoryItem = memo(
       if (e.key === 'Enter') {
         handleSaveTitle();
       } else if (e.key === 'Escape') {
-        setNewTitle(titleRef.current);
+        setNewTitle(title);
         setEditingTitle(false);
       }
     };
