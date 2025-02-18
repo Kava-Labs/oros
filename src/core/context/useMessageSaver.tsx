@@ -14,16 +14,31 @@ export const useMessageSaver = (
 
   useEffect(() => {
     const onChange = async () => {
+      const allConversations: Record<string, ConversationHistory> = JSON.parse(
+        localStorage.getItem('conversations') ?? '{}',
+      );
+
       const messages = messageHistoryStore.getSnapshot();
       const id = messageHistoryStore.getConversationID();
+
+      //  When a user adds a message (after the initial system prompt),
+      //  update the title to the placeholder to handle if the user cancels the stream
+      //  and to have a placeholder while reasoning streaming completes
+      if (messages.length === 2) {
+        allConversations[id] = {
+          id,
+          model: modelID,
+          title: 'New Chat',
+          conversation: messages,
+          lastSaved: new Date().valueOf(),
+        };
+        localStorage.setItem('conversations', JSON.stringify(allConversations));
+      }
 
       if (messages.length >= 3) {
         const firstUserMessage = messages.find((msg) => msg.role === 'user');
         if (!firstUserMessage) return;
         const { content } = firstUserMessage;
-
-        const allConversations: Record<string, ConversationHistory> =
-          JSON.parse(localStorage.getItem('conversations') ?? '{}');
 
         // Check if this is an existing conversation
         const existingConversation = allConversations[id];
@@ -56,7 +71,10 @@ export const useMessageSaver = (
           lastSaved,
         };
 
-        if (!existingConversation) {
+        if (
+          !existingConversation ||
+          existingConversation.title === 'New Chat'
+        ) {
           try {
             const data = await client.chat.completions.create({
               stream: false,
