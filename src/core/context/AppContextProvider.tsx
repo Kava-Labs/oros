@@ -95,14 +95,22 @@ export const AppContextProvider = (props: {
     );
   }, [conversation]);
 
-  const setIsRequesting = useCallback((isRequesting: boolean) => {
+  const setIsRequesting = useCallback((isRequesting: boolean, id: string) => {
+    const conv = activeConversationsRef.current?.get(id);
+    if (conv) {
+      conv.isRequesting = isRequesting;
+    }
+
     setConversation((prev) => {
-      const newConversation = { ...prev, isRequesting };
-      activeConversationsRef.current?.set(
-        newConversation.conversationID,
-        newConversation,
-      );
-      return newConversation;
+      if (prev.conversationID === id) {
+        const newConversation = { ...prev, isRequesting };
+        activeConversationsRef.current?.set(
+          newConversation.conversationID,
+          newConversation,
+        );
+        return newConversation;
+      }
+      return prev;
     });
   }, []);
 
@@ -207,6 +215,9 @@ export const AppContextProvider = (props: {
       if (isRequesting) {
         return;
       }
+
+      const id = conversationID;
+
       // should not happen
       if (!client) {
         console.error('client usage before ready');
@@ -217,7 +228,7 @@ export const AppContextProvider = (props: {
       // Abort controller integrated with UI
       const controller = new AbortController();
       controllerRef.current = controller;
-      setIsRequesting(true);
+      setIsRequesting(true, id);
 
       // Add the user message to the UI
       messageHistoryStore.addMessage({ role: 'user' as const, content: value });
@@ -263,7 +274,7 @@ export const AppContextProvider = (props: {
         // setErrorText(errorMessage);
         conversation.errorStore.setText(errorMessage);
       } finally {
-        setIsRequesting(false);
+        setIsRequesting(false, id);
         controllerRef.current = null;
         // save to local storage (post-request with assistant's response)
         syncWithLocalStorage(
@@ -325,9 +336,7 @@ export const AppContextProvider = (props: {
         executeOperation,
         registry,
         isReady,
-        setIsReady,
         isRequesting,
-        setIsRequesting,
         isOperationValidated,
         conversations,
         hasConversations,

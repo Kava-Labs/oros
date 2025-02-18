@@ -34,9 +34,7 @@ export type ActiveConversation = {
 export type AppContextType = {
   conversationID: string;
   isReady: boolean;
-  setIsReady: React.Dispatch<React.SetStateAction<boolean>>;
   isRequesting: boolean;
-  setIsRequesting: (isRequesting: boolean) => void;
   registry: OperationRegistry<unknown>;
   modelConfig: ModelConfig;
   handleModelChange: (modelName: SupportedModels) => void;
