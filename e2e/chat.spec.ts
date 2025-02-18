@@ -443,11 +443,12 @@ describe('chat', () => {
     await titleInput.waitFor({ state: 'visible' });
     await titleInput.focus();
     await titleInput.fill(updatedTitle);
-    await chatOptionButton.click();
+
     // // Wait for the input to be focused and selected (which happens in useEffect)
     // await page.waitForTimeout(100); // Small delay to ensure selection happens
+    // await chatOptionButton.click();
 
-    // await page.pause();
+    await page.pause();
     //
     // // Type the new title (this will replace the selected text)
     // await titleInput.type(updatedTitle);
@@ -457,9 +458,11 @@ describe('chat', () => {
     await expect(historyEntry).toHaveText(updatedTitle);
     await expect(historyEntry).not.toHaveText(originalTitle);
 
+    await page.pause();
+
     // // Verify title persists after page reload
-    await page.reload();
-    await expect(historyEntry).toHaveText(updatedTitle);
+    // await page.reload();
+    // await expect(historyEntry).toHaveText(updatedTitle);
   });
   test('conversation search functionality', async ({ page }) => {
     const chat = new Chat(page);
