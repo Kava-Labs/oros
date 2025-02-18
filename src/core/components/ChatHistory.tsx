@@ -180,6 +180,8 @@ const HistoryItem = memo(
     useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
         const target = event.target as Node;
+
+        // Don't handle click outside when clicking menu buttons
         const isMenuButtonClick = (target as Element).closest(
           '[data-menu-button="true"]',
         );
