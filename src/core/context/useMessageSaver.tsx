@@ -11,6 +11,7 @@ export const useMessageSaver = (
   modelID: string,
   client: OpenAI,
 ) => {
+  // Keep track of the conversation length to detect new messages
   const prevMessageCountRef = useRef<Record<string, number>>({});
 
   useEffect(() => {
@@ -62,19 +63,26 @@ export const useMessageSaver = (
       if (messages.length >= 3) {
         const firstUserMessage = messages.find((msg) => msg.role === 'user');
         if (!firstUserMessage) return;
-
+        const { content } = firstUserMessage;
+        // Check if this is an existing conversation
         const existingConversation = allConversations[id];
+
+        // Initialize message count for this conversation if it doesn't exist
         if (!prevMessageCountRef.current[id]) {
           prevMessageCountRef.current[id] = existingConversation
             ? existingConversation.conversation.length
             : messages.length;
         }
 
+        // Determine if new messages were added to an existing conversation
         const hasNewMessages =
           existingConversation &&
           messages.length > prevMessageCountRef.current[id];
+
+        // Update the message count reference
         prevMessageCountRef.current[id] = messages.length;
 
+        // Only update lastSaved if new messages were added to an existing conversation
         const lastSaved = hasNewMessages
           ? new Date().valueOf()
           : (existingConversation?.lastSaved ?? new Date().valueOf());
@@ -82,7 +90,7 @@ export const useMessageSaver = (
         const history: ConversationHistory = {
           id,
           model: existingConversation?.model ?? modelID,
-          title: firstUserMessage.content as string,
+          title: content as string,
           conversation: messages,
           lastSaved,
         };
@@ -108,13 +116,14 @@ export const useMessageSaver = (
               ],
               model: 'gpt-4o-mini',
             });
-            history.title = formatConversationTitle(
-              data.choices[0]?.message?.content ??
-                (firstUserMessage.content as string),
-              34,
-            );
-          } catch {
-            history.title = firstUserMessage.content as string;
+            // Apply truncation only when we get the AI-generated title
+            const generatedTitle =
+              data.choices[0].message.content ?? (content as string);
+            history.title = formatConversationTitle(generatedTitle, 34);
+          } catch (err) {
+            // keep the existing title without any truncation
+            history.title = content as string;
+            console.error(err);
           }
         } else {
           history.title = existingConversation.title;
@@ -125,6 +134,8 @@ export const useMessageSaver = (
       }
     };
 
+    // subscribe to the store within the useEffect instead of using useSyncExternalStore
+    // this is to prevent re-renders of the caller using this hook
     const unsubscribe = messageHistoryStore.subscribe(onChange);
     return () => unsubscribe();
   }, [messageHistoryStore, modelID, client]);
