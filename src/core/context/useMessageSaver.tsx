@@ -95,12 +95,21 @@ export const useMessageSaver = (
               messages: [
                 {
                   role: 'system',
-                  content: 'Generate a 3-4 word conversation title.',
+                  content:
+                    'your task is to generate a title for a conversation using 3 to 4 words',
                 },
                 {
                   role: 'user',
-                  content: `Title suggestion for:
-                ${messages.map((msg) => `Role: ${msg.role} ${msg.content}`).join('\n')}`,
+                  content: `Please generate a title for this conversation (max 4 words):
+                  ${messages.map((msg) => {
+                    // only keep user/assistant messages
+                    if (msg.role !== 'user' && msg.role !== 'assistant') return;
+
+                    return `Role: ${msg.role} 
+                                  ${msg.content}
+                    `;
+                  })}
+                  `,
                 },
               ],
               model: 'gpt-4o-mini',
