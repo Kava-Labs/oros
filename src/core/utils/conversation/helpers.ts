@@ -189,3 +189,14 @@ const removeInitialSystemMessage = (conversation: ConversationHistory) => {
     ? conversation.conversation.slice(1)
     : conversation.conversation;
 };
+
+export const isMostRecentConversation = (
+  conversations: Record<string, ConversationHistory>,
+  currentId: string,
+): boolean => {
+  return Object.values(conversations).every(
+    (conv) =>
+      conv.id === currentId ||
+      conv.lastSaved <= conversations[currentId].lastSaved,
+  );
+};
