@@ -103,12 +103,7 @@ export const AppContextProvider = (props: {
 
     setConversation((prev) => {
       if (prev.conversationID === id) {
-        const newConversation = { ...prev, isRequesting };
-        activeConversationsRef.current?.set(
-          newConversation.conversationID,
-          newConversation,
-        );
-        return newConversation;
+        return { ...prev, isRequesting };
       }
       return prev;
     });
