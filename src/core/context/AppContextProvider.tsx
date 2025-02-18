@@ -43,31 +43,33 @@ const newConversation = () => {
   };
 };
 
-export const AppContextProvider = ({
-  children,
-  walletStore,
-  // messageStore,
-  // toolCallStreamStore,
-  // progressStore,
-  // messageHistoryStore,
-  // thinkingStore,
-}: {
+export const AppContextProvider = (props: {
   children: React.ReactNode;
   walletStore: WalletStore;
   thinkingStore: TextStreamStore;
+  errorStore: TextStreamStore;
   messageStore: TextStreamStore;
   toolCallStreamStore: ToolCallStreamStore;
   progressStore: TextStreamStore;
   messageHistoryStore: MessageHistoryStore;
 }) => {
+  const { children, walletStore } = props;
+
   const [isReady, setIsReady] = useState(false);
   const [registry] = useState<OperationRegistry<unknown>>(() =>
     initializeMessageRegistry(),
   );
 
-  const [conversation, setConversation] = useState<ActiveConversation>(() =>
-    newConversation(),
-  );
+  const [conversation, setConversation] = useState<ActiveConversation>({
+    conversationID: uuidv4(),
+    messageHistoryStore: props.messageHistoryStore,
+    toolCallStreamStore: props.toolCallStreamStore,
+    thinkingStore: props.thinkingStore,
+    progressStore: props.progressStore,
+    messageStore: props.messageStore,
+    errorStore: new TextStreamStore(),
+    isRequesting: false,
+  });
 
   const {
     conversationID,
