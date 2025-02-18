@@ -49,17 +49,6 @@ export const useMessageSaver = (
         return;
       }
 
-      // Clean up empty conversations with placeholder title
-      if (
-        messages.length === 1 &&
-        allConversations[id] &&
-        allConversations[id].title === PLACEHOLDER_CHAT_TITLE
-      ) {
-        delete allConversations[id];
-        localStorage.setItem('conversations', JSON.stringify(allConversations));
-        return;
-      }
-
       if (messages.length >= 3) {
         const firstUserMessage = messages.find((msg) => msg.role === 'user');
         if (!firstUserMessage) return;
@@ -90,7 +79,7 @@ export const useMessageSaver = (
         const history: ConversationHistory = {
           id,
           model: existingConversation?.model ?? modelID,
-          title: content as string,
+          title: content as string, //  fallback value
           conversation: messages,
           lastSaved,
         };
