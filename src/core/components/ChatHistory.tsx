@@ -199,6 +199,11 @@ const HistoryItem = memo(
         document.removeEventListener('mousedown', handleClickOutside);
     }, [editingTitle, handleSaveTitle]);
 
+    const handleDelete = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      deleteConversation(id);
+    };
+
     const handleEdit = (e: React.MouseEvent) => {
       e.stopPropagation();
       if (editingTitle) {
@@ -283,10 +288,7 @@ const HistoryItem = memo(
           <button
             className={`${styles.menuButton} ${styles.deleteButton}`}
             data-delete="true"
-            onClick={(e) => {
-              e.stopPropagation();
-              deleteConversation(id);
-            }}
+            onClick={handleDelete}
             aria-label="Delete Chat"
           >
             <Trash2 size={16} />
