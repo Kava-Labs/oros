@@ -158,7 +158,6 @@ const HistoryItem = memo(
       const trimmedTitle = newTitle.trim();
       if (trimmedTitle === '') {
         setNewTitle(title);
-        setEditingTitle(false);
         return;
       }
 
@@ -176,7 +175,7 @@ const HistoryItem = memo(
           console.error('Error saving to localStorage:', error);
         }
       });
-    }, [newTitle, id, title]);
+    }, [newTitle, id, title, saveToLocalStorage]);
 
     useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
