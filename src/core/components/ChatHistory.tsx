@@ -14,7 +14,6 @@ import { useAppContext } from '../context/useAppContext';
 import { EllipsisVertical, Bot, Pencil, Trash2, X } from 'lucide-react';
 import { groupConversationsByTime } from '../utils/conversation/helpers';
 import ButtonIcon from './ButtonIcon';
-import _ from 'lodash';
 
 interface ChatHistoryProps {
   onHistoryItemClick: Dispatch<SetStateAction<boolean>>;
