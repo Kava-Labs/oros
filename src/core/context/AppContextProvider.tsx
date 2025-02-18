@@ -15,7 +15,6 @@ import { initializeMessageRegistry } from '../../features/blockchain/config/init
 import { useExecuteOperation } from './useExecuteOperation';
 import { DEFAULT_MODEL_NAME, getModelConfig } from '../config/models';
 import { SupportedModels, ModelConfig } from '../types/models';
-import { useMessageSaver } from './useMessageSaver';
 import { ActiveConversation, ConversationHistory } from './types';
 import { getToken } from '../../core/utils/token/token';
 import OpenAI from 'openai';
@@ -27,6 +26,7 @@ import {
 import { OperationResult } from '../../features/blockchain/types/chain';
 import { ExecuteOperation } from '../../core/context/types';
 import { v4 as uuidv4 } from 'uuid';
+import { formatConversationTitle } from '../utils/conversation/helpers';
 
 let client: OpenAI | null = null;
 
@@ -151,8 +151,6 @@ export const AppContextProvider = ({
     walletStore,
   );
 
-  useMessageSaver(messageHistoryStore, modelConfig.id, conversationID, client!);
-
   const loadConversation = useCallback(
     (convoHistory: ConversationHistory) => {
       handleModelChange(convoHistory.model as SupportedModels);
@@ -221,6 +219,13 @@ export const AppContextProvider = ({
 
       // Add the user message to the UI
       messageHistoryStore.addMessage({ role: 'user' as const, content: value });
+      // save to local storage (pre-request with user's prompt)
+      syncWithLocalStorage(
+        conversationID,
+        modelConfig.id,
+        messageHistoryStore,
+        client,
+      );
 
       // Call chat completions and resolve all tool calls.
       //
@@ -258,6 +263,13 @@ export const AppContextProvider = ({
       } finally {
         setIsRequesting(false);
         controllerRef.current = null;
+        // save to local storage (post-request with assistant's response)
+        syncWithLocalStorage(
+          conversationID,
+          modelConfig.id,
+          messageHistoryStore,
+          client,
+        );
       }
     },
     [
@@ -505,4 +517,75 @@ async function callTools(
       });
     }
   }
+}
+
+async function syncWithLocalStorage(
+  conversationID: string,
+  modelID: string,
+  messageHistoryStore: MessageHistoryStore,
+  client: OpenAI,
+) {
+  const messages = messageHistoryStore.getSnapshot();
+  const firstUserMessage = messages.find((msg) => msg.role === 'user');
+  if (!firstUserMessage) return;
+
+  const { content } = firstUserMessage;
+
+  const allConversations: Record<string, ConversationHistory> = JSON.parse(
+    localStorage.getItem('conversations') ?? '{}',
+  );
+
+  const existingConversation = allConversations[conversationID];
+  const history: ConversationHistory = {
+    id: conversationID,
+    model: existingConversation ? existingConversation.model : modelID,
+    title: content as string, // fallback value
+    conversation: messages,
+    lastSaved: new Date().valueOf(),
+  };
+
+  if (
+    existingConversation &&
+    existingConversation.title === content &&
+    existingConversation.conversation.length <= 4
+  ) {
+    try {
+      const data = await client.chat.completions.create({
+        stream: false,
+        messages: [
+          {
+            role: 'system',
+            content:
+              'your task is to generate a title for a conversation using 3 to 4 words',
+          },
+          {
+            role: 'user',
+            content: `Please generate a title for this conversation (max 4 words):
+                      ${messages.map((msg) => {
+                        // only keep user/assistant messages
+                        if (msg.role !== 'user' && msg.role !== 'assistant')
+                          return;
+
+                        return `Role: ${msg.role} 
+                                      ${msg.content}
+                        `;
+                      })}
+                      `,
+          },
+        ],
+        model: 'gpt-4o-mini',
+      });
+
+      // Apply truncation only when we get the AI-generated title
+      const generatedTitle =
+        data.choices[0].message.content ?? (content as string);
+      history.title = formatConversationTitle(generatedTitle, 34);
+    } catch (err) {
+      history.title = content as string;
+      console.error(err);
+    }
+  }
+
+  allConversations[conversationID] = history;
+  localStorage.setItem('conversations', JSON.stringify(allConversations));
 }
