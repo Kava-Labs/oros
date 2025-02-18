@@ -52,11 +52,12 @@ describe('useMessageSaver', () => {
     vi.clearAllMocks();
   });
 
-  it('should not save conversation with less than 3 messages', () => {
+  it('should create new chat with placeholder title for initial system message', async () => {
+    const conversationId = 'test-id';
     mockMessageHistoryStore.getSnapshot.mockReturnValue([
-      { role: 'user', content: 'Hello' },
-      { role: 'assistant', content: 'Hi' },
+      { role: 'system', content: 'System message' },
     ]);
+    mockMessageHistoryStore.getConversationID.mockReturnValue(conversationId);
 
     renderHook(() =>
       useMessageSaver(
@@ -66,19 +67,80 @@ describe('useMessageSaver', () => {
       ),
     );
 
-    expect(localStorage.getItem('conversations')).toBeNull();
+    const onChangeCb = mockMessageHistoryStore.subscribe.mock.calls[0][0];
+    await onChangeCb();
+
+    const savedConversations = JSON.parse(
+      localStorage.getItem('conversations') || '{}',
+    );
+
+    expect(savedConversations[conversationId]).toEqual({
+      id: conversationId,
+      model: 'test-model',
+      title: 'New Chat',
+      conversation: [{ role: 'system', content: 'System message' }],
+      lastSaved: expect.any(Number),
+    });
   });
 
-  it('should create new conversation with initial lastSaved timestamp', async () => {
-    const mockTime = 1234567890000;
-    vi.setSystemTime(new Date(mockTime));
+  it('should clean up existing empty placeholder chats when creating new chat', async () => {
+    const oldId = 'old-id';
+    const newId = 'new-id';
+
+    // Setup existing empty placeholder chat
+    mockLocalStorage['conversations'] = JSON.stringify({
+      [oldId]: {
+        id: oldId,
+        model: 'test-model',
+        title: 'New Chat',
+        conversation: [{ role: 'system', content: 'Old system message' }],
+        lastSaved: Date.now(),
+      },
+    });
+
+    mockMessageHistoryStore.getSnapshot.mockReturnValue([
+      { role: 'system', content: 'New system message' },
+    ]);
+    mockMessageHistoryStore.getConversationID.mockReturnValue(newId);
+
+    renderHook(() =>
+      useMessageSaver(
+        mockMessageHistoryStore as unknown as MessageHistoryStore,
+        'test-model',
+        mockClient,
+      ),
+    );
+
+    const onChangeCb = mockMessageHistoryStore.subscribe.mock.calls[0][0];
+    await onChangeCb();
+
+    const savedConversations = JSON.parse(
+      localStorage.getItem('conversations') || '{}',
+    );
+
+    expect(savedConversations[oldId]).toBeUndefined();
+    expect(savedConversations[newId].title).toBe('New Chat');
+  });
+
+  it('should generate AI title when first user message is added to placeholder chat', async () => {
+    const conversationId = 'test-id';
+    const existingChat = {
+      id: conversationId,
+      model: 'test-model',
+      title: 'New Chat',
+      conversation: [{ role: 'system', content: 'System message' }],
+      lastSaved: Date.now(),
+    };
+
+    mockLocalStorage['conversations'] = JSON.stringify({
+      [conversationId]: existingChat,
+    });
 
     const messages = [
       { role: 'system', content: 'System message' },
       { role: 'user', content: 'Hello' },
       { role: 'assistant', content: 'Hi' },
     ];
-    const conversationId = 'test-id';
 
     mockMessageHistoryStore.getSnapshot.mockReturnValue(messages);
     mockMessageHistoryStore.getConversationID.mockReturnValue(conversationId);
@@ -91,7 +153,6 @@ describe('useMessageSaver', () => {
       ),
     );
 
-    // Trigger the onChange callback
     const onChangeCb = mockMessageHistoryStore.subscribe.mock.calls[0][0];
     await onChangeCb();
 
@@ -99,34 +160,34 @@ describe('useMessageSaver', () => {
       localStorage.getItem('conversations') || '{}',
     );
 
-    expect(savedConversations[conversationId]).toBeDefined();
-    expect(savedConversations[conversationId].lastSaved).toBe(mockTime);
-    expect(savedConversations[conversationId].model).toBe('test-model');
+    expect(savedConversations[conversationId].title).toBe('Generated Title');
+    expect(mockClient.chat.completions.create).toHaveBeenCalled();
   });
 
-  it('should preserve lastSaved when loading existing conversation', async () => {
-    const originalTimestamp = 1234567890000;
+  it('should preserve existing non-placeholder title when messages are added', async () => {
     const conversationId = 'test-id';
-    const existingConversation = {
+    const existingTitle = 'Existing Chat Title';
+    const existingChat = {
       id: conversationId,
       model: 'test-model',
-      modelName: 'test-model',
-      title: 'Existing Title',
+      title: existingTitle,
       conversation: [
         { role: 'system', content: 'System message' },
         { role: 'user', content: 'Hello' },
-        { role: 'assistant', content: 'Hi' },
       ],
-      lastSaved: originalTimestamp,
+      lastSaved: Date.now(),
     };
 
     mockLocalStorage['conversations'] = JSON.stringify({
-      [conversationId]: existingConversation,
+      [conversationId]: existingChat,
     });
 
-    mockMessageHistoryStore.getSnapshot.mockReturnValue(
-      existingConversation.conversation,
-    );
+    const messages = [
+      ...existingChat.conversation,
+      { role: 'assistant', content: 'Hi' },
+    ];
+
+    mockMessageHistoryStore.getSnapshot.mockReturnValue(messages);
     mockMessageHistoryStore.getConversationID.mockReturnValue(conversationId);
 
     renderHook(() =>
@@ -137,7 +198,6 @@ describe('useMessageSaver', () => {
       ),
     );
 
-    // Trigger the onChange callback
     const onChangeCb = mockMessageHistoryStore.subscribe.mock.calls[0][0];
     await onChangeCb();
 
@@ -145,21 +205,17 @@ describe('useMessageSaver', () => {
       localStorage.getItem('conversations') || '{}',
     );
 
-    expect(savedConversations[conversationId].lastSaved).toBe(
-      originalTimestamp,
-    );
+    expect(savedConversations[conversationId].title).toBe(existingTitle);
+    expect(mockClient.chat.completions.create).not.toHaveBeenCalled();
   });
 
-  it('should update lastSaved only when new messages are added to existing conversation', async () => {
+  it('should update lastSaved only when new messages are added', async () => {
     const originalTimestamp = 1234567890000;
     const newTimestamp = 1234567899999;
     const conversationId = 'test-id';
-
-    // Set up initial conversation
-    const existingConversation = {
+    const existingChat = {
       id: conversationId,
       model: 'test-model',
-      modelName: 'test-model',
       title: 'Existing Title',
       conversation: [
         { role: 'system', content: 'System message' },
@@ -170,12 +226,11 @@ describe('useMessageSaver', () => {
     };
 
     mockLocalStorage['conversations'] = JSON.stringify({
-      [conversationId]: existingConversation,
+      [conversationId]: existingChat,
     });
 
-    // Mock initial load
     mockMessageHistoryStore.getSnapshot.mockReturnValue(
-      existingConversation.conversation,
+      existingChat.conversation,
     );
     mockMessageHistoryStore.getConversationID.mockReturnValue(conversationId);
 
@@ -187,11 +242,9 @@ describe('useMessageSaver', () => {
       ),
     );
 
-    // Trigger initial onChange
     const onChangeCb = mockMessageHistoryStore.subscribe.mock.calls[0][0];
     await onChangeCb();
 
-    // Verify timestamp hasn't changed after load
     let savedConversations = JSON.parse(
       localStorage.getItem('conversations') || '{}',
     );
@@ -199,18 +252,16 @@ describe('useMessageSaver', () => {
       originalTimestamp,
     );
 
-    // Simulate adding a new message
+    // Add new message
     vi.setSystemTime(new Date(newTimestamp));
-    const updatedConversation = [
-      ...existingConversation.conversation,
+    const updatedMessages = [
+      ...existingChat.conversation,
       { role: 'user', content: 'New message' },
     ];
-    mockMessageHistoryStore.getSnapshot.mockReturnValue(updatedConversation);
+    mockMessageHistoryStore.getSnapshot.mockReturnValue(updatedMessages);
 
-    // Trigger onChange again
     await onChangeCb();
 
-    // Verify timestamp has updated
     savedConversations = JSON.parse(
       localStorage.getItem('conversations') || '{}',
     );
