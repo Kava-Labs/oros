@@ -81,11 +81,17 @@ export const AppContextProvider = ({
   } = conversation;
 
   const activeConversationsRef = useRef<Map<string, ActiveConversation>>(null);
+
   useEffect(() => {
-    activeConversationsRef.current = new Map();
-    const convo = newConversation();
-    activeConversationsRef.current.set(convo.conversationID, convo);
-  }, []);
+    if (!activeConversationsRef.current) {
+      activeConversationsRef.current = new Map();
+    }
+
+    activeConversationsRef.current.set(
+      conversation.conversationID,
+      conversation,
+    );
+  }, [conversation]);
 
   const setIsRequesting = useCallback((isRequesting: boolean) => {
     setConversation((prev) => {
@@ -135,17 +141,10 @@ export const AppContextProvider = ({
     [conversations],
   );
 
-  const handleModelChange = useCallback(
-    (modelName: SupportedModels) => {
-      const newConfig = getModelConfig(modelName);
-      setModelConfig(newConfig);
-      messageHistoryStore.reset();
-      messageHistoryStore.setMessages([
-        { role: 'system', content: newConfig.systemPrompt },
-      ]);
-    },
-    [messageHistoryStore],
-  );
+  const handleModelChange = useCallback((modelName: SupportedModels) => {
+    const newConfig = getModelConfig(modelName);
+    setModelConfig(newConfig);
+  }, []);
 
   const { executeOperation, isOperationValidated } = useExecuteOperation(
     registry,
@@ -163,28 +162,17 @@ export const AppContextProvider = ({
 
       if (!activeConversation) {
         activeConversation = newConversation();
+        activeConversation.conversationID = convoHistory.id; // make sure to link the ids
         activeConversation.messageHistoryStore.loadConversation(convoHistory);
-        activeConversationsRef.current?.set(
-          activeConversation.conversationID,
-          activeConversation,
-        );
       }
+
       setConversation(activeConversation);
     },
     [handleModelChange],
   );
 
   const startNewChat = useCallback(() => {
-    activeConversationsRef.current?.set(
-      conversation.conversationID,
-      conversation,
-    );
-    const newChatConversation = newConversation();
-    setConversation(newChatConversation);
-    activeConversationsRef.current?.set(
-      newChatConversation.conversationID,
-      newChatConversation,
-    );
+    setConversation(newConversation());
   }, [conversation]);
 
   useEffect(() => {
