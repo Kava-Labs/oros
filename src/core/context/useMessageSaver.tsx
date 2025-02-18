@@ -114,6 +114,7 @@ export const useMessageSaver = (
               ],
               model: 'gpt-4o-mini',
             });
+
             // Apply truncation only when we get the AI-generated title
             const generatedTitle =
               data.choices[0].message.content ?? (content as string);
@@ -124,6 +125,7 @@ export const useMessageSaver = (
             console.error(err);
           }
         } else {
+          // keep the existing title without any truncation
           history.title = existingConversation.title;
         }
 
