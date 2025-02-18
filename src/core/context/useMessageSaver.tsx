@@ -2,7 +2,10 @@ import { useEffect, useRef } from 'react';
 import { MessageHistoryStore } from '../stores/messageHistoryStore';
 import { ConversationHistory } from './types';
 import OpenAI from 'openai';
-import { formatConversationTitle } from '../utils/conversation/helpers';
+import {
+  formatConversationTitle,
+  isMostRecentConversation,
+} from '../utils/conversation/helpers';
 
 export const useMessageSaver = (
   messageHistoryStore: MessageHistoryStore,
@@ -18,13 +21,18 @@ export const useMessageSaver = (
         localStorage.getItem('conversations') ?? '{}',
       );
 
-      const messages = messageHistoryStore.getSnapshot();
       const id = messageHistoryStore.getConversationID();
+
+      // Check if this is an existing conversation
+      const existingConversation = allConversations[id];
+
+      const messages = messageHistoryStore.getSnapshot();
 
       //  When a user adds a message (after the initial system prompt),
       //  update the title to the placeholder to handle if the user cancels the stream
       //  and to have a placeholder while reasoning streaming completes
-      if (messages.length === 2) {
+      const isNewConversation = !existingConversation && messages.length === 2;
+      if (isNewConversation) {
         allConversations[id] = {
           id,
           model: modelID,
@@ -39,9 +47,6 @@ export const useMessageSaver = (
         const firstUserMessage = messages.find((msg) => msg.role === 'user');
         if (!firstUserMessage) return;
         const { content } = firstUserMessage;
-
-        // Check if this is an existing conversation
-        const existingConversation = allConversations[id];
 
         // Initialize message count for this conversation if it doesn't exist
         if (!prevMessageCountRef.current[id]) {
@@ -71,10 +76,15 @@ export const useMessageSaver = (
           lastSaved,
         };
 
-        if (
-          !existingConversation ||
-          existingConversation.title === 'New Chat'
-        ) {
+        //  we want to check both the title and the length of the conversation
+        //  we shouldn't prevent a user from renaming to the placeholder
+        //  also, this should only ever apply to the most recent conversation
+        const isPlaceholderHistoryTitle =
+          existingConversation.title === 'New Chat' &&
+          existingConversation.conversation.length === 2 &&
+          isMostRecentConversation(allConversations, id);
+
+        if (!existingConversation || isPlaceholderHistoryTitle) {
           try {
             const data = await client.chat.completions.create({
               stream: false,
