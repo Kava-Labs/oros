@@ -5,6 +5,7 @@ import {
   getTimeGroup,
   groupAndFilterConversations,
   groupConversationsByTime,
+  isMostRecentConversation,
 } from './helpers';
 import { ConversationHistory } from '../../context/types';
 import { ChatCompletionMessageParam } from 'openai/resources/index';
@@ -342,5 +343,60 @@ describe('formatContentSnippet', () => {
     const result = formatContentSnippet(longConversation, 'match');
     expect(result.length).toBe(100);
     expect(result).toContain('preceding words match');
+  });
+  describe('isMostRecentConversation', () => {
+    const createMockConversation = (
+      id: string,
+      lastSaved: number,
+      title = 'Test Chat',
+    ): ConversationHistory => ({
+      id,
+      model: 'test-model',
+      title,
+      conversation: [],
+      lastSaved,
+    });
+
+    it('should return true when there is only one conversation', () => {
+      const conversations = {
+        conv1: createMockConversation('conv1', Date.now()),
+      };
+
+      expect(isMostRecentConversation(conversations, 'conv1')).toBe(true);
+    });
+
+    it('should return true when the current conversation is the newest', () => {
+      const now = Date.now();
+      const conversations = {
+        conv1: createMockConversation('conv1', now - 2000),
+        conv2: createMockConversation('conv2', now - 1000),
+        conv3: createMockConversation('conv3', now),
+      };
+
+      expect(isMostRecentConversation(conversations, 'conv3')).toBe(true);
+    });
+
+    it('should return false when the current conversation is not the newest', () => {
+      const now = Date.now();
+      const conversations = {
+        conv1: createMockConversation('conv1', now),
+        conv2: createMockConversation('conv2', now - 1000),
+        conv3: createMockConversation('conv3', now - 2000),
+      };
+
+      expect(isMostRecentConversation(conversations, 'conv2')).toBe(false);
+      expect(isMostRecentConversation(conversations, 'conv3')).toBe(false);
+    });
+
+    it('should handle conversations with identical timestamps', () => {
+      const timestamp = Date.now();
+      const conversations = {
+        conv1: createMockConversation('conv1', timestamp),
+        conv2: createMockConversation('conv2', timestamp),
+      };
+
+      expect(isMostRecentConversation(conversations, 'conv1')).toBe(true);
+      expect(isMostRecentConversation(conversations, 'conv2')).toBe(true);
+    });
   });
 });

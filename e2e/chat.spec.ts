@@ -287,6 +287,15 @@ describe('chat', () => {
     await chat.waitForStreamToFinish();
     await chat.waitForAssistantResponse();
 
+    //  we don't want to open a new conversation before the title generation completes
+    await page.waitForFunction(() => {
+      const historyEntry = document.querySelector(
+        '[data-testid="chat-history-entry"]:first-child',
+      );
+      const title = historyEntry?.textContent;
+      return title && title !== 'New Chat';
+    });
+
     //  Switching between conversation histories
     let blockchainQuestionConversation =
       await chat.getMessageElementsWithContent();
