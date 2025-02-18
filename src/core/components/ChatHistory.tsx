@@ -175,7 +175,7 @@ const HistoryItem = memo(
           console.error('Error saving to localStorage:', error);
         }
       });
-    }, [newTitle, id, title, saveToLocalStorage]);
+    }, [newTitle, title, saveToLocalStorage]);
 
     useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
