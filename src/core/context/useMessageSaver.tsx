@@ -80,6 +80,7 @@ export const useMessageSaver = (
         //  we shouldn't prevent a user from renaming to the placeholder
         //  also, this should only ever apply to the most recent conversation
         const isPlaceholderHistoryTitle =
+          existingConversation &&
           existingConversation.title === 'New Chat' &&
           existingConversation.conversation.length === 2 &&
           isMostRecentConversation(allConversations, id);
