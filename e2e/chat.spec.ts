@@ -396,7 +396,71 @@ describe('chat', () => {
 
     await expect(historyEntry).toHaveText('Test Conversation Title');
   });
+  test('conversation history title editing', async ({ page }) => {
+    const chat = new Chat(page);
 
+    const originalTitle = 'Original Title';
+    const updatedTitle = 'Updated Title';
+
+    await page.addInitScript(() => {
+      localStorage.setItem(
+        'conversations',
+        JSON.stringify({
+          'test-id': {
+            id: 'test-id',
+            model: 'test-model',
+            title: 'Original Title',
+            conversation: [
+              {
+                role: 'system',
+                message: 'I am a helpful assistant',
+              },
+              {
+                role: 'user',
+                content: 'test message',
+              },
+            ],
+            lastSaved: Date.now(),
+          },
+        }),
+      );
+    });
+
+    await chat.goto();
+
+    const historyEntry = page.getByTestId('chat-history-entry').first();
+    await expect(historyEntry).toHaveText(originalTitle);
+
+    const chatOptionButton = page.getByLabel('Chat Options').first();
+    await chatOptionButton.click();
+
+    // Click rename button
+    const renameButton = page.getByRole('button', { name: 'Rename Title' });
+    await renameButton.click();
+
+    // Get the input with its exact role
+    const titleInput = page.locator('input[role="Edit Title Input"]');
+    await titleInput.waitFor({ state: 'visible' });
+    await titleInput.focus();
+    await titleInput.fill(updatedTitle);
+    await chatOptionButton.click();
+    // // Wait for the input to be focused and selected (which happens in useEffect)
+    // await page.waitForTimeout(100); // Small delay to ensure selection happens
+
+    // await page.pause();
+    //
+    // // Type the new title (this will replace the selected text)
+    // await titleInput.type(updatedTitle);
+    // await titleInput.press('Enter');
+
+    // Verify the changes
+    await expect(historyEntry).toHaveText(updatedTitle);
+    await expect(historyEntry).not.toHaveText(originalTitle);
+
+    // // Verify title persists after page reload
+    await page.reload();
+    await expect(historyEntry).toHaveText(updatedTitle);
+  });
   test('conversation search functionality', async ({ page }) => {
     const chat = new Chat(page);
 

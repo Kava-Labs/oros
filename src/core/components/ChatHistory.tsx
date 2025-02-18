@@ -249,6 +249,7 @@ const HistoryItem = memo(
                 ref={inputRef}
                 type="text"
                 value={newTitle}
+                role="Edit Title Input"
                 onChange={(e) => setNewTitle(e.target.value)}
                 onKeyDown={handleKeyDown}
                 className={styles.chatHistoryTitleInput}
@@ -272,7 +273,11 @@ const HistoryItem = memo(
         <div
           className={`${styles.buttonContainer} ${isMenuOpen ? styles.show : ''}`}
         >
-          <button className={styles.menuButton} onClick={handleEdit}>
+          <button
+            className={styles.menuButton}
+            onClick={handleEdit}
+            aria-label={editingTitle ? 'Cancel Rename Title' : 'Rename Title'}
+          >
             {editingTitle ? (
               <>
                 <X size={16} />
