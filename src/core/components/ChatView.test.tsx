@@ -6,12 +6,14 @@ import { TextStreamStore } from '../stores/textStreamStore';
 import { ToolCallStreamStore } from '../stores/toolCallStreamStore';
 import { MessageHistoryStore } from '../stores/messageHistoryStore';
 import { WalletStore } from '../../features/blockchain/stores/walletStore';
+
 const messageStore = new TextStreamStore();
 const progressStore = new TextStreamStore();
 const toolCallStreamStore = new ToolCallStreamStore();
 const messageHistoryStore = new MessageHistoryStore();
 const walletStore = new WalletStore();
 const thinkingStore = new TextStreamStore();
+const errorStore = new TextStreamStore();
 
 vi.mock(
   import('../../features/blockchain/services/registry'),
@@ -50,6 +52,7 @@ describe('ChatView', () => {
     const wrapper = render(
       <ThemeProvider>
         <AppContextProvider
+          errorStore={errorStore}
           thinkingStore={thinkingStore}
           progressStore={progressStore}
           messageStore={messageStore}

@@ -17,6 +17,7 @@ const toolCallStreamStore = new ToolCallStreamStore();
 const messageHistoryStore = new MessageHistoryStore();
 const walletStore = new WalletStore();
 const thinkingStore = new TextStreamStore();
+const errorStore = new TextStreamStore();
 
 const withProviders =
   (
@@ -29,6 +30,7 @@ const withProviders =
   (Story) => (
     <ThemeProvider>
       <AppContextProvider
+        errorStore={errorStore}
         thinkingStore={thinkingStore}
         progressStore={progressStore}
         messageStore={messageStore}
