@@ -45,6 +45,7 @@ import {
   walletStore,
   thinkingStore,
   toolCallStreamStore,
+  errorStore,
 } from './core/stores/stores.ts';
 
 //
@@ -56,6 +57,7 @@ root.render(
   <StrictMode>
     <ThemeProvider>
       <AppContextProvider
+        errorStore={errorStore}
         progressStore={progressStore}
         messageStore={messageStore}
         thinkingStore={thinkingStore}

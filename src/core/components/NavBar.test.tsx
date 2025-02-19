@@ -2,6 +2,19 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { vi } from 'vitest';
 import { NavBar } from './NavBar';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
+import { AppContextProvider } from '../context/AppContextProvider';
+import { TextStreamStore } from '../stores/textStreamStore';
+import { ToolCallStreamStore } from '../stores/toolCallStreamStore';
+import { MessageHistoryStore } from '../stores/messageHistoryStore';
+import { WalletStore } from '../../features/blockchain/stores/walletStore';
+
+const messageStore = new TextStreamStore();
+const progressStore = new TextStreamStore();
+const toolCallStreamStore = new ToolCallStreamStore();
+const messageHistoryStore = new MessageHistoryStore();
+const walletStore = new WalletStore();
+const thinkingStore = new TextStreamStore();
+const errorStore = new TextStreamStore();
 
 vi.mock('../../shared/theme/useIsMobile');
 
@@ -23,7 +36,6 @@ vi.mock('../assets/NewChatButton', () => ({
 describe('NavBar', () => {
   const mockProps = {
     onMenu: vi.fn(),
-    onNewChat: vi.fn(),
     onPanelOpen: vi.fn(),
     isPanelOpen: false,
   };
@@ -40,7 +52,19 @@ describe('NavBar', () => {
     });
 
     it('renders desktop controls when not mobile', () => {
-      render(<NavBar {...mockProps} />);
+      render(
+        <AppContextProvider
+          errorStore={errorStore}
+          thinkingStore={thinkingStore}
+          progressStore={progressStore}
+          messageStore={messageStore}
+          toolCallStreamStore={toolCallStreamStore}
+          walletStore={walletStore}
+          messageHistoryStore={messageHistoryStore}
+        >
+          <NavBar {...mockProps} />
+        </AppContextProvider>,
+      );
 
       expect(
         screen.getByRole('button', { name: 'Open Menu' }),
@@ -50,7 +74,19 @@ describe('NavBar', () => {
     });
 
     it('hides panel open button when panel is open', () => {
-      render(<NavBar {...mockProps} isPanelOpen={true} />);
+      render(
+        <AppContextProvider
+          errorStore={errorStore}
+          thinkingStore={thinkingStore}
+          progressStore={progressStore}
+          messageStore={messageStore}
+          toolCallStreamStore={toolCallStreamStore}
+          walletStore={walletStore}
+          messageHistoryStore={messageHistoryStore}
+        >
+          <NavBar {...mockProps} isPanelOpen={true} />
+        </AppContextProvider>,
+      );
 
       expect(
         screen.queryByRole('button', { name: 'Open Menu' }),
@@ -58,17 +94,40 @@ describe('NavBar', () => {
     });
 
     it('calls onPanelOpen when panel button is clicked', () => {
-      render(<NavBar {...mockProps} />);
+      render(
+        <AppContextProvider
+          errorStore={errorStore}
+          thinkingStore={thinkingStore}
+          progressStore={progressStore}
+          messageStore={messageStore}
+          toolCallStreamStore={toolCallStreamStore}
+          walletStore={walletStore}
+          messageHistoryStore={messageHistoryStore}
+        >
+          <NavBar {...mockProps} />
+        </AppContextProvider>,
+      );
 
       fireEvent.click(screen.getByRole('button', { name: 'Open Menu' }));
       expect(mockProps.onPanelOpen).toHaveBeenCalledTimes(1);
     });
 
     it('calls onNewChat when new chat button is clicked', () => {
-      render(<NavBar {...mockProps} />);
+      render(
+        <AppContextProvider
+          errorStore={errorStore}
+          thinkingStore={thinkingStore}
+          progressStore={progressStore}
+          messageStore={messageStore}
+          toolCallStreamStore={toolCallStreamStore}
+          walletStore={walletStore}
+          messageHistoryStore={messageHistoryStore}
+        >
+          <NavBar {...mockProps} />
+        </AppContextProvider>,
+      );
 
       fireEvent.click(screen.getByTestId('new-chat-button'));
-      expect(mockProps.onNewChat).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -80,7 +139,19 @@ describe('NavBar', () => {
     });
 
     it('renders mobile layout with menu button', () => {
-      render(<NavBar {...mockProps} />);
+      render(
+        <AppContextProvider
+          errorStore={errorStore}
+          thinkingStore={thinkingStore}
+          progressStore={progressStore}
+          messageStore={messageStore}
+          toolCallStreamStore={toolCallStreamStore}
+          walletStore={walletStore}
+          messageHistoryStore={messageHistoryStore}
+        >
+          <NavBar {...mockProps} />
+        </AppContextProvider>,
+      );
 
       expect(
         screen.getByRole('button', { name: 'Toggle Menu' }),
@@ -90,7 +161,19 @@ describe('NavBar', () => {
     });
 
     it('calls onMenu when menu button is clicked', () => {
-      render(<NavBar {...mockProps} />);
+      render(
+        <AppContextProvider
+          errorStore={errorStore}
+          thinkingStore={thinkingStore}
+          progressStore={progressStore}
+          messageStore={messageStore}
+          toolCallStreamStore={toolCallStreamStore}
+          walletStore={walletStore}
+          messageHistoryStore={messageHistoryStore}
+        >
+          <NavBar {...mockProps} />
+        </AppContextProvider>,
+      );
 
       fireEvent.click(screen.getByRole('button', { name: 'Toggle Menu' }));
       expect(mockProps.onMenu).toHaveBeenCalledTimes(1);

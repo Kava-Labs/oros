@@ -15,25 +15,11 @@ export const App = () => {
   const {
     isReady,
     modelConfig,
-    messageHistoryStore,
-    thinkingStore,
     handleChatCompletion,
-    setIsRequesting,
     handleCancel,
     hasConversations,
   } = useAppContext();
   const { messages } = useMessageHistory();
-
-  const startNewChat = () => {
-    handleCancel();
-    thinkingStore.setText('');
-    messageHistoryStore.reset();
-    messageHistoryStore.addMessage({
-      role: 'system' as const,
-      content: modelConfig.systemPrompt,
-    });
-    setIsRequesting(false);
-  };
 
   const isMobile = useIsMobile();
 
@@ -102,7 +88,6 @@ export const App = () => {
             <div className={styles.sidebarContent}>
               <ChatHistory
                 onHistoryItemClick={setIsMobileSideBarOpen}
-                startNewChat={startNewChat}
               />
             </div>
           </div>
@@ -114,7 +99,6 @@ export const App = () => {
               messages={messages}
               onSubmit={handleChatCompletion}
               onMenu={() => setIsMobileSideBarOpen(true)}
-              onNewChat={startNewChat}
               onPanelOpen={() => setIsDesktopSideBarHidden(false)}
               isPanelOpen={!isDesktopSideBarHidden}
               onCancel={handleCancel}

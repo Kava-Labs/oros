@@ -14,7 +14,6 @@ export interface ChatViewProps {
   onSubmit(value: string): void;
   onCancel(): void;
   onMenu(): void;
-  onNewChat(): void;
   onPanelOpen(): void;
   isPanelOpen: boolean;
   introText: string;
@@ -28,7 +27,6 @@ export const ChatView = ({
   onSubmit,
   onCancel,
   onMenu,
-  onNewChat,
   onPanelOpen,
   isPanelOpen,
   introText,
@@ -160,7 +158,6 @@ export const ChatView = ({
             onPanelOpen={onPanelOpen}
             isPanelOpen={isPanelOpen}
             onMenu={onMenu}
-            onNewChat={onNewChat}
           />
         </div>
 

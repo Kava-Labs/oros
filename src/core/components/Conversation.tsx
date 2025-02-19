@@ -2,7 +2,7 @@ import styles from './Conversation.module.css';
 import { Content } from './Content';
 import { StreamingText } from './StreamingText';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
-import { memo } from 'react';
+import { memo, useSyncExternalStore } from 'react';
 import { useAppContext } from '../context/useAppContext';
 import { ToolCallProgressCards } from './ToolCallProgressCards';
 import {
@@ -33,13 +33,18 @@ const StreamingTextContent = (message: string, onRendered: () => void) => {
 
 const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
   const {
-    errorText,
+    errorStore,
     isRequesting,
     progressStore,
     messageStore,
     registry,
     thinkingStore,
   } = useAppContext();
+
+  const errorText = useSyncExternalStore(
+    errorStore.subscribe,
+    errorStore.getSnapshot,
+  );
 
   return (
     <div className={styles.conversationContainer} data-testid="conversation">

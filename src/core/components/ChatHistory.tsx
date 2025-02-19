@@ -17,17 +17,15 @@ import ButtonIcon from './ButtonIcon';
 
 interface ChatHistoryProps {
   onHistoryItemClick: Dispatch<SetStateAction<boolean>>;
-  startNewChat(): void;
 }
 
-export const ChatHistory = ({
-  onHistoryItemClick,
-  startNewChat,
-}: ChatHistoryProps) => {
+export const ChatHistory = ({ onHistoryItemClick }: ChatHistoryProps) => {
   const {
+    conversationID,
     loadConversation,
     messageHistoryStore,
     conversations,
+    startNewChat,
     hasConversations,
   } = useAppContext();
 
@@ -42,10 +40,7 @@ export const ChatHistory = ({
         localStorage.getItem('conversations') ?? '{}',
       ) as Record<string, ConversationHistory>;
 
-      if (
-        allConversations[id] &&
-        id === messageHistoryStore.getConversationID()
-      ) {
+      if (allConversations[id] && id === conversationID) {
         startNewChat();
       }
 
@@ -53,7 +48,7 @@ export const ChatHistory = ({
       localStorage.setItem('conversations', JSON.stringify(allConversations));
       setOpenMenuId(null);
     },
-    [messageHistoryStore, startNewChat],
+    [messageHistoryStore, startNewChat, conversationID],
   );
 
   const handleChatHistoryClick = useCallback(
@@ -125,8 +120,8 @@ const HistoryItem = memo(
     onMenuClick,
   }: HistoryItemProps) => {
     const { id, title } = conversation;
-    const { messageHistoryStore } = useAppContext();
-    const isSelected = messageHistoryStore.getConversationID() === id;
+    const { conversationID } = useAppContext();
+    const isSelected = conversationID === id;
     const [editingTitle, setEditingTitle] = useState(false);
     const [newTitle, setNewTitle] = useState(title);
 
@@ -161,6 +156,9 @@ const HistoryItem = memo(
       if (trimmedTitle === '') {
         setNewTitle(title);
         return;
+      }
+      if (trimmedTitle !== title) {
+        setDidEditTitle(true);
       }
 
       if (trimmedTitle !== title) {

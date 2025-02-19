@@ -15,8 +15,7 @@ import { initializeMessageRegistry } from '../../features/blockchain/config/init
 import { useExecuteOperation } from './useExecuteOperation';
 import { DEFAULT_MODEL_NAME, getModelConfig } from '../config/models';
 import { SupportedModels, ModelConfig } from '../types/models';
-import { useMessageSaver } from './useMessageSaver';
-import { ConversationHistory } from './types';
+import { ActiveConversation, ConversationHistory } from './types';
 import { getToken } from '../../core/utils/token/token';
 import OpenAI from 'openai';
 import {
@@ -26,32 +25,89 @@ import {
 } from '../utils/streamUtils';
 import { OperationResult } from '../../features/blockchain/types/chain';
 import { ExecuteOperation } from '../../core/context/types';
+import { v4 as uuidv4 } from 'uuid';
+import { formatConversationTitle } from '../utils/conversation/helpers';
 
 let client: OpenAI | null = null;
 
-export const AppContextProvider = ({
-  children,
-  walletStore,
-  messageStore,
-  toolCallStreamStore,
-  progressStore,
-  messageHistoryStore,
-  thinkingStore,
-}: {
+const newConversation = () => {
+  return {
+    conversationID: uuidv4(),
+    messageStore: new TextStreamStore(),
+    thinkingStore: new TextStreamStore(),
+    progressStore: new TextStreamStore(),
+    errorStore: new TextStreamStore(),
+    messageHistoryStore: new MessageHistoryStore(),
+    toolCallStreamStore: new ToolCallStreamStore(),
+    isRequesting: false,
+  };
+};
+
+export const AppContextProvider = (props: {
   children: React.ReactNode;
   walletStore: WalletStore;
   thinkingStore: TextStreamStore;
+  errorStore: TextStreamStore;
   messageStore: TextStreamStore;
   toolCallStreamStore: ToolCallStreamStore;
   progressStore: TextStreamStore;
   messageHistoryStore: MessageHistoryStore;
 }) => {
-  const [errorText, setErrorText] = useState('');
-  const [isRequesting, setIsRequesting] = useState(false);
+  const { children, walletStore } = props;
+
   const [isReady, setIsReady] = useState(false);
   const [registry] = useState<OperationRegistry<unknown>>(() =>
     initializeMessageRegistry(),
   );
+
+  const [conversation, setConversation] = useState<ActiveConversation>({
+    conversationID: uuidv4(),
+    messageHistoryStore: props.messageHistoryStore,
+    toolCallStreamStore: props.toolCallStreamStore,
+    thinkingStore: props.thinkingStore,
+    progressStore: props.progressStore,
+    messageStore: props.messageStore,
+    errorStore: new TextStreamStore(),
+    isRequesting: false,
+  });
+
+  const {
+    conversationID,
+    isRequesting,
+    messageHistoryStore,
+    toolCallStreamStore,
+    messageStore,
+    progressStore,
+    thinkingStore,
+    errorStore,
+  } = conversation;
+
+  const activeConversationsRef = useRef<Map<string, ActiveConversation>>(null);
+
+  useEffect(() => {
+    if (!activeConversationsRef.current) {
+      activeConversationsRef.current = new Map();
+    }
+
+    activeConversationsRef.current.set(
+      conversation.conversationID,
+      conversation,
+    );
+  }, [conversation]);
+
+  const setIsRequesting = useCallback((isRequesting: boolean, id: string) => {
+    const conv = activeConversationsRef.current?.get(id);
+    if (conv) {
+      conv.isRequesting = isRequesting;
+    }
+
+    setConversation((prev) => {
+      if (prev.conversationID === id) {
+        return { ...prev, isRequesting };
+      }
+      return prev;
+    });
+  }, []);
 
   const [conversations, setConversations] = useState<ConversationHistory[]>(
     () => {
@@ -90,34 +146,37 @@ export const AppContextProvider = ({
     [conversations],
   );
 
-  const handleModelChange = useCallback(
-    (modelName: SupportedModels) => {
-      const newConfig = getModelConfig(modelName);
-      setModelConfig(newConfig);
-      messageHistoryStore.reset();
-      messageHistoryStore.setMessages([
-        { role: 'system', content: newConfig.systemPrompt },
-      ]);
-    },
-    [messageHistoryStore],
-  );
+  const handleModelChange = useCallback((modelName: SupportedModels) => {
+    const newConfig = getModelConfig(modelName);
+    setModelConfig(newConfig);
+  }, []);
 
   const { executeOperation, isOperationValidated } = useExecuteOperation(
     registry,
     walletStore,
   );
 
-  useMessageSaver(messageHistoryStore, modelConfig.id, client!);
-
   const loadConversation = useCallback(
     (convoHistory: ConversationHistory) => {
       handleModelChange(convoHistory.model as SupportedModels);
-      messageHistoryStore.loadConversation(convoHistory);
-      setErrorText('');
-      progressStore.setText('');
+      let activeConversation = activeConversationsRef.current?.get(
+        convoHistory.id,
+      );
+
+      if (!activeConversation) {
+        activeConversation = newConversation();
+        activeConversation.conversationID = convoHistory.id; // make sure to link the ids
+        activeConversation.messageHistoryStore.loadConversation(convoHistory);
+      }
+
+      setConversation(activeConversation);
     },
-    [messageHistoryStore, handleModelChange, progressStore],
+    [handleModelChange],
   );
+
+  const startNewChat = useCallback(() => {
+    setConversation(newConversation());
+  }, [conversation]);
 
   useEffect(() => {
     try {
@@ -151,6 +210,9 @@ export const AppContextProvider = ({
       if (isRequesting) {
         return;
       }
+
+      const id = conversationID;
+
       // should not happen
       if (!client) {
         console.error('client usage before ready');
@@ -161,10 +223,17 @@ export const AppContextProvider = ({
       // Abort controller integrated with UI
       const controller = new AbortController();
       controllerRef.current = controller;
-      setIsRequesting(true);
+      setIsRequesting(true, id);
 
       // Add the user message to the UI
       messageHistoryStore.addMessage({ role: 'user' as const, content: value });
+      // save to local storage (pre-request with user's prompt)
+      syncWithLocalStorage(
+        conversationID,
+        modelConfig.id,
+        messageHistoryStore,
+        client,
+      );
 
       // Call chat completions and resolve all tool calls.
       //
@@ -172,7 +241,8 @@ export const AppContextProvider = ({
       // and all follow ups have been completed.
       try {
         //  clear any existing error
-        setErrorText('');
+        // setErrorText('');
+        conversation.errorStore.setText('');
 
         await doChat(
           controller,
@@ -196,15 +266,23 @@ export const AppContextProvider = ({
           errorMessage = 'You clicked cancel - please try again';
         }
 
-        setErrorText(errorMessage);
+        // setErrorText(errorMessage);
+        conversation.errorStore.setText(errorMessage);
       } finally {
-        setIsRequesting(false);
+        setIsRequesting(false, id);
         controllerRef.current = null;
+        // save to local storage (post-request with assistant's response)
+        syncWithLocalStorage(
+          conversationID,
+          modelConfig.id,
+          messageHistoryStore,
+          client,
+        );
       }
     },
     [
       isRequesting,
-      setErrorText,
+      conversation,
       setIsRequesting,
       executeOperation,
       modelConfig,
@@ -234,6 +312,7 @@ export const AppContextProvider = ({
   return (
     <AppContext.Provider
       value={{
+        conversationID,
         client,
         messageHistoryStore,
         messageStore,
@@ -242,19 +321,17 @@ export const AppContextProvider = ({
         toolCallStreamStore,
         modelConfig,
         handleModelChange,
+        startNewChat,
         handleReset,
         handleCancel,
         handleChatCompletion,
         thinkingStore,
+        errorStore,
         loadConversation,
         executeOperation,
         registry,
-        errorText,
-        setErrorText,
         isReady,
-        setIsReady,
         isRequesting,
-        setIsRequesting,
         isOperationValidated,
         conversations,
         hasConversations,
@@ -446,4 +523,75 @@ async function callTools(
       });
     }
   }
+}
+
+async function syncWithLocalStorage(
+  conversationID: string,
+  modelID: string,
+  messageHistoryStore: MessageHistoryStore,
+  client: OpenAI,
+) {
+  const messages = messageHistoryStore.getSnapshot();
+  const firstUserMessage = messages.find((msg) => msg.role === 'user');
+  if (!firstUserMessage) return;
+
+  const { content } = firstUserMessage;
+
+  const allConversations: Record<string, ConversationHistory> = JSON.parse(
+    localStorage.getItem('conversations') ?? '{}',
+  );
+
+  const existingConversation = allConversations[conversationID];
+  const history: ConversationHistory = {
+    id: conversationID,
+    model: existingConversation ? existingConversation.model : modelID,
+    title: content as string, // fallback value
+    conversation: messages,
+    lastSaved: new Date().valueOf(),
+  };
+
+  if (
+    existingConversation &&
+    existingConversation.title === content &&
+    existingConversation.conversation.length <= 4
+  ) {
+    try {
+      const data = await client.chat.completions.create({
+        stream: false,
+        messages: [
+          {
+            role: 'system',
+            content:
+              'your task is to generate a title for a conversation using 3 to 4 words',
+          },
+          {
+            role: 'user',
+            content: `Please generate a title for this conversation (max 4 words):
+                      ${messages.map((msg) => {
+                        // only keep user/assistant messages
+                        if (msg.role !== 'user' && msg.role !== 'assistant')
+                          return;
+
+                        return `Role: ${msg.role} 
+                                      ${msg.content}
+                        `;
+                      })}
+                      `,
+          },
+        ],
+        model: 'gpt-4o-mini',
+      });
+
+      // Apply truncation only when we get the AI-generated title
+      const generatedTitle =
+        data.choices[0].message.content ?? (content as string);
+      history.title = formatConversationTitle(generatedTitle, 34);
+    } catch (err) {
+      history.title = content as string;
+      console.error(err);
+    }
+  }
+
+  allConversations[conversationID] = history;
+  localStorage.setItem('conversations', JSON.stringify(allConversations));
 }

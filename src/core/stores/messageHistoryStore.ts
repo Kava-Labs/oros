@@ -1,5 +1,4 @@
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
-import { v4 as uuidv4 } from 'uuid';
 import { ConversationHistory } from '../context/types';
 type Listener = () => void;
 
@@ -14,7 +13,6 @@ export type ChatMessage =
   | ReasoningAssistantMessage;
 
 export class MessageHistoryStore {
-  private id: string = '';
   private currentValue: ChatMessage[] = [];
   private listeners: Set<Listener> = new Set();
 
@@ -42,19 +40,12 @@ export class MessageHistoryStore {
     return this.currentValue;
   };
 
-  public getConversationID = () => {
-    if (!this.id.length) this.id = uuidv4(); // generate uuid if not exists
-    return this.id;
-  };
-
   public loadConversation = (conversationHistory: ConversationHistory) => {
-    this.id = conversationHistory.id;
     this.currentValue = conversationHistory.conversation;
     this.emitChange();
   };
 
   public reset() {
-    this.id = '';
     this.currentValue = [];
     this.emitChange();
   }
