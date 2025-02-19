@@ -145,12 +145,12 @@ interface HistoryItemProps {
 
 const HistoryItem = memo(
   ({
-    conversation,
-    handleChatHistoryClick,
-    deleteConversation,
-    isMenuOpen,
-    onMenuClick,
-  }: HistoryItemProps) => {
+     conversation,
+     handleChatHistoryClick,
+     deleteConversation,
+     isMenuOpen,
+     onMenuClick,
+   }: HistoryItemProps) => {
     const { id, title } = conversation;
     const { conversationID } = useAppContext();
     const isSelected = conversationID === id;
