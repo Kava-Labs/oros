@@ -23,7 +23,6 @@ export const ChatHistory = ({ onHistoryItemClick }: ChatHistoryProps) => {
   const {
     conversationID,
     loadConversation,
-    messageHistoryStore,
     conversations,
     startNewChat,
     hasConversations,
@@ -48,7 +47,7 @@ export const ChatHistory = ({ onHistoryItemClick }: ChatHistoryProps) => {
       localStorage.setItem('conversations', JSON.stringify(allConversations));
       setOpenMenuId(null);
     },
-    [messageHistoryStore, startNewChat, conversationID],
+    [startNewChat, conversationID],
   );
 
   const handleChatHistoryClick = useCallback(
