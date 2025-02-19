@@ -2,30 +2,34 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
-	"log/slog"
 	"net/http"
 
 	"github.com/kava-labs/kavachat/api/cmd/api/config"
 	"github.com/kava-labs/kavachat/api/cmd/api/middleware"
+	"github.com/rs/zerolog"
 )
 
 type openaiProxyHandler struct {
 	backends config.OpenAIBackends
-	logger   *slog.Logger
+	logger   *zerolog.Logger
 	endpoint string
 }
 
 // NewOpenAIProxyHandler creates a new handler that proxies requests to the OpenAI API
 func NewOpenAIProxyHandler(
 	backends config.OpenAIBackends,
-	logger *slog.Logger,
+	baseLogger *zerolog.Logger,
 	endpoint string,
 ) http.Handler {
+	logger := baseLogger.With().
+		Str("handler", "openai_proxy").
+		Str("endpoint", endpoint).
+		Logger()
+
 	return openaiProxyHandler{
 		backends: backends,
-		logger:   logger,
+		logger:   &logger,
 		endpoint: endpoint,
 	}
 }
@@ -35,7 +39,7 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	model := r.Context().Value(middleware.CTX_REQ_MODEL_KEY).(string)
 	backend, found := h.backends.GetBackendFromModel(model)
 	if !found {
-		h.logger.Error(fmt.Sprintf("error finding backend for model: %s", model))
+		h.logger.Error().Msgf("error finding backend for model: %s", model)
 
 		// Not OpenAI compatible, backend should be found in the middleware
 		w.Header().Set("Content-Type", "application/json")
@@ -44,10 +48,10 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.logger.Debug(fmt.Sprintf(
-		"Forwarding request for model '%s' to backend '%s'",
+	h.logger.Debug().Msgf(
+		"forwarding request for model '%s' to backend '%s'",
 		model, backend.Name,
-	))
+	)
 
 	client := backend.GetClient()
 
@@ -58,10 +62,10 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		r.Body,
 	)
 	if err != nil {
-		h.logger.Error(fmt.Sprintf(
+		h.logger.Error().Msgf(
 			"error forwarding request to backend %s: %s",
 			backend.Name, err.Error(),
-		))
+		)
 
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(err)
@@ -78,5 +82,15 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(apiResponse.StatusCode)
 
 	// Forward response body, straight copy from response which includes streaming
-	io.Copy(w, apiResponse.Body)
+	bytesWritten, err := io.Copy(w, apiResponse.Body)
+	if err != nil {
+		h.logger.Error().Msgf(
+			"error forwarding response body to client: %s",
+			err.Error(),
+		)
+	}
+
+	h.logger.Debug().
+		Int64("bytes_written", bytesWritten).
+		Msg("request forwarded successfully")
 }

@@ -1,12 +1,22 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"log/slog"
-	"net"
+	"io"
+	stdlog "log"
 	"net/http"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
+	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/collectors"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+
+	"github.com/rs/zerolog"
 
 	"github.com/justinas/alice"
 	"github.com/kava-labs/kavachat/api/cmd/api/config"
@@ -14,39 +24,70 @@ import (
 	"github.com/kava-labs/kavachat/api/cmd/api/middleware"
 )
 
+func NewLogger(
+	isJson bool,
+) *zerolog.Logger {
+	var output io.Writer
+	if isJson {
+		output = os.Stdout
+	} else {
+		output = zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.Kitchen}
+	}
+
+	logger := zerolog.New(output).With().Timestamp().Logger()
+	return &logger
+}
+
 func main() {
 	// -------------------------------------------------------------------------
 	// Setup logging, configuration
-	logLevel := new(slog.LevelVar)
-	logLevel.Set(slog.LevelInfo)
 
-	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		Level: logLevel,
-	}))
+	// Default format is JSON before config is loaded
+	logger := NewLogger(true)
 
 	cfg, err := config.NewConfigFromEnv()
 	if err != nil {
-		logFatal(logger, fmt.Errorf("error parsing config: %w", err))
+		logger.Fatal().Err(err).Msgf("error parsing config")
 	}
 
 	if err := cfg.Validate(); err != nil {
-		logFatal(logger, fmt.Errorf("invalid config: %w", err))
+		logger.Fatal().Err(err).Msgf("invalid config")
 	}
 
+	// Replace logger with configured format
+	logger = NewLogger(cfg.LogFormatIsJSON())
+
+	// Set as standard logger output
+	stdlog.SetFlags(0)
+	stdlog.SetOutput(logger)
+
 	// API Keys are redacted in the OpenAIBackend.String() method
-	logger.Info("Load config from env", "config", cfg)
+	logger.Info().Stringer("config", cfg).Msg("Load config from env")
 
 	// Update log level
-	logger.Info("Setting log level", "level", cfg.LogLevel)
+	logger.Info().Str("log_level", cfg.LogLevel).Msg("Setting log level")
+
 	if strings.ToLower(cfg.LogLevel) == "debug" {
-		logLevel.Set(slog.LevelDebug)
+		logger.WithLevel(zerolog.DebugLevel)
 	} else if strings.ToLower(cfg.LogLevel) == "info" {
-		logLevel.Set(slog.LevelInfo)
+		logger.WithLevel(zerolog.InfoLevel)
 	}
 
 	// -------------------------------------------------------------------------
+	// Metrics registry
+	metricsReg := prometheus.NewRegistry()
+
+	// Go runtime metrics and process collectors
+	metricsReg.MustRegister(
+		collectors.NewGoCollector(),
+		collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}),
+	)
+
+	metricsMiddleware := middleware.NewMetricsMiddleware(metricsReg, nil)
+
+	// -------------------------------------------------------------------------
 	// API Routes
-	logger.Info("Starting Kavachat API!")
+	logger.Info().Msg("Starting Kavachat API!")
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/v1/healthcheck", func(w http.ResponseWriter, r *http.Request) {
@@ -61,8 +102,8 @@ func main() {
 				middleware.PreflightMiddleware,
 				middleware.ExtractModelMiddleware(logger),
 				middleware.ModelAllowlistMiddleware(logger, cfg.Backends),
+				metricsMiddleware.WitHandlerName("/chat/completions"),
 			).
-			// Handler
 			Then(
 				handlers.NewOpenAIProxyHandler(
 					cfg.Backends,
@@ -80,6 +121,7 @@ func main() {
 				middleware.PreflightMiddleware,
 				middleware.ExtractModelMiddleware(logger),
 				middleware.ModelAllowlistMiddleware(logger, cfg.Backends),
+				metricsMiddleware.WitHandlerName("/images/generations"),
 			).
 			// Handler
 			Then(
@@ -92,31 +134,69 @@ func main() {
 	)
 
 	// -------------------------------------------------------------------------
+	// Metrics server
+
+	metricsLogger := logger.With().Str("server", "metrics").Logger()
+
+	metricsMux := http.NewServeMux()
+
+	metricsMux.Handle("/metrics", promhttp.HandlerFor(metricsReg, promhttp.HandlerOpts{
+		// register a metric "promhttp_metric_handler_errors_total", partitioned by "cause".
+		Registry: metricsReg,
+		ErrorLog: &metricsLogger,
+	}))
+
+	metricsServer := &http.Server{
+		Addr:    fmt.Sprintf(":%d", cfg.MetricsPort),
+		Handler: metricsMux,
+	}
+
+	go func() {
+		logger.Info().Msgf("serving metrics on: %s/metrics", metricsServer.Addr)
+
+		if err := metricsServer.ListenAndServe(); err != http.ErrServerClosed {
+			logger.Fatal().Err(err).Msg("metrics server err")
+		}
+	}()
+
+	// -------------------------------------------------------------------------
 	// Server setup
 
 	address := fmt.Sprintf("%s:%d", cfg.ServerHost, cfg.ServerPort)
 
-	listener, err := net.Listen("tcp", address)
-	if err != nil {
-		logFatal(logger, fmt.Errorf("failed to start server: %w", err))
-	}
-
-	tcpAddr := listener.Addr().(*net.TCPAddr)
-	logger.Info("listening", "port", tcpAddr.Port)
-
 	server := &http.Server{
-		Handler:  mux,
-		ErrorLog: slog.NewLogLogger(logger.Handler(), slog.LevelError),
+		Addr:    address,
+		Handler: mux,
 	}
 
-	logger.Info("serving", "addr", address)
+	logger.Info().Msgf("serving API on %s", address)
 
-	if err := server.Serve(listener); err != http.ErrServerClosed {
-		logFatal(logger, err)
+	go func() {
+		if err := server.ListenAndServe(); err != http.ErrServerClosed {
+			logger.Fatal().Err(err).Msg("API server err")
+		}
+	}()
+
+	// -------------------------------------------------------------------------
+	// Shutdown cleanup
+
+	// Wait for SIGTERM or SIGINT
+	sigC := make(chan os.Signal, 1)
+	signal.Notify(sigC, syscall.SIGTERM, syscall.SIGINT)
+	<-sigC
+
+	logger.Info().Msg("Received signal, shutting down server (10s timeout)...")
+
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := metricsServer.Shutdown(shutdownCtx); err != nil {
+		logger.Fatal().Err(err).Msg("shutdown metrics server err")
 	}
-}
 
-func logFatal(logger *slog.Logger, err error) {
-	logger.Error(err.Error())
-	os.Exit(1)
+	if err := server.Shutdown(shutdownCtx); err != nil {
+		logger.Fatal().Err(err).Msg("shutdown API server err")
+	}
+
+	logger.Info().Msg("Server shut down")
 }

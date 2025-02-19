@@ -14,6 +14,9 @@ type Config struct {
 	ServerPort int    `env:"PORT" envDefault:"8080"`
 	ServerHost string `env:"HOST" envDefault:"127.0.0.1"`
 
+	MetricsPort int    `env:"METRICS_PORT" envDefault:"9090"`
+	LogFormat   string `env:"LOG_FORMAT" envDefault:"plain"`
+
 	Backends OpenAIBackends `envPrefix:"BACKEND"`
 }
 
@@ -33,7 +36,24 @@ func (c Config) Validate() error {
 		return errors.New("HOST is required")
 	}
 
+	if c.LogFormat != "plain" && c.LogFormat != "json" {
+		return errors.New("LOG_FORMAT must be 'plain' or 'json'")
+	}
+
 	return nil
+}
+
+// LogFormatIsJSON returns true if the log format is JSON
+func (c Config) LogFormatIsJSON() bool {
+	return c.LogFormat == "json"
+}
+
+// String returns a string representation of the configuration with the API key redacted
+func (c Config) String() string {
+	return fmt.Sprintf(
+		"LogLevel: %s, ServerPort: %d, ServerHost: %s, MetricsPort: %d, Backends: %v",
+		c.LogLevel, c.ServerPort, c.ServerHost, c.MetricsPort, c.Backends,
+	)
 }
 
 // NewConfigFromEnv reads the environment variables and returns a Config struct

@@ -19,6 +19,8 @@ allowed models list separated by commas.
 ```env
 KAVACHAT_API_PORT=8080
 KAVACHAT_API_HOST=127.0.0.1
+KAVACHAT_API_METRICS_PORT=9090
+
 KAVACHAT_API_BACKEND_0_NAME=OpenAI
 KAVACHAT_API_BACKEND_0_BASE_URL=https://openai-compatible/endpoint
 KAVACHAT_API_BACKEND_0_API_KEY=your-api-key

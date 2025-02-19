@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -27,12 +28,13 @@ const (
 )
 
 type testConfig struct {
-	name          string
-	apiKey        string
-	baseURL       string
-	allowedModels []string
-	port          int
-	host          string
+	name              string
+	apiKey            string
+	baseURL           string
+	allowedModels     []string
+	port              int
+	host              string
+	metricsServerPort int
 }
 
 var httpTestCases []*HttpTestCase
@@ -42,10 +44,11 @@ func newDefaultTestConfig() testConfig {
 		name:   "openai",
 		apiKey: "test-openai-api-key",
 		// don't use external URL's by default
-		baseURL:       "http://localhost:5556/v1/",
-		allowedModels: []string{"gpt-4o-mini"},
-		port:          8080,
-		host:          "127.0.0.1",
+		baseURL:           "http://localhost:5556/v1/",
+		allowedModels:     []string{"gpt-4o-mini"},
+		port:              8080,
+		host:              "127.0.0.1",
+		metricsServerPort: 9090,
 	}
 }
 
@@ -82,12 +85,14 @@ func startProxyCmd(context context.Context, config testConfig, args ...string) *
 	cmd.Env = append(
 		cmd.Env,
 		"KAVACHAT_API_LOG_LEVEL=debug",
+		"KAVACHAT_API_LOG_FORMAT=json",
 		fmt.Sprintf("KAVACHAT_API_BACKEND_0_NAME=%s", config.name),
 		fmt.Sprintf("KAVACHAT_API_BACKEND_0_API_KEY=%s", config.apiKey),
 		fmt.Sprintf("KAVACHAT_API_BACKEND_0_BASE_URL=%s", config.baseURL),
 		fmt.Sprintf("KAVACHAT_API_BACKEND_0_ALLOWED_MODELS=%s", strings.Join(config.allowedModels, ",")),
 		fmt.Sprintf("KAVACHAT_API_PORT=%d", config.port),
 		fmt.Sprintf("KAVACHAT_API_HOST=%s", config.host),
+		fmt.Sprintf("KAVACHAT_API_METRICS_PORT=%d", config.metricsServerPort),
 	)
 
 	return cmd
@@ -104,27 +109,27 @@ func TestIncorrectRequiredEnvironmentVariable(t *testing.T) {
 			name:                "Backend name missing",
 			environmentVariable: "KAVACHAT_API_BACKEND_0_NAME",
 			substitutedString:   "",
-			expectedError:       "invalid config: invalid backend: NAME is required for backend",
+			expectedError:       "invalid backend: NAME is required for backend",
 		},
 		{
 			name:                "API key missing",
 			environmentVariable: "KAVACHAT_API_BACKEND_0_API_KEY",
 			substitutedString:   "",
-			expectedError:       "invalid config: invalid backend: API_KEY is required for backend openai",
+			expectedError:       "invalid backend: API_KEY is required for backend openai",
 		},
 
 		{
 			name:                "Base url missing",
 			environmentVariable: "KAVACHAT_API_BACKEND_0_BASE_URL",
 			substitutedString:   "",
-			expectedError:       "invalid config: invalid backend: BASE_URL is required for backend openai",
+			expectedError:       "invalid backend: BASE_URL is required for backend openai",
 		},
 
 		{
 			name:                "Allowed models missing",
 			environmentVariable: "KAVACHAT_API_BACKEND_0_ALLOWED_MODELS",
 			substitutedString:   "",
-			expectedError:       "invalid config: invalid backend: ALLOWED_MODELS needs at least one model for backend openai",
+			expectedError:       "invalid backend: ALLOWED_MODELS needs at least one model for backend openai",
 		},
 		{
 			name:                "Port missing, has default",
@@ -136,19 +141,19 @@ func TestIncorrectRequiredEnvironmentVariable(t *testing.T) {
 			name:                "Non-integer for port",
 			environmentVariable: "KAVACHAT_API_PORT",
 			substitutedString:   "abc",
-			expectedError:       "error parsing config: env: parse error on field \"ServerPort\" of type \"int\": strconv.ParseInt: parsing \"abc\"",
+			expectedError:       "env: parse error on field \"ServerPort\" of type \"int\": strconv.ParseInt: parsing \"abc\"",
 		},
 		{
 			name:                "Integer outside range for port",
 			environmentVariable: "KAVACHAT_API_PORT",
 			substitutedString:   "123456789000000000000000000000",
-			expectedError:       "error parsing config: env: parse error on field \"ServerPort\" of type \"int\": strconv.ParseInt: parsing \"123456789000000000000000000000\": value out of range",
+			expectedError:       "env: parse error on field \"ServerPort\" of type \"int\": strconv.ParseInt: parsing \"123456789000000000000000000000\": value out of range",
 		},
 		{
 			name:                "Restricted port",
 			environmentVariable: "KAVACHAT_API_PORT",
 			substitutedString:   "80",
-			expectedError:       "failed to start server: listen tcp 127.0.0.1:80: bind: permission denied",
+			expectedError:       "listen tcp 127.0.0.1:80: bind: permission denied",
 		},
 	}
 
@@ -184,29 +189,41 @@ func TestIncorrectRequiredEnvironmentVariable(t *testing.T) {
 			cmd.Stdout = &stdout
 			cmd.Stderr = &stderr
 
-			err := cmd.Run()
-			require.Error(t, err, fmt.Sprintf("expected %s to fail", cmd.String()))
+			cmdErr := cmd.Run()
+			require.Error(t, cmdErr, fmt.Sprintf("expected %s to fail", cmd.String()))
 
 			// if context.DeadlineExceeded  error
-			if err != nil && errors.Is(err, context.DeadlineExceeded) {
-				t.Fatalf("timeout while running cmd, likely because it did not exit with error: %v", err)
+			if cmdErr != nil && errors.Is(cmdErr, context.DeadlineExceeded) {
+				t.Fatalf("timeout while running cmd, likely because it did not exit with error: %v", cmdErr)
 			}
 
 			stdoutStr := stdout.String()
-			// Remove backslashes
-			stdoutStr = strings.ReplaceAll(stdoutStr, "\\", "")
+
+			t.Logf("stdout: %s", stdoutStr)
 
 			if testCase.expectedError == "" {
-				assert.NotContains(t, stdoutStr, "level=ERROR", "expected no error")
+				assert.NotContains(t, stdoutStr, "error", "expected no error in log output")
 				return
 			}
 
-			assert.Contains(t, stdoutStr, fmt.Sprintf("level=ERROR msg=\"%s", testCase.expectedError))
+			stdoutLines := strings.Split(stdoutStr, "\n")
+			lastLine := stdoutLines[len(stdoutLines)-2]
 
-			if exitErr, ok := err.(*exec.ExitError); ok {
+			var logJson map[string]interface{}
+			err := json.Unmarshal([]byte(lastLine), &logJson)
+			require.NoError(t, err, "expected log output to be json")
+
+			assert.Contains(t, logJson, "error", "expected error field")
+
+			gotErr, ok := logJson["error"].(string)
+			require.True(t, ok, "expected error field to be a string")
+
+			assert.Contains(t, gotErr, testCase.expectedError)
+
+			if exitErr, ok := cmdErr.(*exec.ExitError); ok {
 				assert.Equal(t, 1, exitErr.ExitCode(), "expected exit code to equal 1")
 			} else {
-				t.Fatalf("%v is not an exit error", err)
+				t.Fatalf("%v is not an exit error", cmdErr)
 			}
 		})
 	}
@@ -249,7 +266,7 @@ func launchApiServer(ctx context.Context, conf testConfig) (string, func() error
 		port := make(chan int)
 		readErr := make(chan error)
 
-		portMatcher, err := regexp.Compile("msg=listening port=([0-9]*)")
+		portMatcher, err := regexp.Compile("serving API on (?:\\d{1,3}\\.){3}\\d{1,3}:(\\d+)")
 		if err != nil {
 			panic(err)
 		}
@@ -333,6 +350,31 @@ func TestHttpHealthCheck(t *testing.T) {
 	response, err := http.Get(healthcheckUrl)
 	require.NoError(t, err, "expected server to be ready for requests")
 	assert.Equal(t, http.StatusOK, response.StatusCode, "expected healthcheck to be successful")
+}
+
+func TestMetricsServer(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(2*time.Second))
+	defer cancel()
+
+	config := newDefaultTestConfig()
+
+	_, shutdown, err := launchApiServer(ctx, config)
+	require.NoError(t, err, "expected server to start without error")
+	defer shutdown()
+
+	// metrics server should have nothing on root
+	metricsRootUrl := fmt.Sprintf("http://%s:%d", config.host, config.metricsServerPort)
+
+	response, err := http.Get(metricsRootUrl)
+	require.NoError(t, err, "expected metrics server to be ready for requests")
+	assert.Equal(t, http.StatusNotFound, response.StatusCode, "expected metrics to be successful")
+
+	// metrics server should be serving metrics at /metrics
+	metricsUrl := fmt.Sprintf("http://%s:%d/metrics", config.host, config.metricsServerPort)
+
+	response, err = http.Get(metricsUrl)
+	require.NoError(t, err, "expected metrics server to be ready for requests")
+	assert.Equal(t, http.StatusOK, response.StatusCode, "expected metrics to be successful")
 }
 
 func TestChatCompletionProxy(t *testing.T) {
