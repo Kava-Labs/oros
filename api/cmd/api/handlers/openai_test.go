@@ -7,10 +7,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"log/slog"
-
 	"github.com/kava-labs/kavachat/api/cmd/api/config"
 	"github.com/kava-labs/kavachat/api/cmd/api/middleware"
+	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,7 +22,7 @@ func createMockServer(responseBody string, statusCode int) *httptest.Server {
 }
 
 func TestOpenAIProxyHandler_MultipleBackends(t *testing.T) {
-	logger := slog.Default()
+	logger := log.Logger
 
 	server1 := createMockServer(`{"result": "success1"}`, http.StatusOK)
 	defer server1.Close()
@@ -50,7 +49,7 @@ func TestOpenAIProxyHandler_MultipleBackends(t *testing.T) {
 			backend1,
 			backend2,
 		},
-		logger,
+		&logger,
 		"/v1/chat/completions",
 	)
 
@@ -103,7 +102,7 @@ func TestOpenAIProxyHandler_MultipleBackends(t *testing.T) {
 }
 
 func TestOpenAIProxyHandler_BackendError(t *testing.T) {
-	logger := slog.Default()
+	logger := log.Logger
 
 	backendResponseCode := http.StatusInternalServerError
 	backendResponseBody := `{"error": "backend failure"}`
@@ -121,7 +120,7 @@ func TestOpenAIProxyHandler_BackendError(t *testing.T) {
 		AllowedModels: []string{"gpt-4o-mini"},
 	}
 
-	handler := NewOpenAIProxyHandler(config.OpenAIBackends{backend}, logger, "/v1/chat/completions")
+	handler := NewOpenAIProxyHandler(config.OpenAIBackends{backend}, &logger, "/v1/chat/completions")
 
 	req := httptest.NewRequest("POST", "/v1/chat/completions", bytes.NewBufferString(`{"prompt":"Error"}`))
 

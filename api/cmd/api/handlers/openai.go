@@ -3,25 +3,24 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
-	"log/slog"
 	"net/http"
 
 	"github.com/kava-labs/kavachat/api/cmd/api/config"
 	"github.com/kava-labs/kavachat/api/cmd/api/middleware"
+	"github.com/rs/zerolog"
 )
 
 type openaiProxyHandler struct {
 	backends config.OpenAIBackends
-	logger   *slog.Logger
+	logger   *zerolog.Logger
 	endpoint string
 }
 
 // NewOpenAIProxyHandler creates a new handler that proxies requests to the OpenAI API
 func NewOpenAIProxyHandler(
 	backends config.OpenAIBackends,
-	logger *slog.Logger,
+	logger *zerolog.Logger,
 	endpoint string,
 ) http.Handler {
 	return openaiProxyHandler{
@@ -36,7 +35,7 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	model := r.Context().Value(middleware.CTX_REQ_MODEL_KEY).(string)
 	backend, found := h.backends.GetBackendFromModel(model)
 	if !found {
-		h.logger.Error(fmt.Sprintf("error finding backend for model: %s", model))
+		h.logger.Error().Msgf("error finding backend for model: %s", model)
 
 		// Not OpenAI compatible, backend should be found in the middleware
 		w.Header().Set("Content-Type", "application/json")
@@ -45,10 +44,10 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.logger.Debug(fmt.Sprintf(
+	h.logger.Debug().Msgf(
 		"Forwarding request for model '%s' to backend '%s'",
 		model, backend.Name,
-	))
+	)
 
 	client := backend.GetClient()
 
@@ -59,10 +58,10 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		r.Body,
 	)
 	if err != nil {
-		h.logger.Error(fmt.Sprintf(
+		h.logger.Error().Msgf(
 			"error forwarding request to backend %s: %s",
 			backend.Name, err.Error(),
-		))
+		)
 
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(err)
@@ -87,9 +86,9 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Forward response body, straight copy from response which includes streaming
 	_, err = io.Copy(multiWriter, apiResponse.Body)
 	if err != nil {
-		h.logger.Error(fmt.Sprintf(
+		h.logger.Error().Msgf(
 			"error forwarding response body to client: %s",
 			err.Error(),
-		))
+		)
 	}
 }

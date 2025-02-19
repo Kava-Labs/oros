@@ -2,11 +2,11 @@ package middleware
 
 import (
 	"bytes"
-	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/require"
 )
 
@@ -71,7 +71,7 @@ func TestExtractModelMiddleware(t *testing.T) {
 			})
 
 			// Wrap the handler with the middleware
-			middleware := ExtractModelMiddleware(slog.Default())(handler)
+			middleware := ExtractModelMiddleware(&log.Logger)(handler)
 
 			// Serve the request
 			middleware.ServeHTTP(rr, req)

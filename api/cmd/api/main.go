@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"log/slog"
+	stdlog "log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -15,40 +15,49 @@ import (
 	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
+	"github.com/rs/zerolog"
+
 	"github.com/justinas/alice"
 	"github.com/kava-labs/kavachat/api/cmd/api/config"
 	"github.com/kava-labs/kavachat/api/cmd/api/handlers"
 	"github.com/kava-labs/kavachat/api/cmd/api/middleware"
 )
 
+func NewLogger() *zerolog.Logger {
+	// Can be removed for JSON logging, ConsoleWriter not as performant
+	output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.Kitchen}
+	logger := zerolog.New(output).With().Timestamp().Logger()
+	return &logger
+}
+
 func main() {
 	// -------------------------------------------------------------------------
 	// Setup logging, configuration
-	logLevel := new(slog.LevelVar)
-	logLevel.Set(slog.LevelInfo)
+	logger := NewLogger()
 
-	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		Level: logLevel,
-	}))
+	// Set as standard logger output
+	stdlog.SetFlags(0)
+	stdlog.SetOutput(logger)
 
 	cfg, err := config.NewConfigFromEnv()
 	if err != nil {
-		logFatal(logger, fmt.Errorf("error parsing config: %w", err))
+		logger.Fatal().Err(err).Msgf("error parsing config")
 	}
 
 	if err := cfg.Validate(); err != nil {
-		logFatal(logger, fmt.Errorf("invalid config: %w", err))
+		logger.Fatal().Err(err).Msgf("invalid config")
 	}
 
 	// API Keys are redacted in the OpenAIBackend.String() method
-	logger.Info("Load config from env", "config", cfg)
+	logger.Info().Stringer("config", cfg).Msg("Load config from env")
 
 	// Update log level
-	logger.Info("Setting log level", "level", cfg.LogLevel)
+	logger.Info().Str("log_level", cfg.LogLevel).Msg("Setting log level")
+
 	if strings.ToLower(cfg.LogLevel) == "debug" {
-		logLevel.Set(slog.LevelDebug)
+		logger.WithLevel(zerolog.DebugLevel)
 	} else if strings.ToLower(cfg.LogLevel) == "info" {
-		logLevel.Set(slog.LevelInfo)
+		logger.WithLevel(zerolog.InfoLevel)
 	}
 
 	// -------------------------------------------------------------------------
@@ -65,7 +74,7 @@ func main() {
 
 	// -------------------------------------------------------------------------
 	// API Routes
-	logger.Info("Starting Kavachat API!")
+	logger.Info().Msg("Starting Kavachat API!")
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/v1/healthcheck", func(w http.ResponseWriter, r *http.Request) {
@@ -114,20 +123,22 @@ func main() {
 	// -------------------------------------------------------------------------
 	// Metrics server
 
+	metricsLogger := logger.With().Str("server", "metrics").Logger()
+
 	metricsServer := &http.Server{
-		Addr: ":9090",
+		Addr: fmt.Sprintf(":%d", cfg.MetricsPort),
 		Handler: promhttp.HandlerFor(metricsReg, promhttp.HandlerOpts{
 			// register a metric "promhttp_metric_handler_errors_total", partitioned by "cause".
 			Registry: metricsReg,
-			ErrorLog: slog.NewLogLogger(logger.Handler(), slog.LevelError),
+			ErrorLog: &metricsLogger,
 		}),
-		ErrorLog: slog.NewLogLogger(logger.Handler(), slog.LevelError),
 	}
 
 	go func() {
-		logger.Info("serving metrics at: :9090")
+		logger.Info().Msgf("serving metrics at: %s", metricsServer.Addr)
+
 		if err := metricsServer.ListenAndServe(); err != http.ErrServerClosed {
-			logFatal(logger, fmt.Errorf("metrics server err: %w", err))
+			logger.Fatal().Err(err).Msg("metrics server err")
 		}
 	}()
 
@@ -137,16 +148,15 @@ func main() {
 	address := fmt.Sprintf("%s:%d", cfg.ServerHost, cfg.ServerPort)
 
 	server := &http.Server{
-		Addr:     address,
-		Handler:  mux,
-		ErrorLog: slog.NewLogLogger(logger.Handler(), slog.LevelError),
+		Addr:    address,
+		Handler: mux,
 	}
 
-	logger.Info(fmt.Sprintf("serving API on %s", address))
+	logger.Info().Msgf("serving API on %s", address)
 
 	go func() {
 		if err := server.ListenAndServe(); err != http.ErrServerClosed {
-			logFatal(logger, fmt.Errorf("API server err: %w", err))
+			logger.Fatal().Err(err).Msg("API server err")
 		}
 	}()
 
@@ -158,23 +168,18 @@ func main() {
 	signal.Notify(sigC, syscall.SIGTERM, syscall.SIGINT)
 	<-sigC
 
-	logger.Info("Received signal, shutting down server (10s timeout)...")
+	logger.Info().Msg("Received signal, shutting down server (10s timeout)...")
 
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	if err := metricsServer.Shutdown(shutdownCtx); err != nil {
-		logFatal(logger, fmt.Errorf("shutdown metrics server err: %w", err))
+		logger.Fatal().Err(err).Msg("shutdown metrics server err")
 	}
 
 	if err := server.Shutdown(shutdownCtx); err != nil {
-		logFatal(logger, fmt.Errorf("shutdown API server err: %w", err))
+		logger.Fatal().Err(err).Msg("shutdown API server err")
 	}
 
-	logger.Info("Server shut down")
-}
-
-func logFatal(logger *slog.Logger, err error) {
-	logger.Error(err.Error())
-	os.Exit(1)
+	logger.Info().Msg("Server shut down")
 }

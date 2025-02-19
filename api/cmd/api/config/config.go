@@ -14,6 +14,8 @@ type Config struct {
 	ServerPort int    `env:"PORT" envDefault:"8080"`
 	ServerHost string `env:"HOST" envDefault:"127.0.0.1"`
 
+	MetricsPort int `env:"METRICS_PORT" envDefault:"9090"`
+
 	Backends OpenAIBackends `envPrefix:"BACKEND"`
 }
 
@@ -34,6 +36,13 @@ func (c Config) Validate() error {
 	}
 
 	return nil
+}
+
+func (c Config) String() string {
+	return fmt.Sprintf(
+		"LogLevel: %s, ServerPort: %d, ServerHost: %s, MetricsPort: %d, Backends: %v",
+		c.LogLevel, c.ServerPort, c.ServerHost, c.MetricsPort, c.Backends,
+	)
 }
 
 // NewConfigFromEnv reads the environment variables and returns a Config struct

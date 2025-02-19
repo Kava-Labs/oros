@@ -6,11 +6,11 @@ import (
 	"encoding/json"
 	"io"
 	"log"
-	"log/slog"
 	"net/http"
 
 	"github.com/kava-labs/kavachat/api/cmd/api/types"
 	"github.com/openai/openai-go"
+	"github.com/rs/zerolog"
 )
 
 const CTX_REQ_MODEL_KEY = "model"
@@ -29,7 +29,7 @@ type RequestWithModel struct {
 
 // ExtractModelMiddleware is a middleware that extracts the model field from the
 // request body and stores it in the request context
-func ExtractModelMiddleware(logger *slog.Logger) func(next http.Handler) http.Handler {
+func ExtractModelMiddleware(logger *zerolog.Logger) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Decode the request body into Payload struct
@@ -69,7 +69,7 @@ func ExtractModelMiddleware(logger *slog.Logger) func(next http.Handler) http.Ha
 			// Store the extracted field in the request context
 			ctx := context.WithValue(r.Context(), CTX_REQ_MODEL_KEY, req.Model)
 			ctx = context.WithValue(ctx, CTX_REQ_STREAM_KEY, req.Stream)
-			logger.Debug("extracted model from request body", "model", req.Model)
+			logger.Debug().Str("model", req.Model).Msg("extracted model from request body")
 
 			// Call the next handler with the new context
 			next.ServeHTTP(w, r.WithContext(ctx))

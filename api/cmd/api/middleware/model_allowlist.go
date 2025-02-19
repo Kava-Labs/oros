@@ -2,13 +2,12 @@ package middleware
 
 import (
 	"encoding/json"
-	"fmt"
-	"log/slog"
 	"net/http"
 
 	"github.com/kava-labs/kavachat/api/cmd/api/config"
 	"github.com/kava-labs/kavachat/api/cmd/api/types"
 	"github.com/openai/openai-go"
+	"github.com/rs/zerolog"
 )
 
 // ErrorResponse is the response body for an error
@@ -20,7 +19,7 @@ type ErrorResponse struct {
 // the request body is allowed, in both ChatCompletion and ImageGeneration
 // requests.
 func ModelAllowlistMiddleware(
-	logger *slog.Logger,
+	logger *zerolog.Logger,
 	backends config.OpenAIBackends,
 ) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
@@ -30,7 +29,7 @@ func ModelAllowlistMiddleware(
 
 			// nil check, only for certain context types
 			if model == nil {
-				logger.Debug("model field is nil")
+				logger.Debug().Msg("model field is nil")
 
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusBadRequest)
@@ -49,7 +48,7 @@ func ModelAllowlistMiddleware(
 			// but we'll check it here just in case instead of panicking
 			modelStr, ok := model.(string)
 			if !ok {
-				logger.Debug(fmt.Sprintf("model field is not a string: %v", model))
+				logger.Debug().Msgf("model field is not a string: %v", model)
 
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusBadRequest)
@@ -66,7 +65,7 @@ func ModelAllowlistMiddleware(
 
 			// empty string response
 			if modelStr == "" {
-				logger.Debug("model field is empty")
+				logger.Debug().Msg("model field is empty")
 
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusBadRequest)
@@ -84,7 +83,7 @@ func ModelAllowlistMiddleware(
 			// allowlist check
 			_, found := backends.GetBackendFromModel(modelStr)
 			if !found {
-				logger.Debug(fmt.Sprintf("model is not supported by any backend: %s", model))
+				logger.Debug().Msgf("model is not supported by any backend: %s", model)
 
 				// Respond with matching openai error
 				w.Header().Set("Content-Type", "application/json")
@@ -100,7 +99,7 @@ func ModelAllowlistMiddleware(
 				return
 			}
 
-			logger.Debug(fmt.Sprintf("model is allowed: %s", model))
+			logger.Debug().Msgf("model is allowed: %s", model)
 
 			next.ServeHTTP(w, r)
 		})

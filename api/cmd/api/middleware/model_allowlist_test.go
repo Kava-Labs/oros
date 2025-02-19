@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -12,6 +11,7 @@ import (
 	"github.com/kava-labs/kavachat/api/cmd/api/config"
 	"github.com/kava-labs/kavachat/api/cmd/api/types"
 	"github.com/openai/openai-go"
+	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/require"
 )
 
@@ -104,7 +104,7 @@ func TestModelAllowlistMiddleware(t *testing.T) {
 			})
 
 			// Create middleware
-			middleware := ModelAllowlistMiddleware(slog.Default(), backends)(next)
+			middleware := ModelAllowlistMiddleware(&log.Logger, backends)(next)
 
 			// Add model to request context
 			ctx := context.WithValue(req.Context(), CTX_REQ_MODEL_KEY, tt.modelValue)
