@@ -160,6 +160,10 @@ const HistoryItem = memo(
         setDidEditTitle(true);
       }
 
+      if (trimmedTitle !== title) {
+        setDidEditTitle(true);
+      }
+
       //  Update UI first
       setNewTitle(trimmedTitle);
       setEditingTitle(false);
