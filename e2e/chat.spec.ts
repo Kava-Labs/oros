@@ -396,40 +396,29 @@ describe('chat', () => {
 
     await expect(historyEntry).toHaveText('Test Conversation Title');
   });
+
   test('conversation history title editing', async ({ page }) => {
     const chat = new Chat(page);
-
-    const originalTitle = 'Original Title';
-    const updatedTitle = 'Updated Title';
-
-    await page.addInitScript(() => {
-      localStorage.setItem(
-        'conversations',
-        JSON.stringify({
-          'test-id': {
-            id: 'test-id',
-            model: 'test-model',
-            title: 'Original Title',
-            conversation: [
-              {
-                role: 'system',
-                message: 'I am a helpful assistant',
-              },
-              {
-                role: 'user',
-                content: 'test message',
-              },
-            ],
-            lastSaved: Date.now(),
-          },
-        }),
-      );
-    });
-
     await chat.goto();
 
-    const historyEntry = page.getByTestId('chat-history-entry').first();
-    await expect(historyEntry).toHaveText(originalTitle);
+    const updatedTitle = 'Updated Title';
+
+    await chat.switchToBlockchainModel();
+
+    await chat.submitMessage(
+      'This is an automated test suite, please respond with the exact text: THIS IS A TEST',
+    );
+
+    await chat.waitForStreamToFinish();
+    await chat.waitForAssistantResponse();
+
+    const initialHistoryTitle = await page
+      .getByTestId('chat-history-entry')
+      .first()
+      .textContent();
+
+    expect(initialHistoryTitle).not.toBe('');
+    expect(initialHistoryTitle).not.toBe('New Chat');
 
     const chatOptionButton = page.getByLabel('Chat Options').first();
     await chatOptionButton.click();
@@ -446,14 +435,26 @@ describe('chat', () => {
     await page.keyboard.press('Enter');
     await chatOptionButton.click();
 
-    // Verify the changes
-    await expect(historyEntry).toHaveText(updatedTitle);
-    await expect(historyEntry).not.toHaveText(originalTitle);
+    const updatedHistoryTitle = await page
+      .getByTestId('chat-history-entry')
+      .first()
+      .textContent();
 
-    // // Verify title persists after page reload
-    // await page.reload();
-    // await expect(historyEntry).toHaveText(updatedTitle);
+    expect(updatedHistoryTitle).toBe(updatedTitle);
+    expect(updatedHistoryTitle).not.toBe(initialHistoryTitle);
+
+    // Updated title persists after reload
+    await page.reload();
+
+    const historyTitleAfterReload = await page
+      .getByTestId('chat-history-entry')
+      .first()
+      .textContent();
+
+    expect(historyTitleAfterReload).toBe(updatedTitle);
+    expect(historyTitleAfterReload).not.toBe(initialHistoryTitle);
   });
+
   test('conversation search functionality', async ({ page }) => {
     const chat = new Chat(page);
 

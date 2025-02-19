@@ -154,11 +154,20 @@ const HistoryItem = memo(
       [id],
     );
 
+    const [didEditTitle, setDidEditTitle] = useState(false);
+
     const handleSaveTitle = useCallback(() => {
       const trimmedTitle = newTitle.trim();
       if (trimmedTitle === '') {
+        console.log('1');
         setNewTitle(title);
         return;
+      }
+
+      if (trimmedTitle !== title) {
+        console.log('2');
+
+        setDidEditTitle(true);
       }
 
       //  Update UI first
@@ -170,6 +179,7 @@ const HistoryItem = memo(
       //  and then updating the UI can cause a lag
       Promise.resolve().then(() => {
         try {
+          console.log('3');
           saveToLocalStorage(trimmedTitle);
         } catch (error) {
           console.error('Error saving to localStorage:', error);
@@ -258,7 +268,9 @@ const HistoryItem = memo(
                 }}
               />
             ) : (
-              <small data-testid="chat-history-entry">{newTitle}</small>
+              <small data-testid="chat-history-entry">
+                {didEditTitle ? newTitle : title}
+              </small>
             )}
           </div>
           <ButtonIcon
