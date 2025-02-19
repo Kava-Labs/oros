@@ -49,8 +49,8 @@ function hello() {
     expect(output).toContain(
       '<blockquote>\n<p>A blockquote\nspanning multiple lines.</p>\n</blockquote>',
     );
-    expect(output).toContain('<pre><code class="language-javascript">');
-    expect(output).toContain('console.log("Hello, world!");');
+    expect(output).toContain('<pre><code class="hljs language-javascript"><span class="hljs-keyword">function</span>');
+    expect(output).toContain('<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"Hello, world!"</span>');
     expect(output).toContain('<table>');
     expect(output).toContain('<td>Value A</td>');
     expect(output).toContain('<td>Value B</td>');

@@ -2,6 +2,8 @@ import type { Preview } from '@storybook/react';
 
 import '../src/shared/theme/global.css';
 
+import '../public/atom-one-darker.css';
+
 import '@fontsource/inter/300.css';
 import '@fontsource/inter/300-italic.css';
 
