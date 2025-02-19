@@ -176,7 +176,7 @@ export const AppContextProvider = (props: {
 
   const startNewChat = useCallback(() => {
     setConversation(newConversation());
-  }, [conversation]);
+  }, []);
 
   useEffect(() => {
     try {
@@ -282,15 +282,16 @@ export const AppContextProvider = (props: {
     },
     [
       isRequesting,
-      conversation,
-      setIsRequesting,
-      executeOperation,
-      modelConfig,
-      messageHistoryStore,
-      progressStore,
+      conversationID,
       toolCallStreamStore,
+      setIsRequesting,
+      messageHistoryStore,
+      modelConfig,
+      conversation.errorStore,
+      progressStore,
       messageStore,
       thinkingStore,
+      executeOperation,
     ],
   );
 
