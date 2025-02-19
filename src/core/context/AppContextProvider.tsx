@@ -283,15 +283,15 @@ export const AppContextProvider = (props: {
     [
       isRequesting,
       conversationID,
-      toolCallStreamStore,
       setIsRequesting,
-      messageHistoryStore,
+      executeOperation,
       modelConfig,
+      messageHistoryStore,
       conversation.errorStore,
       progressStore,
+      toolCallStreamStore,
       messageStore,
       thinkingStore,
-      executeOperation,
     ],
   );
 
