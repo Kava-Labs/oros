@@ -63,8 +63,6 @@ func main() {
 
 	metricsMiddleware := middleware.NewMetricsMiddleware(metricsReg, nil)
 
-	openaiProxyMetrics := handlers.NewOpenaiProxyMetrics(metricsReg)
-
 	// -------------------------------------------------------------------------
 	// API Routes
 	logger.Info("Starting Kavachat API!")
@@ -88,7 +86,6 @@ func main() {
 				handlers.NewOpenAIProxyHandler(
 					cfg.Backends,
 					logger,
-					openaiProxyMetrics,
 					"/chat/completions",
 				),
 			),
@@ -109,7 +106,6 @@ func main() {
 				handlers.NewOpenAIProxyHandler(
 					cfg.Backends,
 					logger,
-					openaiProxyMetrics,
 					"/images/generations",
 				),
 			),
