@@ -427,7 +427,23 @@ describe('chat', () => {
     await renameButton.click();
 
     const titleInput = page.locator('input[role="Edit Title Input"]');
+    await titleInput.fill(updatedTitle);
 
+    // Verify the title hasn't changed after clicking cancel
+    const cancelButton = page.getByRole('button', {
+      name: 'Cancel Rename Title',
+    });
+    await cancelButton.click();
+
+    const titleAfterCancel = await page
+      .getByTestId('chat-history-entry')
+      .first()
+      .textContent();
+
+    expect(titleAfterCancel).toBe(initialHistoryTitle);
+    expect(titleAfterCancel).not.toBe(updatedTitle);
+
+    await renameButton.click();
     await titleInput.fill(updatedTitle);
 
     //  todo - adjust after #372 when pressing enter to confirm the new title
