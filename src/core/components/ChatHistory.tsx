@@ -20,13 +20,8 @@ interface ChatHistoryProps {
 }
 
 export const ChatHistory = ({ onHistoryItemClick }: ChatHistoryProps) => {
-  const {
-    conversationID,
-    loadConversation,
-    conversations,
-    startNewChat,
-    hasConversations,
-  } = useAppContext();
+  const { conversationID, loadConversation, conversations, startNewChat } =
+    useAppContext();
 
   const conversationsToRecord = (convs: ConversationHistory[]) => {
     const record: Record<string, ConversationHistory> = {};
@@ -38,6 +33,8 @@ export const ChatHistory = ({ onHistoryItemClick }: ChatHistoryProps) => {
   const [localConversations, setLocalConversations] = useState(() =>
     conversationsToRecord(conversations),
   );
+
+  const hasLocalConversations = Object.keys(localConversations).length > 0;
 
   useEffect(() => {
     setLocalConversations(conversationsToRecord(conversations));
@@ -97,7 +94,7 @@ export const ChatHistory = ({ onHistoryItemClick }: ChatHistoryProps) => {
   return (
     <div className={styles.chatHistoryContainer}>
       <div data-testid="chat-history-section">
-        {Object.keys(localConversations).length === 0 ? (
+        {!hasLocalConversations ? (
           <div className={styles.emptyState}>
             <Bot className={styles.emptyStateIcon} size={24} />
             <small className={styles.emptyStateText}>
