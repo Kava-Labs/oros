@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"bytes"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -77,14 +76,8 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(apiResponse.StatusCode)
 
-	// Write apiResponse.Body to BOTH:
-	// 1. w: the response writer, which will be sent to the client
-	// 2. r.Context(): the request context, which will be used by the next handler for metrics
-	responseBody := bytes.Buffer{}
-	multiWriter := io.MultiWriter(w, &responseBody)
-
 	// Forward response body, straight copy from response which includes streaming
-	_, err = io.Copy(multiWriter, apiResponse.Body)
+	_, err = io.Copy(w, apiResponse.Body)
 	if err != nil {
 		h.logger.Error().Msgf(
 			"error forwarding response body to client: %s",
