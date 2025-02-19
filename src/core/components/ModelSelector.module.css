@@ -135,7 +135,7 @@
 }
 
 /* Desktop styles */
-@media (min-width: 769px) {
+@media (min-width: 768px) {
   .dropdownContainer {
     width: 15rem;
     margin-left: initial;

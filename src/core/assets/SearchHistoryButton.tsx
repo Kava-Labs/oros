@@ -1,6 +1,5 @@
 import { TextSearch } from 'lucide-react';
 import ButtonIcon from '../components/ButtonIcon';
-import styles from './Button.module.css';
 import type { ButtonIconProps } from '../components/ButtonIcon';
 import SearchHistoryModal from '../components/SearchHistoryModal';
 
@@ -27,7 +26,7 @@ export const SearchHistoryButton = ({
       <ButtonIcon
         onClick={onSearchHistoryButtonClick}
         icon={TextSearch}
-        className={`${styles.chatButton} ${className || ''}`}
+        className={className || ''}
         tooltip={{
           text: 'Search History',
           position: 'bottom',
