@@ -27,7 +27,9 @@ type RequestWithModel struct {
 
 // ExtractModelMiddleware is a middleware that extracts the model field from the
 // request body and stores it in the request context
-func ExtractModelMiddleware(logger *zerolog.Logger) func(next http.Handler) http.Handler {
+func ExtractModelMiddleware(baseLogger *zerolog.Logger) func(next http.Handler) http.Handler {
+	logger := baseLogger.With().Str("middleware", "extract_model").Logger()
+
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Decode the request body into Payload struct

@@ -19,12 +19,17 @@ type openaiProxyHandler struct {
 // NewOpenAIProxyHandler creates a new handler that proxies requests to the OpenAI API
 func NewOpenAIProxyHandler(
 	backends config.OpenAIBackends,
-	logger *zerolog.Logger,
+	baseLogger *zerolog.Logger,
 	endpoint string,
 ) http.Handler {
+	logger := baseLogger.With().
+		Str("handler", "openai_proxy").
+		Str("endpoint", endpoint).
+		Logger()
+
 	return openaiProxyHandler{
 		backends: backends,
-		logger:   logger,
+		logger:   &logger,
 		endpoint: endpoint,
 	}
 }
@@ -44,7 +49,7 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.logger.Debug().Msgf(
-		"Forwarding request for model '%s' to backend '%s'",
+		"forwarding request for model '%s' to backend '%s'",
 		model, backend.Name,
 	)
 
@@ -77,11 +82,15 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(apiResponse.StatusCode)
 
 	// Forward response body, straight copy from response which includes streaming
-	_, err = io.Copy(w, apiResponse.Body)
+	bytesWritten, err := io.Copy(w, apiResponse.Body)
 	if err != nil {
 		h.logger.Error().Msgf(
 			"error forwarding response body to client: %s",
 			err.Error(),
 		)
 	}
+
+	h.logger.Debug().
+		Int64("bytes_written", bytesWritten).
+		Msg("request forwarded successfully")
 }

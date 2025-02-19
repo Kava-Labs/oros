@@ -19,9 +19,11 @@ type ErrorResponse struct {
 // the request body is allowed, in both ChatCompletion and ImageGeneration
 // requests.
 func ModelAllowlistMiddleware(
-	logger *zerolog.Logger,
+	baseLogger *zerolog.Logger,
 	backends config.OpenAIBackends,
 ) func(next http.Handler) http.Handler {
+	logger := baseLogger.With().Str("middleware", "model_allowlist").Logger()
+
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Check if model field is present
