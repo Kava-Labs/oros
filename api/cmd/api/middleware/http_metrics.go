@@ -16,6 +16,7 @@
 package middleware
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -42,11 +43,15 @@ type middleware struct {
 func (m *middleware) WrapHandler(handlerName string, handler http.Handler) http.HandlerFunc {
 	reg := prometheus.WrapRegistererWith(prometheus.Labels{"handler": handlerName}, m.registry)
 
+	// "method" and "code" are native promhttp labels.
+	// "model" is a custom label extracted from the request context w/ WithLabelFromCtx
+	labels := []string{"method", "code", "model"}
+
 	requestsTotal := promauto.With(reg).NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "http_requests_total",
 			Help: "Tracks the number of HTTP requests.",
-		}, []string{"method", "code"},
+		}, labels,
 	)
 	requestDuration := promauto.With(reg).NewHistogramVec(
 		prometheus.HistogramOpts{
@@ -54,21 +59,29 @@ func (m *middleware) WrapHandler(handlerName string, handler http.Handler) http.
 			Help:    "Tracks the latencies for HTTP requests.",
 			Buckets: m.buckets,
 		},
-		[]string{"method", "code"},
+		labels,
 	)
 	requestSize := promauto.With(reg).NewSummaryVec(
 		prometheus.SummaryOpts{
 			Name: "http_request_size_bytes",
 			Help: "Tracks the size of HTTP requests.",
 		},
-		[]string{"method", "code"},
+		labels,
 	)
 	responseSize := promauto.With(reg).NewSummaryVec(
 		prometheus.SummaryOpts{
 			Name: "http_response_size_bytes",
 			Help: "Tracks the size of HTTP responses.",
 		},
-		[]string{"method", "code"},
+		labels,
+	)
+
+	// Extract model label from request context. This is set after the handler
+	// is run, so model_extract middleware will already have run.
+	opts := promhttp.WithLabelFromCtx("model",
+		func(ctx context.Context) string {
+			return ctx.Value(CTX_REQ_MODEL_KEY).(string)
+		},
 	)
 
 	// Wraps the provided http.Handler to observe the request result with the provided metrics.
@@ -81,9 +94,13 @@ func (m *middleware) WrapHandler(handlerName string, handler http.Handler) http.
 				promhttp.InstrumentHandlerResponseSize(
 					responseSize,
 					handler,
+					opts,
 				),
+				opts,
 			),
+			opts,
 		),
+		opts,
 	)
 
 	return base.ServeHTTP
