@@ -233,6 +233,7 @@ func TestConfigValidate(t *testing.T) {
 	validCfg := config.Config{
 		ServerPort: 8080,
 		ServerHost: "127.0.0.1",
+		LogFormat:  "json",
 		Backends:   []config.OpenAIBackend{validBackend()},
 	}
 

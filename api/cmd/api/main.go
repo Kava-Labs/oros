@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	stdlog "log"
 	"net/http"
 	"os"
@@ -23,9 +24,16 @@ import (
 	"github.com/kava-labs/kavachat/api/cmd/api/middleware"
 )
 
-func NewLogger() *zerolog.Logger {
-	// Can be removed for JSON logging, ConsoleWriter not as performant
-	output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.Kitchen}
+func NewLogger(
+	isJson bool,
+) *zerolog.Logger {
+	var output io.Writer
+	if isJson {
+		output = os.Stdout
+	} else {
+		output = zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.Kitchen}
+	}
+
 	logger := zerolog.New(output).With().Timestamp().Logger()
 	return &logger
 }
@@ -33,11 +41,9 @@ func NewLogger() *zerolog.Logger {
 func main() {
 	// -------------------------------------------------------------------------
 	// Setup logging, configuration
-	logger := NewLogger()
 
-	// Set as standard logger output
-	stdlog.SetFlags(0)
-	stdlog.SetOutput(logger)
+	// Default format is JSON before config is loaded
+	logger := NewLogger(true)
 
 	cfg, err := config.NewConfigFromEnv()
 	if err != nil {
@@ -47,6 +53,13 @@ func main() {
 	if err := cfg.Validate(); err != nil {
 		logger.Fatal().Err(err).Msgf("invalid config")
 	}
+
+	// Replace logger with configured format
+	logger = NewLogger(cfg.LogFormatIsJSON())
+
+	// Set as standard logger output
+	stdlog.SetFlags(0)
+	stdlog.SetOutput(logger)
 
 	// API Keys are redacted in the OpenAIBackend.String() method
 	logger.Info().Stringer("config", cfg).Msg("Load config from env")
