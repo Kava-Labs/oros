@@ -397,6 +397,80 @@ describe('chat', () => {
     await expect(historyEntry).toHaveText('Test Conversation Title');
   });
 
+  test('conversation history title editing', async ({ page }) => {
+    const chat = new Chat(page);
+    await chat.goto();
+
+    const updatedTitle = 'Updated Title';
+
+    await chat.switchToBlockchainModel();
+
+    await chat.submitMessage(
+      'This is an automated test suite, please respond with the exact text: THIS IS A TEST',
+    );
+
+    await chat.waitForStreamToFinish();
+    await chat.waitForAssistantResponse();
+
+    const initialHistoryTitle = await page
+      .getByTestId('chat-history-entry')
+      .first()
+      .textContent();
+
+    expect(initialHistoryTitle).not.toBe('');
+    expect(initialHistoryTitle).not.toBe('New Chat');
+
+    const chatOptionButton = page.getByLabel('Chat Options').first();
+    await chatOptionButton.click();
+
+    const renameButton = page.getByRole('button', { name: 'Rename Title' });
+    await renameButton.click();
+
+    const titleInput = page.locator('input[role="Edit Title Input"]');
+    await titleInput.fill(updatedTitle);
+
+    // Verify the title hasn't changed after clicking cancel
+    const cancelButton = page.getByRole('button', {
+      name: 'Cancel Rename Title',
+    });
+    await cancelButton.click();
+
+    const titleAfterCancel = await page
+      .getByTestId('chat-history-entry')
+      .first()
+      .textContent();
+
+    expect(titleAfterCancel).toBe(initialHistoryTitle);
+    expect(titleAfterCancel).not.toBe(updatedTitle);
+
+    await renameButton.click();
+    await titleInput.fill(updatedTitle);
+
+    //  todo - adjust after #372 when pressing enter to confirm the new title
+    //  also closes the editing view
+    await page.keyboard.press('Enter');
+    await chatOptionButton.click();
+
+    const updatedHistoryTitle = await page
+      .getByTestId('chat-history-entry')
+      .first()
+      .textContent();
+
+    expect(updatedHistoryTitle).toBe(updatedTitle);
+    expect(updatedHistoryTitle).not.toBe(initialHistoryTitle);
+
+    // Updated title persists after reload
+    await page.reload();
+
+    const historyTitleAfterReload = await page
+      .getByTestId('chat-history-entry')
+      .first()
+      .textContent();
+
+    expect(historyTitleAfterReload).toBe(updatedTitle);
+    expect(historyTitleAfterReload).not.toBe(initialHistoryTitle);
+  });
+
   test('conversation search functionality', async ({ page }) => {
     const chat = new Chat(page);
 

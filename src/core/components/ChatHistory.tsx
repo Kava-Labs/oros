@@ -154,11 +154,17 @@ const HistoryItem = memo(
       [id],
     );
 
+    const [didEditTitle, setDidEditTitle] = useState(false);
+
     const handleSaveTitle = useCallback(() => {
       const trimmedTitle = newTitle.trim();
       if (trimmedTitle === '') {
         setNewTitle(title);
         return;
+      }
+
+      if (trimmedTitle !== title) {
+        setDidEditTitle(true);
       }
 
       //  Update UI first
@@ -249,6 +255,7 @@ const HistoryItem = memo(
                 ref={inputRef}
                 type="text"
                 value={newTitle}
+                role="Edit Title Input"
                 onChange={(e) => setNewTitle(e.target.value)}
                 onKeyDown={handleKeyDown}
                 className={styles.chatHistoryTitleInput}
@@ -257,7 +264,9 @@ const HistoryItem = memo(
                 }}
               />
             ) : (
-              <small data-testid="chat-history-entry">{newTitle}</small>
+              <small data-testid="chat-history-entry">
+                {didEditTitle ? newTitle : title}
+              </small>
             )}
           </div>
           <ButtonIcon
@@ -272,7 +281,11 @@ const HistoryItem = memo(
         <div
           className={`${styles.buttonContainer} ${isMenuOpen ? styles.show : ''}`}
         >
-          <button className={styles.menuButton} onClick={handleEdit}>
+          <button
+            className={styles.menuButton}
+            onClick={handleEdit}
+            aria-label={editingTitle ? 'Cancel Rename Title' : 'Rename Title'}
+          >
             {editingTitle ? (
               <>
                 <X size={16} />
