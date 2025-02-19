@@ -14,7 +14,6 @@ import (
 )
 
 const CTX_REQ_MODEL_KEY = "model"
-const CTX_REQ_STREAM_KEY = "stream"
 
 // 25MB
 const MAX_BODY_SIZE = 25 * 1024 * 1024
@@ -23,8 +22,7 @@ const MAX_BODY_SIZE = 25 * 1024 * 1024
 // field, used to extract the model field from the request body and ignore any
 // other fields
 type RequestWithModel struct {
-	Model  string `json:"model"`
-	Stream bool   `json:"stream"`
+	Model string `json:"model"`
 }
 
 // ExtractModelMiddleware is a middleware that extracts the model field from the
@@ -68,7 +66,6 @@ func ExtractModelMiddleware(logger *zerolog.Logger) func(next http.Handler) http
 
 			// Store the extracted field in the request context
 			ctx := context.WithValue(r.Context(), CTX_REQ_MODEL_KEY, req.Model)
-			ctx = context.WithValue(ctx, CTX_REQ_STREAM_KEY, req.Stream)
 			logger.Debug().Str("model", req.Model).Msg("extracted model from request body")
 
 			// Call the next handler with the new context
