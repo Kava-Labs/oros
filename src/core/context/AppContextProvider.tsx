@@ -546,16 +546,12 @@ async function syncWithLocalStorage(
   const history: ConversationHistory = {
     id: conversationID,
     model: existingConversation ? existingConversation.model : modelID,
-    title: content as string, // fallback value
+    title: 'New Chat', // initial & fallback value
     conversation: messages,
     lastSaved: new Date().valueOf(),
   };
 
-  if (
-    existingConversation &&
-    existingConversation.title === content &&
-    existingConversation.conversation.length <= 4
-  ) {
+  if (existingConversation && existingConversation.conversation.length <= 4) {
     try {
       const data = await client.chat.completions.create({
         stream: false,

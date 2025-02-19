@@ -160,10 +160,6 @@ const HistoryItem = memo(
         setDidEditTitle(true);
       }
 
-      if (trimmedTitle !== title) {
-        setDidEditTitle(true);
-      }
-
       //  Update UI first
       setNewTitle(trimmedTitle);
       setEditingTitle(false);
@@ -213,6 +209,12 @@ const HistoryItem = memo(
         setNewTitle(title);
         setEditingTitle(false);
       } else {
+        // Get the latest title from localStorage when entering edit mode
+        const conversations = JSON.parse(
+          localStorage.getItem('conversations') ?? '{}',
+        );
+        const currentTitle = conversations[id]?.title ?? title;
+        setNewTitle(currentTitle);
         setEditingTitle(true);
       }
     };
@@ -229,13 +231,19 @@ const HistoryItem = memo(
 
     useEffect(() => {
       if (editingTitle) {
+        const conversations = JSON.parse(
+          localStorage.getItem('conversations') ?? '{}',
+        );
+        const currentTitle = conversations[id]?.title ?? title;
+        setNewTitle(currentTitle);
+
         const input = inputRef.current;
         if (input) {
           input.focus();
           input.select();
         }
       }
-    }, [editingTitle]);
+    }, [editingTitle, id, title]);
 
     return (
       <div
