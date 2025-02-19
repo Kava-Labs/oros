@@ -45,12 +45,14 @@ func TestOpenAIProxyHandler_MultipleBackends(t *testing.T) {
 		AllowedModels: []string{"gpt-4o-mini"},
 	}
 
+	metrics := NewOpenaiProxyMetrics(nil)
 	handler := NewOpenAIProxyHandler(
 		config.OpenAIBackends{
 			backend1,
 			backend2,
 		},
 		logger,
+		metrics,
 		"/v1/chat/completions",
 	)
 
@@ -121,7 +123,8 @@ func TestOpenAIProxyHandler_BackendError(t *testing.T) {
 		AllowedModels: []string{"gpt-4o-mini"},
 	}
 
-	handler := NewOpenAIProxyHandler(config.OpenAIBackends{backend}, logger, "/v1/chat/completions")
+	metrics := NewOpenaiProxyMetrics(nil)
+	handler := NewOpenAIProxyHandler(config.OpenAIBackends{backend}, logger, metrics, "/v1/chat/completions")
 
 	req := httptest.NewRequest("POST", "/v1/chat/completions", bytes.NewBufferString(`{"prompt":"Error"}`))
 
