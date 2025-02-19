@@ -97,7 +97,7 @@ export const ChatHistory = ({ onHistoryItemClick }: ChatHistoryProps) => {
   return (
     <div className={styles.chatHistoryContainer}>
       <div data-testid="chat-history-section">
-        {!hasConversations ? (
+        {Object.keys(localConversations).length === 0 ? (
           <div className={styles.emptyState}>
             <Bot className={styles.emptyStateIcon} size={24} />
             <small className={styles.emptyStateText}>
