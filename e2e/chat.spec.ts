@@ -434,31 +434,21 @@ describe('chat', () => {
     const chatOptionButton = page.getByLabel('Chat Options').first();
     await chatOptionButton.click();
 
-    // Click rename button
     const renameButton = page.getByRole('button', { name: 'Rename Title' });
     await renameButton.click();
 
-    // Get the input with its exact role
     const titleInput = page.locator('input[role="Edit Title Input"]');
-    await titleInput.waitFor({ state: 'visible' });
-    await titleInput.focus();
+
     await titleInput.fill(updatedTitle);
 
-    // // Wait for the input to be focused and selected (which happens in useEffect)
-    // await page.waitForTimeout(100); // Small delay to ensure selection happens
-    // await chatOptionButton.click();
-
-    await page.pause();
-    //
-    // // Type the new title (this will replace the selected text)
-    // await titleInput.type(updatedTitle);
-    // await titleInput.press('Enter');
+    //  todo - adjust after #372 when pressing enter to confirm the new title
+    //  also closes the editing view
+    await page.keyboard.press('Enter');
+    await chatOptionButton.click();
 
     // Verify the changes
     await expect(historyEntry).toHaveText(updatedTitle);
     await expect(historyEntry).not.toHaveText(originalTitle);
-
-    await page.pause();
 
     // // Verify title persists after page reload
     // await page.reload();
