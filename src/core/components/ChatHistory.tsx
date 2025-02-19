@@ -159,14 +159,11 @@ const HistoryItem = memo(
     const handleSaveTitle = useCallback(() => {
       const trimmedTitle = newTitle.trim();
       if (trimmedTitle === '') {
-        console.log('1');
         setNewTitle(title);
         return;
       }
 
       if (trimmedTitle !== title) {
-        console.log('2');
-
         setDidEditTitle(true);
       }
 
@@ -179,7 +176,6 @@ const HistoryItem = memo(
       //  and then updating the UI can cause a lag
       Promise.resolve().then(() => {
         try {
-          console.log('3');
           saveToLocalStorage(trimmedTitle);
         } catch (error) {
           console.error('Error saving to localStorage:', error);
