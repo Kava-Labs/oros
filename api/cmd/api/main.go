@@ -138,17 +138,21 @@ func main() {
 
 	metricsLogger := logger.With().Str("server", "metrics").Logger()
 
+	metricsMux := http.NewServeMux()
+
+	metricsMux.Handle("/metrics", promhttp.HandlerFor(metricsReg, promhttp.HandlerOpts{
+		// register a metric "promhttp_metric_handler_errors_total", partitioned by "cause".
+		Registry: metricsReg,
+		ErrorLog: &metricsLogger,
+	}))
+
 	metricsServer := &http.Server{
-		Addr: fmt.Sprintf(":%d", cfg.MetricsPort),
-		Handler: promhttp.HandlerFor(metricsReg, promhttp.HandlerOpts{
-			// register a metric "promhttp_metric_handler_errors_total", partitioned by "cause".
-			Registry: metricsReg,
-			ErrorLog: &metricsLogger,
-		}),
+		Addr:    fmt.Sprintf(":%d", cfg.MetricsPort),
+		Handler: metricsMux,
 	}
 
 	go func() {
-		logger.Info().Msgf("serving metrics at: %s", metricsServer.Addr)
+		logger.Info().Msgf("serving metrics on: %s/metrics", metricsServer.Addr)
 
 		if err := metricsServer.ListenAndServe(); err != http.ErrServerClosed {
 			logger.Fatal().Err(err).Msg("metrics server err")

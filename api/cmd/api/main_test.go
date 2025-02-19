@@ -28,12 +28,13 @@ const (
 )
 
 type testConfig struct {
-	name          string
-	apiKey        string
-	baseURL       string
-	allowedModels []string
-	port          int
-	host          string
+	name              string
+	apiKey            string
+	baseURL           string
+	allowedModels     []string
+	port              int
+	host              string
+	metricsServerPort int
 }
 
 var httpTestCases []*HttpTestCase
@@ -43,10 +44,11 @@ func newDefaultTestConfig() testConfig {
 		name:   "openai",
 		apiKey: "test-openai-api-key",
 		// don't use external URL's by default
-		baseURL:       "http://localhost:5556/v1/",
-		allowedModels: []string{"gpt-4o-mini"},
-		port:          8080,
-		host:          "127.0.0.1",
+		baseURL:           "http://localhost:5556/v1/",
+		allowedModels:     []string{"gpt-4o-mini"},
+		port:              8080,
+		host:              "127.0.0.1",
+		metricsServerPort: 9090,
 	}
 }
 
@@ -90,6 +92,7 @@ func startProxyCmd(context context.Context, config testConfig, args ...string) *
 		fmt.Sprintf("KAVACHAT_API_BACKEND_0_ALLOWED_MODELS=%s", strings.Join(config.allowedModels, ",")),
 		fmt.Sprintf("KAVACHAT_API_PORT=%d", config.port),
 		fmt.Sprintf("KAVACHAT_API_HOST=%s", config.host),
+		fmt.Sprintf("KAVACHAT_API_METRICS_PORT=%d", config.metricsServerPort),
 	)
 
 	return cmd
@@ -347,6 +350,31 @@ func TestHttpHealthCheck(t *testing.T) {
 	response, err := http.Get(healthcheckUrl)
 	require.NoError(t, err, "expected server to be ready for requests")
 	assert.Equal(t, http.StatusOK, response.StatusCode, "expected healthcheck to be successful")
+}
+
+func TestMetricsServer(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(2*time.Second))
+	defer cancel()
+
+	config := newDefaultTestConfig()
+
+	_, shutdown, err := launchApiServer(ctx, config)
+	require.NoError(t, err, "expected server to start without error")
+	defer shutdown()
+
+	// metrics server should have nothing on root
+	metricsRootUrl := fmt.Sprintf("http://%s:%d", config.host, config.metricsServerPort)
+
+	response, err := http.Get(metricsRootUrl)
+	require.NoError(t, err, "expected metrics server to be ready for requests")
+	assert.Equal(t, http.StatusNotFound, response.StatusCode, "expected metrics to be successful")
+
+	// metrics server should be serving metrics at /metrics
+	metricsUrl := fmt.Sprintf("http://%s:%d/metrics", config.host, config.metricsServerPort)
+
+	response, err = http.Get(metricsUrl)
+	require.NoError(t, err, "expected metrics server to be ready for requests")
+	assert.Equal(t, http.StatusOK, response.StatusCode, "expected metrics to be successful")
 }
 
 func TestChatCompletionProxy(t *testing.T) {
