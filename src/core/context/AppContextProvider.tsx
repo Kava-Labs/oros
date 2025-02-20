@@ -126,6 +126,24 @@ export const AppContextProvider = (props: {
     getModelConfig(DEFAULT_MODEL_NAME),
   );
 
+  const contextMetrics = useMemo(() => {
+    //  todo - remove when all models have context limit monitors
+    if (
+      'contextLimitMonitor' in modelConfig &&
+      modelConfig?.contextLimitMonitor
+    ) {
+      return modelConfig.contextLimitMonitor(messageHistoryStore.getSnapshot());
+    }
+    return null;
+  }, [messageHistoryStore.getSnapshot(), modelConfig, conversationID]);
+
+  useEffect(() => {
+    //  todo - trigger UI treatment/warning
+    if (contextMetrics && contextMetrics.percentageRemaining > 10) {
+      console.log('contextMetrics', contextMetrics);
+    }
+  }, [contextMetrics]);
+
   // Poll for conversation changes
   useEffect(() => {
     const load = () => {
