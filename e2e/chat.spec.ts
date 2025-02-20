@@ -328,10 +328,17 @@ describe('chat', () => {
     );
 
     //  Deleting entries
-    const secondHistoryTitle = await blockChainHistoryItem.textContent();
+    const recentHistoryEntry = await blockChainHistoryItem.textContent();
 
-    expect(secondHistoryTitle).not.toBe('');
-    expect(secondHistoryTitle).not.toBe(initialHistoryTitle);
+    expect(recentHistoryEntry).not.toBe('');
+    expect(recentHistoryEntry).toBe('New Chat');
+    await page.waitForFunction(() => {
+      const historyEntry = document.querySelector(
+        '[data-testid="chat-history-entry"]:first-child',
+      );
+      const title = historyEntry?.textContent;
+      return title && title !== 'New Chat';
+    });
 
     let historyEntryTexts = await page.getByTestId('chat-history-entry').all();
     expect(historyEntryTexts).toHaveLength(2);
@@ -418,7 +425,19 @@ describe('chat', () => {
       .textContent();
 
     expect(initialHistoryTitle).not.toBe('');
-    expect(initialHistoryTitle).not.toBe('New Chat');
+    expect(initialHistoryTitle).toBe('New Chat');
+    await page.waitForFunction(() => {
+      const historyEntry = document.querySelector(
+        '[data-testid="chat-history-entry"]:first-child',
+      );
+      const title = historyEntry?.textContent;
+      return title && title !== 'New Chat';
+    });
+
+    const summarizedHistoryTitle = await page
+      .getByTestId('chat-history-entry')
+      .first()
+      .textContent();
 
     const chatOptionButton = page.getByLabel('Chat Options').first();
     await chatOptionButton.click();
@@ -440,7 +459,7 @@ describe('chat', () => {
       .first()
       .textContent();
 
-    expect(titleAfterCancel).toBe(initialHistoryTitle);
+    expect(titleAfterCancel).toBe(summarizedHistoryTitle);
     expect(titleAfterCancel).not.toBe(updatedTitle);
 
     await renameButton.click();
