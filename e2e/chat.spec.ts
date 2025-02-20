@@ -360,6 +360,7 @@ describe('chat', () => {
     await historyEntryTexts[0].waitFor({ state: 'detached' });
     historyEntryTexts = await page.getByTestId('chat-history-entry').all();
     expect(historyEntryTexts).toHaveLength(0);
+    await expect(page.getByText('Start a new chat to begin')).toBeVisible();
   });
   test('conversation history from local storage populates the UI', async ({
     page,
@@ -677,5 +678,7 @@ describe('chat', () => {
 
     const searchButton = page.getByRole('button', { name: 'Search History' });
     await expect(searchButton).toBeDisabled();
+
+    await expect(page.getByText('Start a new chat to begin')).toBeVisible();
   });
 });
