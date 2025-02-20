@@ -1,13 +1,16 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
+  calculateContextMetrics,
   formatContentSnippet,
   formatConversationTitle,
   getTimeGroup,
   groupAndFilterConversations,
   groupConversationsByTime,
+  MAX_TOKENS,
 } from './helpers';
 import { ConversationHistory } from '../../context/types';
 import { ChatCompletionMessageParam } from 'openai/resources/index';
+import { ChatMessage } from '../../stores/messageHistoryStore';
 
 describe('formatConversationTitle', () => {
   it('should remove double quotes from beginning and end', () => {
@@ -342,5 +345,74 @@ describe('formatContentSnippet', () => {
     const result = formatContentSnippet(longConversation, 'match');
     expect(result.length).toBe(100);
     expect(result).toContain('preceding words match');
+  });
+});
+
+describe('calculateContextMetrics', () => {
+  it('initializing with system prompt', () => {
+    const mockMessages: ChatMessage[] = [
+      { role: 'system', content: 'I am helpful' },
+    ];
+    const result = calculateContextMetrics(mockMessages);
+
+    expect(result).toEqual({
+      tokensUsed: 8, //  amount from the system prompt
+      tokensRemaining: MAX_TOKENS - 8,
+      percentageRemaining: 99.9,
+    });
+  });
+
+  it('calculates tokens as conversation proceeds', () => {
+    const mockMessages: ChatMessage[] = [
+      { role: 'system', content: 'I am helpful' },
+      {
+        role: 'user',
+        content: 'Lorem ipsum odor amet, consectetuer adipiscing elit.',
+      },
+    ];
+    const result = calculateContextMetrics(mockMessages);
+
+    expect(result).toEqual({
+      tokensUsed: 24, //  additional tokens used
+      tokensRemaining: MAX_TOKENS - 24,
+      percentageRemaining: 99.9,
+    });
+
+    const updatedMessages: ChatMessage[] = [
+      ...mockMessages,
+      { role: 'assistant', content: 'Do you speak Latin?' },
+    ];
+
+    const updatedResult = calculateContextMetrics(updatedMessages);
+
+    expect(updatedResult).toEqual({
+      tokensUsed: 34, //  more tokens used
+      tokensRemaining: MAX_TOKENS - 34,
+      percentageRemaining: 99.9,
+    });
+  });
+
+  it('handles large input', () => {
+    const mockMessages: ChatMessage[] = [
+      { role: 'system', content: 'Make a giant string'.repeat(30000) },
+    ];
+    const result = calculateContextMetrics(mockMessages);
+
+    expect(result).toEqual({
+      tokensUsed: 120005,
+      tokensRemaining: MAX_TOKENS - 120005,
+      percentageRemaining: 6.2,
+    });
+  });
+
+  it('handles edge case of no messages', () => {
+    const mockMessages: ChatMessage[] = [];
+    const result = calculateContextMetrics(mockMessages);
+
+    expect(result).toEqual({
+      tokensUsed: 0,
+      tokensRemaining: MAX_TOKENS,
+      percentageRemaining: 100.0,
+    });
   });
 });

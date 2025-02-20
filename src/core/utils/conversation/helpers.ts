@@ -1,6 +1,8 @@
 import { ConversationHistory } from '../../context/types';
 import { encode } from 'gpt-tokenizer';
 import { ChatCompletionMessageParam } from 'openai/resources/index';
+import { ChatMessage } from '../../stores/messageHistoryStore';
+import { ContextMetrics } from '../../types/models';
 
 /**
  * Formats a conversation title by removing surrounding quotes and truncating if necessary
@@ -212,3 +214,34 @@ export const estimateTokenCount = (
 
   return tokenCount;
 };
+
+//  todo - put on model configuration
+export const MAX_TOKENS = 128000;
+
+/**
+ * Pure function to calculate context metrics based on messages and max tokens
+ * @param messages Array of chat messages
+ * @returns ContextMetrics object
+ */
+export function calculateContextMetrics(
+  messages: ChatMessage[],
+): ContextMetrics {
+  const maxTokens = MAX_TOKENS;
+  const tokensUsed = estimateTokenCount(messages);
+  const tokensRemaining = Math.max(0, maxTokens - tokensUsed);
+
+  let percentageRemaining = Number(
+    ((tokensRemaining / maxTokens) * 100).toFixed(1),
+  );
+
+  // Adjust percentage if tokens have been used to avoid rounding to 100%
+  if (tokensUsed > 0 && percentageRemaining === 100.0) {
+    percentageRemaining = 99.9;
+  }
+
+  return {
+    tokensUsed,
+    tokensRemaining,
+    percentageRemaining,
+  };
+}
