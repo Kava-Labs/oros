@@ -20,31 +20,61 @@ interface ChatHistoryProps {
 }
 
 export const ChatHistory = ({ onHistoryItemClick }: ChatHistoryProps) => {
-  const {
-    conversationID,
-    loadConversation,
-    conversations,
-    startNewChat,
-    hasConversations,
-  } = useAppContext();
+  const { conversationID, loadConversation, conversations, startNewChat } =
+    useAppContext();
+
+  const conversationsToRecord = (convs: ConversationHistory[]) => {
+    const record: Record<string, ConversationHistory> = {};
+    convs.forEach((conv) => (record[conv.id] = conv));
+    return record;
+  };
+
+  // Keep local state synced with localStorage
+  const [localConversations, setLocalConversations] = useState(() =>
+    conversationsToRecord(conversations),
+  );
+
+  const hasLocalConversations = Object.keys(localConversations).length > 0;
+
+  useEffect(() => {
+    setLocalConversations(conversationsToRecord(conversations));
+  }, [conversations]);
 
   const groupedHistories = useMemo(
-    () => groupConversationsByTime(conversations),
-    [conversations],
+    () => groupConversationsByTime(Object.values(localConversations)),
+    [localConversations],
   );
 
   const deleteConversation = useCallback(
     (id: string) => {
-      const allConversations = JSON.parse(
-        localStorage.getItem('conversations') ?? '{}',
-      ) as Record<string, ConversationHistory>;
+      // First, update the UI by removing the conversation from local state
+      setLocalConversations((prev) => {
+        const updated = { ...prev };
+        delete updated[id];
+        return updated;
+      });
 
-      if (allConversations[id] && id === conversationID) {
+      if (id === conversationID) {
         startNewChat();
       }
 
-      delete allConversations[id];
-      localStorage.setItem('conversations', JSON.stringify(allConversations));
+      // Then, defer the localStorage update
+      Promise.resolve().then(() => {
+        try {
+          const allConversations = JSON.parse(
+            localStorage.getItem('conversations') ?? '{}',
+          ) as Record<string, ConversationHistory>;
+
+          delete allConversations[id];
+          localStorage.setItem(
+            'conversations',
+            JSON.stringify(allConversations),
+          );
+        } catch (error) {
+          console.error('Error updating localStorage:', error);
+        }
+      });
+
       setOpenMenuId(null);
     },
     [startNewChat, conversationID],
@@ -64,7 +94,7 @@ export const ChatHistory = ({ onHistoryItemClick }: ChatHistoryProps) => {
   return (
     <div className={styles.chatHistoryContainer}>
       <div data-testid="chat-history-section">
-        {!hasConversations ? (
+        {!hasLocalConversations ? (
           <div className={styles.emptyState}>
             <Bot className={styles.emptyStateIcon} size={24} />
             <small className={styles.emptyStateText}>
