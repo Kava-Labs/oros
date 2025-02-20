@@ -27,6 +27,7 @@ import { OperationResult } from '../../features/blockchain/types/chain';
 import { ExecuteOperation } from '../../core/context/types';
 import { v4 as uuidv4 } from 'uuid';
 import { formatConversationTitle } from '../utils/conversation/helpers';
+import { useChatContextMonitor } from './useChatContextMonitor';
 
 let client: OpenAI | null = null;
 
@@ -81,6 +82,8 @@ export const AppContextProvider = (props: {
     thinkingStore,
     errorStore,
   } = conversation;
+
+  useChatContextMonitor(messageHistoryStore.getSnapshot());
 
   const activeConversationsRef = useRef<Map<string, ActiveConversation>>(null);
 

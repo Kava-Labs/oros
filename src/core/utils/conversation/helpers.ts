@@ -1,4 +1,6 @@
 import { ConversationHistory } from '../../context/types';
+import { encode } from 'gpt-tokenizer';
+import { ChatCompletionMessageParam } from 'openai/resources/index';
 
 /**
  * Formats a conversation title by removing surrounding quotes and truncating if necessary
@@ -188,4 +190,25 @@ const removeInitialSystemMessage = (conversation: ConversationHistory) => {
   return conversation.conversation[0]?.role === 'system'
     ? conversation.conversation.slice(1)
     : conversation.conversation;
+};
+
+export const estimateTokenCount = (
+  messages: ChatCompletionMessageParam[],
+): number => {
+  let tokenCount = 0;
+
+  messages.forEach(({ role, content }) => {
+    tokenCount += encode(role).length; // Role tokens
+
+    // Ensure content is always a string
+    if (Array.isArray(content)) {
+      tokenCount += encode(content.join(' ')).length;
+    } else if (typeof content === 'string') {
+      tokenCount += encode(content).length;
+    }
+
+    tokenCount += 4; // Approximate overhead per message
+  });
+
+  return tokenCount;
 };
