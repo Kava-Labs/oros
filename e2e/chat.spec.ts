@@ -700,4 +700,58 @@ describe('chat', () => {
 
     await expect(page.getByText('Start a new chat to begin')).toBeVisible();
   });
+  test('context limit (blockchain model)', async ({ page }) => {
+    test.setTimeout(90 * 1000);
+
+    const chat = new Chat(page);
+    await chat.goto();
+
+    await chat.switchToBlockchainModel();
+
+    await chat.submitMessage('Make a giant string'.repeat(5000));
+
+    await chat.waitForStreamToFinish();
+    await chat.waitForAssistantResponse();
+
+    await chat.submitMessage('Make a giant string'.repeat(5000));
+
+    await chat.waitForStreamToFinish();
+    await chat.waitForAssistantResponse();
+
+    await chat.submitMessage('Make a giant string'.repeat(5000));
+
+    await chat.submitMessage('Make a giant string'.repeat(5000));
+
+    await chat.waitForStreamToFinish();
+    await chat.waitForAssistantResponse();
+
+    await chat.submitMessage('Make a giant string'.repeat(5000));
+
+    await chat.waitForStreamToFinish();
+    await chat.waitForAssistantResponse();
+
+    await chat.submitMessage('Make a giant string'.repeat(5000));
+
+    await chat.waitForStreamToFinish();
+    await chat.waitForAssistantResponse();
+
+    await chat.submitMessage('Make a giant string'.repeat(5000));
+
+    await chat.waitForStreamToFinish();
+    await chat.waitForAssistantResponse();
+
+    // await chat.submitMessage('Make a giant string'.repeat(5000));
+
+    await page.pause();
+
+    // const messages = await chat.getMessageElementsWithContent();
+    // expect(messages.length).toBeGreaterThan(0);
+    //
+    // const attr =
+    //   await messages[messages.length - 1].getAttribute('data-chat-role');
+    // expect(attr).toBe('assistant');
+    //
+    // const responseText = await messages[messages.length - 1].innerText();
+    // expect(responseText).toMatch(/THIS IS A TEST/i);
+  });
 });
