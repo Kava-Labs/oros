@@ -8,6 +8,7 @@ import {
 } from '../components/displayCards';
 import { initializeMessageRegistry } from './initializeMessageRegistry';
 import { blockchainMessageProcessor } from './messageProcessing';
+import { calculateContextMetrics } from '../../../core/utils/conversation/helpers';
 
 const messageRegistry = initializeMessageRegistry();
 
@@ -39,6 +40,7 @@ export const blockchainModels: Record<
       },
     },
     messageProcessors: blockchainMessageProcessor,
+    contextLimitMonitor: calculateContextMetrics,
   },
   // 'gpt-4o-mini': {
   //   id: 'gpt-4o-mini',
