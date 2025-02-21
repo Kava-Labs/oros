@@ -8,8 +8,9 @@ import {
   groupConversationsByTime,
   MAX_TOKENS,
 } from './helpers';
-import { ConversationHistory, TextChatMessage } from '../../context/types';
+import { ConversationHistory } from '../../context/types';
 import { ChatCompletionMessageParam } from 'openai/resources/index';
+import { ChatMessage } from '../../stores/messageHistoryStore';
 
 describe('formatConversationTitle', () => {
   it('should remove double quotes from beginning and end', () => {
@@ -349,7 +350,7 @@ describe('formatContentSnippet', () => {
 
 describe('calculateContextMetrics', () => {
   it('initializing with system prompt', async () => {
-    const mockMessages: TextChatMessage[] = [
+    const mockMessages: ChatMessage[] = [
       { role: 'system', content: 'I am helpful' },
     ];
     const result = await calculateContextMetrics(mockMessages);
@@ -362,7 +363,7 @@ describe('calculateContextMetrics', () => {
   });
 
   it('calculates tokens as conversation proceeds', async () => {
-    const mockMessages: TextChatMessage[] = [
+    const mockMessages: ChatMessage[] = [
       { role: 'system', content: 'I am helpful' },
       {
         role: 'user',
@@ -377,7 +378,7 @@ describe('calculateContextMetrics', () => {
       percentageRemaining: 99.9,
     });
 
-    const updatedMessages: TextChatMessage[] = [
+    const updatedMessages: ChatMessage[] = [
       ...mockMessages,
       { role: 'assistant', content: 'Do you speak Latin?' },
     ];
@@ -392,7 +393,7 @@ describe('calculateContextMetrics', () => {
   });
 
   it('handles large input', async () => {
-    const mockMessages: TextChatMessage[] = [
+    const mockMessages: ChatMessage[] = [
       { role: 'system', content: 'Make a giant string'.repeat(30000) },
     ];
     const result = await calculateContextMetrics(mockMessages);
