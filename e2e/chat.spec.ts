@@ -709,9 +709,8 @@ describe('chat', () => {
 
     await chat.switchToBlockchainModel();
 
-    await page
-      .getByTestId('chat-view-input')
-      .fill('Make a giant string'.repeat(10 ** 5));
+    //  Generate 1 million tokens
+    await page.getByTestId('chat-view-input').fill('Token '.repeat(10 ** 6));
 
     const sendButton = page.getByRole('button', { name: 'Send Chat' });
 
