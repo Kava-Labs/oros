@@ -36,6 +36,7 @@ export interface BaseModelConfig {
     preProcess?: (message: string) => string;
     postProcess?: (message: string) => string;
   };
+  contextLimitMonitor: (messages: ChatMessage[]) => Promise<ContextMetrics>;
 }
 export interface BlockchainModelConfig extends BaseModelConfig {
   tools: ChatCompletionTool[];
@@ -43,7 +44,6 @@ export interface BlockchainModelConfig extends BaseModelConfig {
     preProcess: (message: string) => string;
     postProcess: (message: string) => string;
   };
-  contextLimitMonitor: (messages: ChatMessage[]) => ContextMetrics;
 }
 
 export type ReasoningModelConfig = BaseModelConfig;
