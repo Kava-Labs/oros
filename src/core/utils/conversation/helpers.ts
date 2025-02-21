@@ -1,4 +1,8 @@
 import { ConversationHistory } from '../../context/types';
+import { ContextMetrics } from '../../types/models';
+import { ChatMessage } from '../../stores/messageHistoryStore';
+import { ChatCompletionMessageParam } from 'openai/resources/index';
+import { Tiktoken } from 'js-tiktoken/lite';
 
 /**
  * Formats a conversation title by removing surrounding quotes and truncating if necessary
@@ -189,3 +193,75 @@ const removeInitialSystemMessage = (conversation: ConversationHistory) => {
     ? conversation.conversation.slice(1)
     : conversation.conversation;
 };
+
+let tokenizer: Tiktoken | null = null;
+
+// Initialize the tokenizer once and reuse it
+async function initializeTokenizer() {
+  if (!tokenizer) {
+    const res = await fetch(`https://tiktoken.pages.dev/js/cl100k_base.json`);
+    const cl100k_base = await res.json();
+    tokenizer = new Tiktoken(cl100k_base);
+  }
+  return tokenizer;
+}
+
+export const estimateTokenCount = async (
+  messages: ChatCompletionMessageParam[],
+): Promise<number> => {
+  const enc = await initializeTokenizer();
+  let tokenCount = 0;
+  const tokensPerMessage = 3;
+
+  messages.forEach(({ role, content }) => {
+    tokenCount += enc.encode(role).length;
+
+    if (Array.isArray(content)) {
+      content.forEach((item) => {
+        if ('text' in item) {
+          tokenCount += enc.encode(item.text).length;
+        }
+      });
+    } else if (typeof content === 'string') {
+      tokenCount += enc.encode(content).length;
+    }
+
+    tokenCount += tokensPerMessage;
+  });
+
+  tokenCount += 3;
+  return tokenCount;
+};
+
+//  todo - put on model configuration
+export const MAX_TOKENS = 128000;
+
+/**
+ * Pure function to calculate context metrics based on messages and max tokens
+ * @param messages Array of chat messages
+ * @returns ContextMetrics object
+ */
+export async function calculateContextMetrics(
+  messages: ChatMessage[],
+): Promise<ContextMetrics> {
+  const maxTokens = MAX_TOKENS;
+  const tokensUsed = await estimateTokenCount(messages);
+  const tokensRemaining = Math.max(0, maxTokens - tokensUsed);
+
+  let percentageRemaining = Number(
+    ((tokensRemaining / maxTokens) * 100).toFixed(1),
+  );
+
+  // Adjust percentage if tokens have been used to avoid rounding to 100%
+  if (tokensUsed > 0 && percentageRemaining === 100.0) {
+    percentageRemaining = 99.9;
+  }
+
+  console.log(tokensUsed);
+
+  return {
+    tokensUsed,
+    tokensRemaining,
+    percentageRemaining,
+  };
+}
