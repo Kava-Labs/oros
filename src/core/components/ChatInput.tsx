@@ -2,6 +2,7 @@ import styles from './ChatInput.module.css';
 import { CancelChatIcon, SendChatIcon } from '../assets';
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useAppContext } from '../context/useAppContext';
+import { NewChatPrompt } from './NewChatPrompt';
 
 const DEFAULT_HEIGHT = '30px';
 
@@ -100,6 +101,7 @@ const ChatInput = ({
 
   return (
     <div className={styles.controls}>
+      <NewChatPrompt onShowNewChatPrompt={true} />
       <div className={styles.inputContainer}>
         <textarea
           className={styles.input}

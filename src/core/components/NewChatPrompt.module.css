@@ -1,0 +1,52 @@
+.banner {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  width: 98%;
+  background-color: var(--colors-accentTransparent);
+  min-height: 32px;
+  font-size: 1.2rem;
+  color: var(--colors-textPrimary);
+  margin-bottom: -1.2rem;
+  border-radius: var(--borderRadius-sm);
+
+}
+
+.tipText {
+  font-weight: 500;
+}
+
+.message {
+  flex: 1;
+  color: rgb(209, 213, 219);
+}
+
+.newChatButton {
+  background: none;
+  border: none;
+  color: var(--colors-textSecondary);
+  cursor: pointer;
+  padding: 0;
+  font-size: 1.4rem;
+  transition: opacity 0.2s ease;
+}
+
+.newChatButton:hover {
+  opacity: 0.8;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: rgb(209, 213, 219);
+  cursor: pointer;
+  padding: 0;
+  font-size: 2rem;
+  line-height: 1;
+  transition: opacity 0.2s ease;
+}
+
+.closeButton:hover {
+  opacity: 0.8;
+}
