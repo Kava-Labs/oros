@@ -126,6 +126,21 @@ export const AppContextProvider = (props: {
     getModelConfig(DEFAULT_MODEL_NAME),
   );
 
+  const contextMetrics = modelConfig.contextLimitMonitor
+    ? modelConfig.contextLimitMonitor(messageHistoryStore.getSnapshot())
+    : null;
+
+  useEffect(() => {
+    async function checkMetrics() {
+      if (contextMetrics) {
+        const metrics = await contextMetrics;
+        console.log('contextMetrics', metrics);
+      }
+    }
+
+    checkMetrics();
+  }, [contextMetrics]);
+
   // Poll for conversation changes
   useEffect(() => {
     const load = () => {

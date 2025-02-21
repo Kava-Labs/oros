@@ -1,4 +1,7 @@
-import { ConversationHistory } from '../../context/types';
+import { ConversationHistory, TextChatMessage } from '../../context/types';
+import { encodeChat } from 'gpt-tokenizer';
+import { ContextMetrics } from '../../types/models';
+import { ChatMessage } from '../../stores/messageHistoryStore';
 
 /**
  * Formats a conversation title by removing surrounding quotes and truncating if necessary
@@ -189,3 +192,37 @@ const removeInitialSystemMessage = (conversation: ConversationHistory) => {
     ? conversation.conversation.slice(1)
     : conversation.conversation;
 };
+
+//  todo - put on model configuration
+export const MAX_TOKENS = 128000;
+
+/**
+ * Pure function to calculate context metrics based on messages and max tokens
+ * @param messages Array of chat messages
+ * @returns ContextMetrics object
+ */
+export async function calculateContextMetrics(
+  chatMessages: ChatMessage[],
+): Promise<ContextMetrics> {
+  const messages = chatMessages as TextChatMessage[];
+  const maxTokens = MAX_TOKENS;
+  const tokensUsed = encodeChat(messages, 'gpt-4o').length;
+  const tokensRemaining = Math.max(0, maxTokens - tokensUsed);
+
+  let percentageRemaining = Number(
+    ((tokensRemaining / maxTokens) * 100).toFixed(1),
+  );
+
+  // Adjust percentage if tokens have been used to avoid rounding to 100%
+  if (tokensUsed > 0 && percentageRemaining === 100.0) {
+    percentageRemaining = 99.9;
+  }
+
+  console.log(tokensUsed);
+
+  return {
+    tokensUsed,
+    tokensRemaining,
+    percentageRemaining,
+  };
+}

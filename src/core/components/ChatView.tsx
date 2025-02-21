@@ -7,6 +7,8 @@ import { useAppContext } from '../context/useAppContext';
 import { NavBar } from './NavBar';
 import type { ChatMessage } from '../stores/messageHistoryStore';
 import { useMessageHistory } from '../hooks/useMessageHistory';
+import { isWithinTokenLimit } from 'gpt-tokenizer';
+import { MAX_TOKENS } from '../utils/conversation/helpers';
 
 export interface ChatViewProps {
   messages: ChatMessage[];
@@ -97,6 +99,7 @@ export const ChatView = ({
        * upward keeping the user on the same line
        */
       const textarea = event.target;
+
       textarea.style.height = DEFAULT_HEIGHT; // Reset to default height first
       textarea.style.height = `min(${textarea.scrollHeight}px, 60vh)`; // Adjust to scrollHeight
       setInputValue(textarea.value);
@@ -214,7 +217,10 @@ export const ChatView = ({
                   type="submit"
                   onClick={handleButtonClick}
                   aria-label="Send Chat"
-                  disabled={!isRequesting && inputValue.length === 0}
+                  disabled={
+                    (!isRequesting && inputValue.length === 0) ||
+                    !isWithinTokenLimit(inputValue, MAX_TOKENS)
+                  }
                 >
                   {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
                 </button>
