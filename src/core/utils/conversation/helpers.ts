@@ -1,7 +1,8 @@
-import { ConversationHistory, TextChatMessage } from '../../context/types';
-import { encodeChat } from 'gpt-tokenizer';
+import { ConversationHistory } from '../../context/types';
 import { ContextMetrics } from '../../types/models';
 import { ChatMessage } from '../../stores/messageHistoryStore';
+import { ChatCompletionMessageParam } from 'openai/resources/index';
+import { Tiktoken } from 'js-tiktoken/lite';
 
 /**
  * Formats a conversation title by removing surrounding quotes and truncating if necessary
@@ -193,6 +194,45 @@ const removeInitialSystemMessage = (conversation: ConversationHistory) => {
     : conversation.conversation;
 };
 
+let tokenizer: Tiktoken | null = null;
+
+// Initialize the tokenizer once and reuse it
+async function initializeTokenizer() {
+  if (!tokenizer) {
+    const res = await fetch(`https://tiktoken.pages.dev/js/cl100k_base.json`);
+    const cl100k_base = await res.json();
+    tokenizer = new Tiktoken(cl100k_base);
+  }
+  return tokenizer;
+}
+
+export const estimateTokenCount = async (
+  messages: ChatCompletionMessageParam[],
+): Promise<number> => {
+  const enc = await initializeTokenizer();
+  let tokenCount = 0;
+  const tokensPerMessage = 3;
+
+  messages.forEach(({ role, content }) => {
+    tokenCount += enc.encode(role).length;
+
+    if (Array.isArray(content)) {
+      content.forEach((item) => {
+        if ('text' in item) {
+          tokenCount += enc.encode(item.text).length;
+        }
+      });
+    } else if (typeof content === 'string') {
+      tokenCount += enc.encode(content).length;
+    }
+
+    tokenCount += tokensPerMessage;
+  });
+
+  tokenCount += 3;
+  return tokenCount;
+};
+
 //  todo - put on model configuration
 export const MAX_TOKENS = 128000;
 
@@ -202,11 +242,10 @@ export const MAX_TOKENS = 128000;
  * @returns ContextMetrics object
  */
 export async function calculateContextMetrics(
-  chatMessages: ChatMessage[],
+  messages: ChatMessage[],
 ): Promise<ContextMetrics> {
-  const messages = chatMessages as TextChatMessage[];
   const maxTokens = MAX_TOKENS;
-  const tokensUsed = encodeChat(messages, 'gpt-4o').length;
+  const tokensUsed = await estimateTokenCount(messages);
   const tokensRemaining = Math.max(0, maxTokens - tokensUsed);
 
   let percentageRemaining = Number(
