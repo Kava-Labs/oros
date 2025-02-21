@@ -126,7 +126,7 @@ export const AppContextProvider = (props: {
     getModelConfig(DEFAULT_MODEL_NAME),
   );
 
-  const contextMetrics = useMemo(() => {
+  const contextMetrics = useMemo(async () => {
     //  todo - remove when all models have context limit monitors
     if (
       'contextLimitMonitor' in modelConfig &&
