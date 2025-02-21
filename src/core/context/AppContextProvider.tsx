@@ -139,7 +139,7 @@ export const AppContextProvider = (props: {
 
   useEffect(() => {
     //  todo - trigger UI treatment/warning
-    if (contextMetrics && contextMetrics.percentageRemaining > 10) {
+    if (contextMetrics) {
       console.log('contextMetrics', contextMetrics);
     }
   }, [contextMetrics]);

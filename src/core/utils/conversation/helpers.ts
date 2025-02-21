@@ -1,8 +1,7 @@
-import { ConversationHistory } from '../../context/types';
-import { encode } from 'gpt-tokenizer';
-import { ChatCompletionMessageParam } from 'openai/resources/index';
-import { ChatMessage } from '../../stores/messageHistoryStore';
+import { ConversationHistory, TextChatMessage } from '../../context/types';
+import { encodeChat } from 'gpt-tokenizer';
 import { ContextMetrics } from '../../types/models';
+import { ChatMessage } from '../../stores/messageHistoryStore';
 
 /**
  * Formats a conversation title by removing surrounding quotes and truncating if necessary
@@ -194,27 +193,6 @@ const removeInitialSystemMessage = (conversation: ConversationHistory) => {
     : conversation.conversation;
 };
 
-export const estimateTokenCount = (
-  messages: ChatCompletionMessageParam[],
-): number => {
-  let tokenCount = 0;
-
-  messages.forEach(({ role, content }) => {
-    tokenCount += encode(role).length; // Role tokens
-
-    // Ensure content is always a string
-    if (Array.isArray(content)) {
-      tokenCount += encode(content.join(' ')).length;
-    } else if (typeof content === 'string') {
-      tokenCount += encode(content).length;
-    }
-
-    tokenCount += 4; // Approximate overhead per message
-  });
-
-  return tokenCount;
-};
-
 //  todo - put on model configuration
 export const MAX_TOKENS = 128000;
 
@@ -223,11 +201,12 @@ export const MAX_TOKENS = 128000;
  * @param messages Array of chat messages
  * @returns ContextMetrics object
  */
-export function calculateContextMetrics(
-  messages: ChatMessage[],
-): ContextMetrics {
+export async function calculateContextMetrics(
+  chatMessages: ChatMessage[],
+): Promise<ContextMetrics> {
+  const messages = chatMessages as TextChatMessage[];
   const maxTokens = MAX_TOKENS;
-  const tokensUsed = estimateTokenCount(messages);
+  const tokensUsed = encodeChat(messages, 'gpt-4o').length;
   const tokensRemaining = Math.max(0, maxTokens - tokensUsed);
 
   let percentageRemaining = Number(
@@ -238,6 +217,8 @@ export function calculateContextMetrics(
   if (tokensUsed > 0 && percentageRemaining === 100.0) {
     percentageRemaining = 99.9;
   }
+
+  console.log(tokensUsed);
 
   return {
     tokensUsed,
