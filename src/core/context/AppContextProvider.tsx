@@ -126,22 +126,19 @@ export const AppContextProvider = (props: {
     getModelConfig(DEFAULT_MODEL_NAME),
   );
 
-  const contextMetrics = useMemo(async () => {
-    //  todo - remove when all models have context limit monitors
-    if (
-      'contextLimitMonitor' in modelConfig &&
-      modelConfig?.contextLimitMonitor
-    ) {
-      return modelConfig.contextLimitMonitor(messageHistoryStore.getSnapshot());
-    }
-    return null;
-  }, [messageHistoryStore.getSnapshot(), modelConfig, conversationID]);
+  const contextMetrics = modelConfig.contextLimitMonitor
+    ? modelConfig.contextLimitMonitor(messageHistoryStore.getSnapshot())
+    : null;
 
   useEffect(() => {
-    //  todo - trigger UI treatment/warning
-    if (contextMetrics) {
-      console.log('contextMetrics', contextMetrics);
+    async function checkMetrics() {
+      if (contextMetrics) {
+        const metrics = await contextMetrics;
+        console.log('contextMetrics', metrics);
+      }
     }
+
+    checkMetrics();
   }, [contextMetrics]);
 
   // Poll for conversation changes
