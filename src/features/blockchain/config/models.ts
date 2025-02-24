@@ -23,6 +23,7 @@ export const blockchainModels: Record<
     icon: OrosIcon,
     description: 'Blockchain Execution',
     tools: messageRegistry.getToolDefinitions(),
+    contextLength: 128000,
     systemPrompt: messageRegistry.getSystemPrompt(),
     introText: messageRegistry.getIntroText(),
     inputPlaceholderText: messageRegistry.getInputPlaceholderText(),

@@ -12,6 +12,7 @@ export interface BaseModelConfig {
   name: string;
   icon: ComponentType;
   description: string;
+  contextLength: number;
   tools: ChatCompletionTool[];
   systemPrompt: string;
   introText: string;

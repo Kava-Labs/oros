@@ -18,6 +18,7 @@ export const reasoningModels: Record<
     icon: KavaIcon,
     description: 'Logical Analysis',
     tools: [],
+    contextLength: 128000,
     systemPrompt: defaultSystemPrompt,
     introText: defaultIntroText,
     inputPlaceholderText: defaultInputPlaceholderText,
