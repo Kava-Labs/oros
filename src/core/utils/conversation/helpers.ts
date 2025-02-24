@@ -193,9 +193,6 @@ const removeInitialSystemMessage = (conversation: ConversationHistory) => {
     : conversation.conversation;
 };
 
-//  todo - put on model configuration
-export const MAX_TOKENS = 128000;
-
 /**
  * Pure function to calculate context metrics based on messages and max tokens
  * @param messages Array of chat messages
@@ -203,9 +200,10 @@ export const MAX_TOKENS = 128000;
  */
 export async function calculateContextMetrics(
   chatMessages: ChatMessage[],
+  contextLength: number,
 ): Promise<ContextMetrics> {
   const messages = chatMessages as TextChatMessage[];
-  const maxTokens = MAX_TOKENS;
+  const maxTokens = contextLength;
   const tokensUsed = encodeChat(messages, 'gpt-4o').length;
   const tokensRemaining = Math.max(0, maxTokens - tokensUsed);
 

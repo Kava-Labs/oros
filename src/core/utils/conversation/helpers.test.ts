@@ -6,11 +6,11 @@ import {
   getTimeGroup,
   groupAndFilterConversations,
   groupConversationsByTime,
-  MAX_TOKENS,
 } from './helpers';
 import { ConversationHistory } from '../../context/types';
 import { ChatCompletionMessageParam } from 'openai/resources/index';
 import { ChatMessage } from '../../stores/messageHistoryStore';
+import { blockchainModels } from '../../../features/blockchain/config/models';
 
 describe('formatConversationTitle', () => {
   it('should remove double quotes from beginning and end', () => {
@@ -349,11 +349,13 @@ describe('formatContentSnippet', () => {
 });
 
 describe('calculateContextMetrics', () => {
+  const MAX_TOKENS = blockchainModels['gpt-4o'].contextLength;
+
   it('initializing with system prompt', async () => {
     const mockMessages: ChatMessage[] = [
       { role: 'system', content: 'I am helpful' },
     ];
-    const result = await calculateContextMetrics(mockMessages);
+    const result = await calculateContextMetrics(mockMessages, MAX_TOKENS);
 
     expect(result).toEqual({
       tokensUsed: 10, //  amount from the system prompt
@@ -370,7 +372,7 @@ describe('calculateContextMetrics', () => {
         content: 'Lorem ipsum odor amet, consectetuer adipiscing elit.',
       },
     ];
-    const result = await calculateContextMetrics(mockMessages);
+    const result = await calculateContextMetrics(mockMessages, MAX_TOKENS);
 
     expect(result).toEqual({
       tokensUsed: 25, //  additional tokens used
@@ -383,7 +385,10 @@ describe('calculateContextMetrics', () => {
       { role: 'assistant', content: 'Do you speak Latin?' },
     ];
 
-    const updatedResult = await calculateContextMetrics(updatedMessages);
+    const updatedResult = await calculateContextMetrics(
+      updatedMessages,
+      MAX_TOKENS,
+    );
 
     expect(updatedResult).toEqual({
       tokensUsed: 34, //  more tokens used
@@ -396,7 +401,7 @@ describe('calculateContextMetrics', () => {
     const mockMessages: ChatMessage[] = [
       { role: 'system', content: 'Make a giant string'.repeat(30000) },
     ];
-    const result = await calculateContextMetrics(mockMessages);
+    const result = await calculateContextMetrics(mockMessages, MAX_TOKENS);
 
     expect(result).toEqual({
       tokensUsed: 120007,
