@@ -95,6 +95,12 @@
   margin-bottom: 0rem;
 }
 
+.importantInfo {
+  font-size: 1.2rem;
+  text-align: center;
+  color: var(--colors-textMuted);
+}
+
 @media (max-width: 768px) {
   .startLogoContainer {
     width: 212px;
@@ -104,16 +110,3 @@
   }
 }
 
-
-
-
-
-
-
-
-
-.importantInfo {
-  font-size: 1.2rem;
-  text-align: center;
-  color: var(--colors-textMuted);
-}
