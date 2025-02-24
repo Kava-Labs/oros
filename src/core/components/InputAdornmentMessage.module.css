@@ -1,0 +1,43 @@
+.banner {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  width: 98%;
+  background-color: var(--colors-accentTwoMuted);
+  font-size: 1.1rem;
+  color: var(--colors-textPrimary);
+  margin-bottom: -1rem;
+  border-radius: var(--borderRadius-sm);
+}
+
+.message {
+  flex: 1;
+  color: var(--colors-textSecondary);
+}
+
+.newChatButton {
+  background: none;
+  border: none;
+  color: var(--colors-textSecondary);
+  cursor: pointer;
+  padding: 0;
+  transition: opacity 0.2s ease;
+  font-size: 1.1rem;
+}
+
+.newChatButton:hover {
+  opacity: 0.8;
+  color: var(--colors-textPrimary);
+}
+
+.wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  transition: 0.3s ease-in-out;
+}
+
+.closeIcon:hover {
+  background: none;
+}
