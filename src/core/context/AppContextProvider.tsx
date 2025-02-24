@@ -127,7 +127,10 @@ export const AppContextProvider = (props: {
   );
 
   const contextMetrics = modelConfig.contextLimitMonitor
-    ? modelConfig.contextLimitMonitor(messageHistoryStore.getSnapshot())
+    ? modelConfig.contextLimitMonitor(
+        messageHistoryStore.getSnapshot(),
+        modelConfig.contextLength,
+      )
     : null;
 
   useEffect(() => {

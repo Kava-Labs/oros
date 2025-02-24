@@ -233,9 +233,6 @@ export const estimateTokenCount = async (
   return tokenCount;
 };
 
-//  todo - put on model configuration
-export const MAX_TOKENS = 128000;
-
 /**
  * Pure function to calculate context metrics based on messages and max tokens
  * @param messages Array of chat messages
@@ -243,8 +240,9 @@ export const MAX_TOKENS = 128000;
  */
 export async function calculateContextMetrics(
   messages: ChatMessage[],
+  contextLength: number,
 ): Promise<ContextMetrics> {
-  const maxTokens = MAX_TOKENS;
+  const maxTokens = contextLength;
   const tokensUsed = await estimateTokenCount(messages);
   const tokensRemaining = Math.max(0, maxTokens - tokensUsed);
 
