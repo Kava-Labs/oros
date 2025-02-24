@@ -1,15 +1,13 @@
-import styles from './ChatView.module.css';
+import styles from './ChatInput.module.css';
 import { CancelChatIcon, SendChatIcon } from '../assets';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useAppContext } from '../context/useAppContext';
 
 const DEFAULT_HEIGHT = '30px';
 
 interface ChatInputProps {
   onSubmit(value: string): void;
-
   onCancel(): void;
-
   setShouldAutoScroll: (s: boolean) => void;
 }
 
@@ -26,7 +24,7 @@ const ChatInput = ({
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const handleInputChange = useCallback(
-    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    (event: ChangeEvent<HTMLTextAreaElement>) => {
       /**
        * Set the text area height to 'auto' on change so the height is
        * automatically adjusted as the user types. Set it to the
