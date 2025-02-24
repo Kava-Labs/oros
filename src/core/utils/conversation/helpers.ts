@@ -194,9 +194,11 @@ const removeInitialSystemMessage = (conversation: ConversationHistory) => {
 };
 
 /**
- * Pure function to calculate context metrics based on messages and max tokens
+ *
+ * Function to calculate context metrics based on messages and model's context length
  * @param messages Array of chat messages
- * @returns ContextMetrics object
+ * @param contextLength maximum tokens per conversation
+ * @returns ContextMetrics object (promise)
  */
 export async function calculateContextMetrics(
   chatMessages: ChatMessage[],
@@ -215,8 +217,6 @@ export async function calculateContextMetrics(
   if (tokensUsed > 0 && percentageRemaining === 100.0) {
     percentageRemaining = 99.9;
   }
-
-  console.log(tokensUsed);
 
   return {
     tokensUsed,
