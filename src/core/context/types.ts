@@ -56,8 +56,3 @@ export type AppContextType = {
   conversations: ConversationHistory[];
   hasConversations: boolean;
 };
-
-export interface TextChatMessage {
-  role: 'system' | 'assistant' | 'user';
-  content: string;
-}
