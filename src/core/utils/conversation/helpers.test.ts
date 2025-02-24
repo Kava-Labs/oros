@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
+  calculateContextMetrics,
   formatContentSnippet,
   formatConversationTitle,
   getTimeGroup,
@@ -8,6 +9,8 @@ import {
 } from './helpers';
 import { ConversationHistory } from '../../context/types';
 import { ChatCompletionMessageParam } from 'openai/resources/index';
+import { ChatMessage } from '../../stores/messageHistoryStore';
+import { blockchainModels } from '../../../features/blockchain/config/models';
 
 describe('formatConversationTitle', () => {
   it('should remove double quotes from beginning and end', () => {
@@ -342,5 +345,67 @@ describe('formatContentSnippet', () => {
     const result = formatContentSnippet(longConversation, 'match');
     expect(result.length).toBe(100);
     expect(result).toContain('preceding words match');
+  });
+});
+
+describe('calculateContextMetrics', () => {
+  const maxTokens = blockchainModels['gpt-4o'].contextLength;
+  it('initializing with system prompt', async () => {
+    const mockMessages: ChatMessage[] = [
+      { role: 'system', content: 'I am helpful' },
+    ];
+    const result = await calculateContextMetrics(mockMessages, maxTokens);
+
+    expect(result).toEqual({
+      tokensUsed: 10, //  amount from the system prompt
+      tokensRemaining: maxTokens - 10,
+      percentageRemaining: 99.9,
+    });
+  });
+
+  it('calculates tokens as conversation proceeds', async () => {
+    const mockMessages: ChatMessage[] = [
+      { role: 'system', content: 'I am helpful' },
+      {
+        role: 'user',
+        content: 'Lorem ipsum odor amet, consectetuer adipiscing elit.',
+      },
+    ];
+    const result = await calculateContextMetrics(mockMessages, maxTokens);
+
+    expect(result).toEqual({
+      tokensUsed: 25, //  additional tokens used
+      tokensRemaining: maxTokens - 25,
+      percentageRemaining: 99.9,
+    });
+
+    const updatedMessages: ChatMessage[] = [
+      ...mockMessages,
+      { role: 'assistant', content: 'Do you speak Latin?' },
+    ];
+
+    const updatedResult = await calculateContextMetrics(
+      updatedMessages,
+      maxTokens,
+    );
+
+    expect(updatedResult).toEqual({
+      tokensUsed: 34, //  more tokens used
+      tokensRemaining: maxTokens - 34,
+      percentageRemaining: 99.9,
+    });
+  });
+
+  it('handles large input', async () => {
+    const mockMessages: ChatMessage[] = [
+      { role: 'system', content: 'Make a giant string'.repeat(30000) },
+    ];
+    const result = await calculateContextMetrics(mockMessages, maxTokens);
+
+    expect(result).toEqual({
+      tokensUsed: 120007,
+      tokensRemaining: maxTokens - 120007,
+      percentageRemaining: 6.2,
+    });
   });
 });
