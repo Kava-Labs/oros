@@ -6,6 +6,7 @@ import { InputAdornmentMessage } from './InputAdornmentMessage';
 import { ConversationHistory } from '../context/types';
 import { hasSufficientRemainingTokens } from '../utils/conversation/hasSufficientRemainingTokens';
 import { useManageContextWarning } from '../hooks/useManageContextWarning';
+import { Paperclip } from 'lucide-react';
 
 const DEFAULT_HEIGHT = '30px';
 
@@ -36,6 +37,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
 
   const buttonRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const uploadRef = useRef<HTMLInputElement>(null);
 
   const handleInputChange = useCallback(
     (event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -98,6 +100,13 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     }
   };
 
+  const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files?.length) {
+      const file = event.target.files[0];
+      alert('Uploaded: ' + file.name);
+    }
+  };
+
   // Reset textarea height when input is cleared
   useEffect(() => {
     if (inputRef.current && inputValue === '') {
@@ -121,6 +130,8 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
   const remainingContextWindow = currentConversation
     ? currentConversation.tokensRemaining
     : modelConfig.contextLength;
+
+  const [hover, setHover] = useState(false);
 
   return (
     <>
@@ -166,6 +177,24 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
           >
             {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
           </button>
+          <div className={styles.uploadInputFieldContainer}>
+            <input
+              ref={uploadRef}
+              type="file"
+              className={styles.uploadInputField}
+              onChange={handleUpload}
+            />
+          </div>
+
+          <Paperclip
+            onMouseEnter={() => setHover(true)}
+            onMouseLeave={() => setHover(false)}
+            color={hover ? '#FFFFFF' : 'rgb(180 180 180)'}
+            width="30px"
+            height="30px"
+            cursor="pointer"
+            onClick={() => uploadRef.current?.click()}
+          />
         </div>
       </div>
     </>
