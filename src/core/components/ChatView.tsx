@@ -1,12 +1,11 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import styles from './ChatView.module.css';
-import { CancelChatIcon, SendChatIcon } from '../assets';
 import { useTheme } from '../../shared/theme/useTheme';
 import { Conversation } from './Conversation';
-import { useAppContext } from '../context/useAppContext';
 import { NavBar } from './NavBar';
 import type { ChatMessage } from '../stores/messageHistoryStore';
 import { useMessageHistory } from '../hooks/useMessageHistory';
+import ChatInput from './ChatInput';
 
 export interface ChatViewProps {
   messages: ChatMessage[];
@@ -19,8 +18,6 @@ export interface ChatViewProps {
   introText: string;
 }
 
-const DEFAULT_HEIGHT = '30px';
-
 export const ChatView = ({
   messages,
   cautionText,
@@ -31,11 +28,7 @@ export const ChatView = ({
   isPanelOpen,
   introText,
 }: ChatViewProps) => {
-  const { isRequesting, modelConfig } = useAppContext();
   const { hasMessages } = useMessageHistory();
-  const [inputValue, setInputValue] = useState('');
-  const inputRef = useRef<HTMLTextAreaElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Track if we should auto-scroll
@@ -61,14 +54,6 @@ export const ChatView = ({
     containerRef.current.scrollTop = containerRef.current.scrollHeight;
   }, []);
 
-  // Reset textarea height when input is cleared
-  useEffect(() => {
-    if (inputRef.current && inputValue === '') {
-      inputRef.current.style.height = DEFAULT_HEIGHT;
-      setShouldAutoScroll(true); // Reset scroll state when input is cleared
-    }
-  }, [inputValue]);
-
   // Add scroll event listener
   useEffect(() => {
     const container = containerRef.current;
@@ -88,67 +73,7 @@ export const ChatView = ({
     }
   }, [shouldAutoScroll, scrollToBottom]);
 
-  const handleInputChange = useCallback(
-    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-      /**
-       * Set the text area height to 'auto' on change so the height is
-       * automatically adjusted as the user types. Set it to the
-       * scrollHeight so as the user types, the textarea content moves
-       * upward keeping the user on the same line
-       */
-      const textarea = event.target;
-      textarea.style.height = DEFAULT_HEIGHT; // Reset to default height first
-      textarea.style.height = `min(${textarea.scrollHeight}px, 60vh)`; // Adjust to scrollHeight
-      setInputValue(textarea.value);
-    },
-    [],
-  );
-
-  const handleButtonClick = useCallback(() => {
-    if (isRequesting) {
-      onCancel();
-      return;
-    }
-
-    if (inputValue === '') {
-      return;
-    }
-
-    let processedMessage = inputValue;
-    if (modelConfig.messageProcessors?.preProcess) {
-      processedMessage = modelConfig.messageProcessors.preProcess(inputValue);
-    }
-
-    onSubmit(processedMessage);
-    setInputValue('');
-    setShouldAutoScroll(true); // Reset scroll state when sending new message
-
-    // Reset height after submitting
-    if (inputRef.current) {
-      inputRef.current.style.height = DEFAULT_HEIGHT;
-    }
-  }, [isRequesting, inputValue, onSubmit, onCancel, modelConfig]);
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === 'Enter') {
-      if (event.shiftKey) {
-        return;
-      }
-      event.preventDefault();
-
-      if (!isRequesting && buttonRef.current) {
-        buttonRef.current.click();
-      }
-    }
-  };
-
   const { logo: Logo } = useTheme();
-
-  useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, []);
 
   return (
     <div className={styles.chatview} data-testid="chatview">
@@ -182,7 +107,7 @@ export const ChatView = ({
                 <div className={styles.startLogoContainer}>
                   {Logo && (
                     <Logo
-                      width={'100%'}
+                      width="100%"
                       height="auto"
                       className={styles.startLogo}
                     />
@@ -192,35 +117,11 @@ export const ChatView = ({
               </div>
             )}
 
-            <div className={styles.controls}>
-              <div className={styles.inputContainer}>
-                <textarea
-                  className={styles.input}
-                  data-testid="chat-view-input"
-                  rows={1}
-                  value={inputValue}
-                  onChange={handleInputChange}
-                  onKeyDown={handleKeyDown}
-                  ref={inputRef}
-                  placeholder="Ask anything..."
-                ></textarea>
-              </div>
-
-              <div className={styles.buttonContainer}>
-                <button
-                  data-testid="chat-view-button"
-                  ref={buttonRef}
-                  className={styles.sendChatButton}
-                  type="submit"
-                  onClick={handleButtonClick}
-                  aria-label="Send Chat"
-                  disabled={!isRequesting && inputValue.length === 0}
-                >
-                  {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
-                </button>
-              </div>
-            </div>
-
+            <ChatInput
+              onSubmit={onSubmit}
+              onCancel={onCancel}
+              setShouldAutoScroll={setShouldAutoScroll}
+            />
             <div className={styles.importantInfo}>
               <span>{cautionText}</span>
             </div>
