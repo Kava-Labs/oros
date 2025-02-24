@@ -6,7 +6,7 @@ import { InputAdornmentMessage } from './InputAdornmentMessage';
 import { ConversationHistory } from '../context/types';
 import { hasSufficientRemainingTokens } from '../utils/conversation/hasSufficientRemainingTokens';
 import { useManageContextWarning } from '../hooks/useManageContextWarning';
-import { Paperclip } from 'lucide-react';
+import { Paperclip, X } from 'lucide-react';
 
 const DEFAULT_HEIGHT = '30px';
 
@@ -38,6 +38,8 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const uploadRef = useRef<HTMLInputElement>(null);
+
+  const [uploadUrl, setUploadUrl] = useState<string>('');
 
   const handleInputChange = useCallback(
     (event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -103,7 +105,16 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
   const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files?.length) {
       const file = event.target.files[0];
-      alert('Uploaded: ' + file.name);
+      console.log(file);
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (e.target && typeof e.target.result === 'string') {
+            setUploadUrl(e.target.result);
+          }
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 
@@ -133,6 +144,8 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
 
   const [hover, setHover] = useState(false);
 
+  const [imgHover, setImgHover] = useState(false);
+
   return (
     <>
       {showInputAdornmentMessage && (
@@ -144,57 +157,78 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
           }}
         />
       )}
-      <div className={styles.controls}>
-        <div className={styles.inputContainer}>
-          <textarea
-            className={styles.input}
-            data-testid="chat-view-input"
-            rows={1}
-            value={inputValue}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            ref={inputRef}
-            placeholder="Ask anything..."
-          />
-        </div>
-        <div className={styles.buttonContainer}>
-          <button
-            data-testid="chat-view-button"
-            ref={buttonRef}
-            className={styles.sendChatButton}
-            type="submit"
-            onClick={handleButtonClick}
-            aria-label="Send Chat"
-            disabled={
-              (!isRequesting && inputValue.length === 0) ||
-              !hasSufficientRemainingTokens(
-                modelConfig.id,
-                inputValue,
-                remainingContextWindow,
-              ) ||
-              shouldDisableChat
-            }
+      <div>
+        {/* {image upload preview} */}
+        {uploadUrl ? (
+          <div
+            className={styles.imageCard}
+            onMouseEnter={() => setImgHover(true)}
+            onMouseLeave={() => setImgHover(false)}
           >
-            {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
-          </button>
-          <div className={styles.uploadInputFieldContainer}>
-            <input
-              ref={uploadRef}
-              type="file"
-              className={styles.uploadInputField}
-              onChange={handleUpload}
+            <img
+              width="56px"
+              height="56px"
+              className={styles.cardImage}
+              src={uploadUrl}
+            />
+            {imgHover ? (
+              <X onClick={() => setUploadUrl('')} className={styles.xIcon} />
+            ) : null}
+          </div>
+        ) : null}
+
+        <div className={styles.controls}>
+          <div className={styles.inputContainer}>
+            <textarea
+              className={styles.input}
+              data-testid="chat-view-input"
+              rows={1}
+              value={inputValue}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              ref={inputRef}
+              placeholder="Ask anything..."
             />
           </div>
+          <div className={styles.buttonContainer}>
+            <button
+              data-testid="chat-view-button"
+              ref={buttonRef}
+              className={styles.sendChatButton}
+              type="submit"
+              onClick={handleButtonClick}
+              aria-label="Send Chat"
+              disabled={
+                (!isRequesting && inputValue.length === 0) ||
+                !hasSufficientRemainingTokens(
+                  modelConfig.id,
+                  inputValue,
+                  remainingContextWindow,
+                ) ||
+                shouldDisableChat
+              }
+            >
+              {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
+            </button>
+            <div className={styles.uploadInputFieldContainer}>
+              <input
+                ref={uploadRef}
+                type="file"
+                className={styles.uploadInputField}
+                onChange={handleUpload}
+              />
+            </div>
 
-          <Paperclip
-            onMouseEnter={() => setHover(true)}
-            onMouseLeave={() => setHover(false)}
-            color={hover ? '#FFFFFF' : 'rgb(180 180 180)'}
-            width="30px"
-            height="30px"
-            cursor="pointer"
-            onClick={() => uploadRef.current?.click()}
-          />
+            <Paperclip
+              onMouseEnter={() => setHover(true)}
+              onMouseLeave={() => setHover(false)}
+              color={hover ? '#FFFFFF' : 'rgb(180 180 180)'}
+              width="30px"
+              height="30px"
+              cursor="pointer"
+              onClick={() => uploadRef.current?.click()}
+            />
+          </div>
         </div>
       </div>
     </>
