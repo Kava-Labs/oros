@@ -23,6 +23,8 @@ export const blockchainModels: Record<
     icon: OrosIcon,
     description: 'Blockchain Execution',
     tools: messageRegistry.getToolDefinitions(),
+    //  https://platform.openai.com/docs/models#gpt-4o
+    contextLength: 128000,
     systemPrompt: messageRegistry.getSystemPrompt(),
     introText: messageRegistry.getIntroText(),
     inputPlaceholderText: messageRegistry.getInputPlaceholderText(),
