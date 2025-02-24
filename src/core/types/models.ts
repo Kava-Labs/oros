@@ -2,6 +2,7 @@ import { ChatCompletionTool } from 'openai/resources/index';
 import { ComponentType } from 'react';
 import { SupportedBlockchainModels } from '../../features/blockchain/config/models';
 import { SupportedReasoningModels } from '../../features/reasoning/config/models';
+import { ChatMessage } from '../stores/messageHistoryStore';
 
 export type SupportedModels =
   | SupportedBlockchainModels
@@ -35,6 +36,10 @@ export interface BaseModelConfig {
     preProcess?: (message: string) => string;
     postProcess?: (message: string) => string;
   };
+  contextLimitMonitor: (
+    messages: ChatMessage[],
+    contextLimit: number,
+  ) => Promise<ContextMetrics>;
 }
 export interface BlockchainModelConfig extends BaseModelConfig {
   tools: ChatCompletionTool[];
@@ -51,4 +56,10 @@ export type ModelConfig = BlockchainModelConfig | ReasoningModelConfig;
 export interface ModelRegistry {
   blockchain: Record<SupportedBlockchainModels, BlockchainModelConfig>;
   reasoning: Record<SupportedReasoningModels, ReasoningModelConfig>;
+}
+
+export interface ContextMetrics {
+  tokensUsed: number;
+  tokensRemaining: number;
+  percentageRemaining: number;
 }
