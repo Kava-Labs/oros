@@ -2,7 +2,7 @@ import styles from './ChatInput.module.css';
 import { CancelChatIcon, SendChatIcon } from '../assets';
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useAppContext } from '../context/useAppContext';
-import { NewChatPrompt } from './NewChatPrompt';
+import { InputAdornmentMessage } from './InputAdornmentMessage';
 
 const DEFAULT_HEIGHT = '30px';
 
@@ -17,6 +17,8 @@ const ChatInput = ({
   onCancel,
   setShouldAutoScroll,
 }: ChatInputProps) => {
+  const [showInputAdornmentMessage, setShowInputAdornmentMessage] =
+    useState(true);
   const [inputValue, setInputValue] = useState('');
 
   const { isRequesting, modelConfig } = useAppContext();
@@ -100,35 +102,40 @@ const ChatInput = ({
   }, []);
 
   return (
-    <div className={styles.controls}>
-      <NewChatPrompt onShowNewChatPrompt={true} />
-      <div className={styles.inputContainer}>
-        <textarea
-          className={styles.input}
-          data-testid="chat-view-input"
-          rows={1}
-          value={inputValue}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          ref={inputRef}
-          placeholder="Ask anything..."
-        />
-      </div>
+    <>
+      <InputAdornmentMessage
+        showInputAdornmentMessage={showInputAdornmentMessage}
+        setShowInputAdornmentMessage={setShowInputAdornmentMessage}
+      />
+      <div className={styles.controls}>
+        <div className={styles.inputContainer}>
+          <textarea
+            className={styles.input}
+            data-testid="chat-view-input"
+            rows={1}
+            value={inputValue}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            ref={inputRef}
+            placeholder="Ask anything..."
+          />
+        </div>
 
-      <div className={styles.buttonContainer}>
-        <button
-          data-testid="chat-view-button"
-          ref={buttonRef}
-          className={styles.sendChatButton}
-          type="submit"
-          onClick={handleButtonClick}
-          aria-label="Send Chat"
-          disabled={!isRequesting && inputValue.length === 0}
-        >
-          {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
-        </button>
+        <div className={styles.buttonContainer}>
+          <button
+            data-testid="chat-view-button"
+            ref={buttonRef}
+            className={styles.sendChatButton}
+            type="submit"
+            onClick={handleButtonClick}
+            aria-label="Send Chat"
+            disabled={!isRequesting && inputValue.length === 0}
+          >
+            {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
