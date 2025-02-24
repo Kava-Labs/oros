@@ -18,7 +18,7 @@ const ChatInput = ({
   setShouldAutoScroll,
 }: ChatInputProps) => {
   const [showInputAdornmentMessage, setShowInputAdornmentMessage] =
-    useState(true);
+    useState(false);
   const [inputValue, setInputValue] = useState('');
 
   const { isRequesting, modelConfig } = useAppContext();

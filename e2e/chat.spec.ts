@@ -279,7 +279,6 @@ describe('chat', () => {
 
     const newChatIcon = page.getByRole('button', {
       name: 'New Chat',
-      exact: true,
     });
     await newChatIcon.click();
 
