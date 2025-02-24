@@ -62,7 +62,14 @@ const ChatInput = ({
     if (inputRef.current) {
       inputRef.current.style.height = DEFAULT_HEIGHT;
     }
-  }, [isRequesting, inputValue, onSubmit, onCancel, modelConfig]);
+  }, [
+    isRequesting,
+    inputValue,
+    modelConfig.messageProcessors,
+    onSubmit,
+    setShouldAutoScroll,
+    onCancel,
+  ]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter') {
@@ -85,6 +92,12 @@ const ChatInput = ({
     }
   }, [inputValue, setShouldAutoScroll]);
 
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
+
   return (
     <div className={styles.controls}>
       <div className={styles.inputContainer}>
@@ -97,7 +110,7 @@ const ChatInput = ({
           onKeyDown={handleKeyDown}
           ref={inputRef}
           placeholder="Ask anything..."
-        ></textarea>
+        />
       </div>
 
       <div className={styles.buttonContainer}>

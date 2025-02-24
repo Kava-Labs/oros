@@ -29,7 +29,6 @@ export const ChatView = ({
   introText,
 }: ChatViewProps) => {
   const { hasMessages } = useMessageHistory();
-  const inputRef = useRef<HTMLTextAreaElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Track if we should auto-scroll
@@ -75,12 +74,6 @@ export const ChatView = ({
   }, [shouldAutoScroll, scrollToBottom]);
 
   const { logo: Logo } = useTheme();
-
-  useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, []);
 
   return (
     <div className={styles.chatview} data-testid="chatview">
