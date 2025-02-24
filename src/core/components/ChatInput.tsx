@@ -2,6 +2,7 @@ import styles from './ChatInput.module.css';
 import { CancelChatIcon, SendChatIcon } from '../assets';
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useAppContext } from '../context/useAppContext';
+import { Paperclip } from 'lucide-react';
 
 const DEFAULT_HEIGHT = '30px';
 
@@ -22,6 +23,7 @@ const ChatInput = ({
 
   const buttonRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const uploadRef = useRef<HTMLInputElement>(null);
 
   const handleInputChange = useCallback(
     (event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -84,6 +86,13 @@ const ChatInput = ({
     }
   };
 
+  const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files?.length) {
+      const file = event.target.files[0];
+      alert('Uploaded: ' + file.name);
+    }
+  };
+
   // Reset textarea height when input is cleared
   useEffect(() => {
     if (inputRef.current && inputValue === '') {
@@ -97,6 +106,8 @@ const ChatInput = ({
       inputRef.current.focus();
     }
   }, []);
+
+  const [hover, setHover] = useState(false);
 
   return (
     <div className={styles.controls}>
@@ -125,6 +136,25 @@ const ChatInput = ({
         >
           {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
         </button>
+
+        <div className={styles.uploadInputFieldContainer}>
+          <input
+            ref={uploadRef}
+            type="file"
+            className={styles.uploadInputField}
+            onChange={handleUpload}
+          />
+        </div>
+
+        <Paperclip
+          onMouseEnter={() => setHover(true)}
+          onMouseLeave={() => setHover(false)}
+          color={hover ? '#FFFFFF' : 'rgb(180 180 180)'}
+          width="30px"
+          height="30px"
+          cursor="pointer"
+          onClick={() => uploadRef.current?.click()}
+        />
       </div>
     </div>
   );

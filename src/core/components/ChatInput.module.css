@@ -88,3 +88,12 @@
     border-radius: 50%;
   }
 }
+
+.uploadInputFieldContainer { 
+  margin-left: 0.4rem;
+  margin-right: 0.4rem;
+}
+
+.uploadInputField {
+  display: none;
+}
