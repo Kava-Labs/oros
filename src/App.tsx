@@ -10,7 +10,13 @@ import { MobileSideBar } from './core/components/MobileSideBar';
 import { MobileBackdrop } from './core/components/MobileBackdrop';
 
 export const App = () => {
+<<<<<<< HEAD
   const { isReady } = useAppContext();
+=======
+  const { isReady, modelConfig, hasConversations } = useAppContext();
+  const { messages } = useMessageHistory();
+
+>>>>>>> 8397b99 (feat: remove unneccesarry prop drilling for handlers that live in context)
   const isMobile = useIsMobile();
 
   /*
@@ -61,6 +67,12 @@ export const App = () => {
 
           <div className={styles.content}>
             <ChatView
+<<<<<<< HEAD
+=======
+              introText={modelConfig.introText}
+              cautionText={defaultCautionText}
+              messages={messages}
+>>>>>>> 8397b99 (feat: remove unneccesarry prop drilling for handlers that live in context)
               onMenu={() => setIsMobileSideBarOpen(true)}
               onPanelOpen={() => setIsDesktopSideBarHidden(false)}
               isPanelOpen={!isDesktopSideBarHidden}
