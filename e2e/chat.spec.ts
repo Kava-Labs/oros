@@ -268,6 +268,7 @@ describe('chat', () => {
     );
 
     await chat.waitForStreamToFinish();
+    await chat.waitForSummarizationToFinish();
     await chat.waitForAssistantResponse();
 
     const initialHistoryTitle = await page
@@ -285,6 +286,7 @@ describe('chat', () => {
     );
 
     await chat.waitForStreamToFinish();
+    await chat.waitForSummarizationToFinish();
     await chat.waitForAssistantResponse();
 
     //  Switching between conversation histories
