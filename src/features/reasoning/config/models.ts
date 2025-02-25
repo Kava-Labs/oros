@@ -18,8 +18,8 @@ export const reasoningModels: Record<
     icon: KavaIcon,
     description: 'Logical Analysis',
     tools: [],
-    //  https://github.com/deepseek-ai/DeepSeek-R1?tab=readme-ov-file#deepseek-r1-models
-    contextLength: 128000,
+    //  not running full 128K token context currently
+    contextLength: 8192,
     systemPrompt: defaultSystemPrompt,
     introText: defaultIntroText,
     inputPlaceholderText: defaultInputPlaceholderText,
