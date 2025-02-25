@@ -192,9 +192,12 @@ describe('updateTokenUsage', () => {
     vi.restoreAllMocks();
   });
 
-  it('should use API token counts when available', () => {
+  it('should use API token counts when available for deepseek', () => {
     const conversationID = 'test-conversation-id';
-    const modelConfig = { contextLength: 4000 } as ModelConfig;
+    const modelConfig = {
+      contextLength: 4000,
+      id: 'deepseek-r1',
+    } as ModelConfig;
 
     localStorageMock['conversations'] = JSON.stringify({
       [conversationID]: {

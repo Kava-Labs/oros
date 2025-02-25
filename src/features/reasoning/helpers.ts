@@ -112,7 +112,12 @@ export const updateTokenUsage = (
   messageHistoryStore: MessageHistoryStore,
 ) => {
   // Extract token usage from the API response
-  const tokenUsage = extractTokenUsageFromChunk(apiResponse);
+  const tokenUsage =
+    modelConfig.id === 'deepseek-r1'
+      ? extractTokenUsageFromChunk(apiResponse)
+      : 0;
+
+  console.log('tokenUsage', tokenUsage);
 
   if (!tokenUsage) {
     // If we don't have token usage from the API, estimate it

@@ -28,10 +28,7 @@ import { ExecuteOperation } from '../../core/context/types';
 import { v4 as uuidv4 } from 'uuid';
 import { formatConversationTitle } from '../utils/conversation/helpers';
 import { ChatCompletionChunk } from 'openai/resources/index';
-import {
-  estimateTokenUsage,
-  updateTokenUsage,
-} from '../../features/reasoning/helpers';
+import { estimateTokenUsage } from '../../features/reasoning/helpers';
 
 let client: OpenAI | null = null;
 
