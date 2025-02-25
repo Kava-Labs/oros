@@ -546,7 +546,7 @@ async function syncWithLocalStorage(
   modelConfig: ModelConfig,
   messageHistoryStore: MessageHistoryStore,
   client: OpenAI,
-  apiResponse?: ChatCompletionChunk, // Optional response for token tracking
+  finalChunk?: ChatCompletionChunk, // Optional response for token tracking
 ) {
   const { id, contextLength } = modelConfig;
   const messages = messageHistoryStore.getSnapshot();
@@ -564,15 +564,16 @@ async function syncWithLocalStorage(
   // Calculate tokens remaining based on model
   let tokensRemaining: number;
 
+  //  todo - refactor deepseek to use a modelConfig.contextLimitMonitor
+  //  and simplify conditional
   const isDeepseekModel = id.includes('deepseek');
   const isGPTModel = id.includes('gpt');
 
-  // Determine tokens remaining based on the model type
-  if (apiResponse && apiResponse.usage && apiResponse.usage.total_tokens) {
+  if (finalChunk && finalChunk.usage && finalChunk.usage.total_tokens) {
     // If we have API response with token usage, use it
     tokensRemaining = Math.max(
       0,
-      contextLength - apiResponse.usage.total_tokens,
+      contextLength - finalChunk.usage.total_tokens,
     );
   } else if (isDeepseekModel) {
     // For Deepseek models without API response, use estimation
@@ -580,20 +581,11 @@ async function syncWithLocalStorage(
     tokensRemaining = Math.max(0, contextLength - estimatedUsage.totalTokens);
   } else if (isGPTModel && modelConfig.contextLimitMonitor) {
     // For GPT models with contextLimitMonitor
-    try {
-      const metrics = await modelConfig.contextLimitMonitor(
-        messages,
-        contextLength,
-      );
-      tokensRemaining = metrics.tokensRemaining;
-    } catch (error) {
-      // Fallback to default if monitoring fails
-      tokensRemaining = contextLength;
-      console.error('Error calculating token usage:', error);
-    }
-  } else {
-    // Default fallback
-    tokensRemaining = contextLength;
+    const metrics = await modelConfig.contextLimitMonitor(
+      messages,
+      contextLength,
+    );
+    tokensRemaining = metrics.tokensRemaining;
   }
 
   const history: ConversationHistory = {
