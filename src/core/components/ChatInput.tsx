@@ -138,22 +138,6 @@ const ChatInput = ({
           </button>
         </div>
       </div>
-      <div className={styles.buttonContainer}>
-        <button
-          data-testid="chat-view-button"
-          ref={buttonRef}
-          className={styles.sendChatButton}
-          type="submit"
-          onClick={handleButtonClick}
-          aria-label="Send Chat"
-          disabled={
-            (!isRequesting && inputValue.length === 0) ||
-            !isWithinTokenLimit(inputValue, modelConfig.contextLength)
-          }
-        >
-          {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
-        </button>
-      </div>
     </>
   );
 };
