@@ -110,6 +110,7 @@ describe('groupConversationsByTime', () => {
         lastSaved: now - 1000 * 60 * 60 * 2, // 2 hours ago
         conversation: [],
         model: 'gpt-4o-mini',
+        tokensRemaining: 128000,
       },
       {
         id: '2',
@@ -117,6 +118,7 @@ describe('groupConversationsByTime', () => {
         lastSaved: now - 1000 * 60 * 60 * 25, // 25 hours ago
         conversation: [],
         model: 'gpt-4o-mini',
+        tokensRemaining: 128000,
       },
       {
         id: '3',
@@ -124,6 +126,7 @@ describe('groupConversationsByTime', () => {
         lastSaved: now - 1000 * 60 * 60 * 24 * 5, // 5 days ago
         conversation: [],
         model: 'gpt-4o-mini',
+        tokensRemaining: 128000,
       },
     ];
   });
@@ -148,6 +151,7 @@ describe('groupConversationsByTime', () => {
       lastSaved: now - 1000 * 60 * 60, // 1 hour ago
       conversation: [],
       model: 'gpt-4o-mini',
+      tokensRemaining: 128000,
     };
     mockConversations.push(anotherTodayChat);
 
@@ -195,6 +199,7 @@ describe('groupAndFilterConversations', () => {
         lastSaved: now - 1000 * 60 * 60 * 2,
         conversation: mockConversation,
         model: 'gpt-4o-mini',
+        tokensRemaining: 128000,
       },
       {
         id: '2',
@@ -202,6 +207,7 @@ describe('groupAndFilterConversations', () => {
         lastSaved: now - 1000 * 60 * 60 * 25,
         conversation: [],
         model: 'gpt-4o-mini',
+        tokensRemaining: 128000,
       },
       {
         id: '3',
@@ -209,6 +215,7 @@ describe('groupAndFilterConversations', () => {
         lastSaved: now - 1000 * 60 * 60 * 24 * 5,
         conversation: [],
         model: 'gpt-4o-mini',
+        tokensRemaining: 128000,
       },
     ];
   });
@@ -254,6 +261,7 @@ describe('formatContentSnippet', () => {
     title: 'Test Conversation',
     model: 'test-model',
     lastSaved: Date.now(),
+    tokensRemaining: 128000,
     conversation: [
       {
         role: 'system',
