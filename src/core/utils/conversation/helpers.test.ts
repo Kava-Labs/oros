@@ -349,17 +349,17 @@ describe('formatContentSnippet', () => {
 });
 
 describe('calculateContextMetrics', () => {
-  const MAX_TOKENS = blockchainModels['gpt-4o'].contextLength;
+  const maxTokens = blockchainModels['gpt-4o'].contextLength;
 
   it('initializing with system prompt', async () => {
     const mockMessages: ChatMessage[] = [
       { role: 'system', content: 'I am helpful' },
     ];
-    const result = await calculateContextMetrics(mockMessages, MAX_TOKENS);
+    const result = await calculateContextMetrics(mockMessages, maxTokens);
 
     expect(result).toEqual({
       tokensUsed: 10, //  amount from the system prompt
-      tokensRemaining: MAX_TOKENS - 10,
+      tokensRemaining: maxTokens - 10,
       percentageRemaining: 99.9,
     });
   });
@@ -372,11 +372,11 @@ describe('calculateContextMetrics', () => {
         content: 'Lorem ipsum odor amet, consectetuer adipiscing elit.',
       },
     ];
-    const result = await calculateContextMetrics(mockMessages, MAX_TOKENS);
+    const result = await calculateContextMetrics(mockMessages, maxTokens);
 
     expect(result).toEqual({
       tokensUsed: 25, //  additional tokens used
-      tokensRemaining: MAX_TOKENS - 25,
+      tokensRemaining: maxTokens - 25,
       percentageRemaining: 99.9,
     });
 
@@ -387,12 +387,12 @@ describe('calculateContextMetrics', () => {
 
     const updatedResult = await calculateContextMetrics(
       updatedMessages,
-      MAX_TOKENS,
+      maxTokens,
     );
 
     expect(updatedResult).toEqual({
       tokensUsed: 34, //  more tokens used
-      tokensRemaining: MAX_TOKENS - 34,
+      tokensRemaining: maxTokens - 34,
       percentageRemaining: 99.9,
     });
   });
@@ -401,11 +401,11 @@ describe('calculateContextMetrics', () => {
     const mockMessages: ChatMessage[] = [
       { role: 'system', content: 'Make a giant string'.repeat(30000) },
     ];
-    const result = await calculateContextMetrics(mockMessages, MAX_TOKENS);
+    const result = await calculateContextMetrics(mockMessages, maxTokens);
 
     expect(result).toEqual({
       tokensUsed: 120007,
-      tokensRemaining: MAX_TOKENS - 120007,
+      tokensRemaining: maxTokens - 120007,
       percentageRemaining: 6.2,
     });
   });
