@@ -570,20 +570,19 @@ async function syncWithLocalStorage(
   }
 
   const isDeepseekModel = id.includes('deepseek');
-  const isGPTModel = id.includes('gpt');
 
-  // Now decrement based on new tokens used in this interaction
-  if (finalChunk && finalChunk.usage && finalChunk.usage.total_tokens) {
-    // If we have API response with token usage for this interaction
-    const newTokensUsed = finalChunk.usage.total_tokens;
-    tokensRemaining = Math.max(0, tokensRemaining - newTokensUsed);
-  } else if (isDeepseekModel) {
-    // For Deepseek models, calculate token usage
-    // Note: This might need adjustment to only count new messages
-    const estimatedUsage = estimateTokenUsage(messages);
-    tokensRemaining = Math.max(0, contextLength - estimatedUsage.totalTokens);
-  } else if (isGPTModel && modelConfig.contextLimitMonitor) {
-    // For GPT models with contextLimitMonitor
+  if (isDeepseekModel) {
+    if (finalChunk && finalChunk.usage && finalChunk.usage.total_tokens) {
+      // If we have API response with token usage for this interaction
+      const newTokensUsed = finalChunk.usage.total_tokens;
+      tokensRemaining = Math.max(0, tokensRemaining - newTokensUsed);
+    } else {
+      // if the api response fails, fall back to an estimation
+      const estimatedUsage = estimateTokenUsage(messages);
+      tokensRemaining = Math.max(0, contextLength - estimatedUsage.totalTokens);
+    }
+    //  GPT model with contextLimitMonitor
+  } else if (modelConfig.contextLimitMonitor) {
     const metrics = await modelConfig.contextLimitMonitor(
       messages,
       contextLength,
