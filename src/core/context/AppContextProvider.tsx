@@ -577,7 +577,7 @@ async function syncWithLocalStorage(
   } else if (isDeepseekModel) {
     // For Deepseek models without API response, use estimation
     const estimatedUsage = estimateTokenUsage(messages);
-    tokensRemaining = Math.max(0, contextLength - estimatedUsage.total_tokens);
+    tokensRemaining = Math.max(0, contextLength - estimatedUsage.totalTokens);
   } else if (isGPTModel && modelConfig.contextLimitMonitor) {
     // For GPT models with contextLimitMonitor
     try {

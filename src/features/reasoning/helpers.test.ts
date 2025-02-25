@@ -23,9 +23,9 @@ describe('estimateTokenUsage', () => {
 
     // "Hello, how are you?" is 19 chars, so ~5 tokens
     // "I am doing well, thank you for asking!" is 42 chars, so ~10 tokens
-    expect(result.prompt_tokens).toBe(5);
-    expect(result.completion_tokens).toBe(10);
-    expect(result.total_tokens).toBe(15);
+    expect(result.promptTokens).toBe(5);
+    expect(result.completionTokens).toBe(10);
+    expect(result.totalTokens).toBe(15);
   });
 
   it('should handle empty messages', () => {
@@ -36,9 +36,9 @@ describe('estimateTokenUsage', () => {
 
     const result = estimateTokenUsage(messages);
 
-    expect(result.prompt_tokens).toBe(0);
-    expect(result.completion_tokens).toBe(0);
-    expect(result.total_tokens).toBe(0);
+    expect(result.promptTokens).toBe(0);
+    expect(result.completionTokens).toBe(0);
+    expect(result.totalTokens).toBe(0);
   });
 
   it('should correctly categorize tokens by role', () => {
@@ -54,9 +54,9 @@ describe('estimateTokenUsage', () => {
 
     //  User messages + system = (14 + 14 + 14)/4 ≈ 11 tokens
     //  Assistant messages = (20 + 20)/4 ≈ 10 tokens
-    expect(result.prompt_tokens).toBe(12);
-    expect(result.completion_tokens).toBe(10);
-    expect(result.total_tokens).toBe(22);
+    expect(result.promptTokens).toBe(12);
+    expect(result.completionTokens).toBe(10);
+    expect(result.totalTokens).toBe(22);
   });
 });
 
@@ -82,7 +82,7 @@ describe('updateConversationTokens', () => {
   it('should update tokens remaining for an existing conversation', () => {
     const conversationID = 'test-conversation-id';
     const modelConfig = { contextLength: 4000 };
-    const usageInfo = { total_tokens: 1000 };
+    const usageInfo = { totalTokens: 1000 };
 
     localStorageMock['conversations'] = JSON.stringify({
       [conversationID]: {
@@ -99,7 +99,7 @@ describe('updateConversationTokens', () => {
   it('should return context length when conversation does not exist', () => {
     const conversationID = 'non-existent-conversation';
     const modelConfig = { contextLength: 4000 };
-    const usageInfo = { total_tokens: 1000 };
+    const usageInfo = { totalTokens: 1000 };
 
     localStorageMock['conversations'] = JSON.stringify({});
 
@@ -117,7 +117,7 @@ describe('updateConversationTokens', () => {
   it('should cap tokens remaining at zero when usage exceeds context length', () => {
     const conversationID = 'test-conversation-id';
     const modelConfig = { contextLength: 1000 };
-    const usageInfo = { total_tokens: 1500 };
+    const usageInfo = { totalTokens: 1500 };
 
     localStorageMock['conversations'] = JSON.stringify({
       [conversationID]: {
@@ -136,18 +136,18 @@ describe('extractTokenUsageFromChunk', () => {
   it('should extract token usage from a valid chunk', () => {
     const chunk = {
       usage: {
-        total_tokens: 100,
-        prompt_tokens: 60,
-        completion_tokens: 40,
+        totalTokens: 100,
+        promptTokens: 60,
+        completionTokens: 40,
       },
-    } as ChatCompletionChunk;
+    } as unknown as ChatCompletionChunk;
 
     const result = extractTokenUsageFromChunk(chunk);
 
     expect(result).toEqual({
-      total_tokens: 100,
-      prompt_tokens: 60,
-      completion_tokens: 40,
+      totalTokens: 100,
+      promptTokens: 60,
+      completionTokens: 40,
     });
   });
 
@@ -206,11 +206,11 @@ describe('updateTokenUsage', () => {
     });
     const apiResponse = {
       usage: {
-        total_tokens: 150,
-        prompt_tokens: 50,
-        completion_tokens: 100,
+        totalTokens: 150,
+        promptTokens: 50,
+        completionTokens: 100,
       },
-    } as ChatCompletionChunk;
+    } as unknown as ChatCompletionChunk;
 
     updateTokenUsage(
       conversationID,

@@ -14,9 +14,9 @@ import { ModelConfig } from '../../core/types/models';
 export const estimateTokenUsage = (
   messages: ChatMessage[],
 ): {
-  total_tokens: number;
-  prompt_tokens: number;
-  completion_tokens: number;
+  totalTokens: number;
+  promptTokens: number;
+  completionTokens: number;
 } => {
   // Very rough token estimation (about 4 chars per token)
   let promptTokens = 0;
@@ -34,9 +34,9 @@ export const estimateTokenUsage = (
   });
 
   return {
-    prompt_tokens: promptTokens,
-    completion_tokens: completionTokens,
-    total_tokens: promptTokens + completionTokens,
+    promptTokens: promptTokens,
+    completionTokens: completionTokens,
+    totalTokens: promptTokens + completionTokens,
   };
 };
 
@@ -50,7 +50,7 @@ export const estimateTokenUsage = (
 export const updateConversationTokens = (
   conversationID: string,
   modelConfig: { contextLength: number },
-  usageInfo: { total_tokens: number },
+  usageInfo: { totalTokens: number },
 ) => {
   const { contextLength } = modelConfig;
 
@@ -67,7 +67,7 @@ export const updateConversationTokens = (
   // Update the conversation
   conversation.tokensRemaining = Math.max(
     0,
-    contextLength - usageInfo.total_tokens,
+    contextLength - usageInfo.totalTokens,
   );
   conversation.lastSaved = new Date().valueOf();
 
@@ -89,9 +89,9 @@ export const extractTokenUsageFromChunk = (chunk: ChatCompletionChunk) => {
   const usage = chunk.usage;
 
   return {
-    total_tokens: usage.total_tokens,
-    prompt_tokens: usage.prompt_tokens,
-    completion_tokens: usage.completion_tokens,
+    totalTokens: usage.total_tokens,
+    promptTokens: usage.prompt_tokens,
+    completionTokens: usage.completion_tokens,
   };
 };
 
@@ -116,8 +116,6 @@ export const updateTokenUsage = (
     modelConfig.id === 'deepseek-r1'
       ? extractTokenUsageFromChunk(apiResponse)
       : 0;
-
-  console.log('tokenUsage', tokenUsage);
 
   if (!tokenUsage) {
     // If we don't have token usage from the API, estimate it
