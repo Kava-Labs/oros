@@ -146,10 +146,14 @@ export const AppContextProvider = (props: {
     [conversations],
   );
 
-  const handleModelChange = useCallback((modelName: SupportedModels) => {
-    const newConfig = getModelConfig(modelName);
-    setModelConfig(newConfig);
-  }, []);
+  const handleModelChange = useCallback(
+    (modelName: SupportedModels) => {
+      messageHistoryStore.reset();
+      const newConfig = getModelConfig(modelName);
+      setModelConfig(newConfig);
+    },
+    [messageHistoryStore],
+  );
 
   const { executeOperation, isOperationValidated } = useExecuteOperation(
     registry,
