@@ -18,6 +18,7 @@ export type ConversationHistory = {
   title: string;
   conversation: ChatCompletionMessageParam[];
   lastSaved: number;
+  tokensRemaining: number;
 };
 
 export type ActiveConversation = {
@@ -56,3 +57,8 @@ export type AppContextType = {
   conversations: ConversationHistory[];
   hasConversations: boolean;
 };
+
+export interface TextChatMessage {
+  role: 'system' | 'assistant' | 'user';
+  content: string;
+}

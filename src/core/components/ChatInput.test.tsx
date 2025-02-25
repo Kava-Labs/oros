@@ -67,7 +67,30 @@ describe('ChatInput', () => {
     fireEvent.change(input, { target: { value: 'How are you?' } });
     expect(sendChatButton).toBeEnabled();
   });
-  test.todo(
-    'Inputs larger than the available context window disable the send button',
-  );
+  test('Inputs larger than the available context window disable the send button', () => {
+    const wrapper = render(
+      <ThemeProvider>
+        <AppContextProvider
+          errorStore={errorStore}
+          thinkingStore={thinkingStore}
+          progressStore={progressStore}
+          messageStore={messageStore}
+          toolCallStreamStore={toolCallStreamStore}
+          walletStore={walletStore}
+          messageHistoryStore={messageHistoryStore}
+        >
+          <ChatInput {...props} />
+        </AppContextProvider>
+      </ThemeProvider>,
+    );
+    const input = wrapper.getByTestId('chat-view-input');
+
+    const sendChatButton = wrapper.getByRole('button', { name: 'Send Chat' });
+
+    fireEvent.change(input, { target: { value: 'Token '.repeat(10) } });
+    expect(sendChatButton).toBeEnabled();
+
+    fireEvent.change(input, { target: { value: 'Token '.repeat(10 ** 6) } });
+    expect(sendChatButton).toBeDisabled();
+  });
 });

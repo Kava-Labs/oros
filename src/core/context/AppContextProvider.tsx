@@ -230,7 +230,7 @@ export const AppContextProvider = (props: {
       // save to local storage (pre-request with user's prompt)
       syncWithLocalStorage(
         conversationID,
-        modelConfig.id,
+        modelConfig,
         messageHistoryStore,
         client,
       );
@@ -274,7 +274,7 @@ export const AppContextProvider = (props: {
         // save to local storage (post-request with assistant's response)
         syncWithLocalStorage(
           conversationID,
-          modelConfig.id,
+          modelConfig,
           messageHistoryStore,
           client,
         );
@@ -528,10 +528,13 @@ async function callTools(
 
 async function syncWithLocalStorage(
   conversationID: string,
-  modelID: string,
+  modelConfig: ModelConfig,
   messageHistoryStore: MessageHistoryStore,
   client: OpenAI,
+  //  todo - reimplement with deepseek
+  // apiResponse?: ChatCompletionChunk, // Optional response for token tracking
 ) {
+  const { id, contextLength } = modelConfig;
   const messages = messageHistoryStore.getSnapshot();
   const firstUserMessage = messages.find((msg) => msg.role === 'user');
   if (!firstUserMessage) return;
@@ -543,12 +546,39 @@ async function syncWithLocalStorage(
   );
 
   const existingConversation = allConversations[conversationID];
+
+  let tokensRemaining = contextLength;
+
+  const isDeepseekModel = id.includes('deepseek');
+  const isGPTModel = id.includes('gpt');
+
+  //  todo - refactor to use modelConfig for both and simplify conditionals
+  if (isDeepseekModel) {
+    //  If we get a response with usage, use that to calculate
+  } else {
+    //  todo - plug in deepseek approximation function
+  }
+
+  //  type guard won't be necessary when all model configs have a contextLimitMonitor
+  if (isGPTModel && modelConfig.contextLimitMonitor) {
+    try {
+      const metrics = await modelConfig.contextLimitMonitor(
+        messages,
+        contextLength,
+      );
+      tokensRemaining = metrics.tokensRemaining;
+    } catch {
+      //  estimate the amount
+    }
+  }
+
   const history: ConversationHistory = {
     id: conversationID,
-    model: existingConversation ? existingConversation.model : modelID,
+    model: existingConversation ? existingConversation.model : id,
     title: 'New Chat', // initial & fallback value
     conversation: messages,
     lastSaved: new Date().valueOf(),
+    tokensRemaining,
   };
 
   if (existingConversation && existingConversation.conversation.length <= 4) {

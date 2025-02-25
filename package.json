@@ -31,6 +31,7 @@
     "dompurify": "^3.2.2",
     "dotenv": "^16.4.7",
     "ethers": "^6.13.4",
+    "gpt-tokenizer": "^2.8.1",
     "highlight.js": "^11.11.1",
     "long": "^5.2.3",
     "lucide-react": "^0.469.0",

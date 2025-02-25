@@ -3,6 +3,7 @@ import { CancelChatIcon, SendChatIcon } from '../assets';
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useAppContext } from '../context/useAppContext';
 import { InputAdornmentMessage } from './InputAdornmentMessage';
+import { isWithinTokenLimit } from 'gpt-tokenizer';
 
 const DEFAULT_HEIGHT = '30px';
 
@@ -120,7 +121,6 @@ const ChatInput = ({
             placeholder="Ask anything..."
           />
         </div>
-
         <div className={styles.buttonContainer}>
           <button
             data-testid="chat-view-button"
@@ -129,7 +129,10 @@ const ChatInput = ({
             type="submit"
             onClick={handleButtonClick}
             aria-label="Send Chat"
-            disabled={!isRequesting && inputValue.length === 0}
+            disabled={
+              (!isRequesting && inputValue.length === 0) ||
+              !isWithinTokenLimit(inputValue, modelConfig.contextLength)
+            }
           >
             {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
           </button>
