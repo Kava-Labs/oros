@@ -75,17 +75,12 @@ export const updateConversationTokens = (
   localStorage.setItem('conversations', JSON.stringify(allConversations));
 };
 
-export /**
+/**
  * Extracts token usage from a Deepseek API response chunk
  * @param chunk - The final chunk from a streaming API response
  * @returns An object with token usage information or null if not available
  */
-function extractTokenUsageFromChunk(chunk: ChatCompletionChunk): {
-  total_tokens: number;
-  prompt_tokens: number;
-  completion_tokens: number;
-  reasoning_tokens?: number;
-} | null {
+export const extractTokenUsageFromChunk = (chunk: ChatCompletionChunk) => {
   // Check if this is the final chunk with usage information
   if (!chunk || !chunk.usage) {
     return null;
@@ -98,16 +93,24 @@ function extractTokenUsageFromChunk(chunk: ChatCompletionChunk): {
     prompt_tokens: usage.prompt_tokens,
     completion_tokens: usage.completion_tokens,
   };
-}
+};
 
-// Helper function to update token usage in localStorage
-export function updateTokenUsage(
+/**
+ * Updates token usage information for a conversation
+ * First attempts to extract token usage from API response, then falls back to estimation
+ *
+ * @param conversationID - The unique identifier for the conversation
+ * @param modelConfig - Configuration for the model, containing context length
+ * @param apiResponse - Response from the API, potentially containing token usage data
+ * @param messageHistoryStore - Store containing message history for token estimation
+ * @returns Context length remaining after update (returned from updateConversationTokens)
+ */
+export const updateTokenUsage = (
   conversationID: string,
   modelConfig: ModelConfig,
   apiResponse: ChatCompletionChunk,
   messageHistoryStore: MessageHistoryStore,
-) {
-  console.log('updating token usage');
+) => {
   // Extract token usage from the API response
   const tokenUsage = extractTokenUsageFromChunk(apiResponse);
 
@@ -121,4 +124,5 @@ export function updateTokenUsage(
       estimatedUsage,
     );
   }
-}
+  return updateConversationTokens(conversationID, modelConfig, tokenUsage);
+};
