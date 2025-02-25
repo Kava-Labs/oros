@@ -1,4 +1,4 @@
-package handlers
+package handlers_test
 
 import (
 	"bytes"
@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/kava-labs/kavachat/api/internal/config"
+	"github.com/kava-labs/kavachat/api/internal/handlers"
 	"github.com/kava-labs/kavachat/api/internal/middleware"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
@@ -44,7 +45,7 @@ func TestOpenAIProxyHandler_MultipleBackends(t *testing.T) {
 		AllowedModels: []string{"gpt-4o-mini"},
 	}
 
-	handler := NewOpenAIProxyHandler(
+	handler := handlers.NewOpenAIChatHandler(
 		config.OpenAIBackends{
 			backend1,
 			backend2,
@@ -120,7 +121,7 @@ func TestOpenAIProxyHandler_BackendError(t *testing.T) {
 		AllowedModels: []string{"gpt-4o-mini"},
 	}
 
-	handler := NewOpenAIProxyHandler(config.OpenAIBackends{backend}, &logger, "/v1/chat/completions")
+	handler := handlers.NewOpenAIChatHandler(config.OpenAIBackends{backend}, &logger, "/v1/chat/completions")
 
 	req := httptest.NewRequest("POST", "/v1/chat/completions", bytes.NewBufferString(`{"prompt":"Error"}`))
 

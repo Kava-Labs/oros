@@ -19,6 +19,7 @@ import (
 	"github.com/kava-labs/kavachat/api/internal/config"
 	"github.com/kava-labs/kavachat/api/internal/handlers"
 	"github.com/kava-labs/kavachat/api/internal/middleware"
+	"github.com/kava-labs/kavachat/api/internal/types"
 )
 
 func main() {
@@ -111,25 +112,23 @@ func main() {
 		r.Use(middleware.ExtractModelMiddleware(logger))
 		r.Use(middleware.ModelAllowlistMiddleware(logger, cfg.Backends))
 
-		chatCompletionsRoute := "/chat/completions"
-		r.With(metricsMiddleware.WitHandlerName(chatCompletionsRoute)).
+		r.With(metricsMiddleware.WitHandlerName(types.ChatCompletionEndpoint.String())).
 			Handle(
-				chatCompletionsRoute,
-				handlers.NewOpenAIProxyHandler(
+				types.ChatCompletionEndpoint.String(),
+				handlers.NewOpenAIChatHandler(
 					cfg.Backends,
 					logger,
-					chatCompletionsRoute,
+					types.ChatCompletionEndpoint,
 				),
 			)
 
-		imageGenerationsRoute := "/images/generations"
-		r.With(metricsMiddleware.WitHandlerName(imageGenerationsRoute)).
+		r.With(metricsMiddleware.WitHandlerName(types.ImageGenerationsEndpoint.String())).
 			Handle(
-				imageGenerationsRoute,
-				handlers.NewOpenAIProxyHandler(
+				types.ImageGenerationsEndpoint.String(),
+				handlers.NewBasicOpenAIProxyHandler(
 					cfg.Backends,
 					logger,
-					imageGenerationsRoute,
+					types.ImageGenerationsEndpoint,
 				),
 			)
 	})

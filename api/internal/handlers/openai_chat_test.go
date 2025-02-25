@@ -1,0 +1,143 @@
+package handlers_test
+
+import (
+	"testing"
+
+	"github.com/kava-labs/kavachat/api/internal/handlers"
+	openai "github.com/sashabaranov/go-openai"
+	"github.com/stretchr/testify/assert"
+)
+
+func TestLatestUserContentHasImage(t *testing.T) {
+	tests := []struct {
+		name     string
+		request  openai.ChatCompletionRequest
+		expected []openai.ChatMessagePart
+	}{
+		{
+			"Empty Messages",
+			openai.ChatCompletionRequest{
+				Messages: []openai.ChatCompletionMessage{},
+			},
+			nil,
+		},
+		{
+			"No User Message Content",
+			openai.ChatCompletionRequest{
+				Messages: []openai.ChatCompletionMessage{
+					{
+						Role:    openai.ChatMessageRoleSystem,
+						Content: "System message",
+					},
+				},
+			},
+			nil,
+		},
+		{
+			"Text User Message Content",
+			openai.ChatCompletionRequest{
+				Messages: []openai.ChatCompletionMessage{
+					{
+						Role:    openai.ChatMessageRoleUser,
+						Content: "hello there",
+					},
+				},
+			},
+			nil,
+		},
+		{
+			"Valid Image URL in User Message Content",
+			openai.ChatCompletionRequest{
+				Messages: []openai.ChatCompletionMessage{
+					{
+						Role: openai.ChatMessageRoleUser,
+						MultiContent: []openai.ChatMessagePart{
+							{
+								Type: "image_url",
+								ImageURL: &openai.ChatMessageImageURL{
+									URL: "http://example.com/image.jpg",
+								},
+							},
+						},
+					},
+				},
+			},
+			[]openai.ChatMessagePart{
+				{
+					Type: "image_url",
+					ImageURL: &openai.ChatMessageImageURL{
+						URL: "http://example.com/image.jpg",
+					},
+				},
+			},
+		},
+		{
+			"With previous user messages",
+			openai.ChatCompletionRequest{
+				Messages: []openai.ChatCompletionMessage{
+					{
+						Role:    openai.ChatMessageRoleUser,
+						Content: "Some text content",
+					},
+					{
+						Role:    openai.ChatMessageRoleAssistant,
+						Content: "response",
+					},
+					{
+						Role: openai.ChatMessageRoleUser,
+						MultiContent: []openai.ChatMessagePart{
+							{
+								Type: "image_url",
+								ImageURL: &openai.ChatMessageImageURL{
+									URL: "http://example.com/image",
+								},
+							},
+						},
+					},
+				},
+			},
+			[]openai.ChatMessagePart{
+				{
+					Type: "image_url",
+					ImageURL: &openai.ChatMessageImageURL{
+						URL: "http://example.com/image",
+					},
+				},
+			},
+		},
+		{
+			"Followup after image",
+			openai.ChatCompletionRequest{
+				Messages: []openai.ChatCompletionMessage{
+					{
+						Role: openai.ChatMessageRoleUser,
+						MultiContent: []openai.ChatMessagePart{
+							{
+								Type: "image_url",
+								ImageURL: &openai.ChatMessageImageURL{
+									URL: "http://example.com/image",
+								},
+							},
+						},
+					},
+					{
+						Role:    openai.ChatMessageRoleAssistant,
+						Content: "response",
+					},
+					{
+						Role:    openai.ChatMessageRoleUser,
+						Content: "Some text content",
+					},
+				},
+			},
+			nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := handlers.GetLatestUserContentImages(tt.request)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}

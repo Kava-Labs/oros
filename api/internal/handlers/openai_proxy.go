@@ -1,33 +1,34 @@
 package handlers
 
 import (
-	"encoding/json"
 	"io"
 	"net/http"
 
 	"github.com/kava-labs/kavachat/api/internal/config"
 	"github.com/kava-labs/kavachat/api/internal/middleware"
+	"github.com/kava-labs/kavachat/api/internal/types"
+
 	"github.com/rs/zerolog"
 )
 
-type openaiProxyHandler struct {
+type basicOpenAIProxyHandler struct {
 	backends config.OpenAIBackends
 	logger   *zerolog.Logger
-	endpoint string
+	endpoint types.OpenAIEndpoint
 }
 
-// NewOpenAIProxyHandler creates a new handler that proxies requests to the OpenAI API
-func NewOpenAIProxyHandler(
+// NewBasicOpenAIProxyHandler creates a new handler that proxies requests to the OpenAI API
+func NewBasicOpenAIProxyHandler(
 	backends config.OpenAIBackends,
 	baseLogger *zerolog.Logger,
-	endpoint string,
+	endpoint types.OpenAIEndpoint,
 ) http.Handler {
 	logger := baseLogger.With().
-		Str("handler", "openai_proxy").
-		Str("endpoint", endpoint).
+		Str("handler", "openai_proxy_basic").
+		Stringer("endpoint", endpoint).
 		Logger()
 
-	return openaiProxyHandler{
+	return basicOpenAIProxyHandler{
 		backends: backends,
 		logger:   &logger,
 		endpoint: endpoint,
@@ -35,22 +36,29 @@ func NewOpenAIProxyHandler(
 }
 
 // ServeHTTP forwards the request to the OpenAI API
-func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h basicOpenAIProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	model := r.Context().Value(middleware.CTX_REQ_MODEL_KEY).(string)
 	backend, found := h.backends.GetBackendFromModel(model)
 	if !found {
 		h.logger.Error().Msgf("error finding backend for model: %s", model)
 
-		// Not OpenAI compatible, backend should be found in the middleware
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusInternalServerError)
-
+		RespondAPIError(w, http.StatusInternalServerError, "error finding backend for model")
 		return
 	}
 
+	h.forwardOpenAIRequest(w, r, backend)
+}
+
+// forwardOpenAIRequest forwards the request to the OpenAI API and writes the
+// response back to the client
+func (h basicOpenAIProxyHandler) forwardOpenAIRequest(
+	w http.ResponseWriter,
+	r *http.Request,
+	backend *config.OpenAIBackend,
+) {
 	h.logger.Debug().Msgf(
-		"forwarding request for model '%s' to backend '%s'",
-		model, backend.Name,
+		"forwarding request for model to backend '%s'",
+		backend.Name,
 	)
 
 	client := backend.GetClient()
@@ -58,7 +66,7 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Forward request to OpenAI API
 	apiResponse, err := client.DoRequest(
 		r.Method,
-		h.endpoint,
+		h.endpoint.String(),
 		r.Body,
 	)
 	if err != nil {
@@ -67,9 +75,7 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			backend.Name, err.Error(),
 		)
 
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(err)
-
+		RespondAPIError(w, http.StatusInternalServerError, "error forwarding request to model")
 		return
 	}
 	defer apiResponse.Body.Close()
@@ -78,7 +84,6 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", apiResponse.Header.Get("Content-Type"))
 	w.Header().Set("Transfer-Encoding", "identity")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-
 	w.WriteHeader(apiResponse.StatusCode)
 
 	// Forward response body, straight copy from response which includes streaming
