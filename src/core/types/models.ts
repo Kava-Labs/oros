@@ -14,6 +14,10 @@ export interface BaseModelConfig {
   icon: ComponentType;
   description: string;
   contextLength: number;
+  contextLimitMonitor?: (
+    messages: ChatMessage[],
+    contextLimit: number,
+  ) => Promise<ContextMetrics>;
   tools: ChatCompletionTool[];
   systemPrompt: string;
   introText: string;
@@ -36,10 +40,6 @@ export interface BaseModelConfig {
     preProcess?: (message: string) => string;
     postProcess?: (message: string) => string;
   };
-  contextLimitMonitor: (
-    messages: ChatMessage[],
-    contextLimit: number,
-  ) => Promise<ContextMetrics>;
 }
 export interface BlockchainModelConfig extends BaseModelConfig {
   tools: ChatCompletionTool[];

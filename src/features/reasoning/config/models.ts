@@ -5,7 +5,6 @@ import {
   defaultInputPlaceholderText,
 } from './prompts/defaultPrompts';
 import KavaIcon from '../../../core/assets/KavaIcon';
-import { calculateContextMetrics } from '../../../core/utils/conversation/helpers';
 
 export type SupportedReasoningModels = 'deepseek-r1';
 
@@ -21,7 +20,6 @@ export const reasoningModels: Record<
     tools: [],
     //  https://github.com/deepseek-ai/DeepSeek-R1?tab=readme-ov-file#deepseek-r1-models
     contextLength: 128000,
-    contextLimitMonitor: calculateContextMetrics,
     systemPrompt: defaultSystemPrompt,
     introText: defaultIntroText,
     inputPlaceholderText: defaultInputPlaceholderText,
