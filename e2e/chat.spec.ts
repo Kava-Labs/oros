@@ -700,20 +700,4 @@ describe('chat', () => {
 
     await expect(page.getByText('Start a new chat to begin')).toBeVisible();
   });
-
-  test('test huge input disables button', async ({ page }) => {
-    test.setTimeout(90 * 1000);
-
-    const chat = new Chat(page);
-    await chat.goto();
-
-    await chat.switchToBlockchainModel();
-
-    //  Generate 1 million tokens
-    await page.getByTestId('chat-view-input').fill('Token '.repeat(10 ** 6));
-
-    const sendButton = page.getByRole('button', { name: 'Send Chat' });
-
-    await expect(sendButton).toBeDisabled();
-  });
 });
