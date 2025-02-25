@@ -578,7 +578,7 @@ async function syncWithLocalStorage(
     title: 'New Chat', // initial & fallback value
     conversation: messages,
     lastSaved: new Date().valueOf(),
-    tokensRemaining: tokensRemaining,
+    tokensRemaining,
   };
 
   if (existingConversation && existingConversation.conversation.length <= 4) {
