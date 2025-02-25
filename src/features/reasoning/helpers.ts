@@ -33,10 +33,12 @@ export const estimateTokenUsage = (
     }
   });
 
+  const totalTokens = promptTokens + completionTokens;
+
   return {
-    promptTokens: promptTokens,
-    completionTokens: completionTokens,
-    totalTokens: promptTokens + completionTokens,
+    promptTokens,
+    completionTokens,
+    totalTokens,
   };
 };
 
