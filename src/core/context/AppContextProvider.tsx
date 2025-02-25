@@ -127,24 +127,6 @@ export const AppContextProvider = (props: {
     getModelConfig(DEFAULT_MODEL_NAME),
   );
 
-  const contextMetrics = modelConfig.contextLimitMonitor
-    ? modelConfig.contextLimitMonitor(
-        messageHistoryStore.getSnapshot(),
-        modelConfig.contextLength,
-      )
-    : null;
-
-  useEffect(() => {
-    async function checkMetrics() {
-      if (contextMetrics) {
-        const metrics = await contextMetrics;
-        console.log('contextMetrics', metrics);
-      }
-    }
-
-    checkMetrics();
-  }, [contextMetrics]);
-
   // Poll for conversation changes
   useEffect(() => {
     const load = () => {
@@ -565,36 +547,33 @@ async function syncWithLocalStorage(
 
   const existingConversation = allConversations[conversationID];
 
-  // Calculate tokens remaining based on model type
   let tokensRemaining = contextLength;
-  const isDeepseekModel = id.includes('deepseek');
-  const isGPT4oModel = id.includes('gpt-4o');
 
-  // For Deepseek models: Use API response if available, otherwise use estimation
+  const isDeepseekModel = id.includes('deepseek');
+  const isGPTModel = id.includes('gpt');
+
+  //  todo - refactor to use modelConfig for both and eliminate conditional
   if (isDeepseekModel) {
+    //  If we get a response with usage, use that to calculate
     if (apiResponse?.usage?.total_tokens) {
       tokensRemaining = Math.max(
         0,
         contextLength - apiResponse.usage.total_tokens,
       );
-      console.log(`Deepseek tokens from API response: ${tokensRemaining}`);
     } else {
-      try {
-        //  todo - plug in deepseek utility
-      } catch (error) {
-        console.error('Error calculating token usage:', error);
-      }
+      //  todo - plug in deepseek approximation function
     }
-  } else if (isGPT4oModel && modelConfig.contextLimitMonitor) {
+  }
+
+  if (isGPTModel && modelConfig.contextLimitMonitor) {
     try {
       const metrics = await modelConfig.contextLimitMonitor(
         messages,
         contextLength,
       );
       tokensRemaining = metrics.tokensRemaining;
-      console.log(`GPT-4o tokens from contextLimitMonitor: ${tokensRemaining}`);
-    } catch (error) {
-      console.error('Error calculating GPT-4o token usage:', error);
+    } catch {
+      //  estimate the amount
     }
   }
 
