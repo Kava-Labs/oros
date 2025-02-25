@@ -561,22 +561,25 @@ async function syncWithLocalStorage(
 
   const existingConversation = allConversations[conversationID];
 
-  // Calculate tokens remaining based on model
   let tokensRemaining: number;
 
-  //  todo - refactor deepseek to use a modelConfig.contextLimitMonitor
-  //  and simplify conditional
+  if (existingConversation && existingConversation.tokensRemaining) {
+    tokensRemaining = existingConversation.tokensRemaining;
+  } else {
+    tokensRemaining = contextLength;
+  }
+
   const isDeepseekModel = id.includes('deepseek');
   const isGPTModel = id.includes('gpt');
 
+  // Now decrement based on new tokens used in this interaction
   if (finalChunk && finalChunk.usage && finalChunk.usage.total_tokens) {
-    // If we have API response with token usage, use it
-    tokensRemaining = Math.max(
-      0,
-      contextLength - finalChunk.usage.total_tokens,
-    );
+    // If we have API response with token usage for this interaction
+    const newTokensUsed = finalChunk.usage.total_tokens;
+    tokensRemaining = Math.max(0, tokensRemaining - newTokensUsed);
   } else if (isDeepseekModel) {
-    // For Deepseek models without API response, use estimation
+    // For Deepseek models, calculate token usage
+    // Note: This might need adjustment to only count new messages
     const estimatedUsage = estimateTokenUsage(messages);
     tokensRemaining = Math.max(0, contextLength - estimatedUsage.totalTokens);
   } else if (isGPTModel && modelConfig.contextLimitMonitor) {
@@ -594,7 +597,7 @@ async function syncWithLocalStorage(
     title: existingConversation ? existingConversation.title : 'New Chat',
     conversation: messages,
     lastSaved: new Date().valueOf(),
-    tokensRemaining: tokensRemaining,
+    tokensRemaining,
   };
 
   // Generate a title for new conversations
