@@ -136,9 +136,9 @@ describe('extractTokenUsageFromChunk', () => {
   it('should extract token usage from a valid chunk', () => {
     const chunk = {
       usage: {
-        totalTokens: 100,
-        promptTokens: 60,
-        completionTokens: 40,
+        total_tokens: 100,
+        prompt_tokens: 60,
+        completion_tokens: 40,
       },
     } as unknown as ChatCompletionChunk;
 
@@ -206,9 +206,9 @@ describe('updateTokenUsage', () => {
     });
     const apiResponse = {
       usage: {
-        totalTokens: 150,
-        promptTokens: 50,
-        completionTokens: 100,
+        total_tokens: 150,
+        prompt_tokens: 50,
+        completion_tokens: 100,
       },
     } as unknown as ChatCompletionChunk;
 

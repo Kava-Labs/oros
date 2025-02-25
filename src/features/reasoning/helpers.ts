@@ -113,11 +113,14 @@ export const updateTokenUsage = (
   apiResponse: ChatCompletionChunk,
   messageHistoryStore: MessageHistoryStore,
 ) => {
+  console.log('apiResponse', apiResponse);
   // Extract token usage from the API response
   const tokenUsage =
     modelConfig.id === 'deepseek-r1'
       ? extractTokenUsageFromChunk(apiResponse)
       : 0;
+
+  console.log({ tokenUsage });
 
   if (!tokenUsage) {
     // If we don't have token usage from the API, estimate it
