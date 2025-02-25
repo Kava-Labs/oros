@@ -50,12 +50,28 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
     <div className={styles.conversationContainer} data-testid="conversation">
       {messages.map((message, index) => {
         if (message.role === 'user') {
+          let content: string =
+            typeof message.content === 'string' ? message.content : '';
+          if (Array.isArray(message.content)) {
+            // todo: we also need to render the images not only the user prompt
+            for (const msgContent of message.content) {
+              if (msgContent.type === 'text') {
+                content = msgContent.text;
+                break;
+              }
+            }
+          }
+          if (!content.length) {
+            // useful warning to catch bugs during dev
+            console.warn(
+              'failed to correctly parse message content',
+              message.content,
+            );
+          }
+
           return (
             <div key={index} className={styles.userInputContainer}>
-              <Content
-                role={message.role}
-                content={message.content as string}
-              />
+              <Content role={message.role} content={content} />
             </div>
           );
         }

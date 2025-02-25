@@ -53,7 +53,25 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       processedMessage = modelConfig.messageProcessors.preProcess(inputValue);
     }
 
-    handleChatCompletion(processedMessage);
+    if (uploadUrl.length) {
+      handleChatCompletion([
+        {
+          type: 'text',
+          text: processedMessage,
+        },
+        {
+          type: 'image_url',
+          image_url: {
+            url: uploadUrl,
+          },
+        },
+      ]);
+
+      setUploadUrl('');
+    } else {
+      handleChatCompletion(processedMessage);
+    }
+
     setInputValue('');
     setShouldAutoScroll(true); // Reset scroll state when sending new message
 
@@ -62,6 +80,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       inputRef.current.style.height = DEFAULT_HEIGHT;
     }
   }, [
+    uploadUrl,
     isRequesting,
     inputValue,
     modelConfig.messageProcessors,
