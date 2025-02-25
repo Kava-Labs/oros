@@ -27,7 +27,6 @@ import { OperationResult } from '../../features/blockchain/types/chain';
 import { ExecuteOperation } from '../../core/context/types';
 import { v4 as uuidv4 } from 'uuid';
 import { formatConversationTitle } from '../utils/conversation/helpers';
-import { ChatCompletionChunk } from 'openai/resources/index';
 
 let client: OpenAI | null = null;
 
@@ -532,7 +531,8 @@ async function syncWithLocalStorage(
   modelConfig: ModelConfig,
   messageHistoryStore: MessageHistoryStore,
   client: OpenAI,
-  apiResponse?: ChatCompletionChunk, // Optional response for token tracking
+  //  todo - reimplement with deepseek
+  // apiResponse?: ChatCompletionChunk, // Optional response for token tracking
 ) {
   const { id, contextLength } = modelConfig;
   const messages = messageHistoryStore.getSnapshot();
@@ -552,19 +552,14 @@ async function syncWithLocalStorage(
   const isDeepseekModel = id.includes('deepseek');
   const isGPTModel = id.includes('gpt');
 
-  //  todo - refactor to use modelConfig for both and eliminate conditional
+  //  todo - refactor to use modelConfig for both and simplify conditionals
   if (isDeepseekModel) {
     //  If we get a response with usage, use that to calculate
-    if (apiResponse?.usage?.total_tokens) {
-      tokensRemaining = Math.max(
-        0,
-        contextLength - apiResponse.usage.total_tokens,
-      );
-    } else {
-      //  todo - plug in deepseek approximation function
-    }
+  } else {
+    //  todo - plug in deepseek approximation function
   }
 
+  //  type guard won't be necessary when all model configs have a contextLimitMonitor
   if (isGPTModel && modelConfig.contextLimitMonitor) {
     try {
       const metrics = await modelConfig.contextLimitMonitor(
