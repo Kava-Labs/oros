@@ -27,6 +27,11 @@ import { OperationResult } from '../../features/blockchain/types/chain';
 import { ExecuteOperation } from '../../core/context/types';
 import { v4 as uuidv4 } from 'uuid';
 import { formatConversationTitle } from '../utils/conversation/helpers';
+import { ChatCompletionChunk } from 'openai/resources/index';
+import {
+  estimateTokenUsage,
+  updateTokenUsage,
+} from '../../features/reasoning/helpers';
 
 let client: OpenAI | null = null;
 
@@ -241,7 +246,6 @@ export const AppContextProvider = (props: {
       // and all follow ups have been completed.
       try {
         //  clear any existing error
-        // setErrorText('');
         conversation.errorStore.setText('');
 
         await doChat(
@@ -254,6 +258,7 @@ export const AppContextProvider = (props: {
           toolCallStreamStore,
           thinkingStore,
           executeOperation,
+          conversationID,
         );
       } catch (error) {
         let errorMessage =
@@ -266,18 +271,10 @@ export const AppContextProvider = (props: {
           errorMessage = 'You clicked cancel - please try again';
         }
 
-        // setErrorText(errorMessage);
         conversation.errorStore.setText(errorMessage);
       } finally {
         setIsRequesting(false, id);
         controllerRef.current = null;
-        // save to local storage (post-request with assistant's response)
-        syncWithLocalStorage(
-          conversationID,
-          modelConfig,
-          messageHistoryStore,
-          client,
-        );
       }
     },
     [
@@ -353,19 +350,26 @@ async function doChat(
   toolCallStreamStore: ToolCallStreamStore,
   thinkingStore: TextStreamStore,
   executeOperation: ExecuteOperation,
+  conversationID: string,
 ) {
   progressStore.setText('Thinking');
   const { id, tools } = modelConfig;
   try {
+    const messages = messageHistoryStore.getSnapshot().map((msg) => {
+      if ('reasoningContent' in msg) {
+        delete msg.reasoningContent;
+      }
+      return msg;
+    });
+
+    const isDeepseekModel = id.includes('deepseek');
+
+    let finalChunk = null;
+
     const stream = await client.chat.completions.create(
       {
         model: id,
-        messages: messageHistoryStore.getSnapshot().map((msg) => {
-          if ('reasoningContent' in msg) {
-            delete msg.reasoningContent;
-          }
-          return msg;
-        }),
+        messages: messages,
         tools: tools,
         stream: true,
       },
@@ -378,6 +382,11 @@ async function doChat(
     let thinkingEnd = -1;
 
     for await (const chunk of stream) {
+      // Keep track of the final chunk for token usage
+      if (isDeepseekModel) {
+        finalChunk = chunk;
+      }
+
       if (progressStore.getSnapshot() !== '') {
         progressStore.setText('');
       }
@@ -436,7 +445,6 @@ async function doChat(
       }
 
       messageHistoryStore.addMessage(msg);
-
       messageStore.setText('');
     }
 
@@ -459,8 +467,18 @@ async function doChat(
         toolCallStreamStore,
         thinkingStore,
         executeOperation,
+        conversationID,
       );
     }
+
+    // save to local storage (post-request with assistant's response) with token info if available
+    syncWithLocalStorage(
+      conversationID,
+      modelConfig,
+      messageHistoryStore,
+      client,
+      finalChunk && finalChunk.usage ? finalChunk : undefined,
+    );
   } catch (e) {
     console.error(`An error occurred: ${e} `);
     throw e;
@@ -531,8 +549,7 @@ async function syncWithLocalStorage(
   modelConfig: ModelConfig,
   messageHistoryStore: MessageHistoryStore,
   client: OpenAI,
-  //  todo - reimplement with deepseek
-  // apiResponse?: ChatCompletionChunk, // Optional response for token tracking
+  apiResponse?: ChatCompletionChunk, // Optional response for token tracking
 ) {
   const { id, contextLength } = modelConfig;
   const messages = messageHistoryStore.getSnapshot();
@@ -547,40 +564,51 @@ async function syncWithLocalStorage(
 
   const existingConversation = allConversations[conversationID];
 
-  let tokensRemaining = contextLength;
+  // Calculate tokens remaining based on model
+  let tokensRemaining: number;
 
   const isDeepseekModel = id.includes('deepseek');
   const isGPTModel = id.includes('gpt');
 
-  //  todo - refactor to use modelConfig for both and simplify conditionals
-  if (isDeepseekModel) {
-    //  If we get a response with usage, use that to calculate
-  } else {
-    //  todo - plug in deepseek approximation function
-  }
-
-  //  type guard won't be necessary when all model configs have a contextLimitMonitor
-  if (isGPTModel && modelConfig.contextLimitMonitor) {
+  // Determine tokens remaining based on the model type
+  if (apiResponse && apiResponse.usage && apiResponse.usage.total_tokens) {
+    // If we have API response with token usage, use it
+    tokensRemaining = Math.max(
+      0,
+      contextLength - apiResponse.usage.total_tokens,
+    );
+  } else if (isDeepseekModel) {
+    // For Deepseek models without API response, use estimation
+    const estimatedUsage = estimateTokenUsage(messages);
+    tokensRemaining = Math.max(0, contextLength - estimatedUsage.total_tokens);
+  } else if (isGPTModel && modelConfig.contextLimitMonitor) {
+    // For GPT models with contextLimitMonitor
     try {
       const metrics = await modelConfig.contextLimitMonitor(
         messages,
         contextLength,
       );
       tokensRemaining = metrics.tokensRemaining;
-    } catch {
-      //  estimate the amount
+    } catch (error) {
+      // Fallback to default if monitoring fails
+      tokensRemaining = contextLength;
+      console.error('Error calculating token usage:', error);
     }
+  } else {
+    // Default fallback
+    tokensRemaining = contextLength;
   }
 
   const history: ConversationHistory = {
     id: conversationID,
     model: existingConversation ? existingConversation.model : id,
-    title: 'New Chat', // initial & fallback value
+    title: existingConversation ? existingConversation.title : 'New Chat',
     conversation: messages,
     lastSaved: new Date().valueOf(),
-    tokensRemaining,
+    tokensRemaining: tokensRemaining,
   };
 
+  // Generate a title for new conversations
   if (existingConversation && existingConversation.conversation.length <= 4) {
     try {
       const data = await client.chat.completions.create({
@@ -622,3 +650,16 @@ async function syncWithLocalStorage(
   allConversations[conversationID] = history;
   localStorage.setItem('conversations', JSON.stringify(allConversations));
 }
+
+// // Helper for updating token usage specifically for Deepseek models
+// // This can be called from syncWithLocalStorage or directly from doChat
+// function updateDeepseekTokenUsage(
+//   conversationID: string,
+//   modelConfig: ModelConfig,
+//   chunk: ChatCompletionChunk,
+//   messageHistoryStore: MessageHistoryStore,
+// ) {
+//   if (chunk.usage) {
+//     updateTokenUsage(conversationID, modelConfig, chunk, messageHistoryStore);
+//   }
+// }

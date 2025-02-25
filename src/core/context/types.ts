@@ -18,7 +18,11 @@ export type ConversationHistory = {
   title: string;
   conversation: ChatCompletionMessageParam[];
   lastSaved: number;
+<<<<<<< HEAD
   tokensRemaining: number;
+=======
+  tokensRemaining?: number;
+>>>>>>> a511208 (feat: estimate deepseek remaining tokens and store on conversation)
 };
 
 export type ActiveConversation = {
