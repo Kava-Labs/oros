@@ -10,8 +10,6 @@ import ChatInput from './ChatInput';
 export interface ChatViewProps {
   messages: ChatMessage[];
   cautionText: string;
-  onSubmit(value: string): void;
-  onCancel(): void;
   onMenu(): void;
   onPanelOpen(): void;
   isPanelOpen: boolean;
@@ -21,8 +19,6 @@ export interface ChatViewProps {
 export const ChatView = ({
   messages,
   cautionText,
-  onSubmit,
-  onCancel,
   onMenu,
   onPanelOpen,
   isPanelOpen,
@@ -117,11 +113,7 @@ export const ChatView = ({
               </div>
             )}
 
-            <ChatInput
-              onSubmit={onSubmit}
-              onCancel={onCancel}
-              setShouldAutoScroll={setShouldAutoScroll}
-            />
+            <ChatInput setShouldAutoScroll={setShouldAutoScroll} />
             <div className={styles.importantInfo}>
               <span>{cautionText}</span>
             </div>

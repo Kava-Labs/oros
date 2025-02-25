@@ -7,19 +7,14 @@ import { Paperclip, X } from 'lucide-react';
 const DEFAULT_HEIGHT = '30px';
 
 interface ChatInputProps {
-  onSubmit(value: string): void;
-  onCancel(): void;
   setShouldAutoScroll: (s: boolean) => void;
 }
 
-const ChatInput = ({
-  onSubmit,
-  onCancel,
-  setShouldAutoScroll,
-}: ChatInputProps) => {
+const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
   const [inputValue, setInputValue] = useState('');
 
-  const { isRequesting, modelConfig } = useAppContext();
+  const { isRequesting, modelConfig, handleChatCompletion, handleCancel } =
+    useAppContext();
 
   const buttonRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -45,7 +40,7 @@ const ChatInput = ({
 
   const handleButtonClick = useCallback(() => {
     if (isRequesting) {
-      onCancel();
+      handleCancel();
       return;
     }
 
@@ -58,7 +53,7 @@ const ChatInput = ({
       processedMessage = modelConfig.messageProcessors.preProcess(inputValue);
     }
 
-    onSubmit(processedMessage);
+    handleChatCompletion(processedMessage);
     setInputValue('');
     setShouldAutoScroll(true); // Reset scroll state when sending new message
 
@@ -70,9 +65,9 @@ const ChatInput = ({
     isRequesting,
     inputValue,
     modelConfig.messageProcessors,
-    onSubmit,
+    handleChatCompletion,
     setShouldAutoScroll,
-    onCancel,
+    handleCancel,
   ]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {

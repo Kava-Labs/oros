@@ -12,13 +12,7 @@ import { useMessageHistory } from './core/hooks/useMessageHistory';
 import { SearchHistoryButton } from './core/assets/SearchHistoryButton';
 
 export const App = () => {
-  const {
-    isReady,
-    modelConfig,
-    handleChatCompletion,
-    handleCancel,
-    hasConversations,
-  } = useAppContext();
+  const { isReady, modelConfig, hasConversations } = useAppContext();
   const { messages } = useMessageHistory();
 
   const isMobile = useIsMobile();
@@ -95,11 +89,9 @@ export const App = () => {
               introText={modelConfig.introText}
               cautionText={defaultCautionText}
               messages={messages}
-              onSubmit={handleChatCompletion}
               onMenu={() => setIsMobileSideBarOpen(true)}
               onPanelOpen={() => setIsDesktopSideBarHidden(false)}
               isPanelOpen={!isDesktopSideBarHidden}
-              onCancel={handleCancel}
             />
           </div>
         </div>
