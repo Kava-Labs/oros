@@ -107,6 +107,7 @@ export function updateTokenUsage(
   apiResponse: ChatCompletionChunk,
   messageHistoryStore: MessageHistoryStore,
 ) {
+  console.log('updating token usage');
   // Extract token usage from the API response
   const tokenUsage = extractTokenUsageFromChunk(apiResponse);
 

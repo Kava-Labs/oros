@@ -650,16 +650,3 @@ async function syncWithLocalStorage(
   allConversations[conversationID] = history;
   localStorage.setItem('conversations', JSON.stringify(allConversations));
 }
-
-// // Helper for updating token usage specifically for Deepseek models
-// // This can be called from syncWithLocalStorage or directly from doChat
-// function updateDeepseekTokenUsage(
-//   conversationID: string,
-//   modelConfig: ModelConfig,
-//   chunk: ChatCompletionChunk,
-//   messageHistoryStore: MessageHistoryStore,
-// ) {
-//   if (chunk.usage) {
-//     updateTokenUsage(conversationID, modelConfig, chunk, messageHistoryStore);
-//   }
-// }
