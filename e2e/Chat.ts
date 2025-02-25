@@ -1,4 +1,4 @@
-import { ElementHandle, expect, Locator, Page } from '@playwright/test';
+import { ElementHandle, Locator, Page } from '@playwright/test';
 
 export class Chat {
   public page: Page;
