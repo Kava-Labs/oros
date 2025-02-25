@@ -292,6 +292,15 @@ describe('chat', () => {
     //  Switching between conversation histories
     let blockchainQuestionConversation =
       await chat.getMessageElementsWithContent();
+
+    console.log('0', await blockchainQuestionConversation[0].innerText());
+    console.log('1', await blockchainQuestionConversation[1].innerText());
+    console.log('2', await blockchainQuestionConversation[2].innerText());
+    console.log(
+      'blockchainQuestionConversation.length',
+      blockchainQuestionConversation.length,
+    );
+
     const blockchainQuestionConversationResponse =
       await blockchainQuestionConversation[
         blockchainQuestionConversation.length - 1
