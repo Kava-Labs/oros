@@ -18,6 +18,7 @@ export type ConversationHistory = {
   title: string;
   conversation: ChatCompletionMessageParam[];
   lastSaved: number;
+  tokensRemaining: number;
 };
 
 export type ActiveConversation = {

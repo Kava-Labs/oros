@@ -27,6 +27,7 @@ import { OperationResult } from '../../features/blockchain/types/chain';
 import { ExecuteOperation } from '../../core/context/types';
 import { v4 as uuidv4 } from 'uuid';
 import { formatConversationTitle } from '../utils/conversation/helpers';
+import { ChatCompletionChunk } from 'openai/resources/index';
 
 let client: OpenAI | null = null;
 
@@ -248,7 +249,7 @@ export const AppContextProvider = (props: {
       // save to local storage (pre-request with user's prompt)
       syncWithLocalStorage(
         conversationID,
-        modelConfig.id,
+        modelConfig,
         messageHistoryStore,
         client,
       );
@@ -292,7 +293,7 @@ export const AppContextProvider = (props: {
         // save to local storage (post-request with assistant's response)
         syncWithLocalStorage(
           conversationID,
-          modelConfig.id,
+          modelConfig,
           messageHistoryStore,
           client,
         );
@@ -546,10 +547,12 @@ async function callTools(
 
 async function syncWithLocalStorage(
   conversationID: string,
-  modelID: string,
+  modelConfig: ModelConfig,
   messageHistoryStore: MessageHistoryStore,
   client: OpenAI,
+  apiResponse?: ChatCompletionChunk, // Optional response for token tracking
 ) {
+  const { id, contextLength } = modelConfig;
   const messages = messageHistoryStore.getSnapshot();
   const firstUserMessage = messages.find((msg) => msg.role === 'user');
   if (!firstUserMessage) return;
@@ -561,12 +564,47 @@ async function syncWithLocalStorage(
   );
 
   const existingConversation = allConversations[conversationID];
+
+  // Calculate tokens remaining based on model type
+  let tokensRemaining = contextLength;
+  const isDeepseekModel = id.includes('deepseek');
+  const isGPT4oModel = id.includes('gpt-4o');
+
+  // For Deepseek models: Use API response if available, otherwise use estimation
+  if (isDeepseekModel) {
+    if (apiResponse?.usage?.total_tokens) {
+      tokensRemaining = Math.max(
+        0,
+        contextLength - apiResponse.usage.total_tokens,
+      );
+      console.log(`Deepseek tokens from API response: ${tokensRemaining}`);
+    } else {
+      try {
+        //  todo - plug in deepseek utility
+      } catch (error) {
+        console.error('Error calculating token usage:', error);
+      }
+    }
+  } else if (isGPT4oModel && modelConfig.contextLimitMonitor) {
+    try {
+      const metrics = await modelConfig.contextLimitMonitor(
+        messages,
+        contextLength,
+      );
+      tokensRemaining = metrics.tokensRemaining;
+      console.log(`GPT-4o tokens from contextLimitMonitor: ${tokensRemaining}`);
+    } catch (error) {
+      console.error('Error calculating GPT-4o token usage:', error);
+    }
+  }
+
   const history: ConversationHistory = {
     id: conversationID,
-    model: existingConversation ? existingConversation.model : modelID,
-    title: 'New Chat', // initial & fallback value
+    model: existingConversation ? existingConversation.model : id,
+    title: 'New Chat',
     conversation: messages,
     lastSaved: new Date().valueOf(),
+    tokensRemaining: tokensRemaining,
   };
 
   if (existingConversation && existingConversation.conversation.length <= 4) {
