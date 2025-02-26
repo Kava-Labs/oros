@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
-  calculateContextMetrics,
+  calculateGptContextMetrics,
   formatContentSnippet,
   formatConversationTitle,
   getTimeGroup,
@@ -363,7 +363,7 @@ describe('calculateContextMetrics', () => {
     const mockMessages: ChatMessage[] = [
       { role: 'system', content: 'I am helpful' },
     ];
-    const result = await calculateContextMetrics(mockMessages, maxTokens);
+    const result = await calculateGptContextMetrics(mockMessages);
 
     expect(result).toEqual({
       tokensUsed: 10, //  amount from the system prompt
@@ -380,7 +380,7 @@ describe('calculateContextMetrics', () => {
         content: 'Lorem ipsum odor amet, consectetuer adipiscing elit.',
       },
     ];
-    const result = await calculateContextMetrics(mockMessages, maxTokens);
+    const result = await calculateGptContextMetrics(mockMessages);
 
     expect(result).toEqual({
       tokensUsed: 25, //  additional tokens used
@@ -393,10 +393,7 @@ describe('calculateContextMetrics', () => {
       { role: 'assistant', content: 'Do you speak Latin?' },
     ];
 
-    const updatedResult = await calculateContextMetrics(
-      updatedMessages,
-      maxTokens,
-    );
+    const updatedResult = await calculateGptContextMetrics(updatedMessages);
 
     expect(updatedResult).toEqual({
       tokensUsed: 34, //  more tokens used
@@ -409,7 +406,7 @@ describe('calculateContextMetrics', () => {
     const mockMessages: ChatMessage[] = [
       { role: 'system', content: 'Make a giant string'.repeat(30000) },
     ];
-    const result = await calculateContextMetrics(mockMessages, maxTokens);
+    const result = await calculateGptContextMetrics(mockMessages);
 
     expect(result).toEqual({
       tokensUsed: 120007,

@@ -3,7 +3,7 @@ import {
   MessageHistoryStore,
 } from '../../core/stores/messageHistoryStore';
 import { ChatCompletionChunk } from 'openai/resources/index';
-import { ModelConfig } from '../../core/types/models';
+import { ContextMetrics, ModelConfig } from '../../core/types/models';
 
 /**
  * Estimates token usage based on message lengths
@@ -113,14 +113,11 @@ export const updateTokenUsage = (
   apiResponse: ChatCompletionChunk,
   messageHistoryStore: MessageHistoryStore,
 ) => {
-  console.log('apiResponse', apiResponse);
   // Extract token usage from the API response
   const tokenUsage =
     modelConfig.id === 'deepseek-r1'
       ? extractTokenUsageFromChunk(apiResponse)
       : 0;
-
-  console.log({ tokenUsage });
 
   if (!tokenUsage) {
     // If we don't have token usage from the API, estimate it
@@ -134,3 +131,37 @@ export const updateTokenUsage = (
   }
   return updateConversationTokens(conversationID, modelConfig, tokenUsage);
 };
+
+export async function calculateDeepseekTokenUsage(
+  messages: ChatMessage[],
+  contextLength: number,
+  finalChunk: ChatCompletionChunk | null,
+): Promise<ContextMetrics> {
+  let tokensRemaining: number;
+
+  if (finalChunk && finalChunk.usage && finalChunk.usage.total_tokens) {
+    // If we have API response with token usage for this interaction
+    const newTokensUsed = finalChunk.usage.total_tokens;
+    tokensRemaining = Math.max(0, contextLength - newTokensUsed);
+  } else {
+    // If the API response fails, fall back to an estimation
+    const estimatedUsage = estimateTokenUsage(messages);
+    tokensRemaining = Math.max(0, contextLength - estimatedUsage.totalTokens);
+  }
+
+  const tokensUsed = contextLength - tokensRemaining;
+  const percentageRemaining = Number(
+    ((tokensRemaining / contextLength) * 100).toFixed(1),
+  );
+
+  console.log(tokensUsed, tokensRemaining);
+
+  return {
+    tokensUsed,
+    tokensRemaining,
+    percentageRemaining:
+      tokensUsed > 0 && percentageRemaining === 100.0
+        ? 99.9
+        : percentageRemaining,
+  };
+}

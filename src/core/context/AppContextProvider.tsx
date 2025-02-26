@@ -28,7 +28,6 @@ import { ExecuteOperation } from '../../core/context/types';
 import { v4 as uuidv4 } from 'uuid';
 import { formatConversationTitle } from '../utils/conversation/helpers';
 import { ChatCompletionChunk } from 'openai/resources/index';
-import { estimateTokenUsage } from '../../features/reasoning/helpers';
 
 let client: OpenAI | null = null;
 
@@ -235,6 +234,7 @@ export const AppContextProvider = (props: {
         modelConfig,
         messageHistoryStore,
         client,
+        null,
       );
 
       // Call chat completions and resolve all tool calls.
@@ -359,8 +359,6 @@ async function doChat(
       return msg;
     });
 
-    const isDeepseekModel = id.includes('deepseek');
-
     let finalChunk = null;
 
     const stream = await client.chat.completions.create(
@@ -379,10 +377,8 @@ async function doChat(
     let thinkingEnd = -1;
 
     for await (const chunk of stream) {
-      // Keep track of the final chunk for token usage
-      if (isDeepseekModel) {
-        finalChunk = chunk;
-      }
+      // Keep track of the final chunk for token usage (for all models)
+      finalChunk = chunk;
 
       if (progressStore.getSnapshot() !== '') {
         progressStore.setText('');
@@ -390,7 +386,7 @@ async function doChat(
 
       if (isContentChunk(chunk)) {
         content += chunk['choices'][0]['delta']['content'];
-        // todo: chance to clean up into a helper similar to assembleToolCallFromStream
+        // Process model-specific content formatting
         switch (modelConfig.id) {
           case 'deepseek-r1': {
             const openTag = '<think>';
@@ -468,13 +464,13 @@ async function doChat(
       );
     }
 
-    // save to local storage (post-request with assistant's response) with token info if available
+    // Save to local storage with token info (unified for all models)
     syncWithLocalStorage(
       conversationID,
       modelConfig,
       messageHistoryStore,
       client,
-      finalChunk && finalChunk.usage ? finalChunk : undefined,
+      finalChunk,
     );
   } catch (e) {
     console.error(`An error occurred: ${e} `);
@@ -495,7 +491,6 @@ async function doChat(
     }
   }
 }
-
 async function callTools(
   toolCallStreamStore: ToolCallStreamStore,
   messageHistoryStore: MessageHistoryStore,
@@ -546,7 +541,7 @@ async function syncWithLocalStorage(
   modelConfig: ModelConfig,
   messageHistoryStore: MessageHistoryStore,
   client: OpenAI,
-  finalChunk?: ChatCompletionChunk, // Optional response for token tracking
+  finalChunk: ChatCompletionChunk | null, // Optional response for token tracking
 ) {
   const { id, contextLength } = modelConfig;
   const messages = messageHistoryStore.getSnapshot();
@@ -561,31 +556,17 @@ async function syncWithLocalStorage(
 
   const existingConversation = allConversations[conversationID];
 
-  let tokensRemaining: number;
+  // Initialize tokensRemaining from existing conversation or default to full context length
+  let tokensRemaining = existingConversation?.tokensRemaining ?? contextLength;
 
-  if (existingConversation && existingConversation.tokensRemaining) {
-    tokensRemaining = existingConversation.tokensRemaining;
-  } else {
-    tokensRemaining = contextLength;
-  }
-
-  const isDeepseekModel = id.includes('deepseek');
-
-  if (isDeepseekModel) {
-    if (finalChunk && finalChunk.usage && finalChunk.usage.total_tokens) {
-      // If we have API response with token usage for this interaction
-      const newTokensUsed = finalChunk.usage.total_tokens;
-      tokensRemaining = Math.max(0, tokensRemaining - newTokensUsed);
-    } else {
-      // if the api response fails, fall back to an estimation
-      const estimatedUsage = estimateTokenUsage(messages);
-      tokensRemaining = Math.max(0, contextLength - estimatedUsage.totalTokens);
-    }
-    //  GPT model with contextLimitMonitor
-  } else if (modelConfig.contextLimitMonitor) {
+  // Use contextLimitMonitor for all models
+  if (modelConfig.contextLimitMonitor) {
+    const contextToProcess =
+      modelConfig.id === 'deepseek-r1' ? tokensRemaining : contextLength;
     const metrics = await modelConfig.contextLimitMonitor(
       messages,
-      contextLength,
+      contextToProcess,
+      finalChunk, // Pass finalChunk to all contextLimitMonitor calls
     );
     tokensRemaining = metrics.tokensRemaining;
   }
