@@ -27,10 +27,10 @@ export const useManageContextWarning = (
     if (
       currentConversation &&
       //  todo - determine threshold
-      // currentConversation.tokensRemaining < ? &&
+      currentConversation.tokensRemaining < 1000000 &&
       !dismissWarning
     ) {
-      // setShowInputAdornmentMessage(true);
+      setShowInputAdornmentMessage(true);
     }
   }, [currentConversation, dismissWarning, setShowInputAdornmentMessage]);
 };
