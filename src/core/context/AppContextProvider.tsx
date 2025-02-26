@@ -575,7 +575,7 @@ async function syncWithLocalStorage(
   const history: ConversationHistory = {
     id: conversationID,
     model: existingConversation ? existingConversation.model : id,
-    title: 'New Chat', // initial & fallback value
+    title: existingConversation ? existingConversation.title : 'New Chat', // initial & fallback value
     conversation: messages,
     lastSaved: new Date().valueOf(),
     tokensRemaining,
