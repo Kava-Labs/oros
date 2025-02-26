@@ -21,6 +21,7 @@ func TestGetConfigFromEnv(t *testing.T) {
 		require.Equal(t, 9090, cfg.MetricsPort)
 		require.Empty(t, cfg.Backends)
 		require.Empty(t, cfg.S3BucketName)
+		require.Empty(t, cfg.VisionPreprocessingMap)
 	})
 
 	t.Run("custom values", func(t *testing.T) {
@@ -31,6 +32,7 @@ func TestGetConfigFromEnv(t *testing.T) {
 		os.Setenv("KAVACHAT_API_S3_BUCKET", "bucket-name")
 		os.Setenv("KAVACHAT_API_LOG_FORMAT", "json")
 		os.Setenv("KAVACHAT_API_METRICS_PORT", "8181")
+
 		os.Setenv("KAVACHAT_API_BACKEND_0_NAME", "OpenAI")
 		os.Setenv("KAVACHAT_API_BACKEND_0_BASE_URL", "https://api.openai.com")
 		os.Setenv("KAVACHAT_API_BACKEND_0_API_KEY", "test-api-key")
@@ -40,6 +42,14 @@ func TestGetConfigFromEnv(t *testing.T) {
 		os.Setenv("KAVACHAT_API_BACKEND_1_BASE_URL", "https://runpod.io/some-url")
 		os.Setenv("KAVACHAT_API_BACKEND_1_API_KEY", "second-api-key")
 		os.Setenv("KAVACHAT_API_BACKEND_1_ALLOWED_MODELS", "deepseek-r1")
+
+		os.Setenv("KAVACHAT_API_BACKEND_2_NAME", "backend-qwen")
+		os.Setenv("KAVACHAT_API_BACKEND_2_BASE_URL", "https://runpod.io/some-url-2")
+		os.Setenv("KAVACHAT_API_BACKEND_2_API_KEY", "third-api-key")
+		os.Setenv("KAVACHAT_API_BACKEND_2_ALLOWED_MODELS", "qwen2.5-vl")
+
+		os.Setenv("KAVACHAT_API_VISION_PREPROCESSOR", "deepseek-r1:qwen2.5-vl")
+		os.Setenv("KAVACHAT_API_VISION_SYSTEM_PROMPT", "some-prompt")
 
 		cfg, err := config.NewConfigFromEnv()
 		require.NoError(t, err)
@@ -51,7 +61,7 @@ func TestGetConfigFromEnv(t *testing.T) {
 		require.Equal(t, "json", cfg.LogFormat)
 		require.Equal(t, 8181, cfg.MetricsPort)
 
-		require.Len(t, cfg.Backends, 2)
+		require.Len(t, cfg.Backends, 3)
 
 		expectedBackends := config.OpenAIBackends{
 			{
@@ -66,9 +76,22 @@ func TestGetConfigFromEnv(t *testing.T) {
 				APIKey:        "second-api-key",
 				AllowedModels: []string{"deepseek-r1"},
 			},
+			{
+				Name:          "backend-qwen",
+				BaseURL:       "https://runpod.io/some-url-2",
+				APIKey:        "third-api-key",
+				AllowedModels: []string{"qwen2.5-vl"},
+			},
 		}
 
 		require.Equal(t, expectedBackends, cfg.Backends)
+
+		expectedVisionPreprocessingMap := map[string]string{
+			"deepseek-r1": "qwen2.5-vl",
+		}
+
+		require.Equal(t, expectedVisionPreprocessingMap, cfg.VisionPreprocessingMap)
+		require.Equal(t, "some-prompt", cfg.VisionSystemPrompt)
 	})
 }
 
@@ -366,6 +389,59 @@ func TestConfigValidate(t *testing.T) {
 				return cfg
 			}(),
 			wantErr: errors.New("LOG_FORMAT must be 'plain' or 'json'"),
+		},
+		{
+			name: "valid - vision map",
+			cfg: func() config.Config {
+				cfg := validCfg
+				cfg.VisionPreprocessingMap = map[string]string{
+					"model1": "model2",
+				}
+
+				cfg.VisionSystemPrompt = "some-prompt"
+
+				return cfg
+			}(),
+			wantErr: nil,
+		},
+		{
+			name: "invalid - vision map unknown key",
+			cfg: func() config.Config {
+				cfg := validCfg
+				cfg.VisionPreprocessingMap = map[string]string{
+					"hello": "model2",
+				}
+				cfg.VisionSystemPrompt = "some-prompt"
+
+				return cfg
+			}(),
+			wantErr: errors.New("model 'hello' in VISION_PREPROCESSING is not supported by any backend"),
+		},
+		{
+			name: "invalid - vision map unknown value",
+			cfg: func() config.Config {
+				cfg := validCfg
+				cfg.VisionPreprocessingMap = map[string]string{
+					"model1": "world",
+				}
+				cfg.VisionSystemPrompt = "some-prompt"
+
+				return cfg
+			}(),
+			wantErr: errors.New("vision model 'world' in VISION_PREPROCESSING is not supported by any backend"),
+		},
+		{
+			name: "invalid - vision prompt not set when vision map is set",
+			cfg: func() config.Config {
+				cfg := validCfg
+				cfg.VisionPreprocessingMap = map[string]string{
+					"model1": "model2",
+				}
+				cfg.VisionSystemPrompt = ""
+
+				return cfg
+			}(),
+			wantErr: errors.New("VISION_SYSTEM_PROMPT is required when VISION_PREPROCESSOR has entries"),
 		},
 	}
 

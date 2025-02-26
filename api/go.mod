@@ -16,6 +16,7 @@ require (
 	github.com/rs/zerolog v1.33.0
 	github.com/sashabaranov/go-openai v1.38.0
 	github.com/stretchr/testify v1.10.0
+	golang.org/x/exp v0.0.0-20250218142911-aa4b98e5adaa
 )
 
 require (

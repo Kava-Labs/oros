@@ -24,6 +24,10 @@ type Config struct {
 	S3PathStyleRequests bool   `env:"S3_PATH_STYLE_REQUESTS" envDefault:"false"`
 
 	Backends OpenAIBackends `envPrefix:"BACKEND"`
+
+	// requested model name -> model used for vision preprocessing
+	VisionPreprocessingMap map[string]string `env:"VISION_PREPROCESSOR" envDefault:""`
+	VisionSystemPrompt     string            `env:"VISION_SYSTEM_PROMPT" envDefault:""`
 }
 
 // Validate checks if the required fields are set
@@ -51,8 +55,28 @@ func (c Config) Validate() error {
 		return errors.New("S3_BUCKET cannot be empty string")
 	}
 
-	// Validate backends
-	return c.Backends.Validate()
+	// Validate backends before vision
+	if err := c.Backends.Validate(); err != nil {
+		return fmt.Errorf("invalid backends: %w", err)
+	}
+
+	// Validate vision preprocessing map, both key and values should exist in
+	// the backend allowlists
+	for model, visionModel := range c.VisionPreprocessingMap {
+		if _, found := c.Backends.GetBackendFromModel(model); !found {
+			return fmt.Errorf("model '%s' in VISION_PREPROCESSING is not supported by any backend", model)
+		}
+
+		if _, found := c.Backends.GetBackendFromModel(visionModel); !found {
+			return fmt.Errorf("vision model '%s' in VISION_PREPROCESSING is not supported by any backend", visionModel)
+		}
+	}
+
+	if len(c.VisionPreprocessingMap) > 0 && c.VisionSystemPrompt == "" {
+		return errors.New("VISION_SYSTEM_PROMPT is required when VISION_PREPROCESSOR has entries")
+	}
+
+	return nil
 }
 
 // LogFormatIsJSON returns true if the log format is JSON

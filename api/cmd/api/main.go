@@ -119,6 +119,8 @@ func main() {
 					cfg.Backends,
 					logger,
 					types.ChatCompletionEndpoint,
+					cfg.VisionPreprocessingMap,
+					cfg.VisionSystemPrompt,
 				),
 			)
 

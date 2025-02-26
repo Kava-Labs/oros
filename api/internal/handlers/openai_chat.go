@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/kava-labs/kavachat/api/internal/config"
 	"github.com/kava-labs/kavachat/api/internal/middleware"
@@ -18,7 +19,7 @@ type OpenAIChatHandler struct {
 	base basicOpenAIProxyHandler
 
 	// Vision capable model name to use for generating image descriptions
-	visionModel string
+	visionModelMap map[string]string
 	// Prompt to use for generating image descriptions
 	visionModelPrompt string
 }
@@ -28,6 +29,8 @@ func NewOpenAIChatHandler(
 	backends config.OpenAIBackends,
 	baseLogger *zerolog.Logger,
 	endpoint types.OpenAIEndpoint,
+	visionModelMap map[string]string,
+	visionModelPrompt string,
 ) http.Handler {
 	logger := baseLogger.With().
 		Str("handler", "openai_proxy").
@@ -40,6 +43,8 @@ func NewOpenAIChatHandler(
 			logger:   &logger,
 			endpoint: endpoint,
 		},
+		visionModelMap:    visionModelMap,
+		visionModelPrompt: visionModelPrompt,
 	}
 }
 
@@ -90,8 +95,17 @@ func (h OpenAIChatHandler) handleChatCompletion(
 		return
 	}
 
+	// Get corresponding vision model for the backend
+	visionModel, found := h.visionModelMap[decodedReq.Model]
+	if !found {
+		h.base.logger.Error().Msgf("no pre-processing vision model set for model: %s", decodedReq.Model)
+
+		RespondAPIError(w, http.StatusInternalServerError, "no vision preprocessor model")
+		return
+	}
+
 	// Get image description in text
-	description, err := h.DescribeImages(images)
+	description, err := h.DescribeImages(visionModel, images)
 	if err != nil {
 		h.base.logger.Error().Msgf("error updating request with image description: %s", err.Error())
 
@@ -119,6 +133,7 @@ func (h OpenAIChatHandler) handleChatCompletion(
 // image with a vision capable backend model and then updates the original
 // request with the generated description.
 func (h OpenAIChatHandler) DescribeImages(
+	visionModel string,
 	images []openai.ChatMessagePart,
 ) (string, error) {
 	// 1. Extract image URL from the request
@@ -126,16 +141,16 @@ func (h OpenAIChatHandler) DescribeImages(
 	// 3. Update the request with the generated description
 	// 4. Return the updated request
 
-	visionBackend, found := h.base.backends.GetBackendFromModel(h.visionModel)
+	visionBackend, found := h.base.backends.GetBackendFromModel(visionModel)
 	if !found {
-		return "", fmt.Errorf("error finding vision backend for model: %s", h.visionModel)
+		return "", fmt.Errorf("error finding vision backend for model: %s", visionModel)
 	}
 
 	client := visionBackend.GetClient()
 
 	// Build vision model request
 	visionReq := openai.ChatCompletionRequest{
-		Model: h.visionModel,
+		Model: visionModel,
 		Messages: []openai.ChatCompletionMessage{
 			{
 				Role:    openai.ChatMessageRoleSystem,
@@ -239,18 +254,49 @@ func UpdateLatestUserMessage(
 		return req
 	}
 
+	if len(imageDescription) == 0 {
+		return req
+	}
+
 	lastMessage := req.Messages[len(req.Messages)-1]
 
+	// Validations
 	// Not a user message
 	if lastMessage.Role != openai.ChatMessageRoleUser {
 		return req
 	}
 
-	// Clear multi content
-	lastMessage.MultiContent = nil
+	// Already has Content and/or no MultiContent
+	if lastMessage.Content != "" || len(lastMessage.MultiContent) == 0 {
+		return req
+	}
 
-	// Add image description
-	lastMessage.Content = imageDescription
+	// Extract text from multicontent, if any. There could be multiple text parts
+	// in the user message, so we concatenate them all.
+	hasImage := false
+	userMessages := []string{}
+	for _, content := range lastMessage.MultiContent {
+		if content.ImageURL != nil {
+			hasImage = true
+			continue
+		}
+
+		if content.Text != "" {
+			userMessages = append(userMessages, content.Text)
+		}
+	}
+
+	// No image found in the user message
+	if !hasImage {
+		return req
+	}
+
+	// Combine image description with user message content
+	newContent := imageDescription + "\n" + strings.Join(userMessages, "\n")
+
+	// Clear multi content, as we are replacing it with a single text part
+	lastMessage.MultiContent = nil
+	lastMessage.Content = newContent
 
 	// Replace last message
 	req.Messages[len(req.Messages)-1] = lastMessage
