@@ -293,6 +293,12 @@ describe('chat', () => {
     await chat.waitForAssistantResponse();
 
     //  Switching between conversation histories
+    let blockchainQuestionConversation =
+      await chat.getMessageElementsWithContent();
+    let messageCount = await blockchainQuestionConversation.count();
+    const blockchainQuestionConversationResponse =
+      await blockchainQuestionConversation.nth(messageCount - 1).innerText();
+
     const thisIsATestConversation = page
       .getByTestId('chat-history-entry')
       .nth(1);
@@ -301,7 +307,7 @@ describe('chat', () => {
 
     const testConversationMessages = await chat.getMessageElementsWithContent();
 
-    let messageCount = await testConversationMessages.count();
+    messageCount = await testConversationMessages.count();
 
     const testConversationResponse = await testConversationMessages
       .nth(messageCount - 1)
@@ -322,6 +328,24 @@ describe('chat', () => {
       .innerText();
 
     expect(responseInView).not.toBe(testConversationResponse);
+
+    //  switch back to the initial conversation
+
+    const blockChainHistoryItem = page
+      .getByTestId('chat-history-entry')
+      .first();
+
+    await blockChainHistoryItem.click();
+
+    blockchainQuestionConversation = await chat.getMessageElementsWithContent();
+
+    messageCount = await blockchainQuestionConversation.count();
+    const newBlockchainQuestionConversationResponse =
+      await blockchainQuestionConversation.nth(messageCount - 1).innerText();
+
+    expect(newBlockchainQuestionConversationResponse).toBe(
+      blockchainQuestionConversationResponse,
+    );
 
     // Deleting entries
     let historyEntryTexts = await page.getByTestId('chat-history-entry').all();
