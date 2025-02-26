@@ -234,7 +234,6 @@ export const AppContextProvider = (props: {
         modelConfig,
         messageHistoryStore,
         client,
-        null,
       );
 
       // Call chat completions and resolve all tool calls.
@@ -386,7 +385,7 @@ async function doChat(
 
       if (isContentChunk(chunk)) {
         content += chunk['choices'][0]['delta']['content'];
-        // Process model-specific content formatting
+        // todo: chance to clean up into a helper similar to assembleToolCallFromStream
         switch (modelConfig.id) {
           case 'deepseek-r1': {
             const openTag = '<think>';
@@ -464,13 +463,12 @@ async function doChat(
       );
     }
 
-    // Save to local storage with token info (unified for all models)
     syncWithLocalStorage(
       conversationID,
       modelConfig,
       messageHistoryStore,
       client,
-      finalChunk,
+      finalChunk ?? undefined,
     );
   } catch (e) {
     console.error(`An error occurred: ${e} `);
@@ -541,7 +539,7 @@ async function syncWithLocalStorage(
   modelConfig: ModelConfig,
   messageHistoryStore: MessageHistoryStore,
   client: OpenAI,
-  finalChunk: ChatCompletionChunk | null, // Optional response for token tracking
+  finalChunk?: ChatCompletionChunk, // Optional response for token tracking
 ) {
   const { id, contextLength } = modelConfig;
   const messages = messageHistoryStore.getSnapshot();
@@ -566,7 +564,7 @@ async function syncWithLocalStorage(
     const metrics = await modelConfig.contextLimitMonitor(
       messages,
       contextToProcess,
-      finalChunk, // Pass finalChunk to all contextLimitMonitor calls
+      finalChunk ?? undefined,
     );
     tokensRemaining = metrics.tokensRemaining;
   }
@@ -574,13 +572,12 @@ async function syncWithLocalStorage(
   const history: ConversationHistory = {
     id: conversationID,
     model: existingConversation ? existingConversation.model : id,
-    title: existingConversation ? existingConversation.title : 'New Chat',
+    title: 'New Chat', // initial & fallback value
     conversation: messages,
     lastSaved: new Date().valueOf(),
     tokensRemaining,
   };
 
-  // Generate a title for new conversations
   if (existingConversation && existingConversation.conversation.length <= 4) {
     try {
       const data = await client.chat.completions.create({

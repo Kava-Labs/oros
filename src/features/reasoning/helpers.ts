@@ -135,7 +135,7 @@ export const updateTokenUsage = (
 export async function calculateDeepseekTokenUsage(
   messages: ChatMessage[],
   contextLength: number,
-  finalChunk: ChatCompletionChunk | null,
+  finalChunk?: ChatCompletionChunk,
 ): Promise<ContextMetrics> {
   let tokensRemaining: number;
 
@@ -153,8 +153,6 @@ export async function calculateDeepseekTokenUsage(
   const percentageRemaining = Number(
     ((tokensRemaining / contextLength) * 100).toFixed(1),
   );
-
-  console.log(tokensUsed, tokensRemaining);
 
   return {
     tokensUsed,

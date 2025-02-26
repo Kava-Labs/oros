@@ -218,8 +218,6 @@ export async function calculateGptContextMetrics(
     percentageRemaining = 99.9;
   }
 
-  console.log(tokensUsed, tokensRemaining);
-
   return {
     tokensUsed,
     tokensRemaining,

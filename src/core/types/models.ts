@@ -17,10 +17,10 @@ export interface BaseModelConfig {
   icon: ComponentType;
   description: string;
   contextLength: number;
-  contextLimitMonitor?: (
+  contextLimitMonitor: (
     messages: ChatMessage[],
     contextLength: number,
-    finalChunk: ChatCompletionChunk | null,
+    finalChunk?: ChatCompletionChunk,
   ) => Promise<ContextMetrics>;
   tools: ChatCompletionTool[];
   systemPrompt: string;
