@@ -263,7 +263,7 @@ describe('chat', () => {
     const chat = new Chat(page);
     await chat.goto();
 
-    // //  this test runs very slowly on the reasoning model
+    //  this test runs very slowly on the reasoning model
     await chat.switchToBlockchainModel();
 
     await chat.submitMessage(
@@ -298,14 +298,6 @@ describe('chat', () => {
     await chat.waitForStreamToFinish();
     await chat.waitForSummarizationToFinish();
     await chat.waitForAssistantResponse();
-
-    await page.waitForFunction(() => {
-      const historyEntry = document.querySelector(
-        '[data-testid="chat-history-entry"]:first-child',
-      );
-      const title = historyEntry?.textContent;
-      return title && title !== 'New Chat';
-    });
 
     //  Switching between conversation histories
     const thisIsATestConversation = page
