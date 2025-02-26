@@ -38,13 +38,16 @@ describe('chat', () => {
     await chat.waitForAssistantResponse();
 
     const messages = await chat.getMessageElementsWithContent();
-    expect(messages.length).toBeGreaterThan(0);
+    const messageCount = await messages.count();
 
-    const attr =
-      await messages[messages.length - 1].getAttribute('data-chat-role');
+    expect(messageCount).toBeGreaterThan(0);
+
+    const attr = await messages
+      .nth(messageCount - 1)
+      .getAttribute('data-chat-role');
     expect(attr).toBe('assistant');
 
-    const responseText = await messages[messages.length - 1].innerText();
+    const responseText = await messages.nth(messageCount - 1).innerText();
     expect(responseText).toMatch(/THIS IS A TEST/i);
   });
 
@@ -268,6 +271,7 @@ describe('chat', () => {
     );
 
     await chat.waitForStreamToFinish();
+    await chat.waitForSummarizationToFinish();
     await chat.waitForAssistantResponse();
 
     const initialHistoryTitle = await page
@@ -285,29 +289,30 @@ describe('chat', () => {
     );
 
     await chat.waitForStreamToFinish();
+    await chat.waitForSummarizationToFinish();
     await chat.waitForAssistantResponse();
 
     //  Switching between conversation histories
     let blockchainQuestionConversation =
       await chat.getMessageElementsWithContent();
+    let messageCount = await blockchainQuestionConversation.count();
     const blockchainQuestionConversationResponse =
-      await blockchainQuestionConversation[
-        blockchainQuestionConversation.length - 1
-      ].innerText();
+      await blockchainQuestionConversation.nth(messageCount - 1).innerText();
 
     const thisIsATestConversation = page
       .getByTestId('chat-history-entry')
       .nth(1);
+
     await thisIsATestConversation.click();
 
     const currentInViewConversation =
       await chat.getMessageElementsWithContent();
-    const currentInViewResponse =
-      await currentInViewConversation[
-        currentInViewConversation.length - 1
-      ].innerText();
+    messageCount = await currentInViewConversation.count();
+    const currentInViewResponse = await currentInViewConversation
+      .nth(messageCount - 1)
+      .innerText();
 
-    expect(currentInViewResponse).not.toEqual(
+    expect(currentInViewResponse).not.toBe(
       blockchainQuestionConversationResponse,
     );
 
@@ -315,31 +320,20 @@ describe('chat', () => {
     const blockChainHistoryItem = page
       .getByTestId('chat-history-entry')
       .first();
+
     await blockChainHistoryItem.click();
 
     blockchainQuestionConversation = await chat.getMessageElementsWithContent();
-    const newBlockChainConversationResponse =
-      await blockchainQuestionConversation[
-        blockchainQuestionConversation.length - 1
-      ].innerText();
 
-    expect(newBlockChainConversationResponse).toBe(
+    messageCount = await blockchainQuestionConversation.count();
+    const newBlockchainQuestionConversationResponse =
+      await blockchainQuestionConversation.nth(messageCount - 1).innerText();
+
+    expect(newBlockchainQuestionConversationResponse).toBe(
       blockchainQuestionConversationResponse,
     );
 
-    //  Deleting entries
-    const recentHistoryEntry = await blockChainHistoryItem.textContent();
-
-    expect(recentHistoryEntry).not.toBe('');
-    expect(recentHistoryEntry).toBe('New Chat');
-    await page.waitForFunction(() => {
-      const historyEntry = document.querySelector(
-        '[data-testid="chat-history-entry"]:first-child',
-      );
-      const title = historyEntry?.textContent;
-      return title && title !== 'New Chat';
-    });
-
+    // Deleting entries
     let historyEntryTexts = await page.getByTestId('chat-history-entry').all();
     expect(historyEntryTexts).toHaveLength(2);
 
