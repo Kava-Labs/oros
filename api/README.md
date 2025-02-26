@@ -43,6 +43,30 @@ KAVACHAT_API_BACKEND_1_API_KEY=your-api-key
 KAVACHAT_API_BACKEND_1_ALLOWED_MODELS=other,models
 ```
 
+## Sequence Diagram
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant C as Client
+
+    box Backend
+    participant P as Proxy
+    participant RPQ as LLM Vision
+    participant RP as LLM Reasoning
+    end
+
+    C->>+P: POST /v1/chat/completions
+
+    P->>+RPQ: Transcribe / Describe image<br/>POST /v1/chat/completions
+    RPQ-->>-P: Image text response
+
+    P->>+RP: POST /v1/chat/completions<br/>With image text
+    RP-->>-P: Chat completion response
+
+    P-->>-C: Chat completion response
+```
+
 ## Local Development
 
 File uploads use localstack for S3. You can start localstack with docker compose
