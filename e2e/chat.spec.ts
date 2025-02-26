@@ -260,221 +260,113 @@ describe('chat', () => {
   test('chat history', async ({ page }) => {
     test.setTimeout(90 * 1000);
 
-    await page.addInitScript(() => {
-      localStorage.setItem(
-        'conversations',
-        JSON.stringify({
-          'test-id-1': {
-            id: 'test-id-1',
-            model: 'gpt-4o',
-            title: 'First Conversation Title',
-            conversation: [
-              {
-                role: 'user',
-                content: 'First message',
-              },
-              {
-                role: 'assistant',
-                content: 'First response',
-              },
-            ],
-            lastSaved: Date.now(),
-          },
-          'test-id-2': {
-            id: 'test-id-2',
-            model: 'gpt-4o',
-            title: 'Second Conversation Title',
-            conversation: [
-              {
-                role: 'user',
-                content: 'Second message',
-              },
-              {
-                role: 'assistant',
-                content: 'Second response',
-              },
-            ],
-            lastSaved: Date.now(),
-          },
-        }),
-      );
-    });
-
     const chat = new Chat(page);
     await chat.goto();
 
-    await page.pause();
-
     // //  this test runs very slowly on the reasoning model
-    // await chat.switchToBlockchainModel();
-    //
-    // await chat.submitMessage(
-    //   'This is an automated test suite, please respond with the exact text: THIS IS A TEST',
-    // );
-    //
-    // await chat.waitForStreamToFinish();
-    // await chat.waitForSummarizationToFinish();
-    // await chat.waitForAssistantResponse();
-    //
-    // const initialHistoryTitle = await page
-    //   .getByTestId('chat-history-entry')
-    //   .first()
-    //   .textContent();
-    //
-    // const blockchainConversationMessages =
-    //   await chat.getMessageElementsWithContent();
-    //
-    // let messageCount = await blockchainConversationMessages.count();
-    //
-    // const blockchainConversationResponse = await blockchainConversationMessages
-    //   .nth(messageCount - 1)
-    //   .innerText();
-    //
-    // expect(initialHistoryTitle).not.toBe('');
-    // await page.waitForFunction(() => {
-    //   const historyEntry = document.querySelector(
-    //     '[data-testid="chat-history-entry"]:first-child',
-    //   );
-    //   const title = historyEntry?.textContent;
-    //   return title && title !== 'New Chat';
-    // });
-    //
-    // const newChatIcon = page.getByRole('button', { name: 'New Chat' });
-    // await newChatIcon.click();
-    //
-    // await chat.submitMessage(
-    //   'Can you help me move my blockchain asset from one chain to another?',
-    // );
-    //
-    // await chat.waitForStreamToFinish();
-    // await chat.waitForSummarizationToFinish();
-    // await chat.waitForAssistantResponse();
-    //
-    // await page.waitForFunction(() => {
-    //   const historyEntry = document.querySelector(
-    //     '[data-testid="chat-history-entry"]:first-child',
-    //   );
-    //   const title = historyEntry?.textContent;
-    //   return title && title !== 'New Chat';
-    // });
-    //
-    // //  Switching between conversation histories
-    // const thisIsATestConversation = page
-    //   .getByTestId('chat-history-entry')
-    //   .nth(1);
-    //
-    // await page.pause();
-    //
-    // await thisIsATestConversation.click();
-    //
-    // const testConversationMessages = await chat.getMessageElementsWithContent();
-    //
-    // messageCount = await testConversationMessages.count();
-    //
-    // const testConversationResponse = await testConversationMessages
-    //   .nth(messageCount - 1)
-    //   .innerText();
-    //
-    // const blockchainConversation = page
-    //   .getByTestId('chat-history-entry')
-    //   .first();
-    //
-    // await page.waitForLoadState('domcontentloaded');
-    //
-    // await page.pause();
-    // await blockchainConversation.click({ force: true });
-    //
-    // const messagesInView = await chat.getMessageElementsWithContent();
-    //
-    // messageCount = await messagesInView.count();
-    //
-    // const responseInView = await messagesInView
-    //   .nth(messageCount - 1)
-    //   .innerText();
-    //
-    // expect(responseInView).not.toBe(testConversationResponse);
+    await chat.switchToBlockchainModel();
 
-    // const thisIsATestConversation = page
-    //   .getByTestId('chat-history-entry')
-    //   .nth(1);
-    // await thisIsATestConversation.click();
-    //
-    // const currentInViewConversation =
-    //   await chat.getMessageElementsWithContent();
-    //
-    // messageCount = await currentInViewConversation.count();
-    // const currentInViewResponse = await currentInViewConversation
-    //   .nth(messageCount - 1)
-    //   .innerText();
-    //
-    // expect(currentInViewResponse).not.toEqual(
-    //   blockchainQuestionConversationResponse,
-    // );
+    await chat.submitMessage(
+      'This is an automated test suite, please respond with the exact text: THIS IS A TEST',
+    );
 
-    // console.log('currentInViewResponse', currentInViewResponse);
-    // console.log(
-    //   'blockchainQuestionConversationResponse',
-    //   blockchainQuestionConversationResponse,
-    // );
-    //
-    //  switch back to the initial conversation
-    // const blockChainHistoryItem = page
-    //   .getByTestId('chat-history-entry')
-    //   .first();
-    // await blockChainHistoryItem.click();
-    //
-    // blockchainQuestionConversation = await chat.getMessageElementsWithContent();
-    //
-    // messageCount = await blockchainQuestionConversation.count();
-    //
-    // const newBlockChainConversationResponse =
-    //   await blockchainQuestionConversation.nth(messageCount - 1).innerText();
-    //
-    // expect(newBlockChainConversationResponse).toContain(
-    //   blockchainQuestionConversationResponse,
-    // );
+    await chat.waitForStreamToFinish();
+    await chat.waitForSummarizationToFinish();
+    await chat.waitForAssistantResponse();
 
-    //  Deleting entries
-    // const recentHistoryEntry = await blockChainHistoryItem.textContent();
-    //
-    // expect(recentHistoryEntry).not.toBe('');
-    // expect(recentHistoryEntry).toBe('New Chat');
-    // await page.waitForFunction(() => {
-    //   const historyEntry = document.querySelector(
-    //     '[data-testid="chat-history-entry"]:first-child',
-    //   );
-    //   const title = historyEntry?.textContent;
-    //   return title && title !== 'New Chat';
-    // });
-    //
-    // let historyEntryTexts = await page.getByTestId('chat-history-entry').all();
-    // expect(historyEntryTexts).toHaveLength(2);
-    //
-    // const chatOptionButtons = await page.getByLabel('Chat Options').all();
-    // expect(chatOptionButtons).toHaveLength(2);
-    //
-    // // Get the first chat history entry Chat Option button
-    // const firstChatOptionButton = chatOptionButtons[0];
-    //
-    // // Find and click the "Chat Options" button inside the first entry
-    // await firstChatOptionButton.click();
-    //
-    // await page.locator(`[aria-label="Delete Chat"]`).first().click();
-    // await historyEntryTexts[1].waitFor({ state: 'detached' });
-    // historyEntryTexts = await page.getByTestId('chat-history-entry').all();
-    //
-    // expect(historyEntryTexts).toHaveLength(1);
-    //
-    // // Get the only remaining chat history entry Chat Option button
-    // const lastChatOptionButton = chatOptionButtons[0];
-    //
-    // // Find and click the "Chat Options" button inside the first entry
-    // await lastChatOptionButton.click();
-    // await page.locator(`[aria-label="Delete Chat"]`).first().click();
-    // await historyEntryTexts[0].waitFor({ state: 'detached' });
-    // historyEntryTexts = await page.getByTestId('chat-history-entry').all();
-    // expect(historyEntryTexts).toHaveLength(0);
-    // await expect(page.getByText('Start a new chat to begin')).toBeVisible();
+    const initialHistoryTitle = await page
+      .getByTestId('chat-history-entry')
+      .first()
+      .textContent();
+
+    expect(initialHistoryTitle).not.toBe('');
+    await page.waitForFunction(() => {
+      const historyEntry = document.querySelector(
+        '[data-testid="chat-history-entry"]:first-child',
+      );
+      const title = historyEntry?.textContent;
+      return title && title !== 'New Chat';
+    });
+
+    const newChatIcon = page.getByRole('button', { name: 'New Chat' });
+    await newChatIcon.click();
+
+    await chat.submitMessage(
+      'Can you help me move my blockchain asset from one chain to another?',
+    );
+
+    await chat.waitForStreamToFinish();
+    await chat.waitForSummarizationToFinish();
+    await chat.waitForAssistantResponse();
+
+    await page.waitForFunction(() => {
+      const historyEntry = document.querySelector(
+        '[data-testid="chat-history-entry"]:first-child',
+      );
+      const title = historyEntry?.textContent;
+      return title && title !== 'New Chat';
+    });
+
+    //  Switching between conversation histories
+    const thisIsATestConversation = page
+      .getByTestId('chat-history-entry')
+      .nth(1);
+
+    await thisIsATestConversation.click();
+
+    const testConversationMessages = await chat.getMessageElementsWithContent();
+
+    let messageCount = await testConversationMessages.count();
+
+    const testConversationResponse = await testConversationMessages
+      .nth(messageCount - 1)
+      .innerText();
+
+    const blockchainConversation = page
+      .getByTestId('chat-history-entry')
+      .first();
+
+    await blockchainConversation.click();
+
+    const messagesInView = await chat.getMessageElementsWithContent();
+
+    messageCount = await messagesInView.count();
+
+    const responseInView = await messagesInView
+      .nth(messageCount - 1)
+      .innerText();
+
+    expect(responseInView).not.toBe(testConversationResponse);
+
+    // Deleting entries
+    let historyEntryTexts = await page.getByTestId('chat-history-entry').all();
+    expect(historyEntryTexts).toHaveLength(2);
+
+    const chatOptionButtons = await page.getByLabel('Chat Options').all();
+    expect(chatOptionButtons).toHaveLength(2);
+
+    // Get the first chat history entry Chat Option button
+    const firstChatOptionButton = chatOptionButtons[0];
+
+    // Find and click the "Chat Options" button inside the first entry
+    await firstChatOptionButton.click();
+
+    await page.locator(`[aria-label="Delete Chat"]`).first().click();
+    await historyEntryTexts[1].waitFor({ state: 'detached' });
+    historyEntryTexts = await page.getByTestId('chat-history-entry').all();
+
+    expect(historyEntryTexts).toHaveLength(1);
+
+    // Get the only remaining chat history entry Chat Option button
+    const lastChatOptionButton = chatOptionButtons[0];
+
+    // Find and click the "Chat Options" button inside the first entry
+    await lastChatOptionButton.click();
+    await page.locator(`[aria-label="Delete Chat"]`).first().click();
+    await historyEntryTexts[0].waitFor({ state: 'detached' });
+    historyEntryTexts = await page.getByTestId('chat-history-entry').all();
+    expect(historyEntryTexts).toHaveLength(0);
+    await expect(page.getByText('Start a new chat to begin')).toBeVisible();
   });
   test('conversation history from local storage populates the UI', async ({
     page,
