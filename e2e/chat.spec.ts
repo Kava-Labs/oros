@@ -305,32 +305,14 @@ describe('chat', () => {
 
     await thisIsATestConversation.click();
 
-    const testConversationMessages = await chat.getMessageElementsWithContent();
+    const currentInViewConversation =
+      await chat.getMessageElementsWithContent();
 
-    messageCount = await testConversationMessages.count();
-
-    const testConversationResponse = await testConversationMessages
-      .nth(messageCount - 1)
-      .innerText();
-
-    const blockchainConversation = page
-      .getByTestId('chat-history-entry')
-      .first();
-
-    await blockchainConversation.click();
-
-    const messagesInView = await chat.getMessageElementsWithContent();
-
-    messageCount = await messagesInView.count();
-
-    const responseInView = await messagesInView
-      .nth(messageCount - 1)
-      .innerText();
-
-    expect(responseInView).not.toBe(testConversationResponse);
+    expect(currentInViewConversation).not.toBe(
+      blockchainQuestionConversationResponse,
+    );
 
     //  switch back to the initial conversation
-
     const blockChainHistoryItem = page
       .getByTestId('chat-history-entry')
       .first();
