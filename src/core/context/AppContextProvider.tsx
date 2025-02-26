@@ -559,17 +559,17 @@ async function syncWithLocalStorage(
   // Initialize tokensRemaining from existing conversation or default to full context length
   let tokensRemaining = existingConversation?.tokensRemaining ?? contextLength;
 
-  // Use contextLimitMonitor for all models
-  if (modelConfig.contextLimitMonitor) {
-    const contextToProcess =
-      modelConfig.id === 'deepseek-r1' ? tokensRemaining : contextLength;
-    const metrics = await modelConfig.contextLimitMonitor(
-      messages,
-      contextToProcess,
-      finalChunk ?? undefined,
-    );
-    tokensRemaining = metrics.tokensRemaining;
-  }
+  //  Deepseek compares the current message to the remaining context
+  //  GPT compares the entire conversation thread to the max context
+  const contextToProcess =
+    modelConfig.id === 'deepseek-r1' ? tokensRemaining : contextLength;
+
+  const metrics = await modelConfig.contextLimitMonitor(
+    messages,
+    contextToProcess,
+    finalChunk,
+  );
+  tokensRemaining = metrics.tokensRemaining;
 
   const history: ConversationHistory = {
     id: conversationID,
