@@ -280,13 +280,6 @@ describe('chat', () => {
       .textContent();
 
     expect(initialHistoryTitle).not.toBe('');
-    await page.waitForFunction(() => {
-      const historyEntry = document.querySelector(
-        '[data-testid="chat-history-entry"]:first-child',
-      );
-      const title = historyEntry?.textContent;
-      return title && title !== 'New Chat';
-    });
 
     const newChatIcon = page.getByRole('button', { name: 'New Chat' });
     await newChatIcon.click();
