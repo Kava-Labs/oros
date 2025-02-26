@@ -439,6 +439,7 @@ async function doChat(
       }
 
       messageHistoryStore.addMessage(msg);
+
       messageStore.setText('');
     }
 
@@ -491,6 +492,7 @@ async function doChat(
     }
   }
 }
+
 async function callTools(
   toolCallStreamStore: ToolCallStreamStore,
   messageHistoryStore: MessageHistoryStore,
@@ -541,7 +543,7 @@ async function syncWithLocalStorage(
   modelConfig: ModelConfig,
   messageHistoryStore: MessageHistoryStore,
   client: OpenAI,
-  finalChunk?: ChatCompletionChunk, // Optional response for token tracking
+  finalChunk?: ChatCompletionChunk, // Used by deepseek for token tracking
 ) {
   const { id, contextLength } = modelConfig;
   const messages = messageHistoryStore.getSnapshot();
