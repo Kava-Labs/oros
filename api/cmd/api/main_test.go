@@ -35,6 +35,8 @@ type testConfig struct {
 	port              int
 	host              string
 	metricsServerPort int
+	s3BucketURI       string
+	publicURL         string
 }
 
 var httpTestCases []*HttpTestCase
@@ -49,6 +51,8 @@ func newDefaultTestConfig() testConfig {
 		port:              8080,
 		host:              "127.0.0.1",
 		metricsServerPort: 9090,
+		s3BucketURI:       "s3://test-bucket",
+		publicURL:         "https://api.server.iu",
 	}
 }
 
@@ -93,6 +97,8 @@ func startProxyCmd(context context.Context, config testConfig, args ...string) *
 		fmt.Sprintf("KAVACHAT_API_PORT=%d", config.port),
 		fmt.Sprintf("KAVACHAT_API_HOST=%s", config.host),
 		fmt.Sprintf("KAVACHAT_API_METRICS_PORT=%d", config.metricsServerPort),
+		fmt.Sprintf("KAVACHAT_API_S3_BUCKET=%s", config.s3BucketURI),
+		fmt.Sprintf("KAVACHAT_API_PUBLIC_URL=%s", config.publicURL),
 	)
 
 	return cmd

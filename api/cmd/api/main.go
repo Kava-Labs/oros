@@ -94,6 +94,26 @@ func main() {
 		fmt.Fprintln(w, "available")
 	})
 
+	// File uploads
+	mux.Handle(
+		"POST /v1/files",
+		handlers.NewImageUploadHandler(
+			cfg.S3BucketName,
+			cfg.PublicURL,
+			logger,
+		),
+	)
+
+	// File downloads
+	mux.Handle(
+		"GET /v1/files/{file_id}",
+		handlers.NewFileDownloadHandler(
+			cfg.S3BucketName,
+			logger,
+		),
+	)
+
+	// OpenAI routes
 	mux.Handle(
 		"/openai/v1/chat/completions",
 		alice.

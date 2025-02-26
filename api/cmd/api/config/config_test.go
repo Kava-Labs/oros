@@ -17,12 +17,20 @@ func TestGetConfigFromEnv(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, 8080, cfg.ServerPort)
 		require.Equal(t, "127.0.0.1", cfg.ServerHost)
+		require.Equal(t, "plain", cfg.LogFormat)
+		require.Equal(t, 9090, cfg.MetricsPort)
 		require.Empty(t, cfg.Backends)
+		require.Empty(t, cfg.S3BucketName)
 	})
 
 	t.Run("custom values", func(t *testing.T) {
+		os.Clearenv() // Clear any previous environment variables
 		os.Setenv("KAVACHAT_API_PORT", "9090")
 		os.Setenv("KAVACHAT_API_HOST", "0.0.0.0")
+		os.Setenv("KAVACHAT_API_PUBLIC_URL", "https://api.example.com")
+		os.Setenv("KAVACHAT_API_S3_BUCKET", "bucket-name")
+		os.Setenv("KAVACHAT_API_LOG_FORMAT", "json")
+		os.Setenv("KAVACHAT_API_METRICS_PORT", "8181")
 		os.Setenv("KAVACHAT_API_BACKEND_0_NAME", "OpenAI")
 		os.Setenv("KAVACHAT_API_BACKEND_0_BASE_URL", "https://api.openai.com")
 		os.Setenv("KAVACHAT_API_BACKEND_0_API_KEY", "test-api-key")
@@ -38,6 +46,10 @@ func TestGetConfigFromEnv(t *testing.T) {
 
 		require.Equal(t, 9090, cfg.ServerPort)
 		require.Equal(t, "0.0.0.0", cfg.ServerHost)
+		require.Equal(t, "https://api.example.com", cfg.PublicURL)
+		require.Equal(t, "bucket-name", cfg.S3BucketName)
+		require.Equal(t, "json", cfg.LogFormat)
+		require.Equal(t, 8181, cfg.MetricsPort)
 
 		require.Len(t, cfg.Backends, 2)
 
@@ -229,12 +241,45 @@ func TestOpenAiBackendsValidate(t *testing.T) {
 	}
 }
 
+func TestConfigString(t *testing.T) {
+	cfg := config.Config{
+		LogLevel:     "debug",
+		ServerPort:   8080,
+		ServerHost:   "localhost",
+		PublicURL:    "http://localhost:8080",
+		MetricsPort:  9090,
+		S3BucketName: "my-bucket",
+		Backends: []config.OpenAIBackend{
+			{
+				Name:          "TestBackend",
+				BaseURL:       "https://api.test.com",
+				APIKey:        "secret-key",
+				AllowedModels: []string{"model1", "model2"},
+			},
+		},
+	}
+
+	str := cfg.String()
+	require.Contains(t, str, "LogLevel: debug")
+	require.Contains(t, str, "ServerPort: 8080")
+	require.Contains(t, str, "ServerHost: localhost")
+	require.Contains(t, str, "PublicURL: http://localhost:8080")
+	require.Contains(t, str, "MetricsPort: 9090")
+	require.Contains(t, str, "S3BucketName: my-bucket")
+	require.Contains(t, str, "Backends:")
+	require.Contains(t, str, "TestBackend")
+	require.Contains(t, str, "REDACTED")      // API key should be redacted
+	require.NotContains(t, str, "secret-key") // Should not contain the actual API key
+}
+
 func TestConfigValidate(t *testing.T) {
 	validCfg := config.Config{
-		ServerPort: 8080,
-		ServerHost: "127.0.0.1",
-		LogFormat:  "json",
-		Backends:   []config.OpenAIBackend{validBackend()},
+		ServerPort:   8080,
+		ServerHost:   "127.0.0.1",
+		LogFormat:    "json",
+		PublicURL:    "http://localhost:8080", // PublicURL is required
+		S3BucketName: "test-bucket",
+		Backends:     []config.OpenAIBackend{validBackend()},
 	}
 
 	tests := []struct {
@@ -304,6 +349,24 @@ func TestConfigValidate(t *testing.T) {
 			}(),
 			wantErr: errors.New("HOST is required"),
 		},
+		{
+			name: "missing PublicURL",
+			cfg: func() config.Config {
+				cfg := validCfg
+				cfg.PublicURL = ""
+				return cfg
+			}(),
+			wantErr: errors.New("PUBLIC_URL is required"),
+		},
+		{
+			name: "invalid LogFormat",
+			cfg: func() config.Config {
+				cfg := validCfg
+				cfg.LogFormat = "invalid"
+				return cfg
+			}(),
+			wantErr: errors.New("LOG_FORMAT must be 'plain' or 'json'"),
+		},
 	}
 
 	for _, tc := range tests {
@@ -346,5 +409,49 @@ func TestOpenAIBackendGetClient(t *testing.T) {
 		client2 := backend.GetClient()
 
 		require.Equal(t, client1, client2, "client does not change when backend config changes")
+	})
+}
+
+// Test GetBackendFromModel function
+func TestGetBackendFromModel(t *testing.T) {
+	backends := config.OpenAIBackends{
+		{
+			Name:          "OpenAI",
+			BaseURL:       "https://api.openai.com",
+			APIKey:        "test-api-key",
+			AllowedModels: []string{"gpt-4", "gpt-3.5-turbo"},
+		},
+		{
+			Name:          "RunPod",
+			BaseURL:       "https://api.runpod.io",
+			APIKey:        "runpod-key",
+			AllowedModels: []string{"deepseek-r1", "llama-3"},
+		},
+	}
+
+	t.Run("model exists in first backend", func(t *testing.T) {
+		backend, found := backends.GetBackendFromModel("gpt-4")
+		require.True(t, found)
+		require.NotNil(t, backend)
+		require.Equal(t, "OpenAI", backend.Name)
+	})
+
+	t.Run("model exists in second backend", func(t *testing.T) {
+		backend, found := backends.GetBackendFromModel("llama-3")
+		require.True(t, found)
+		require.NotNil(t, backend)
+		require.Equal(t, "RunPod", backend.Name)
+	})
+
+	t.Run("model does not exist", func(t *testing.T) {
+		backend, found := backends.GetBackendFromModel("nonexistent-model")
+		require.False(t, found)
+		require.Nil(t, backend)
+	})
+
+	t.Run("empty model name", func(t *testing.T) {
+		backend, found := backends.GetBackendFromModel("")
+		require.False(t, found)
+		require.Nil(t, backend)
 	})
 }
