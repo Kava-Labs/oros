@@ -293,11 +293,6 @@ describe('chat', () => {
     let blockchainQuestionConversation =
       await chat.getMessageElementsWithContent();
 
-    console.log(
-      'await blockchainQuestionConversation[1]',
-      await blockchainQuestionConversation[1].innerText(),
-    );
-
     const blockchainQuestionConversationResponse =
       await blockchainQuestionConversation[1].innerText();
 
@@ -325,9 +320,7 @@ describe('chat', () => {
 
     blockchainQuestionConversation = await chat.getMessageElementsWithContent();
     const newBlockChainConversationResponse =
-      await blockchainQuestionConversation[
-        blockchainQuestionConversation.length - 1
-      ].innerText();
+      await blockchainQuestionConversation[1].innerText();
 
     expect(newBlockChainConversationResponse).toBe(
       blockchainQuestionConversationResponse,
