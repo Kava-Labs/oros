@@ -4,7 +4,7 @@ import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useAppContext } from '../context/useAppContext';
 import { InputAdornmentMessage } from './InputAdornmentMessage';
 import { ConversationHistory } from '../context/types';
-import { hasSufficientRemainingTokens } from '../utils/conversation/helpers';
+import { hasSufficientRemainingTokens } from '../utils/conversation/hasSufficientRemainingTokens';
 
 const DEFAULT_HEIGHT = '30px';
 
@@ -109,7 +109,9 @@ const ChatInput = ({
 
   const currentConversation = allConversations[conversationID];
 
-  const remainingContextWindow = currentConversation.tokensRemaining;
+  const remainingContextWindow = currentConversation
+    ? currentConversation.tokensRemaining
+    : modelConfig.contextLength;
 
   return (
     <>
