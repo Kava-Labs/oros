@@ -358,7 +358,7 @@ async function doChat(
       return msg;
     });
 
-    let finalChunk = null;
+    let finalChunk: ChatCompletionChunk | undefined;
 
     const stream = await client.chat.completions.create(
       {
@@ -376,8 +376,10 @@ async function doChat(
     let thinkingEnd = -1;
 
     for await (const chunk of stream) {
-      // Keep track of the final chunk for token usage (for all models)
-      finalChunk = chunk;
+      //  Get the usage info (in the final chunk)
+      if (chunk.usage) {
+        finalChunk = chunk;
+      }
 
       if (progressStore.getSnapshot() !== '') {
         progressStore.setText('');
@@ -468,7 +470,7 @@ async function doChat(
       modelConfig,
       messageHistoryStore,
       client,
-      finalChunk ?? undefined,
+      finalChunk,
     );
   } catch (e) {
     console.error(`An error occurred: ${e} `);
