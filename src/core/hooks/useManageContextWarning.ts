@@ -15,11 +15,12 @@ export const useManageContextWarning = (
 
   const currentConversation = allConversations[conversationID];
 
-  //  when a user changes to another conversation or starts a new one,
-  //  reset dismissal so they get the warning
+  //  when a user changes to another conversation (existing or new),
+  //  reset all state
   useEffect(() => {
+    setShowInputAdornmentMessage(false);
     setDismissWarning(false);
-  }, [conversationID, setDismissWarning]);
+  }, [conversationID, setDismissWarning, setShowInputAdornmentMessage]);
 
   //  when an existing conversation goes over the threshold,
   //  show the warning, provided the user hasn't already seen it and toggled it off

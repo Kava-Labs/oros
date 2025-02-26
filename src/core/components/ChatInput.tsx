@@ -26,7 +26,6 @@ const ChatInput = ({
 }: ChatInputProps) => {
   const [showInputAdornmentMessage, setShowInputAdornmentMessage] =
     useState(false);
-
   const [dismissWarning, setDismissWarning] = useState(false);
 
   useManageContextWarning(
