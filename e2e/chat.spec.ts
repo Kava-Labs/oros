@@ -307,8 +307,12 @@ describe('chat', () => {
 
     const currentInViewConversation =
       await chat.getMessageElementsWithContent();
+    messageCount = await currentInViewConversation.count();
+    const currentInViewResponse = await currentInViewConversation
+      .nth(messageCount - 1)
+      .innerText();
 
-    expect(currentInViewConversation).not.toBe(
+    expect(currentInViewResponse).not.toBe(
       blockchainQuestionConversationResponse,
     );
 
