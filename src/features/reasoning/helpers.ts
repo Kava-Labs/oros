@@ -12,8 +12,6 @@ export const estimateTokenUsage = (
   messages: ChatMessage[],
 ): {
   totalTokens: number;
-  promptTokens: number;
-  completionTokens: number;
 } => {
   // Very rough token estimation (about 4 chars per token)
   let promptTokens = 0;
@@ -33,8 +31,6 @@ export const estimateTokenUsage = (
   const totalTokens = promptTokens + completionTokens;
 
   return {
-    promptTokens,
-    completionTokens,
     totalTokens,
   };
 };

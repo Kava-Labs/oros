@@ -3,7 +3,8 @@ import { CancelChatIcon, SendChatIcon } from '../assets';
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useAppContext } from '../context/useAppContext';
 import { InputAdornmentMessage } from './InputAdornmentMessage';
-import { isWithinTokenLimit } from 'gpt-tokenizer';
+import { ConversationHistory } from '../context/types';
+import { hasSufficientRemainingTokens } from '../utils/conversation/helpers';
 
 const DEFAULT_HEIGHT = '30px';
 
@@ -22,7 +23,7 @@ const ChatInput = ({
     useState(false);
   const [inputValue, setInputValue] = useState('');
 
-  const { isRequesting, modelConfig } = useAppContext();
+  const { isRequesting, modelConfig, conversationID } = useAppContext();
 
   const buttonRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -102,6 +103,14 @@ const ChatInput = ({
     }
   }, []);
 
+  const allConversations: Record<string, ConversationHistory> = JSON.parse(
+    localStorage.getItem('conversations') ?? '{}',
+  );
+
+  const currentConversation = allConversations[conversationID];
+
+  const remainingContextWindow = currentConversation.tokensRemaining;
+
   return (
     <>
       <InputAdornmentMessage
@@ -131,7 +140,11 @@ const ChatInput = ({
             aria-label="Send Chat"
             disabled={
               (!isRequesting && inputValue.length === 0) ||
-              !isWithinTokenLimit(inputValue, modelConfig.contextLength)
+              !hasSufficientRemainingTokens(
+                modelConfig.id,
+                inputValue,
+                remainingContextWindow,
+              )
             }
           >
             {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
