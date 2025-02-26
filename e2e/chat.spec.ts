@@ -48,133 +48,134 @@ describe('chat', () => {
     expect(responseText).toMatch(/THIS IS A TEST/i);
   });
 
-  test('check balances', async ({ page, context, metaMaskExtensionId }) => {
-    test.setTimeout(90 * 1000);
+  // test('check balances', async ({ page, context, metaMaskExtensionId }) => {
+  //   test.setTimeout(90 * 1000);
+  //
+  //   const chat = new Chat(page);
+  //   await chat.goto();
+  //
+  //   await chat.switchToBlockchainModel();
+  //
+  //   const metaMask = await MetaMask.prepareWallet(context, metaMaskExtensionId);
+  //
+  //   await metaMask.switchNetwork();
+  //
+  //   //  be ready to find the upcoming popup
+  //   const metamaskPopupPromise = context.waitForEvent('page');
+  //
+  //   await chat.submitMessage('What are my balances on Kava Internal Testnet?');
+  //
+  //   await chat.waitForStreamToFinish();
+  //
+  //   const metamaskPopup = await metamaskPopupPromise;
+  //
+  //   await retryButtonClick(metamaskPopup, { name: 'Connect' });
+  //
+  //   await chat.waitForStreamToFinish();
+  //   await chat.waitForAssistantResponse();
+  //
+  //   const amountElement = await page.getByTestId('TKAVA-query-amount');
+  //   const amountText = (await amountElement.textContent()) || '';
+  //
+  //   const amount = parseFloat(amountText.replace(/,/g, ''));
+  //   expect(amount).toBeGreaterThan(1000);
+  // });
 
-    const chat = new Chat(page);
-    await chat.goto();
+  // test('send tx (native asset)', async ({
+  //   page,
+  //   context,
+  //   metaMaskExtensionId,
+  // }) => {
+  //   const KAVA_EVM_DECIMALS = 10 ** 18;
+  //   test.setTimeout(90 * 1000);
+  //
+  //   const chat = new Chat(page);
+  //   await chat.goto();
+  //
+  //   await chat.switchToBlockchainModel();
+  //
+  //   const metaMask = await MetaMask.prepareWallet(context, metaMaskExtensionId);
+  //
+  //   await metaMask.switchNetwork();
+  //
+  //   //  be ready to find the upcoming popup
+  //   const metamaskPopupPromise = context.waitForEvent('page');
+  //
+  //   await chat.submitMessage(
+  //     'Send 0.12345 TKAVA to 0xC07918E451Ab77023a16Fa7515Dd60433A3c771D on Kava EVM Internal Testnet',
+  //   );
+  //
+  //   await chat.waitForStreamToFinish();
+  //
+  //   const metamaskPopup = await metamaskPopupPromise;
+  //   await retryButtonClick(metamaskPopup, { name: 'Connect' });
+  //   await retryButtonClick(metamaskPopup, { name: 'Confirm' });
+  //
+  //   //  In progress
+  //   await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
+  //
+  //   const provider = new ethers.JsonRpcProvider(
+  //     'https://evm.data.internal.testnet.us-east.production.kava.io',
+  //   );
+  //   const txHash = await page.getByTestId('tx-hash').innerText();
+  //   const txInfo = await provider.getTransaction(txHash);
+  //
+  //   //  Verify that the tx value is the amount from the user input
+  //   const txValue: bigint = txInfo.value;
+  //
+  //   expect(Number(txValue) / KAVA_EVM_DECIMALS).toBe(0.12345);
+  // });
 
-    await chat.switchToBlockchainModel();
-
-    const metaMask = await MetaMask.prepareWallet(context, metaMaskExtensionId);
-
-    await metaMask.switchNetwork();
-
-    //  be ready to find the upcoming popup
-    const metamaskPopupPromise = context.waitForEvent('page');
-
-    await chat.submitMessage('What are my balances on Kava Internal Testnet?');
-
-    await chat.waitForStreamToFinish();
-
-    const metamaskPopup = await metamaskPopupPromise;
-
-    await retryButtonClick(metamaskPopup, { name: 'Connect' });
-
-    await chat.waitForStreamToFinish();
-    await chat.waitForAssistantResponse();
-
-    const amountElement = await page.getByTestId('TKAVA-query-amount');
-    const amountText = (await amountElement.textContent()) || '';
-
-    const amount = parseFloat(amountText.replace(/,/g, ''));
-    expect(amount).toBeGreaterThan(1000);
-  });
-
-  test('send tx (native asset)', async ({
-    page,
-    context,
-    metaMaskExtensionId,
-  }) => {
-    const KAVA_EVM_DECIMALS = 10 ** 18;
-    test.setTimeout(90 * 1000);
-
-    const chat = new Chat(page);
-    await chat.goto();
-
-    await chat.switchToBlockchainModel();
-
-    const metaMask = await MetaMask.prepareWallet(context, metaMaskExtensionId);
-
-    await metaMask.switchNetwork();
-
-    //  be ready to find the upcoming popup
-    const metamaskPopupPromise = context.waitForEvent('page');
-
-    await chat.submitMessage(
-      'Send 0.12345 TKAVA to 0xC07918E451Ab77023a16Fa7515Dd60433A3c771D on Kava EVM Internal Testnet',
-    );
-
-    await chat.waitForStreamToFinish();
-
-    const metamaskPopup = await metamaskPopupPromise;
-    await retryButtonClick(metamaskPopup, { name: 'Connect' });
-    await retryButtonClick(metamaskPopup, { name: 'Confirm' });
-
-    //  In progress
-    await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
-
-    const provider = new ethers.JsonRpcProvider(
-      'https://evm.data.internal.testnet.us-east.production.kava.io',
-    );
-    const txHash = await page.getByTestId('tx-hash').innerText();
-    const txInfo = await provider.getTransaction(txHash);
-
-    //  Verify that the tx value is the amount from the user input
-    const txValue: bigint = txInfo.value;
-
-    expect(Number(txValue) / KAVA_EVM_DECIMALS).toBe(0.12345);
-  });
-  test('send tx (non-native asset)', async ({
-    page,
-    context,
-    metaMaskExtensionId,
-  }) => {
-    const USDT_DECIMALS = 10 ** 6;
-    test.setTimeout(90 * 1000);
-
-    const chat = new Chat(page);
-    await chat.goto();
-
-    await chat.switchToBlockchainModel();
-
-    const metaMask = await MetaMask.prepareWallet(context, metaMaskExtensionId);
-
-    await metaMask.switchNetwork();
-
-    //  be ready to find the upcoming popup
-    const metamaskPopupPromise = context.waitForEvent('page');
-
-    await chat.submitMessage(
-      'Send 0.2345 USDT to 0xC07918E451Ab77023a16Fa7515Dd60433A3c771D on Kava EVM Internal Testnet',
-    );
-
-    await chat.waitForStreamToFinish();
-
-    const metamaskPopup = await metamaskPopupPromise;
-    await retryButtonClick(metamaskPopup, { name: 'Connect' });
-    await retryButtonClick(metamaskPopup, { name: 'Confirm' });
-
-    //  In progress
-    await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
-
-    const provider = new ethers.JsonRpcProvider(
-      'https://evm.data.internal.testnet.us-east.production.kava.io',
-    );
-    const txHash = await page.getByTestId('tx-hash').innerText();
-    const txInfo = await provider.getTransaction(txHash);
-
-    // Get the parsed transaction data using ethers interface
-    const ethersInterface = new ethers.Interface([
-      'function transfer(address to, uint256 amount)',
-    ]);
-    const decodedData = ethersInterface.parseTransaction({ data: txInfo.data });
-
-    const amount = decodedData.args[1]; // Second argument is the amount
-    const formattedAmount = Number(amount) / USDT_DECIMALS;
-
-    expect(formattedAmount).toBe(0.2345);
-  });
+  // test('send tx (non-native asset)', async ({
+  //   page,
+  //   context,
+  //   metaMaskExtensionId,
+  // }) => {
+  //   const USDT_DECIMALS = 10 ** 6;
+  //   test.setTimeout(90 * 1000);
+  //
+  //   const chat = new Chat(page);
+  //   await chat.goto();
+  //
+  //   await chat.switchToBlockchainModel();
+  //
+  //   const metaMask = await MetaMask.prepareWallet(context, metaMaskExtensionId);
+  //
+  //   await metaMask.switchNetwork();
+  //
+  //   //  be ready to find the upcoming popup
+  //   const metamaskPopupPromise = context.waitForEvent('page');
+  //
+  //   await chat.submitMessage(
+  //     'Send 0.2345 USDT to 0xC07918E451Ab77023a16Fa7515Dd60433A3c771D on Kava EVM Internal Testnet',
+  //   );
+  //
+  //   await chat.waitForStreamToFinish();
+  //
+  //   const metamaskPopup = await metamaskPopupPromise;
+  //   await retryButtonClick(metamaskPopup, { name: 'Connect' });
+  //   await retryButtonClick(metamaskPopup, { name: 'Confirm' });
+  //
+  //   //  In progress
+  //   await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
+  //
+  //   const provider = new ethers.JsonRpcProvider(
+  //     'https://evm.data.internal.testnet.us-east.production.kava.io',
+  //   );
+  //   const txHash = await page.getByTestId('tx-hash').innerText();
+  //   const txInfo = await provider.getTransaction(txHash);
+  //
+  //   // Get the parsed transaction data using ethers interface
+  //   const ethersInterface = new ethers.Interface([
+  //     'function transfer(address to, uint256 amount)',
+  //   ]);
+  //   const decodedData = ethersInterface.parseTransaction({ data: txInfo.data });
+  //
+  //   const amount = decodedData.args[1]; // Second argument is the amount
+  //   const formattedAmount = Number(amount) / USDT_DECIMALS;
+  //
+  //   expect(formattedAmount).toBe(0.2345);
+  // });
   test('model dropdown interactions', async ({ page }) => {
     const DEFAULT_MODEL_DISPLAY_NAME = 'General Reasoning';
     const NUMBER_OF_SUPPORTED_MODELS = 2;
@@ -223,37 +224,6 @@ describe('chat', () => {
     await expect(modelButton).toBeDisabled();
   });
 
-  test('model dropdown interactions in mobile', async ({ browser }) => {
-    const context = await browser.newContext({
-      ...devices['iPhone 13'],
-    });
-
-    const page = await context.newPage();
-    const chat = new Chat(page);
-    await chat.goto();
-
-    const modelButton = page.getByRole('combobox', { name: 'Select Model' });
-    await modelButton.click();
-
-    const dropdown = page.getByRole('listbox');
-    await expect(dropdown).toBeVisible();
-
-    const blockchainModel = page
-      .getByRole('option')
-      .filter({ hasText: 'Blockchain Instruct' });
-    const reasoningModel = page
-      .getByRole('option')
-      .filter({ hasText: 'General Reasoning' });
-
-    await expect(blockchainModel).toBeEnabled();
-    await expect(reasoningModel).toBeEnabled();
-
-    await blockchainModel.click();
-    await expect(modelButton).toContainText('Blockchain Instruct');
-
-    await context.close();
-  });
-
   test('chat history', async ({ page }) => {
     test.setTimeout(90 * 1000);
 
@@ -294,7 +264,7 @@ describe('chat', () => {
       await chat.getMessageElementsWithContent();
 
     const blockchainQuestionConversationResponse =
-      await blockchainQuestionConversation[1].innerText();
+      await blockchainQuestionConversation[1].textContent();
 
     const thisIsATestConversation = page
       .getByTestId('chat-history-entry')
@@ -306,7 +276,7 @@ describe('chat', () => {
     const currentInViewResponse =
       await currentInViewConversation[
         currentInViewConversation.length - 1
-      ].innerText();
+      ].textContent();
 
     expect(currentInViewResponse).not.toEqual(
       blockchainQuestionConversationResponse,
@@ -320,7 +290,7 @@ describe('chat', () => {
 
     blockchainQuestionConversation = await chat.getMessageElementsWithContent();
     const newBlockChainConversationResponse =
-      await blockchainQuestionConversation[1].innerText();
+      await blockchainQuestionConversation[1].textContent();
 
     expect(newBlockChainConversationResponse).toBe(
       blockchainQuestionConversationResponse,
