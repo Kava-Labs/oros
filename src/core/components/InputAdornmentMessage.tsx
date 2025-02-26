@@ -5,17 +5,13 @@ import { X as CloseX } from 'lucide-react';
 import { useAppContext } from '../context/useAppContext';
 
 interface InputAdornmentMessageProps {
-  showInputAdornmentMessage: boolean;
-  setShowInputAdornmentMessage: (show: boolean) => void;
+  onCloseClick: () => void;
 }
 
 export const InputAdornmentMessage: React.FC<InputAdornmentMessageProps> = ({
-  showInputAdornmentMessage,
-  setShowInputAdornmentMessage,
+  onCloseClick,
 }) => {
   const { startNewChat } = useAppContext();
-
-  if (!showInputAdornmentMessage) return null;
 
   return (
     <div className={styles.wrapper}>
@@ -35,7 +31,7 @@ export const InputAdornmentMessage: React.FC<InputAdornmentMessageProps> = ({
           size={12}
           aria-label="Close New Chat Prompt"
           className={styles.closeIcon}
-          onClick={() => setShowInputAdornmentMessage(false)}
+          onClick={onCloseClick}
         />
       </div>
     </div>

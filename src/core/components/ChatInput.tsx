@@ -3,8 +3,13 @@ import { CancelChatIcon, SendChatIcon } from '../assets';
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useAppContext } from '../context/useAppContext';
 import { InputAdornmentMessage } from './InputAdornmentMessage';
+<<<<<<< HEAD
 import { ConversationHistory } from '../context/types';
 import { hasSufficientRemainingTokens } from '../utils/conversation/hasSufficientRemainingTokens';
+=======
+import { isWithinTokenLimit } from 'gpt-tokenizer';
+import { useManageContextWarning } from '../hooks/useManageContextWarning';
+>>>>>>> 46adced (feat: show input warning)
 
 const DEFAULT_HEIGHT = '30px';
 
@@ -21,6 +26,15 @@ const ChatInput = ({
 }: ChatInputProps) => {
   const [showInputAdornmentMessage, setShowInputAdornmentMessage] =
     useState(false);
+
+  const [dismissWarning, setDismissWarning] = useState(false);
+
+  useManageContextWarning(
+    dismissWarning,
+    setDismissWarning,
+    setShowInputAdornmentMessage,
+  );
+
   const [inputValue, setInputValue] = useState('');
 
   const { isRequesting, modelConfig, conversationID } = useAppContext();
@@ -115,10 +129,14 @@ const ChatInput = ({
 
   return (
     <>
-      <InputAdornmentMessage
-        showInputAdornmentMessage={showInputAdornmentMessage}
-        setShowInputAdornmentMessage={setShowInputAdornmentMessage}
-      />
+      {showInputAdornmentMessage && (
+        <InputAdornmentMessage
+          onCloseClick={() => {
+            setShowInputAdornmentMessage(false);
+            setDismissWarning(true);
+          }}
+        />
+      )}
       <div className={styles.controls}>
         <div className={styles.inputContainer}>
           <textarea
