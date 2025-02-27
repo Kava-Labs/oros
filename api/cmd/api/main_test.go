@@ -15,7 +15,6 @@ import (
 	"os"
 	"os/exec"
 	"regexp"
-	"strconv"
 	"strings"
 	"syscall"
 	"testing"
@@ -278,17 +277,9 @@ func launchApiServer(ctx context.Context, conf testConfig) (string, func() error
 		}
 	}()
 
-	// Only used to find port
-	stdoutChan := make(chan string, 10)
-	stdoutChanClosed := false
-
 	go func() {
 		for scannerStdout.Scan() {
 			fmt.Println(scannerStdout.Text())
-
-			if !stdoutChanClosed {
-				stdoutChan <- scannerStdout.Text()
-			}
 		}
 	}()
 
@@ -297,55 +288,9 @@ func launchApiServer(ctx context.Context, conf testConfig) (string, func() error
 		return "", shutdownServer, err
 	}
 
-	getPort, readerErr := func() (chan int, chan error) {
-		port := make(chan int)
-		readErr := make(chan error)
-
-		portMatcher, err := regexp.Compile("serving API on (?:\\d{1,3}\\.){3}\\d{1,3}:(\\d+)")
-		if err != nil {
-			panic(err)
-		}
-
-		go func() {
-			// Use stdoutChan
-			for line := range stdoutChan {
-				matches := portMatcher.FindStringSubmatch(line)
-
-				if len(matches) > 1 {
-					parsedPort, err := strconv.Atoi(matches[1])
-					if err == nil {
-						port <- parsedPort
-					} else {
-						readErr <- err
-					}
-					break
-
-				}
-			}
-
-			close(port)
-			close(stdoutChan)
-			stdoutChanClosed = true
-		}()
-
-		return port, readErr
-	}()
-
-	port := 0
-	err = nil
-	select {
-	case port = <-getPort:
-	case err = <-readerErr:
-	case <-ctx.Done():
-		err = ctx.Err()
-	}
-	if err != nil {
-		return "", shutdownServer, err
-	}
-
 	waitUntilReady := func(ctx context.Context) chan error {
 		ready := make(chan error)
-		requestURL := fmt.Sprintf("http://localhost:%d/v1/healthcheck", port)
+		requestURL := fmt.Sprintf("http://localhost:%d/v1/healthcheck", conf.port)
 		go func() {
 			for ctx.Err() == nil {
 				resp, err := http.Get(requestURL)
@@ -370,7 +315,7 @@ func launchApiServer(ctx context.Context, conf testConfig) (string, func() error
 		return "", shutdownServer, fmt.Errorf("server is not ready: %w", err)
 	}
 
-	return fmt.Sprintf("http://localhost:%d", port), shutdownServer, nil
+	return fmt.Sprintf("http://localhost:%d", conf.port), shutdownServer, nil
 }
 
 func TestHttpHealthCheck(t *testing.T) {
@@ -543,7 +488,7 @@ func TestFileUpload(t *testing.T) {
 	require.Equal(t, http.StatusCreated, response.StatusCode, "expected successful file upload")
 
 	// Read response
-	var fileResponse handlers.FileResponse
+	var fileResponse handlers.FileUploadResponse
 	err = json.NewDecoder(response.Body).Decode(&fileResponse)
 	require.NoError(t, err)
 
