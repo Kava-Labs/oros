@@ -74,6 +74,38 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
+  api-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current commit
+        uses: actions/checkout@v4
+
+      - name: Check for API server changes
+        id: diff
+        uses: technote-space/get-diff-action@v6
+        with:
+          PATTERNS: |
+            api/**
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: ./api/go.mod
+          cache-dependency-path: ./api/go.sum
+
+      - name: Start localstack
+        # Wait for containers to be healthy or fail after 30 seconds
+        run: |
+          docker compose \
+            -f docker-compose.yaml \
+            -f docker-compose.ci.yaml \
+            up -d --wait --wait-timeout 30 \
+            localstack
+
+      # Run tests
+      - name: Run API tests
+        run: go test -v ./api/...
+
   docker-build-test:
     runs-on: ubuntu-latest
     env:
