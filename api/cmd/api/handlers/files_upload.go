@@ -118,11 +118,16 @@ func (h *FileUploadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	expireAt, err := ExtractExpireAt(putResponse.Expiration)
 	if err != nil {
+		expirationStr := ""
+		if putResponse.Expiration != nil {
+			expirationStr = *putResponse.Expiration
+		}
+
 		h.logger.
 			Warn().
 			Err(err).
 			Str("key", fileKey).
-			Str("x-amz-expiration", *putResponse.Expiration).
+			Str("x-amz-expiration", expirationStr).
 			Msg("Failed to extract expiration date from S3 response")
 
 		// TODO: Actually delete instead of just setting expiration response

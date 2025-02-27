@@ -80,8 +80,8 @@ func (h *FileDownloadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	h.logger.Debug().
 		Str("bucket_name", h.bucketName).
 		Str("key", fileID).
-		Str("content_type", *objectResult.ContentType).
-		Str("content_disposition", *objectResult.ContentDisposition).
+		Str("content_type", w.Header().Get("Content-Type")).
+		Str("content_disposition", w.Header().Get("Content-Disposition")).
 		Msg("Downloading file")
 
 	// Copy the file to the response
