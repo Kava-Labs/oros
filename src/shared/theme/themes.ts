@@ -84,7 +84,7 @@ export const baseTheme: Theme = {
     textMuted: 'rgb(150, 150, 150)',
     accent: 'rgb(255, 67, 62)',
     accentTransparent: 'rgba(255, 67, 62, 0.75)',
-    accentMuted: 'rgba(255, 67, 62, 0.5)',
+    accentMuted: 'rgba(255, 67, 62, 0.4)',
     accentTwo: 'rgb(147, 130, 215)',
     accentTwoTransparent: 'rgba(147, 130, 215, 0.75)',
     accentTwoMuted: 'rgba(147, 130, 215, 0.4)',
