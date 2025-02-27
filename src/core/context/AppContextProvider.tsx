@@ -230,10 +230,6 @@ export const AppContextProvider = (props: {
     setIsReady(true);
   }, []);
 
-  useEffect(() => {
-    ensureCorrectSystemPrompt(messageHistoryStore, modelConfig);
-  }, [messageHistoryStore, modelConfig, ensureCorrectSystemPrompt]);
-
   // abort controller for cancelling openai request
   const controllerRef = useRef<AbortController | null>(null);
 
