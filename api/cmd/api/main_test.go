@@ -10,6 +10,7 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"net/textproto"
 	"net/url"
 	"os"
 	"os/exec"
@@ -516,7 +517,14 @@ func TestFileUpload(t *testing.T) {
 
 	// Upload /v1/files
 	fileContent := []byte("test image content")
-	body, contentType := createMultipartBody(t, "file", "test.jpg", fileContent)
+	fileContentType := "image/jpeg"
+	body, contentType := createMultipartBody(
+		t,
+		"file",
+		"test.jpg",
+		fileContent,
+		fileContentType,
+	)
 
 	uploadUrl, err := url.JoinPath(serverUrl, "/v1/files")
 	require.NoError(t, err, "could not build upload url")
@@ -540,7 +548,7 @@ func TestFileUpload(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.NotEmpty(t, fileResponse.ID)
-	expectedPath := fmt.Sprintf("/v1/files/%s.jpg", fileResponse.ID)
+	expectedPath := fmt.Sprintf("/v1/files/%s", fileResponse.ID)
 	expectedURL := serverConfig.publicURL + expectedPath
 	assert.Equal(t, expectedURL, fileResponse.URL)
 
@@ -551,10 +559,13 @@ func TestFileUpload(t *testing.T) {
 
 	response, err = client.Get(downloadUrl)
 	require.NoError(t, err)
-
 	defer response.Body.Close()
 
 	require.Equalf(t, http.StatusOK, response.StatusCode, "expected successful file download %s", downloadUrl)
+
+	// Check headers
+	assert.Equal(t, "inline; filename=\"test.jpg\"", response.Header.Get("Content-Disposition"))
+	assert.Equal(t, fileContentType, response.Header.Get("Content-Type"))
 
 	data, err := io.ReadAll(response.Body)
 	require.NoError(t, err)
@@ -562,13 +573,23 @@ func TestFileUpload(t *testing.T) {
 	assert.Equal(t, fileContent, data)
 }
 
-func createMultipartBody(t *testing.T, fieldName, fileName string, fileContent []byte) (*bytes.Buffer, string) {
+func createMultipartBody(
+	t *testing.T,
+	fieldName string,
+	fileName string,
+	fileContent []byte,
+	fileContentType string,
+) (*bytes.Buffer, string) {
 	t.Helper()
 
 	var b bytes.Buffer
 	writer := multipart.NewWriter(&b)
 
-	part, err := writer.CreateFormFile(fieldName, fileName)
+	header := make(textproto.MIMEHeader)
+	header.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, fieldName, fileName))
+	header.Set("Content-Type", fileContentType)
+
+	part, err := writer.CreatePart(header)
 	require.NoError(t, err)
 
 	_, err = io.Copy(part, bytes.NewReader(fileContent))

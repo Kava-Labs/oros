@@ -22,7 +22,11 @@ type FileDownloadHandler struct {
 	logger     *zerolog.Logger
 }
 
-func NewFileDownloadHandler(bucketName string, logger *zerolog.Logger) *FileDownloadHandler {
+func NewFileDownloadHandler(bucketName string, baseLogger *zerolog.Logger) *FileDownloadHandler {
+	logger := baseLogger.With().
+		Str("handler", "FileDownloadHandler").
+		Logger()
+
 	// Load AWS config from environment
 	cfg, err := config.LoadDefaultConfig(context.Background())
 	if err != nil {
@@ -34,7 +38,7 @@ func NewFileDownloadHandler(bucketName string, logger *zerolog.Logger) *FileDown
 	return &FileDownloadHandler{
 		s3Client:   client,
 		bucketName: bucketName,
-		logger:     logger,
+		logger:     &logger,
 	}
 }
 
@@ -50,10 +54,8 @@ func (h *FileDownloadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	h.logger.Debug().Str("bucket_name", h.bucketName).Str("file_id", fileID).Msg("Downloading file")
-
 	ctx := r.Context()
-	result, err := h.s3Client.GetObject(ctx, &s3.GetObjectInput{
+	objectResult, err := h.s3Client.GetObject(ctx, &s3.GetObjectInput{
 		Bucket: aws.String(h.bucketName),
 		Key:    aws.String(fileID),
 	})
@@ -63,15 +65,27 @@ func (h *FileDownloadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Error retrieving file", http.StatusNotFound)
 		return
 	}
-	defer result.Body.Close()
+	defer objectResult.Body.Close()
 
 	// Set content type if available
-	if result.ContentType != nil {
-		w.Header().Set("Content-Type", *result.ContentType)
+	if objectResult.ContentType != nil {
+		w.Header().Set("Content-Type", *objectResult.ContentType)
 	}
 
+	// Set ContentDisposition if available
+	if objectResult.ContentDisposition != nil {
+		w.Header().Set("Content-Disposition", *objectResult.ContentDisposition)
+	}
+
+	h.logger.Debug().
+		Str("bucket_name", h.bucketName).
+		Str("key", fileID).
+		Str("content_type", *objectResult.ContentType).
+		Str("content_disposition", *objectResult.ContentDisposition).
+		Msg("Downloading file")
+
 	// Copy the file to the response
-	if _, err := io.Copy(w, result.Body); err != nil {
+	if _, err := io.Copy(w, objectResult.Body); err != nil {
 		h.logger.Error().Err(err).Str("file_id", fileID).Msg("Error streaming file")
 		http.Error(w, "Error streaming file", http.StatusInternalServerError)
 		return

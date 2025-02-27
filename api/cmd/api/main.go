@@ -108,7 +108,7 @@ func main() {
 				WindowSize:  1 * time.Minute,
 			}),
 		).Then(
-			handlers.NewImageUploadHandler(
+			handlers.NewFileUploadHandler(
 				cfg.S3BucketName,
 				cfg.PublicURL,
 				logger,

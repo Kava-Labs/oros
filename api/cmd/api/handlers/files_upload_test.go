@@ -11,7 +11,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/smithy-go"
 	"github.com/rs/zerolog"
@@ -63,7 +65,7 @@ func TestImageUploadHandler(t *testing.T) {
 			},
 		}
 
-		handler := &ImageUploadHandler{
+		handler := &FileUploadHandler{
 			s3Client:   mock,
 			bucketName: "test-bucket",
 			publicURL:  "http://example.com",
@@ -90,7 +92,7 @@ func TestImageUploadHandler(t *testing.T) {
 	})
 
 	t.Run("method not allowed", func(t *testing.T) {
-		handler := &ImageUploadHandler{
+		handler := &FileUploadHandler{
 			logger: &logger,
 		}
 
@@ -103,7 +105,7 @@ func TestImageUploadHandler(t *testing.T) {
 	})
 
 	t.Run("file too large", func(t *testing.T) {
-		handler := &ImageUploadHandler{
+		handler := &FileUploadHandler{
 			logger: &logger,
 		}
 
@@ -118,7 +120,7 @@ func TestImageUploadHandler(t *testing.T) {
 	})
 
 	t.Run("missing file", func(t *testing.T) {
-		handler := &ImageUploadHandler{
+		handler := &FileUploadHandler{
 			logger: &logger,
 		}
 
@@ -150,7 +152,7 @@ func TestImageUploadHandler(t *testing.T) {
 			},
 		}
 
-		handler := &ImageUploadHandler{
+		handler := &FileUploadHandler{
 			s3Client:   mock,
 			bucketName: "test-bucket",
 			logger:     &logger,
@@ -164,4 +166,63 @@ func TestImageUploadHandler(t *testing.T) {
 		assert.Equal(t, http.StatusInternalServerError, w.Code)
 		assert.Contains(t, w.Body.String(), "Error uploading file")
 	})
+}
+
+func TestExtractExpireAt(t *testing.T) {
+	tests := []struct {
+		name               string
+		responseExpiration *string
+		expectedTime       time.Time
+		expectedError      error
+	}{
+		{
+			name:               "valid expiration date, converted to UTC",
+			responseExpiration: aws.String(`expiry-date="Fri, 23 Dec 2012 00:00:00 GMT", rule-id="1"`),
+			expectedTime:       time.Date(2012, time.December, 23, 0, 0, 0, 0, time.UTC),
+			expectedError:      nil,
+		},
+		{
+			name:               "nil expiration date",
+			responseExpiration: nil,
+			expectedTime:       time.Time{},
+			expectedError:      fmt.Errorf("response expiration is nil"),
+		},
+		{
+			name:               "empty expiration date",
+			responseExpiration: aws.String(""),
+			expectedTime:       time.Time{},
+			expectedError:      errors.New("response expiration is empty or NotImplemented"),
+		},
+		{
+			name:               "not implemented expiration date",
+			responseExpiration: aws.String("NotImplemented"),
+			expectedTime:       time.Time{},
+			expectedError:      errors.New("response expiration is empty or NotImplemented"),
+		},
+		{
+			name:               "invalid expiration date format",
+			responseExpiration: aws.String(`expiry-date="invalid-date", rule-id="1"`),
+			expectedTime:       time.Time{},
+			expectedError:      fmt.Errorf("error parsing expiry date: parsing time \"invalid-date\" as \"Mon, 02 Jan 2006 15:04:05 MST\": cannot parse \"invalid-date\" as \"Mon\""),
+		},
+		{
+			name:               "missing expiry-date",
+			responseExpiration: aws.String(`rule-id="1"`),
+			expectedTime:       time.Time{},
+			expectedError:      errors.New("no expiry-date found in response"),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			expireAt, err := ExtractExpireAt(tt.responseExpiration)
+			if tt.expectedError != nil {
+				require.Error(t, err)
+				assert.Equal(t, tt.expectedError.Error(), err.Error())
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, tt.expectedTime, expireAt)
+			}
+		})
+	}
 }

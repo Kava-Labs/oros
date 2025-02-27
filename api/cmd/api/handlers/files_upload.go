@@ -3,9 +3,11 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
-	"path"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -31,15 +33,19 @@ type S3Uploader interface {
 	PutObject(context.Context, *s3.PutObjectInput, ...func(*s3.Options)) (*s3.PutObjectOutput, error)
 }
 
-type ImageUploadHandler struct {
+type FileUploadHandler struct {
 	s3Client   S3Uploader
 	bucketName string
 	publicURL  string
 	logger     *zerolog.Logger
 }
 
-func NewImageUploadHandler(bucketName, publicURL string, baseLogger *zerolog.Logger) *ImageUploadHandler {
-	logger := baseLogger.With().Str("handler", "ImageUploadHandler").Logger()
+var expireDateRegex = regexp.MustCompile(`expiry-date="([^"]+)"`)
+
+func NewFileUploadHandler(bucketName, publicURL string, baseLogger *zerolog.Logger) *FileUploadHandler {
+	logger := baseLogger.With().
+		Str("handler", "FileUploadHandler").
+		Logger()
 
 	// Load AWS config from environment
 	cfg, err := config.LoadDefaultConfig(context.Background())
@@ -49,7 +55,7 @@ func NewImageUploadHandler(bucketName, publicURL string, baseLogger *zerolog.Log
 
 	client := s3.NewFromConfig(cfg)
 
-	return &ImageUploadHandler{
+	return &FileUploadHandler{
 		s3Client:   client,
 		bucketName: bucketName,
 		publicURL:  publicURL,
@@ -57,7 +63,7 @@ func NewImageUploadHandler(bucketName, publicURL string, baseLogger *zerolog.Log
 	}
 }
 
-func (h *ImageUploadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *FileUploadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
@@ -74,7 +80,7 @@ func (h *ImageUploadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	file, header, err := r.FormFile("file")
+	file, fileHeader, err := r.FormFile("file")
 	if err != nil {
 		h.logger.Debug().Err(err).Msg("Error retrieving file from form")
 
@@ -83,16 +89,26 @@ func (h *ImageUploadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	// Generate unique filename using ULID
-	id := ulid.Make()
-	filename := id.String() + path.Ext(header.Filename)
+	// Generate unique filename using ULID, shorter than UUID
+	fileKey := ulid.Make().String()
+	fileContentType := fileHeader.Header.Get("Content-Type")
+	fileContentDisposition := fmt.Sprintf("inline; filename=\"%s\"", fileHeader.Filename)
+
+	h.logger.Debug().
+		Str("key", fileKey).
+		Str("content_type", fileContentType).
+		Str("content_disposition", fileContentDisposition).
+		Msg("File uploaded successfully")
 
 	// Upload to S3
 	ctx := r.Context()
-	_, err = h.s3Client.PutObject(ctx, &s3.PutObjectInput{
-		Bucket: aws.String(h.bucketName),
-		Key:    aws.String(filename),
-		Body:   file,
+	putResponse, err := h.s3Client.PutObject(ctx, &s3.PutObjectInput{
+		Bucket:      aws.String(h.bucketName),
+		Key:         aws.String(fileKey),
+		Body:        file,
+		ContentType: aws.String(fileContentType),
+		// Inline for client side display
+		ContentDisposition: aws.String(fileContentDisposition),
 	})
 	if err != nil {
 		h.logger.Error().Err(err).Msg("Failed to upload file to S3")
@@ -100,23 +116,60 @@ func (h *ImageUploadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	expireAt, err := ExtractExpireAt(putResponse.Expiration)
+	if err != nil {
+		h.logger.
+			Warn().
+			Err(err).
+			Str("key", fileKey).
+			Str("x-amz-expiration", *putResponse.Expiration).
+			Msg("Failed to extract expiration date from S3 response")
+
+		// TODO: Actually delete instead of just setting expiration response
+		expireAt = time.Now().Add(24 * time.Hour)
+	}
+
 	// Calculate file size from header
-	size := header.Size
+	size := fileHeader.Size
 
 	now := time.Now()
 	response := FileResponse{
-		ID:        id.String(),
-		URL:       fmt.Sprintf("%s/v1/files/%s", h.publicURL, filename),
+		ID:        fileKey,
+		URL:       fmt.Sprintf("%s/v1/files/%s", h.publicURL, fileKey),
 		Bytes:     size,
 		CreatedAt: now,
-		// TODO: Configurable expiration
-		// Actually delete them
-		ExpireAt: now.Add(1 * time.Hour),
+		// TODO: Configurable expiration & actually delete them in process
+		ExpireAt: expireAt,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(response)
+}
 
-	h.logger.Debug().Str("bucket_name", h.bucketName).Str("id", id.String()).Msg("File uploaded successfully")
+// ExtractExpireAt extracts the expiration date from the x-amz-expiration
+// response header from S3 PutObject API response.
+func ExtractExpireAt(responseExpiration *string) (time.Time, error) {
+	if responseExpiration == nil {
+		return time.Time{}, fmt.Errorf("response expiration is nil")
+	}
+
+	// expiry-date="Fri, 23 Dec 2012 00:00:00 GMT", rule-id="1"
+	if *responseExpiration == "" || strings.Contains(*responseExpiration, "NotImplemented") {
+		return time.Time{}, errors.New("response expiration is empty or NotImplemented")
+	}
+
+	matches := expireDateRegex.FindStringSubmatch(*responseExpiration)
+	if len(matches) < 2 {
+		return time.Time{}, errors.New("no expiry-date found in response")
+	}
+
+	expiryDate := matches[1]
+	expireAt, err := time.Parse(time.RFC1123, expiryDate)
+	if err != nil {
+		return time.Time{}, fmt.Errorf("error parsing expiry date: %w", err)
+	}
+
+	// Convert to UTC
+	return expireAt.UTC(), nil
 }
