@@ -146,6 +146,30 @@ export const AppContextProvider = (props: {
     [conversations],
   );
 
+  const ensureCorrectSystemPrompt = useCallback(
+    (messageStore: MessageHistoryStore, modelConfig: ModelConfig) => {
+      const messages = messageStore.getSnapshot();
+      const systemPrompt = modelConfig.systemPrompt;
+
+      // If no messages, add the system message
+      if (messages.length === 0) {
+        messageStore.addMessage({
+          role: 'system',
+          content: systemPrompt,
+        });
+      } else if (messages[0].role === 'system') {
+        // If first message is system, update it
+        const updatedMessages = [...messages];
+        updatedMessages[0] = {
+          role: 'system',
+          content: systemPrompt,
+        };
+        messageStore.setMessages(updatedMessages);
+      }
+    },
+    [],
+  );
+
   const handleModelChange = useCallback(
     (modelName: SupportedModels) => {
       const newConfig = getModelConfig(modelName);
@@ -155,18 +179,8 @@ export const AppContextProvider = (props: {
       const messages = messageHistoryStore.getSnapshot();
       const hasUserMessages = messages.some((msg) => msg.role === 'user');
 
-      if (
-        !hasUserMessages &&
-        messages.length > 0 &&
-        messages[0].role === 'system'
-      ) {
-        // Update existing system message
-        const updatedMessages = [...messages];
-        updatedMessages[0] = {
-          role: 'system',
-          content: newConfig.systemPrompt,
-        };
-        messageHistoryStore.setMessages(updatedMessages);
+      if (!hasUserMessages) {
+        ensureCorrectSystemPrompt(messageHistoryStore, newConfig);
       }
     },
     [messageHistoryStore],
@@ -196,7 +210,9 @@ export const AppContextProvider = (props: {
   );
 
   const startNewChat = useCallback(() => {
-    setConversation(newConversation());
+    const newConv = newConversation();
+    ensureCorrectSystemPrompt(newConv.messageHistoryStore, modelConfig);
+    setConversation(newConv);
   }, []);
 
   useEffect(() => {
@@ -215,13 +231,8 @@ export const AppContextProvider = (props: {
   }, []);
 
   useEffect(() => {
-    if (!messageHistoryStore.getSnapshot().length) {
-      messageHistoryStore.addMessage({
-        role: 'system' as const,
-        content: modelConfig.systemPrompt,
-      });
-    }
-  }, [messageHistoryStore, modelConfig.systemPrompt]);
+    ensureCorrectSystemPrompt(messageHistoryStore, modelConfig);
+  }, [messageHistoryStore, modelConfig]);
 
   // abort controller for cancelling openai request
   const controllerRef = useRef<AbortController | null>(null);
