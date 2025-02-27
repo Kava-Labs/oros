@@ -146,10 +146,31 @@ export const AppContextProvider = (props: {
     [conversations],
   );
 
-  const handleModelChange = useCallback((modelName: SupportedModels) => {
-    const newConfig = getModelConfig(modelName);
-    setModelConfig(newConfig);
-  }, []);
+  const handleModelChange = useCallback(
+    (modelName: SupportedModels) => {
+      const newConfig = getModelConfig(modelName);
+      setModelConfig(newConfig);
+
+      // Only update system prompt if there are no user messages yet
+      const messages = messageHistoryStore.getSnapshot();
+      const hasUserMessages = messages.some((msg) => msg.role === 'user');
+
+      if (
+        !hasUserMessages &&
+        messages.length > 0 &&
+        messages[0].role === 'system'
+      ) {
+        // Update existing system message
+        const updatedMessages = [...messages];
+        updatedMessages[0] = {
+          role: 'system',
+          content: newConfig.systemPrompt,
+        };
+        messageHistoryStore.setMessages(updatedMessages);
+      }
+    },
+    [messageHistoryStore],
+  );
 
   const { executeOperation, isOperationValidated } = useExecuteOperation(
     registry,
