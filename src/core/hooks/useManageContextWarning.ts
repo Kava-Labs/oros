@@ -39,8 +39,9 @@ export const useManageContextWarning = (
   //  show the warning, provided the user hasn't already seen it and toggled it off,
   //  but override that preference when they get dangerously low
   const dangerouslyLowContext =
+    currentConversation &&
     currentConversation.tokensRemaining <
-    modelConfig.conversationResetThreshold;
+      modelConfig.conversationResetThreshold;
 
   useEffect(() => {
     const shouldShowWarning =
