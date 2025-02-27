@@ -45,6 +45,7 @@ export const InputAdornmentMessage: React.FC<InputAdornmentMessageProps> = ({
           aria-label="Close New Chat Prompt"
           className={closeIconStyle}
           onClick={onCloseClick}
+          disabled={shouldDisableChat}
         />
       </div>
     </div>
