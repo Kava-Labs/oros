@@ -77,8 +77,8 @@ func TestFileDownloadHandler_ServeHTTP(t *testing.T) {
 				s3Client: &mockS3Downloader{
 					getObjectFn: tt.s3ClientFn,
 				},
-				bucketURI: "test-bucket",
-				logger:    &logger,
+				bucketName: "test-bucket",
+				logger:     &logger,
 			}
 
 			req := httptest.NewRequest(tt.method, "/files/"+tt.fileID, nil)

@@ -64,10 +64,10 @@ func TestImageUploadHandler(t *testing.T) {
 		}
 
 		handler := &ImageUploadHandler{
-			s3Client:  mock,
-			bucketURI: "test-bucket",
-			publicURL: "http://example.com",
-			logger:    &logger,
+			s3Client:   mock,
+			bucketName: "test-bucket",
+			publicURL:  "http://example.com",
+			logger:     &logger,
 		}
 
 		fileContent := []byte("test image content")
@@ -151,9 +151,9 @@ func TestImageUploadHandler(t *testing.T) {
 		}
 
 		handler := &ImageUploadHandler{
-			s3Client:  mock,
-			bucketURI: "test-bucket",
-			logger:    &logger,
+			s3Client:   mock,
+			bucketName: "test-bucket",
+			logger:     &logger,
 		}
 
 		req := createMultipartRequest(t, "file", "test.jpg", []byte("test content"))
