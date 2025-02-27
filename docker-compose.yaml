@@ -19,7 +19,6 @@ services:
     ports:
       - '4566:4566'
     environment:
-      DEBUG: '1'
       SERVICES: 's3'
     volumes:
       - ./aws:/etc/localstack/init/ready.d
