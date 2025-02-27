@@ -21,7 +21,12 @@ const (
 	maxFileSize = 10 * 1024 * 1024 // 10MB
 )
 
-type FileResponse struct {
+// expireDateRegex is a regular expression to extract the expiry-date from the
+// x-amz-expiration response header from S3.
+var expireDateRegex = regexp.MustCompile(`expiry-date="([^"]+)"`)
+
+// FileUploadResponse is the response format for a successful file upload.
+type FileUploadResponse struct {
 	ID        string    `json:"id"`
 	URL       string    `json:"url"`
 	Bytes     int64     `json:"bytes"`
@@ -29,10 +34,12 @@ type FileResponse struct {
 	ExpireAt  time.Time `json:"expire_at"`
 }
 
+// S3Uploader implements the PutObject method from the AWS SDK.
 type S3Uploader interface {
 	PutObject(context.Context, *s3.PutObjectInput, ...func(*s3.Options)) (*s3.PutObjectOutput, error)
 }
 
+// FileUploadHandler is a HTTP handler for file uploads to S3.
 type FileUploadHandler struct {
 	s3Client   S3Uploader
 	bucketName string
@@ -40,9 +47,12 @@ type FileUploadHandler struct {
 	logger     *zerolog.Logger
 }
 
-var expireDateRegex = regexp.MustCompile(`expiry-date="([^"]+)"`)
-
-func NewFileUploadHandler(bucketName, publicURL string, baseLogger *zerolog.Logger) *FileUploadHandler {
+// NewFileUploadHandler creates a new FileUploadHandler with the given bucket name,
+func NewFileUploadHandler(
+	bucketName string,
+	publicURL string,
+	baseLogger *zerolog.Logger,
+) *FileUploadHandler {
 	logger := baseLogger.With().
 		Str("handler", "FileUploadHandler").
 		Logger()
@@ -63,6 +73,7 @@ func NewFileUploadHandler(bucketName, publicURL string, baseLogger *zerolog.Logg
 	}
 }
 
+// ServeHTTP implements the http.Handler interface for the FileUploadHandler.
 func (h *FileUploadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -138,7 +149,7 @@ func (h *FileUploadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	size := fileHeader.Size
 
 	now := time.Now()
-	response := FileResponse{
+	response := FileUploadResponse{
 		ID:        fileKey,
 		URL:       fmt.Sprintf("%s/v1/files/%s", h.publicURL, fileKey),
 		Bytes:     size,

@@ -12,17 +12,23 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// S3Downloader implements the GetObject method from the AWS SDK.
 type S3Downloader interface {
 	GetObject(ctx context.Context, params *s3.GetObjectInput, optFns ...func(*s3.Options)) (*s3.GetObjectOutput, error)
 }
 
+// FileDownloadHandler is a HTTP handler for file downloads from S3.
 type FileDownloadHandler struct {
 	s3Client   S3Downloader
 	bucketName string
 	logger     *zerolog.Logger
 }
 
-func NewFileDownloadHandler(bucketName string, baseLogger *zerolog.Logger) *FileDownloadHandler {
+// NewFileDownloadHandler creates a new FileDownloadHandler with the given bucket name.
+func NewFileDownloadHandler(
+	bucketName string,
+	baseLogger *zerolog.Logger,
+) *FileDownloadHandler {
 	logger := baseLogger.With().
 		Str("handler", "FileDownloadHandler").
 		Logger()
@@ -42,6 +48,7 @@ func NewFileDownloadHandler(bucketName string, baseLogger *zerolog.Logger) *File
 	}
 }
 
+// ServeHTTP implements the http.Handler interface for the FileDownloadHandler.
 func (h *FileDownloadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)

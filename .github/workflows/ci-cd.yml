@@ -112,7 +112,7 @@ jobs:
         if: failure()
         run: docker compose -f docker-compose.yaml logs
 
-      - name: Shutdown proxy and kava node
+      - name: Shutdown localstack
         if: always()
         run: docker compose -f docker-compose.yaml down
 

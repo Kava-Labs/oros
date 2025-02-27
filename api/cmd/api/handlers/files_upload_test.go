@@ -80,7 +80,7 @@ func TestImageUploadHandler(t *testing.T) {
 
 		assert.Equal(t, http.StatusCreated, w.Code)
 
-		var response FileResponse
+		var response FileUploadResponse
 		err := json.NewDecoder(w.Body).Decode(&response)
 		require.NoError(t, err)
 

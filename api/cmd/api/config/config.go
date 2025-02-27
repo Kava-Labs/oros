@@ -27,6 +27,8 @@ type Config struct {
 
 // Validate checks if the required fields are set
 func (c Config) Validate() error {
+	// Technically still works if 0 and uses a random port. But this may cause
+	// more confusion than it's worth if it wasn't intentionally left out
 	if c.ServerPort == 0 {
 		return errors.New("PORT is required")
 	}
