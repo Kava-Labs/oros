@@ -105,7 +105,8 @@ jobs:
 
       # Run tests
       - name: Run API tests
-        run: go test -v ./api/...
+        working-directory: ./api
+        run: go test -v ./...
 
   docker-build-test:
     runs-on: ubuntu-latest
