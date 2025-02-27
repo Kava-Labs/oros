@@ -56,7 +56,7 @@ func newDefaultTestConfig() testConfig {
 		metricsServerPort: 9090,
 		// Matches localstack seed script in ./aws/bucket.sh
 		s3BucketName: "test-bucket",
-		publicURL:    "https://api.server.iu",
+		publicURL:    "https://api.server.io",
 	}
 }
 

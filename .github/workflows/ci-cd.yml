@@ -108,6 +108,14 @@ jobs:
         working-directory: ./api
         run: go test -v ./...
 
+      - name: Output logs if containers are unhealthy or if tests fail
+        if: failure()
+        run: docker compose -f docker-compose.yaml logs
+
+      - name: Shutdown proxy and kava node
+        if: always()
+        run: docker compose -f docker-compose.yaml down
+
   docker-build-test:
     runs-on: ubuntu-latest
     env:
@@ -204,7 +212,7 @@ jobs:
             -f docker-compose.yaml \
             -f docker-compose.ci.yaml \
             up -d --wait --wait-timeout 30 \
-            kavachat-api
+            kavachat-api localstack
 
       - name: Install Node.js
         uses: actions/setup-node@v4

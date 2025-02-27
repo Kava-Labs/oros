@@ -12,9 +12,9 @@ services:
       KAVACHAT_API_BACKEND_0_NAME: 'OpenAI'
 
       # localstack: localhost may fail with hostname resolution error
-      AWS_ENDPOINT_URL: http://127.0.0.1:4566
+      AWS_ENDPOINT_URL: http://localstack:4566
       # file support
-      KAVACHAT_API_PUBLIC_URL: http://localhost:8080
+      KAVACHAT_API_PUBLIC_URL: http://localhost:5555
       KAVACHAT_API_S3_BUCKET: test-bucket
 
       # Pass through existing environment variables
