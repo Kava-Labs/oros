@@ -94,11 +94,12 @@ jobs:
           cache-dependency-path: ./api/go.sum
 
       - name: Start localstack
-        # Wait for containers to be healthy or fail after 30 seconds
+        # Wait for containers to be healthy or fail after 30 seconds.
+        # Do not include docker-compose.ci.yaml as it is only used for local API
+        # image.
         run: |
           docker compose \
             -f docker-compose.yaml \
-            -f docker-compose.ci.yaml \
             up -d --wait --wait-timeout 30 \
             localstack
 
