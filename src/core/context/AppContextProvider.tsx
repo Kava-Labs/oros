@@ -183,7 +183,7 @@ export const AppContextProvider = (props: {
         ensureCorrectSystemPrompt(messageHistoryStore, newConfig);
       }
     },
-    [messageHistoryStore],
+    [messageHistoryStore, ensureCorrectSystemPrompt],
   );
 
   const { executeOperation, isOperationValidated } = useExecuteOperation(
@@ -213,7 +213,7 @@ export const AppContextProvider = (props: {
     const newConv = newConversation();
     ensureCorrectSystemPrompt(newConv.messageHistoryStore, modelConfig);
     setConversation(newConv);
-  }, []);
+  }, [modelConfig, ensureCorrectSystemPrompt]);
 
   useEffect(() => {
     try {
@@ -232,7 +232,7 @@ export const AppContextProvider = (props: {
 
   useEffect(() => {
     ensureCorrectSystemPrompt(messageHistoryStore, modelConfig);
-  }, [messageHistoryStore, modelConfig]);
+  }, [messageHistoryStore, modelConfig, ensureCorrectSystemPrompt]);
 
   // abort controller for cancelling openai request
   const controllerRef = useRef<AbortController | null>(null);
@@ -335,13 +335,6 @@ export const AppContextProvider = (props: {
     }
   }, [toolCallStreamStore]);
 
-  const handleReset = useCallback(() => {
-    handleCancel();
-    messageHistoryStore.setMessages([
-      { role: 'system' as const, content: modelConfig.systemPrompt },
-    ]);
-  }, [handleCancel, messageHistoryStore, modelConfig.systemPrompt]);
-
   return (
     <AppContext.Provider
       value={{
@@ -355,7 +348,6 @@ export const AppContextProvider = (props: {
         modelConfig,
         handleModelChange,
         startNewChat,
-        handleReset,
         handleCancel,
         handleChatCompletion,
         thinkingStore,
