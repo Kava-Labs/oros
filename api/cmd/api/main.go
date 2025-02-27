@@ -97,6 +97,9 @@ func main() {
 	})
 
 	// File uploads
+	// Metrics re-use middleware for /v1/files to not duplicate metrics
+	fileMetrics := metricsMiddleware.WitHandlerName("/v1/files")
+
 	mux.Handle(
 		"POST /v1/files",
 		alice.New(
@@ -107,6 +110,7 @@ func main() {
 				MaxRequests: 10,
 				WindowSize:  1 * time.Minute,
 			}),
+			fileMetrics,
 		).Then(
 			handlers.NewFileUploadHandler(
 				cfg.S3BucketName,
@@ -119,9 +123,13 @@ func main() {
 	// File downloads
 	mux.Handle(
 		"GET /v1/files/{file_id}",
-		handlers.NewFileDownloadHandler(
-			cfg.S3BucketName,
-			logger,
+		alice.New(
+			fileMetrics,
+		).Then(
+			handlers.NewFileDownloadHandler(
+				cfg.S3BucketName,
+				logger,
+			),
 		),
 	)
 
