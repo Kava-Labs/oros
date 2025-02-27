@@ -52,6 +52,7 @@ export const useManageContextWarning = (
     setShowInputAdornmentMessage(shouldShowWarning);
   }, [
     currentConversation,
+    dangerouslyLowContext,
     dismissWarning,
     modelConfig,
     setShowInputAdornmentMessage,
