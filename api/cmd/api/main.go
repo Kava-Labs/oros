@@ -18,6 +18,8 @@ import (
 
 	"github.com/rs/zerolog"
 
+	chimiddleware "github.com/go-chi/chi/middleware"
+
 	"github.com/justinas/alice"
 	"github.com/kava-labs/kavachat/api/cmd/api/config"
 	"github.com/kava-labs/kavachat/api/cmd/api/handlers"
@@ -97,10 +99,20 @@ func main() {
 	// File uploads
 	mux.Handle(
 		"POST /v1/files",
-		handlers.NewImageUploadHandler(
-			cfg.S3BucketName,
-			cfg.PublicURL,
-			logger,
+		alice.New(
+			// Need to set real IP
+			chimiddleware.RealIP,
+			// Before rate limiter
+			middleware.NewRateLimiter(middleware.RateLimiterConfig{
+				MaxRequests: 10,
+				WindowSize:  1 * time.Minute,
+			}),
+		).Then(
+			handlers.NewImageUploadHandler(
+				cfg.S3BucketName,
+				cfg.PublicURL,
+				logger,
+			),
 		),
 	)
 

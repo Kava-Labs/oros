@@ -6,7 +6,9 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.36.2
 	github.com/aws/aws-sdk-go-v2/config v1.29.7
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.77.1
+	github.com/aws/smithy-go v1.22.2
 	github.com/caarlos0/env/v11 v11.3.1
+	github.com/go-chi/chi v1.5.5
 	github.com/justinas/alice v1.2.0
 	github.com/oklog/ulid/v2 v2.1.0
 	github.com/openai/openai-go v0.1.0-alpha.51
@@ -30,7 +32,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sso v1.24.16 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.28.15 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.33.15 // indirect
-	github.com/aws/smithy-go v1.22.2 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
