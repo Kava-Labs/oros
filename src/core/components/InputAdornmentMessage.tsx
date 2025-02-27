@@ -23,7 +23,7 @@ export const InputAdornmentMessage: React.FC<InputAdornmentMessageProps> = ({
     ? styles.warningBanner
     : styles.cautionBanner;
 
-  //  give user option to close, only start new chat
+  //  don't give user option to close, only start new chat
   const closeIconStyle = shouldDisableChat
     ? styles.hiddenCloseIcon
     : styles.closeIcon;

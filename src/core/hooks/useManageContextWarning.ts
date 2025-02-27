@@ -41,7 +41,7 @@ export const useManageContextWarning = (
   const dangerouslyLowContext =
     currentConversation &&
     currentConversation.tokensRemaining <
-      modelConfig.conversationResetThreshold;
+      modelConfig.conversationResetTokenThreshold;
 
   useEffect(() => {
     const shouldShowWarning =

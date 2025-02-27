@@ -23,7 +23,7 @@ export const reasoningModels: Record<
     contextLength: 8192,
     contextLimitMonitor: calculateDeepseekTokenUsage,
     contextWarningThresholdPercentage: 5,
-    conversationResetThreshold: 100,
+    conversationResetTokenThreshold: 100,
     systemPrompt: defaultSystemPrompt,
     introText: defaultIntroText,
     inputPlaceholderText: defaultInputPlaceholderText,

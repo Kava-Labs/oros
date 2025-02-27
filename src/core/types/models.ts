@@ -23,7 +23,7 @@ export interface BaseModelConfig {
     finalChunk?: ChatCompletionChunk,
   ) => Promise<ContextMetrics>;
   contextWarningThresholdPercentage: number;
-  conversationResetThreshold: number;
+  conversationResetTokenThreshold: number;
   tools: ChatCompletionTool[];
   systemPrompt: string;
   introText: string;

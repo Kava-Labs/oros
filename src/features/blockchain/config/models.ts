@@ -28,7 +28,7 @@ export const blockchainModels: Record<
     contextLength: 128000,
     contextLimitMonitor: calculateGptContextMetrics,
     contextWarningThresholdPercentage: 5,
-    conversationResetThreshold: 100,
+    conversationResetTokenThreshold: 100,
     systemPrompt: messageRegistry.getSystemPrompt(),
     introText: messageRegistry.getIntroText(),
     inputPlaceholderText: messageRegistry.getInputPlaceholderText(),
