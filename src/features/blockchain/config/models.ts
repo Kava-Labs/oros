@@ -27,6 +27,7 @@ export const blockchainModels: Record<
     //  https://platform.openai.com/docs/models#gpt-4o
     contextLength: 128000,
     contextLimitMonitor: calculateGptContextMetrics,
+    contextThresholdPercentage: 5,
     systemPrompt: messageRegistry.getSystemPrompt(),
     introText: messageRegistry.getIntroText(),
     inputPlaceholderText: messageRegistry.getInputPlaceholderText(),

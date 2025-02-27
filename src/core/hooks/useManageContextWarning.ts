@@ -1,13 +1,24 @@
 import { useEffect } from 'react';
 import { useAppContext } from '../context/useAppContext';
 import { ConversationHistory } from '../context/types';
+import { ModelConfig } from '../types/models';
+
+const isBelowContextThreshold = (
+  conversation: ConversationHistory,
+  modelConfig: ModelConfig,
+) => {
+  const { tokensRemaining } = conversation;
+  const { contextLength, contextThresholdPercentage } = modelConfig;
+
+  return (tokensRemaining / contextLength) * 100 <= contextThresholdPercentage;
+};
 
 export const useManageContextWarning = (
   dismissWarning: boolean,
   setDismissWarning: (dismiss: boolean) => void,
   setShowInputAdornmentMessage: (show: boolean) => void,
 ) => {
-  const { conversationID } = useAppContext();
+  const { conversationID, modelConfig } = useAppContext();
 
   const allConversations: Record<string, ConversationHistory> = JSON.parse(
     localStorage.getItem('conversations') ?? '{}',
@@ -27,11 +38,15 @@ export const useManageContextWarning = (
   useEffect(() => {
     if (
       currentConversation &&
-      //  todo - determine threshold
-      // currentConversation.tokensRemaining <  &&
-      !dismissWarning
+      !dismissWarning &&
+      isBelowContextThreshold(currentConversation, modelConfig)
     ) {
-      // setShowInputAdornmentMessage(true);
+      setShowInputAdornmentMessage(true);
     }
-  }, [currentConversation, dismissWarning, setShowInputAdornmentMessage]);
+  }, [
+    currentConversation,
+    dismissWarning,
+    modelConfig,
+    setShowInputAdornmentMessage,
+  ]);
 };

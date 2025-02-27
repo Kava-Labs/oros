@@ -22,6 +22,7 @@ export interface BaseModelConfig {
     contextLength: number,
     finalChunk?: ChatCompletionChunk,
   ) => Promise<ContextMetrics>;
+  contextThresholdPercentage: number;
   tools: ChatCompletionTool[];
   systemPrompt: string;
   introText: string;
