@@ -28,7 +28,7 @@ const ChatInput = ({
     useState(false);
   const [dismissWarning, setDismissWarning] = useState(false);
 
-  useManageContextWarning(
+  const { shouldDisableChat } = useManageContextWarning(
     dismissWarning,
     setDismissWarning,
     setShowInputAdornmentMessage,
@@ -130,6 +130,7 @@ const ChatInput = ({
     <>
       {showInputAdornmentMessage && (
         <InputAdornmentMessage
+          shouldDisableChat={shouldDisableChat}
           onCloseClick={() => {
             setShowInputAdornmentMessage(false);
             setDismissWarning(true);
@@ -159,11 +160,16 @@ const ChatInput = ({
             aria-label="Send Chat"
             disabled={
               (!isRequesting && inputValue.length === 0) ||
+<<<<<<< HEAD
               !hasSufficientRemainingTokens(
                 modelConfig.id,
                 inputValue,
                 remainingContextWindow,
               )
+=======
+              !isWithinTokenLimit(inputValue, modelConfig.contextLength) ||
+              shouldDisableChat
+>>>>>>> 829815d (feat: lock out once tokens remaining is dangerously low)
             }
           >
             {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}

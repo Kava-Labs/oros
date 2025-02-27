@@ -22,7 +22,8 @@ export const reasoningModels: Record<
     //  not running full 128K token context currently
     contextLength: 8192,
     contextLimitMonitor: calculateDeepseekTokenUsage,
-    contextThresholdPercentage: 5,
+    contextWarningThresholdPercentage: 5,
+    conversationResetThreshold: 100,
     systemPrompt: defaultSystemPrompt,
     introText: defaultIntroText,
     inputPlaceholderText: defaultInputPlaceholderText,

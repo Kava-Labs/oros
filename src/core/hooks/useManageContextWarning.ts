@@ -8,9 +8,11 @@ const isBelowContextThreshold = (
   modelConfig: ModelConfig,
 ) => {
   const { tokensRemaining } = conversation;
-  const { contextLength, contextThresholdPercentage } = modelConfig;
+  const { contextLength, contextWarningThresholdPercentage } = modelConfig;
 
-  return (tokensRemaining / contextLength) * 100 <= contextThresholdPercentage;
+  return (
+    (tokensRemaining / contextLength) * 100 <= contextWarningThresholdPercentage
+  );
 };
 
 export const useManageContextWarning = (
@@ -34,19 +36,26 @@ export const useManageContextWarning = (
   }, [conversationID, setDismissWarning, setShowInputAdornmentMessage]);
 
   //  when an existing conversation goes below the threshold,
-  //  show the warning, provided the user hasn't already seen it and toggled it off
+  //  show the warning, provided the user hasn't already seen it and toggled it off,
+  //  but override that preference when they get dangerously low
+  const dangerouslyLowContext =
+    currentConversation.tokensRemaining <
+    modelConfig.conversationResetThreshold;
+
   useEffect(() => {
-    if (
+    const shouldShowWarning =
       currentConversation &&
-      !dismissWarning &&
-      isBelowContextThreshold(currentConversation, modelConfig)
-    ) {
-      setShowInputAdornmentMessage(true);
-    }
+      ((!dismissWarning &&
+        isBelowContextThreshold(currentConversation, modelConfig)) ||
+        dangerouslyLowContext);
+
+    setShowInputAdornmentMessage(shouldShowWarning);
   }, [
     currentConversation,
     dismissWarning,
     modelConfig,
     setShowInputAdornmentMessage,
   ]);
+
+  return { shouldDisableChat: dangerouslyLowContext };
 };

@@ -1,4 +1,4 @@
-.banner {
+.cautionBanner {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
@@ -10,6 +10,20 @@
   margin-bottom: -1rem;
   border-radius: var(--borderRadius-sm);
 }
+
+.warningBanner {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  width: 98%;
+  background-color: var(--colors-accentMuted);
+  font-size: 1.1rem;
+  color: var(--colors-textPrimary);
+  margin-bottom: -1rem;
+  border-radius: var(--borderRadius-sm);
+}
+
 
 .message {
   flex: 1;
@@ -40,4 +54,8 @@
 
 .closeIcon:hover {
   background: none;
+}
+
+.hiddenCloseIcon {
+  visibility: hidden;
 }

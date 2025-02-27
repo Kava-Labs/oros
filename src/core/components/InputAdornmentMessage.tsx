@@ -6,19 +6,32 @@ import { useAppContext } from '../context/useAppContext';
 
 interface InputAdornmentMessageProps {
   onCloseClick: () => void;
+  shouldDisableChat: boolean;
 }
 
 export const InputAdornmentMessage: React.FC<InputAdornmentMessageProps> = ({
   onCloseClick,
+  shouldDisableChat,
 }) => {
   const { startNewChat } = useAppContext();
 
+  const warningText = shouldDisableChat
+    ? 'This conversation has exceeded the context limit'
+    : 'This conversation is approaching the context limit';
+
+  const bannerStyle = shouldDisableChat
+    ? styles.warningBanner
+    : styles.cautionBanner;
+
+  //  give user option to close, only start new chat
+  const closeIconStyle = shouldDisableChat
+    ? styles.hiddenCloseIcon
+    : styles.closeIcon;
+
   return (
     <div className={styles.wrapper}>
-      <div className={styles.banner}>
-        <span className={styles.message}>
-          This conversation has exceeded the context limit
-        </span>
+      <div className={bannerStyle}>
+        <span className={styles.message}>{warningText}</span>
         <button
           onClick={startNewChat}
           aria-label="Start New Chat Button"
@@ -30,7 +43,7 @@ export const InputAdornmentMessage: React.FC<InputAdornmentMessageProps> = ({
           icon={CloseX}
           size={12}
           aria-label="Close New Chat Prompt"
-          className={styles.closeIcon}
+          className={closeIconStyle}
           onClick={onCloseClick}
         />
       </div>
