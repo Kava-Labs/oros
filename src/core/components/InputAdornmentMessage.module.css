@@ -1,29 +1,24 @@
-.cautionBanner {
+.banner {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm);
   width: 98%;
-  background-color: var(--colors-accentTwoMuted);
   font-size: 1.1rem;
   color: var(--colors-textPrimary);
   margin-bottom: -1rem;
   border-radius: var(--borderRadius-sm);
+}
+
+.cautionBanner {
+  composes: banner;
+  background-color: var(--colors-accentTwoMuted);
 }
 
 .warningBanner {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm);
-  width: 98%;
+  composes: banner;
   background-color: var(--colors-accentMuted);
-  font-size: 1.1rem;
-  color: var(--colors-textPrimary);
-  margin-bottom: -1rem;
-  border-radius: var(--borderRadius-sm);
 }
-
 
 .message {
   flex: 1;
