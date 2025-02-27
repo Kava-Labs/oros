@@ -197,7 +197,7 @@ const removeInitialSystemMessage = (conversation: ConversationHistory) => {
 /**
  *
  * Function to calculate context metrics based on messages and model's context length
- * @param messages Array of chat messages
+ * @param chatMessages  The conversation
  * @param contextLength maximum tokens per conversation
  * @returns ContextMetrics object (promise)
  */

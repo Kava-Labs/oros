@@ -33,7 +33,7 @@ export const useManageContextWarning = (
     setDismissWarning(false);
   }, [conversationID, setDismissWarning, setShowInputAdornmentMessage]);
 
-  //  when an existing conversation goes over the threshold,
+  //  when an existing conversation goes below the threshold,
   //  show the warning, provided the user hasn't already seen it and toggled it off
   useEffect(() => {
     if (
