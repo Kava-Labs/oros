@@ -20,7 +20,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kava-labs/kavachat/api/cmd/api/handlers"
+	"github.com/kava-labs/kavachat/api/internal/handlers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/caarlos0/env/v11"
-	"github.com/kava-labs/kavachat/api/cmd/api/types"
+	"github.com/kava-labs/kavachat/api/internal/types"
 )
 
 // Config is the configuration for the API server

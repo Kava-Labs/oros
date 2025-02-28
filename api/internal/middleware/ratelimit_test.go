@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kava-labs/kavachat/api/cmd/api/middleware"
+	"github.com/kava-labs/kavachat/api/internal/middleware"
 	"github.com/stretchr/testify/require"
 )
 

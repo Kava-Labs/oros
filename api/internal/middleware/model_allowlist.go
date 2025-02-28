@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/kava-labs/kavachat/api/cmd/api/config"
-	"github.com/kava-labs/kavachat/api/cmd/api/types"
+	"github.com/kava-labs/kavachat/api/internal/config"
+	"github.com/kava-labs/kavachat/api/internal/types"
 	"github.com/openai/openai-go"
 	"github.com/rs/zerolog"
 )

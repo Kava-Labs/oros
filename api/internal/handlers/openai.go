@@ -5,8 +5,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/kava-labs/kavachat/api/cmd/api/config"
-	"github.com/kava-labs/kavachat/api/cmd/api/middleware"
+	"github.com/kava-labs/kavachat/api/internal/config"
+	"github.com/kava-labs/kavachat/api/internal/middleware"
 	"github.com/rs/zerolog"
 )
 

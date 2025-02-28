@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/kava-labs/kavachat/api/cmd/api/config"
+	"github.com/kava-labs/kavachat/api/internal/config"
 	"github.com/openai/openai-go"
 	"github.com/openai/openai-go/packages/pagination"
 )

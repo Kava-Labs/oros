@@ -7,7 +7,10 @@ COMMIT_ID_SHORT:=$(shell git rev-parse --short HEAD)
 DOCKER_REPOSITORY_URL:=$(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com/$(IMAGE_NAME)
 
 install:
-	go install
+	go install ./cmd/api/
+
+test:
+	go test -v ./...
 
 .PHONY: docker-login
 docker-login:
