@@ -125,14 +125,14 @@ func main() {
 				),
 			)
 
-		// /openai/v1/image/generations
-		r.With(metricsMiddleware.WitHandlerName(types.ImageGenerationsEndpoint.String())).
+		// /openai/v1/images/generations
+		r.With(metricsMiddleware.WitHandlerName(types.ImagesGenerationsEndpoint.String())).
 			Handle(
-				types.ImageGenerationsEndpoint.String(),
+				types.ImagesGenerationsEndpoint.String(),
 				handlers.NewBasicOpenAIProxyHandler(
 					cfg.Backends,
 					logger,
-					types.ImageGenerationsEndpoint,
+					types.ImagesGenerationsEndpoint,
 				),
 			)
 	})

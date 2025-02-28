@@ -12,6 +12,6 @@ const (
 	// ChatCompletionEndpoint is the endpoint for chat completions
 	ChatCompletionEndpoint OpenAIEndpoint = "/chat/completions"
 
-	// ImageGenerationsEndpoint is the endpoint for image completions
-	ImageGenerationsEndpoint OpenAIEndpoint = "/image/generations"
+	// ImagesGenerationsEndpoint is the endpoint for image completions
+	ImagesGenerationsEndpoint OpenAIEndpoint = "/images/generations"
 )
