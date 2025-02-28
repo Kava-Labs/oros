@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+awslocal configure set region us-east-1
+
 BUCKET_NAME="test-bucket"
 
 # Create bucket for file upload tests

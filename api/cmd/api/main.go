@@ -114,6 +114,7 @@ func main() {
 			fileMetrics,
 		).Then(handlers.NewFileUploadHandler(
 			cfg.S3BucketName,
+			cfg.S3PathStyleRequests,
 			cfg.PublicURL,
 			logger,
 		)),
@@ -126,6 +127,7 @@ func main() {
 			fileMetrics,
 		).Then(handlers.NewFileDownloadHandler(
 			cfg.S3BucketName,
+			cfg.S3PathStyleRequests,
 			logger,
 		)),
 	)

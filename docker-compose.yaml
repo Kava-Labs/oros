@@ -11,11 +11,17 @@ services:
       KAVACHAT_API_HOST: '0.0.0.0'
       KAVACHAT_API_BACKEND_0_NAME: 'OpenAI'
 
-      # localstack: localhost may fail with hostname resolution error
+      # Localstack
       AWS_ENDPOINT_URL: http://localstack:4566
-      # file support
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+
+      # File support
       KAVACHAT_API_PUBLIC_URL: http://localhost:5555
       KAVACHAT_API_S3_BUCKET: test-bucket
+      # Use path-style requests for localstack to avoid DNS issues
+      KAVACHAT_API_S3_PATH_STYLE_REQUESTS: true
 
       # Pass through existing environment variables
       KAVACHAT_API_BACKEND_0_BASE_URL: ${OPENAI_BASE_URL}
