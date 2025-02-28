@@ -75,7 +75,7 @@ func TestOpenAIProxyHandler_MultipleBackends(t *testing.T) {
 		{
 			"Invalid Model gpt-5",
 			"gpt-5",
-			``,
+			`{"message": "error finding backend for model", "type": "server_error"}`,
 			http.StatusInternalServerError,
 		},
 	}

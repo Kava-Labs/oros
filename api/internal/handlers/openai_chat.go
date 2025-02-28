@@ -75,7 +75,7 @@ func (h OpenAIChatHandler) handleChatCompletion(
 	r *http.Request,
 	backend *config.OpenAIBackend,
 ) {
-	decodedReq, err := DecodeRequest(r)
+	decodedReq, originalRequestBody, err := DecodeRequest(r)
 	if err != nil {
 		// Debug log for bad request errors
 		h.base.logger.Debug().Msgf("error decoding request: %s", err.Error())
@@ -89,8 +89,15 @@ func (h OpenAIChatHandler) handleChatCompletion(
 	// message content, even if it doesn't support vision.
 	images := GetLatestUserContentImages(decodedReq)
 
+	h.base.logger.Debug().
+		Int("images_len", len(images)).
+		Msgf("decoded chat completion request")
+
 	// No images found in the request, forward the request as-is
 	if len(images) == 0 {
+		// Replace the request body with unmodified body
+		r.Body = io.NopCloser(bytes.NewBuffer(originalRequestBody))
+
 		h.base.forwardOpenAIRequest(w, r, backend)
 		return
 	}
@@ -187,14 +194,18 @@ func (h OpenAIChatHandler) DescribeImages(
 // DecodeRequest decodes the request body into a ChatCompletionRequest struct
 func DecodeRequest(
 	r *http.Request,
-) (openai.ChatCompletionRequest, error) {
-
-	var params openai.ChatCompletionRequest
-	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
-		return openai.ChatCompletionRequest{}, fmt.Errorf("error decoding request body: %w", err)
+) (openai.ChatCompletionRequest, []byte, error) {
+	originalBody, err := io.ReadAll(r.Body)
+	if err != nil {
+		return openai.ChatCompletionRequest{}, nil, fmt.Errorf("error reading request body: %w", err)
 	}
 
-	return params, nil
+	var params openai.ChatCompletionRequest
+	if err := json.Unmarshal(originalBody, &params); err != nil {
+		return openai.ChatCompletionRequest{}, nil, fmt.Errorf("error decoding request body: %w", err)
+	}
+
+	return params, originalBody, nil
 }
 
 // GetLatestUserContentImages checks if the request last user message
@@ -254,7 +265,7 @@ func UpdateLatestUserMessage(
 		return req
 	}
 
-	if len(imageDescription) == 0 {
+	if imageDescription == "" {
 		return req
 	}
 

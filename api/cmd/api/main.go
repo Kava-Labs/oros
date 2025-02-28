@@ -112,6 +112,7 @@ func main() {
 		r.Use(middleware.ExtractModelMiddleware(logger))
 		r.Use(middleware.ModelAllowlistMiddleware(logger, cfg.Backends))
 
+		// /openai/v1/chat/completions
 		r.With(metricsMiddleware.WitHandlerName(types.ChatCompletionEndpoint.String())).
 			Handle(
 				types.ChatCompletionEndpoint.String(),
@@ -124,6 +125,7 @@ func main() {
 				),
 			)
 
+		// /openai/v1/image/generations
 		r.With(metricsMiddleware.WitHandlerName(types.ImageGenerationsEndpoint.String())).
 			Handle(
 				types.ImageGenerationsEndpoint.String(),

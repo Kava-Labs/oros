@@ -57,7 +57,7 @@ func (c Config) Validate() error {
 
 	// Validate backends before vision
 	if err := c.Backends.Validate(); err != nil {
-		return fmt.Errorf("invalid backends: %w", err)
+		return err
 	}
 
 	// Validate vision preprocessing map, both key and values should exist in

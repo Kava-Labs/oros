@@ -218,8 +218,13 @@ func TestUpdateLatestUserMessage(t *testing.T) {
 			openai.ChatCompletionRequest{
 				Messages: []openai.ChatCompletionMessage{
 					{
-						Role:    openai.ChatMessageRoleUser,
-						Content: "Old content",
+						Role: openai.ChatMessageRoleUser,
+						MultiContent: []openai.ChatMessagePart{
+							{
+								Type: "text",
+								Text: "User text prompt",
+							},
+						},
 					},
 				},
 			},
@@ -266,12 +271,17 @@ func TestUpdateLatestUserMessage(t *testing.T) {
 					},
 				},
 			},
-			"New image description",
+			"",
 			openai.ChatCompletionRequest{
 				Messages: []openai.ChatCompletionMessage{
 					{
-						Role:    openai.ChatMessageRoleUser,
-						Content: "New image description\nUser text prompt",
+						Role: openai.ChatMessageRoleUser,
+						MultiContent: []openai.ChatMessagePart{
+							{
+								Type: "text",
+								Text: "User text prompt",
+							},
+						},
 					},
 				},
 			},
