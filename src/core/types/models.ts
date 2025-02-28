@@ -65,7 +65,5 @@ export interface ModelRegistry {
 }
 
 export interface ContextMetrics {
-  tokensUsed: number;
   tokensRemaining: number;
-  percentageRemaining: number;
 }

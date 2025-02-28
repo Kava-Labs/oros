@@ -208,18 +208,7 @@ export async function calculateGptContextMetrics(
   const tokensUsed = encodeChat(messages, 'gpt-4o').length;
   const tokensRemaining = Math.max(0, maxTokens - tokensUsed);
 
-  let percentageRemaining = Number(
-    ((tokensRemaining / maxTokens) * 100).toFixed(1),
-  );
-
-  // Adjust percentage if tokens have been used to avoid rounding to 100%
-  if (tokensUsed > 0 && percentageRemaining === 100.0) {
-    percentageRemaining = 99.9;
-  }
-
   return {
-    tokensUsed,
     tokensRemaining,
-    percentageRemaining,
   };
 }
