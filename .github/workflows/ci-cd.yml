@@ -298,6 +298,8 @@ jobs:
   deploy-production-api:
     name: Deploy API to production
     needs:
+      # Requires API tests to pass and Docker image to be built
+      - api-test
       - docker-build-test
     # Only run on main branch pushes and if API files changed
     if: |
