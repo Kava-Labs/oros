@@ -10,6 +10,11 @@ Not all OpenAI API routes are supported. The following routes are supported:
 - `POST /openai/v1/chat/completions`
 - `POST /openai/v1/images/generations`
 
+Non-OpenAI routes are also supported:
+
+- `POST /v1/files`
+- `GET /v1/files/:id`
+
 ## Configuration
 
 API configuration is done through environment variables. The following variables
@@ -20,6 +25,8 @@ allowed models list separated by commas.
 KAVACHAT_API_PORT=8080
 KAVACHAT_API_HOST=127.0.0.1
 KAVACHAT_API_METRICS_PORT=9090
+KAVACHAT_API_PUBLIC_URL=https://public-url.com
+KAVACHAT_API_S3_BUCKET=your-bucket-name
 
 KAVACHAT_API_BACKEND_0_NAME=OpenAI
 KAVACHAT_API_BACKEND_0_BASE_URL=https://openai-compatible/endpoint

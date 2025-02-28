@@ -96,10 +96,11 @@ func main() {
 		fmt.Fprintln(w, "available")
 	})
 
-	// File uploads
-	// Metrics re-use middleware for /v1/files to not duplicate metrics
+	// Metrics re-use middleware for /v1/files routes to not duplicate metrics
+	// autoprom panics if the same handler name is used
 	fileMetrics := metricsMiddleware.WitHandlerName("/v1/files")
 
+	// File uploads
 	mux.Handle(
 		"POST /v1/files",
 		alice.New(
@@ -111,13 +112,11 @@ func main() {
 				WindowSize:  1 * time.Minute,
 			}),
 			fileMetrics,
-		).Then(
-			handlers.NewFileUploadHandler(
-				cfg.S3BucketName,
-				cfg.PublicURL,
-				logger,
-			),
-		),
+		).Then(handlers.NewFileUploadHandler(
+			cfg.S3BucketName,
+			cfg.PublicURL,
+			logger,
+		)),
 	)
 
 	// File downloads
@@ -125,12 +124,10 @@ func main() {
 		"GET /v1/files/{file_id}",
 		alice.New(
 			fileMetrics,
-		).Then(
-			handlers.NewFileDownloadHandler(
-				cfg.S3BucketName,
-				logger,
-			),
-		),
+		).Then(handlers.NewFileDownloadHandler(
+			cfg.S3BucketName,
+			logger,
+		)),
 	)
 
 	// OpenAI routes
@@ -144,13 +141,11 @@ func main() {
 				middleware.ModelAllowlistMiddleware(logger, cfg.Backends),
 				metricsMiddleware.WitHandlerName("/chat/completions"),
 			).
-			Then(
-				handlers.NewOpenAIProxyHandler(
-					cfg.Backends,
-					logger,
-					"/chat/completions",
-				),
-			),
+			Then(handlers.NewOpenAIProxyHandler(
+				cfg.Backends,
+				logger,
+				"/chat/completions",
+			)),
 	)
 
 	mux.Handle(
@@ -164,13 +159,11 @@ func main() {
 				metricsMiddleware.WitHandlerName("/images/generations"),
 			).
 			// Handler
-			Then(
-				handlers.NewOpenAIProxyHandler(
-					cfg.Backends,
-					logger,
-					"/images/generations",
-				),
-			),
+			Then(handlers.NewOpenAIProxyHandler(
+				cfg.Backends,
+				logger,
+				"/images/generations",
+			)),
 	)
 
 	// -------------------------------------------------------------------------
