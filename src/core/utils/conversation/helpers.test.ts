@@ -365,9 +365,7 @@ describe('calculateGptContextMetrics', () => {
     const result = await calculateGptContextMetrics(mockMessages);
 
     expect(result).toEqual({
-      tokensUsed: 10, //  amount from the system prompt
       tokensRemaining: maxTokens - 10,
-      percentageRemaining: 99.9,
     });
   });
 
@@ -382,9 +380,7 @@ describe('calculateGptContextMetrics', () => {
     const result = await calculateGptContextMetrics(mockMessages);
 
     expect(result).toEqual({
-      tokensUsed: 25, //  additional tokens used
       tokensRemaining: maxTokens - 25,
-      percentageRemaining: 99.9,
     });
 
     const updatedMessages: ChatMessage[] = [
@@ -395,9 +391,7 @@ describe('calculateGptContextMetrics', () => {
     const updatedResult = await calculateGptContextMetrics(updatedMessages);
 
     expect(updatedResult).toEqual({
-      tokensUsed: 34, //  more tokens used
       tokensRemaining: maxTokens - 34,
-      percentageRemaining: 99.9,
     });
   });
 
@@ -408,9 +402,7 @@ describe('calculateGptContextMetrics', () => {
     const result = await calculateGptContextMetrics(mockMessages);
 
     expect(result).toEqual({
-      tokensUsed: 120007,
       tokensRemaining: maxTokens - 120007,
-      percentageRemaining: 6.2,
     });
   });
 });

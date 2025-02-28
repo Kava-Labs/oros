@@ -57,17 +57,7 @@ export async function calculateDeepseekTokenUsage(
     tokensRemaining = Math.max(0, contextLength - estimatedUsage.totalTokens);
   }
 
-  const tokensUsed = contextLength - tokensRemaining;
-  const percentageRemaining = Number(
-    ((tokensRemaining / contextLength) * 100).toFixed(1),
-  );
-
   return {
-    tokensUsed,
     tokensRemaining,
-    percentageRemaining:
-      tokensUsed > 0 && percentageRemaining === 100.0
-        ? 99.9
-        : percentageRemaining,
   };
 }
