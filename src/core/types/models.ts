@@ -1,4 +1,7 @@
-import { ChatCompletionTool } from 'openai/resources/index';
+import {
+  ChatCompletionChunk,
+  ChatCompletionTool,
+} from 'openai/resources/index';
 import { ComponentType } from 'react';
 import { SupportedBlockchainModels } from '../../features/blockchain/config/models';
 import { SupportedReasoningModels } from '../../features/reasoning/config/models';
@@ -14,9 +17,10 @@ export interface BaseModelConfig {
   icon: ComponentType;
   description: string;
   contextLength: number;
-  contextLimitMonitor?: (
+  contextLimitMonitor: (
     messages: ChatMessage[],
-    contextLimit: number,
+    contextLength: number,
+    finalChunk?: ChatCompletionChunk,
   ) => Promise<ContextMetrics>;
   tools: ChatCompletionTool[];
   systemPrompt: string;

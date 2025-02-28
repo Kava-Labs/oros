@@ -27,6 +27,7 @@ import { OperationResult } from '../../features/blockchain/types/chain';
 import { ExecuteOperation } from '../../core/context/types';
 import { v4 as uuidv4 } from 'uuid';
 import { formatConversationTitle } from '../utils/conversation/helpers';
+import { ChatCompletionChunk } from 'openai/resources/index';
 
 let client: OpenAI | null = null;
 
@@ -241,7 +242,6 @@ export const AppContextProvider = (props: {
       // and all follow ups have been completed.
       try {
         //  clear any existing error
-        // setErrorText('');
         conversation.errorStore.setText('');
 
         await doChat(
@@ -254,6 +254,7 @@ export const AppContextProvider = (props: {
           toolCallStreamStore,
           thinkingStore,
           executeOperation,
+          conversationID,
         );
       } catch (error) {
         let errorMessage =
@@ -266,18 +267,10 @@ export const AppContextProvider = (props: {
           errorMessage = 'You clicked cancel - please try again';
         }
 
-        // setErrorText(errorMessage);
         conversation.errorStore.setText(errorMessage);
       } finally {
         setIsRequesting(false, id);
         controllerRef.current = null;
-        // save to local storage (post-request with assistant's response)
-        syncWithLocalStorage(
-          conversationID,
-          modelConfig,
-          messageHistoryStore,
-          client,
-        );
       }
     },
     [
@@ -353,19 +346,24 @@ async function doChat(
   toolCallStreamStore: ToolCallStreamStore,
   thinkingStore: TextStreamStore,
   executeOperation: ExecuteOperation,
+  conversationID: string,
 ) {
   progressStore.setText('Thinking');
   const { id, tools } = modelConfig;
   try {
+    const messages = messageHistoryStore.getSnapshot().map((msg) => {
+      if ('reasoningContent' in msg) {
+        delete msg.reasoningContent;
+      }
+      return msg;
+    });
+
+    let finalChunk: ChatCompletionChunk | undefined;
+
     const stream = await client.chat.completions.create(
       {
         model: id,
-        messages: messageHistoryStore.getSnapshot().map((msg) => {
-          if ('reasoningContent' in msg) {
-            delete msg.reasoningContent;
-          }
-          return msg;
-        }),
+        messages: messages,
         tools: tools,
         stream: true,
       },
@@ -378,6 +376,11 @@ async function doChat(
     let thinkingEnd = -1;
 
     for await (const chunk of stream) {
+      //  Get the usage info (in the final chunk)
+      if (chunk.usage) {
+        finalChunk = chunk;
+      }
+
       if (progressStore.getSnapshot() !== '') {
         progressStore.setText('');
       }
@@ -459,8 +462,17 @@ async function doChat(
         toolCallStreamStore,
         thinkingStore,
         executeOperation,
+        conversationID,
       );
     }
+
+    syncWithLocalStorage(
+      conversationID,
+      modelConfig,
+      messageHistoryStore,
+      client,
+      finalChunk,
+    );
   } catch (e) {
     console.error(`An error occurred: ${e} `);
     throw e;
@@ -531,8 +543,7 @@ async function syncWithLocalStorage(
   modelConfig: ModelConfig,
   messageHistoryStore: MessageHistoryStore,
   client: OpenAI,
-  //  todo - reimplement with deepseek
-  // apiResponse?: ChatCompletionChunk, // Optional response for token tracking
+  finalChunk?: ChatCompletionChunk, // Used by deepseek for token tracking
 ) {
   const { id, contextLength } = modelConfig;
   const messages = messageHistoryStore.getSnapshot();
@@ -547,30 +558,20 @@ async function syncWithLocalStorage(
 
   const existingConversation = allConversations[conversationID];
 
-  let tokensRemaining = contextLength;
+  // Initialize tokensRemaining from existing conversation or default to full context length
+  let tokensRemaining = existingConversation?.tokensRemaining ?? contextLength;
 
-  const isDeepseekModel = id.includes('deepseek');
-  const isGPTModel = id.includes('gpt');
+  //  Deepseek compares the current message to the remaining context
+  //  GPT compares the entire conversation thread to the max context
+  const contextToProcess =
+    modelConfig.id === 'deepseek-r1' ? tokensRemaining : contextLength;
 
-  //  todo - refactor to use modelConfig for both and simplify conditionals
-  if (isDeepseekModel) {
-    //  If we get a response with usage, use that to calculate
-  } else {
-    //  todo - plug in deepseek approximation function
-  }
-
-  //  type guard won't be necessary when all model configs have a contextLimitMonitor
-  if (isGPTModel && modelConfig.contextLimitMonitor) {
-    try {
-      const metrics = await modelConfig.contextLimitMonitor(
-        messages,
-        contextLength,
-      );
-      tokensRemaining = metrics.tokensRemaining;
-    } catch {
-      //  estimate the amount
-    }
-  }
+  const metrics = await modelConfig.contextLimitMonitor(
+    messages,
+    contextToProcess,
+    finalChunk,
+  );
+  tokensRemaining = metrics.tokensRemaining;
 
   const history: ConversationHistory = {
     id: conversationID,

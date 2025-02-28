@@ -5,6 +5,7 @@ import {
   defaultInputPlaceholderText,
 } from './prompts/defaultPrompts';
 import KavaIcon from '../../../core/assets/KavaIcon';
+import { calculateDeepseekTokenUsage } from '../helpers';
 
 export type SupportedReasoningModels = 'deepseek-r1';
 
@@ -20,6 +21,7 @@ export const reasoningModels: Record<
     tools: [],
     //  not running full 128K token context currently
     contextLength: 8192,
+    contextLimitMonitor: calculateDeepseekTokenUsage,
     systemPrompt: defaultSystemPrompt,
     introText: defaultIntroText,
     inputPlaceholderText: defaultInputPlaceholderText,

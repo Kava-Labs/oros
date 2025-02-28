@@ -8,7 +8,7 @@ import {
 } from '../components/displayCards';
 import { initializeMessageRegistry } from './initializeMessageRegistry';
 import { blockchainMessageProcessor } from './messageProcessing';
-import { calculateContextMetrics } from '../../../core/utils/conversation/helpers';
+import { calculateGptContextMetrics } from '../../../core/utils/conversation/helpers';
 
 const messageRegistry = initializeMessageRegistry();
 
@@ -26,7 +26,7 @@ export const blockchainModels: Record<
     tools: messageRegistry.getToolDefinitions(),
     //  https://platform.openai.com/docs/models#gpt-4o
     contextLength: 128000,
-    contextLimitMonitor: calculateContextMetrics,
+    contextLimitMonitor: calculateGptContextMetrics,
     systemPrompt: messageRegistry.getSystemPrompt(),
     introText: messageRegistry.getIntroText(),
     inputPlaceholderText: messageRegistry.getInputPlaceholderText(),

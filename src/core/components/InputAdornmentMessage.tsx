@@ -4,12 +4,12 @@ import ButtonIcon from './ButtonIcon';
 import { X as CloseX } from 'lucide-react';
 import { useAppContext } from '../context/useAppContext';
 
-interface NewChatPromptProps {
+interface InputAdornmentMessageProps {
   showInputAdornmentMessage: boolean;
   setShowInputAdornmentMessage: (show: boolean) => void;
 }
 
-export const InputAdornmentMessage: React.FC<NewChatPromptProps> = ({
+export const InputAdornmentMessage: React.FC<InputAdornmentMessageProps> = ({
   showInputAdornmentMessage,
   setShowInputAdornmentMessage,
 }) => {
