@@ -14,8 +14,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	chimiddleware "github.com/go-chi/chi/middleware"
+	"github.com/go-chi/chi/v5"
 
-	"github.com/justinas/alice"
 	"github.com/kava-labs/kavachat/api/cmd/api/config"
 	"github.com/kava-labs/kavachat/api/cmd/api/handlers"
 	"github.com/kava-labs/kavachat/api/cmd/api/middleware"
@@ -57,21 +57,29 @@ func main() {
 
 	// -------------------------------------------------------------------------
 	// API Routes
-	logger.Info().Msg("Starting Kavachat API!")
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/v1/healthcheck", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "available")
-	})
+	r := chi.NewRouter()
+
+	r.Use(chimiddleware.Recoverer) // Recover from panics, 500 response, logs stack trace
 
 	// Metrics re-use middleware for /v1/files routes to not duplicate metrics
 	// autoprom panics if the same handler name is used
 	fileMetrics := metricsMiddleware.WitHandlerName("/v1/files")
 
-	// File uploads
-	mux.Handle(
-		"POST /v1/files",
-		alice.New(
+	// /v1/ custom routes
+	r.Route("/v1", func(r chi.Router) {
+		r.Get("/healthcheck", func(w http.ResponseWriter, r *http.Request) {
+			fmt.Fprintln(w, "available")
+		})
+
+		// POST /v1/files - File uploads
+		fileUploadHandler := handlers.NewFileUploadHandler(
+			cfg.S3BucketName,
+			cfg.S3PathStyleRequests,
+			cfg.PublicURL,
+			logger,
+		)
+		r.With(
 			// Need to set real IP
 			chimiddleware.RealIP,
 			// Before rate limiter
@@ -80,70 +88,59 @@ func main() {
 				WindowSize:  1 * time.Minute,
 			}),
 			fileMetrics,
-		).Then(handlers.NewFileUploadHandler(
-			cfg.S3BucketName,
-			cfg.S3PathStyleRequests,
-			cfg.PublicURL,
-			logger,
-		)),
-	)
+		).Post(
+			"/files",
+			fileUploadHandler.ServeHTTP,
+		)
 
-	// File downloads
-	mux.Handle(
-		"GET /v1/files/{file_id}",
-		alice.New(
-			fileMetrics,
-		).Then(handlers.NewFileDownloadHandler(
+		// GET /v1/files/{file_id} - File downloads
+		downloadHandler := handlers.NewFileDownloadHandler(
 			cfg.S3BucketName,
 			cfg.S3PathStyleRequests,
 			logger,
-		)),
-	)
+		)
+		r.With(fileMetrics).Get(
+			"/files/{file_id}",
+			downloadHandler.ServeHTTP,
+		)
+	})
 
-	// OpenAI routes
-	mux.Handle(
-		"/openai/v1/chat/completions",
-		alice.
-			// Middlewares
-			New(
-				middleware.PreflightMiddleware,
-				middleware.ExtractModelMiddleware(logger),
-				middleware.ModelAllowlistMiddleware(logger, cfg.Backends),
-				metricsMiddleware.WitHandlerName("/chat/completions"),
-			).
-			Then(handlers.NewOpenAIProxyHandler(
-				cfg.Backends,
-				logger,
-				"/chat/completions",
-			)),
-	)
+	// OpenAI compatible routes
+	r.Route("/openai/v1", func(r chi.Router) {
+		r.Use(middleware.PreflightMiddleware)
+		r.Use(middleware.ExtractModelMiddleware(logger))
+		r.Use(middleware.ModelAllowlistMiddleware(logger, cfg.Backends))
 
-	mux.Handle(
-		"/openai/v1/images/generations",
-		alice.
-			// Middlewares
-			New(
-				middleware.PreflightMiddleware,
-				middleware.ExtractModelMiddleware(logger),
-				middleware.ModelAllowlistMiddleware(logger, cfg.Backends),
-				metricsMiddleware.WitHandlerName("/images/generations"),
-			).
-			// Handler
-			Then(handlers.NewOpenAIProxyHandler(
-				cfg.Backends,
-				logger,
-				"/images/generations",
-			)),
-	)
+		chatCompletionsRoute := "/chat/completions"
+		r.With(metricsMiddleware.WitHandlerName(chatCompletionsRoute)).
+			Handle(
+				chatCompletionsRoute,
+				handlers.NewOpenAIProxyHandler(
+					cfg.Backends,
+					logger,
+					chatCompletionsRoute,
+				),
+			)
+
+		imageGenerationsRoute := "/images/generations"
+		r.With(metricsMiddleware.WitHandlerName(imageGenerationsRoute)).
+			Handle(
+				imageGenerationsRoute,
+				handlers.NewOpenAIProxyHandler(
+					cfg.Backends,
+					logger,
+					imageGenerationsRoute,
+				),
+			)
+	})
 
 	// -------------------------------------------------------------------------
 	// Metrics server
 
 	metricsLogger := logger.With().Str("server", "metrics").Logger()
 
-	metricsMux := http.NewServeMux()
-
-	metricsMux.Handle("/metrics", promhttp.HandlerFor(metricsReg, promhttp.HandlerOpts{
+	metricsR := chi.NewRouter()
+	metricsR.Handle("/metrics", promhttp.HandlerFor(metricsReg, promhttp.HandlerOpts{
 		// register a metric "promhttp_metric_handler_errors_total", partitioned by "cause".
 		Registry: metricsReg,
 		ErrorLog: &metricsLogger,
@@ -151,7 +148,7 @@ func main() {
 
 	metricsServer := &http.Server{
 		Addr:    fmt.Sprintf(":%d", cfg.MetricsPort),
-		Handler: metricsMux,
+		Handler: metricsR,
 	}
 
 	go func() {
@@ -165,11 +162,13 @@ func main() {
 	// -------------------------------------------------------------------------
 	// Server setup
 
+	logger.Info().Msg("Starting Kavachat API!")
+
 	address := fmt.Sprintf("%s:%d", cfg.ServerHost, cfg.ServerPort)
 
 	server := &http.Server{
 		Addr:    address,
-		Handler: mux,
+		Handler: r,
 	}
 
 	logger.Info().Msgf("serving API on %s", address)

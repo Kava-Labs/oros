@@ -9,6 +9,9 @@ DOCKER_REPOSITORY_URL:=$(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com/$(I
 install:
 	go install
 
+test:
+	go test -v ./...
+
 .PHONY: docker-login
 docker-login:
 	$(AWS) ecr get-login-password --region $(AWS_REGION) | \

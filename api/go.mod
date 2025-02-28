@@ -9,7 +9,8 @@ require (
 	github.com/aws/smithy-go v1.22.2
 	github.com/caarlos0/env/v11 v11.3.1
 	github.com/go-chi/chi v1.5.5
-	github.com/justinas/alice v1.2.0
+	github.com/go-chi/chi/v5 v5.2.1
+	github.com/go-chi/docgen v1.3.0
 	github.com/oklog/ulid/v2 v2.1.0
 	github.com/openai/openai-go v0.1.0-alpha.51
 	github.com/prometheus/client_golang v1.20.5
