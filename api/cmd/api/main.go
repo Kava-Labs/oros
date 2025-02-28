@@ -3,20 +3,15 @@ package main
 import (
 	"context"
 	"fmt"
-	"io"
-	stdlog "log"
 	"net/http"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-
-	"github.com/rs/zerolog"
 
 	chimiddleware "github.com/go-chi/chi/middleware"
 
@@ -26,26 +21,12 @@ import (
 	"github.com/kava-labs/kavachat/api/cmd/api/middleware"
 )
 
-func NewLogger(
-	isJson bool,
-) *zerolog.Logger {
-	var output io.Writer
-	if isJson {
-		output = os.Stdout
-	} else {
-		output = zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.Kitchen}
-	}
-
-	logger := zerolog.New(output).With().Timestamp().Logger()
-	return &logger
-}
-
 func main() {
 	// -------------------------------------------------------------------------
 	// Setup logging, configuration
 
 	// Default format is JSON before config is loaded
-	logger := NewLogger(true)
+	logger := InitializeLogger(true, "debug")
 
 	cfg, err := config.NewConfigFromEnv()
 	if err != nil {
@@ -57,23 +38,10 @@ func main() {
 	}
 
 	// Replace logger with configured format
-	logger = NewLogger(cfg.LogFormatIsJSON())
-
-	// Set as standard logger output
-	stdlog.SetFlags(0)
-	stdlog.SetOutput(logger)
+	logger = InitializeLogger(cfg.LogFormatIsJSON(), cfg.LogLevel)
 
 	// API Keys are redacted in the OpenAIBackend.String() method
 	logger.Info().Stringer("config", cfg).Msg("Load config from env")
-
-	// Update log level
-	logger.Info().Str("log_level", cfg.LogLevel).Msg("Setting log level")
-
-	if strings.ToLower(cfg.LogLevel) == "debug" {
-		logger.WithLevel(zerolog.DebugLevel)
-	} else if strings.ToLower(cfg.LogLevel) == "info" {
-		logger.WithLevel(zerolog.InfoLevel)
-	}
 
 	// -------------------------------------------------------------------------
 	// Metrics registry
