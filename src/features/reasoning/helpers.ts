@@ -16,6 +16,8 @@ export const estimateTokenUsage = (
   // Very rough token estimation (about 4 chars per token)
   let promptTokens = 0;
   let completionTokens = 0;
+  //  tokens need to be allocated for the role
+  let messageOverheadTokens = 0;
 
   messages.forEach((msg) => {
     const content = typeof msg.content === 'string' ? msg.content : '';
@@ -26,9 +28,12 @@ export const estimateTokenUsage = (
     } else {
       promptTokens += contentTokens;
     }
+
+    //  rough estimate
+    messageOverheadTokens += 5;
   });
 
-  const totalTokens = promptTokens + completionTokens;
+  const totalTokens = promptTokens + completionTokens + messageOverheadTokens;
 
   return {
     totalTokens,
