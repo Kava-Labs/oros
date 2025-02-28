@@ -10,6 +10,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
+	"net/textproto"
 	"testing"
 	"time"
 
@@ -34,11 +35,23 @@ func (m *mockS3Client) GetObject(ctx context.Context, input *s3.GetObjectInput, 
 	return m.getObjectFn(ctx, input, opts...)
 }
 
-func createMultipartRequest(t *testing.T, fieldName, fileName string, fileContent []byte) *http.Request {
+func createMultipartBody(
+	t *testing.T,
+	fieldName string,
+	fileName string,
+	fileContent []byte,
+	fileContentType string,
+) (*bytes.Buffer, string) {
+	t.Helper()
+
 	var b bytes.Buffer
 	writer := multipart.NewWriter(&b)
 
-	part, err := writer.CreateFormFile(fieldName, fileName)
+	header := make(textproto.MIMEHeader)
+	header.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, fieldName, fileName))
+	header.Set("Content-Type", fileContentType)
+
+	part, err := writer.CreatePart(header)
 	require.NoError(t, err)
 
 	_, err = io.Copy(part, bytes.NewReader(fileContent))
@@ -47,8 +60,16 @@ func createMultipartRequest(t *testing.T, fieldName, fileName string, fileConten
 	err = writer.Close()
 	require.NoError(t, err)
 
-	req := httptest.NewRequest(http.MethodPost, "/upload", &b)
-	req.Header.Set("Content-Type", writer.FormDataContentType())
+	return &b, writer.FormDataContentType()
+}
+
+func createMultipartRequest(t *testing.T, fieldName string, fileName string, fileContent []byte, fileContentType string) *http.Request {
+	t.Helper()
+
+	body, contentType := createMultipartBody(t, fieldName, fileName, fileContent, fileContentType)
+	req := httptest.NewRequest(http.MethodPost, "/upload", body)
+	req.Header.Set("Content-Type", contentType)
+
 	return req
 }
 
@@ -56,9 +77,15 @@ func TestImageUploadHandler(t *testing.T) {
 	logger := zerolog.New(io.Discard)
 
 	t.Run("successful upload", func(t *testing.T) {
+		var capturedInput *s3.PutObjectInput
+
 		mock := &mockS3Client{
 			putObjectFn: func(ctx context.Context, input *s3.PutObjectInput, opts ...func(*s3.Options)) (*s3.PutObjectOutput, error) {
-				return &s3.PutObjectOutput{}, nil
+				capturedInput = input
+				expiration := "expiry-date=\"Fri, 23 Dec 2022 00:00:00 GMT\", rule-id=\"test-rule\""
+				return &s3.PutObjectOutput{
+					Expiration: &expiration,
+				}, nil
 			},
 			getObjectFn: func(ctx context.Context, input *s3.GetObjectInput, opts ...func(*s3.Options)) (*s3.GetObjectOutput, error) {
 				return nil, errors.New("not implemented")
@@ -73,12 +100,22 @@ func TestImageUploadHandler(t *testing.T) {
 		}
 
 		fileContent := []byte("test image content")
-		req := createMultipartRequest(t, "file", "test.jpg", fileContent)
+		contentType := "image/jpeg"
+		req := createMultipartRequest(t, "file", "test.jpg", fileContent, contentType)
 		w := httptest.NewRecorder()
 
 		handler.ServeHTTP(w, req)
 
 		assert.Equal(t, http.StatusCreated, w.Code)
+
+		// Verify content type was correctly passed to S3
+		require.NotNil(t, capturedInput)
+		require.NotNil(t, capturedInput.ContentType)
+		assert.Equal(t, contentType, *capturedInput.ContentType)
+
+		// Verify content disposition was set correctly
+		require.NotNil(t, capturedInput.ContentDisposition)
+		assert.Equal(t, "inline; filename=\"test.jpg\"", *capturedInput.ContentDisposition)
 
 		var response FileUploadResponse
 		err := json.NewDecoder(w.Body).Decode(&response)
@@ -89,6 +126,10 @@ func TestImageUploadHandler(t *testing.T) {
 		assert.Equal(t, int64(len(fileContent)), response.Bytes)
 		assert.False(t, response.CreatedAt.IsZero())
 		assert.False(t, response.ExpireAt.IsZero())
+
+		// Verify the expiration date was correctly extracted
+		expectedExpireAt := time.Date(2022, time.December, 23, 0, 0, 0, 0, time.UTC)
+		assert.Equal(t, expectedExpireAt, response.ExpireAt)
 	})
 
 	t.Run("method not allowed", func(t *testing.T) {
@@ -110,7 +151,7 @@ func TestImageUploadHandler(t *testing.T) {
 		}
 
 		largeContent := bytes.Repeat([]byte("a"), maxFileSize+1)
-		req := createMultipartRequest(t, "file", "large.jpg", largeContent)
+		req := createMultipartRequest(t, "file", "large.jpg", largeContent, "image/jpeg")
 		w := httptest.NewRecorder()
 
 		handler.ServeHTTP(w, req)
@@ -158,13 +199,53 @@ func TestImageUploadHandler(t *testing.T) {
 			logger:     &logger,
 		}
 
-		req := createMultipartRequest(t, "file", "test.jpg", []byte("test content"))
+		req := createMultipartRequest(t, "file", "test.jpg", []byte("test content"), "image/jpeg")
 		w := httptest.NewRecorder()
 
 		handler.ServeHTTP(w, req)
 
 		assert.Equal(t, http.StatusInternalServerError, w.Code)
 		assert.Contains(t, w.Body.String(), "Error uploading file")
+	})
+
+	t.Run("different content types", func(t *testing.T) {
+		contentTypes := []string{
+			"image/png",
+			"application/pdf",
+			"text/plain",
+			"application/octet-stream",
+		}
+
+		for _, contentType := range contentTypes {
+			t.Run(contentType, func(t *testing.T) {
+				var capturedInput *s3.PutObjectInput
+
+				mock := &mockS3Client{
+					putObjectFn: func(ctx context.Context, input *s3.PutObjectInput, opts ...func(*s3.Options)) (*s3.PutObjectOutput, error) {
+						capturedInput = input
+						return &s3.PutObjectOutput{}, nil
+					},
+				}
+
+				handler := &FileUploadHandler{
+					s3Client:   mock,
+					bucketName: "test-bucket",
+					publicURL:  "http://example.com",
+					logger:     &logger,
+				}
+
+				fileContent := []byte("test content")
+				req := createMultipartRequest(t, "file", "test-file", fileContent, contentType)
+				w := httptest.NewRecorder()
+
+				handler.ServeHTTP(w, req)
+
+				assert.Equal(t, http.StatusCreated, w.Code)
+				require.NotNil(t, capturedInput)
+				require.NotNil(t, capturedInput.ContentType)
+				assert.Equal(t, contentType, *capturedInput.ContentType)
+			})
+		}
 	})
 }
 
