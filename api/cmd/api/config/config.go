@@ -20,7 +20,8 @@ type Config struct {
 	LogFormat   string `env:"LOG_FORMAT" envDefault:"plain"`
 
 	// File Uploads
-	S3BucketName string `env:"S3_BUCKET"`
+	S3BucketName        string `env:"S3_BUCKET"`
+	S3PathStyleRequests bool   `env:"S3_PATH_STYLE_REQUESTS" envDefault:"false"`
 
 	Backends OpenAIBackends `envPrefix:"BACKEND"`
 }

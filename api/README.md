@@ -26,7 +26,7 @@ KAVACHAT_API_PORT=8080
 KAVACHAT_API_HOST=127.0.0.1
 KAVACHAT_API_METRICS_PORT=9090
 KAVACHAT_API_PUBLIC_URL=https://public-url.com
-KAVACHAT_API_S3_BUCKET=your-bucket-name
+KAVACHAT_API_S3_BUCKET=test-bucket
 
 KAVACHAT_API_BACKEND_0_NAME=OpenAI
 KAVACHAT_API_BACKEND_0_BASE_URL=https://openai-compatible/endpoint
@@ -42,3 +42,17 @@ KAVACHAT_API_BACKEND_1_BASE_URL=https://your-endpoint
 KAVACHAT_API_BACKEND_1_API_KEY=your-api-key
 KAVACHAT_API_BACKEND_1_ALLOWED_MODELS=other,models
 ```
+
+## Local Development
+
+File uploads use localstack for S3. You can start localstack with docker compose
+and the [docker-compose.yaml](../docker-compose.yaml) file in the root of the
+repository.
+
+```bash
+docker compose up localstack
+```
+
+Note that localstack initialization creates a bucket with the name `test-bucket`.
+
+Initialization files can be found in the root [`./aws`](../aws/) directory.

@@ -27,6 +27,7 @@ type FileDownloadHandler struct {
 // NewFileDownloadHandler creates a new FileDownloadHandler with the given bucket name.
 func NewFileDownloadHandler(
 	bucketName string,
+	s3PathStyleRequests bool,
 	baseLogger *zerolog.Logger,
 ) *FileDownloadHandler {
 	logger := baseLogger.With().
@@ -39,7 +40,9 @@ func NewFileDownloadHandler(
 		panic(fmt.Sprintf("unable to load AWS SDK config: %v", err))
 	}
 
-	client := s3.NewFromConfig(cfg)
+	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
+		o.UsePathStyle = s3PathStyleRequests
+	})
 
 	return &FileDownloadHandler{
 		s3Client:   client,

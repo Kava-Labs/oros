@@ -50,6 +50,7 @@ type FileUploadHandler struct {
 // NewFileUploadHandler creates a new FileUploadHandler with the given bucket name,
 func NewFileUploadHandler(
 	bucketName string,
+	s3PathStyleRequests bool,
 	publicURL string,
 	baseLogger *zerolog.Logger,
 ) *FileUploadHandler {
@@ -63,7 +64,9 @@ func NewFileUploadHandler(
 		panic(fmt.Sprintf("unable to load AWS SDK config: %v", err))
 	}
 
-	client := s3.NewFromConfig(cfg)
+	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
+		o.UsePathStyle = s3PathStyleRequests
+	})
 
 	return &FileUploadHandler{
 		s3Client:   client,
