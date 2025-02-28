@@ -74,6 +74,48 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
+  api-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current commit
+        uses: actions/checkout@v4
+
+      - name: Check for API server changes
+        id: diff
+        uses: technote-space/get-diff-action@v6
+        with:
+          PATTERNS: |
+            api/**
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: ./api/go.mod
+          cache-dependency-path: ./api/go.sum
+
+      - name: Start localstack
+        # Wait for containers to be healthy or fail after 30 seconds.
+        # Do not include docker-compose.ci.yaml as it is only used for local API
+        # image.
+        run: |
+          docker compose \
+            -f docker-compose.yaml \
+            up -d --wait --wait-timeout 30 \
+            localstack
+
+      # Run tests
+      - name: Run API tests
+        working-directory: ./api
+        run: go test -v ./...
+
+      - name: Output logs if containers are unhealthy or if tests fail
+        if: failure()
+        run: docker compose -f docker-compose.yaml logs
+
+      - name: Shutdown localstack
+        if: always()
+        run: docker compose -f docker-compose.yaml down
+
   docker-build-test:
     runs-on: ubuntu-latest
     env:
@@ -170,7 +212,7 @@ jobs:
             -f docker-compose.yaml \
             -f docker-compose.ci.yaml \
             up -d --wait --wait-timeout 30 \
-            kavachat-api
+            kavachat-api localstack
 
       - name: Install Node.js
         uses: actions/setup-node@v4
@@ -256,6 +298,8 @@ jobs:
   deploy-production-api:
     name: Deploy API to production
     needs:
+      # Requires API tests to pass and Docker image to be built
+      - api-test
       - docker-build-test
     # Only run on main branch pushes and if API files changed
     if: |

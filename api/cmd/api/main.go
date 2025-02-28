@@ -18,6 +18,8 @@ import (
 
 	"github.com/rs/zerolog"
 
+	chimiddleware "github.com/go-chi/chi/middleware"
+
 	"github.com/justinas/alice"
 	"github.com/kava-labs/kavachat/api/cmd/api/config"
 	"github.com/kava-labs/kavachat/api/cmd/api/handlers"
@@ -94,6 +96,41 @@ func main() {
 		fmt.Fprintln(w, "available")
 	})
 
+	// Metrics re-use middleware for /v1/files routes to not duplicate metrics
+	// autoprom panics if the same handler name is used
+	fileMetrics := metricsMiddleware.WitHandlerName("/v1/files")
+
+	// File uploads
+	mux.Handle(
+		"POST /v1/files",
+		alice.New(
+			// Need to set real IP
+			chimiddleware.RealIP,
+			// Before rate limiter
+			middleware.NewRateLimiter(middleware.RateLimiterConfig{
+				MaxRequests: 10,
+				WindowSize:  1 * time.Minute,
+			}),
+			fileMetrics,
+		).Then(handlers.NewFileUploadHandler(
+			cfg.S3BucketName,
+			cfg.PublicURL,
+			logger,
+		)),
+	)
+
+	// File downloads
+	mux.Handle(
+		"GET /v1/files/{file_id}",
+		alice.New(
+			fileMetrics,
+		).Then(handlers.NewFileDownloadHandler(
+			cfg.S3BucketName,
+			logger,
+		)),
+	)
+
+	// OpenAI routes
 	mux.Handle(
 		"/openai/v1/chat/completions",
 		alice.
@@ -104,13 +141,11 @@ func main() {
 				middleware.ModelAllowlistMiddleware(logger, cfg.Backends),
 				metricsMiddleware.WitHandlerName("/chat/completions"),
 			).
-			Then(
-				handlers.NewOpenAIProxyHandler(
-					cfg.Backends,
-					logger,
-					"/chat/completions",
-				),
-			),
+			Then(handlers.NewOpenAIProxyHandler(
+				cfg.Backends,
+				logger,
+				"/chat/completions",
+			)),
 	)
 
 	mux.Handle(
@@ -124,13 +159,11 @@ func main() {
 				metricsMiddleware.WitHandlerName("/images/generations"),
 			).
 			// Handler
-			Then(
-				handlers.NewOpenAIProxyHandler(
-					cfg.Backends,
-					logger,
-					"/images/generations",
-				),
-			),
+			Then(handlers.NewOpenAIProxyHandler(
+				cfg.Backends,
+				logger,
+				"/images/generations",
+			)),
 	)
 
 	// -------------------------------------------------------------------------

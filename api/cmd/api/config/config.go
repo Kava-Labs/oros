@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/caarlos0/env/v11"
 	"github.com/kava-labs/kavachat/api/cmd/api/types"
@@ -13,19 +14,19 @@ type Config struct {
 	LogLevel   string `env:"LOG_LEVEL" envDefault:"info"`
 	ServerPort int    `env:"PORT" envDefault:"8080"`
 	ServerHost string `env:"HOST" envDefault:"127.0.0.1"`
+	PublicURL  string `env:"PUBLIC_URL"`
 
 	MetricsPort int    `env:"METRICS_PORT" envDefault:"9090"`
 	LogFormat   string `env:"LOG_FORMAT" envDefault:"plain"`
+
+	// File Uploads
+	S3BucketName string `env:"S3_BUCKET"`
 
 	Backends OpenAIBackends `envPrefix:"BACKEND"`
 }
 
 // Validate checks if the required fields are set
 func (c Config) Validate() error {
-	if err := c.Backends.Validate(); err != nil {
-		return err
-	}
-
 	// Technically still works if 0 and uses a random port. But this may cause
 	// more confusion than it's worth if it wasn't intentionally left out
 	if c.ServerPort == 0 {
@@ -36,11 +37,21 @@ func (c Config) Validate() error {
 		return errors.New("HOST is required")
 	}
 
+	if c.PublicURL == "" {
+		return errors.New("PUBLIC_URL is required")
+	}
+
 	if c.LogFormat != "plain" && c.LogFormat != "json" {
 		return errors.New("LOG_FORMAT must be 'plain' or 'json'")
 	}
 
-	return nil
+	// S3 bucket required
+	if strings.TrimSpace(c.S3BucketName) == "" {
+		return errors.New("S3_BUCKET cannot be empty string")
+	}
+
+	// Validate backends
+	return c.Backends.Validate()
 }
 
 // LogFormatIsJSON returns true if the log format is JSON
@@ -51,8 +62,8 @@ func (c Config) LogFormatIsJSON() bool {
 // String returns a string representation of the configuration with the API key redacted
 func (c Config) String() string {
 	return fmt.Sprintf(
-		"LogLevel: %s, ServerPort: %d, ServerHost: %s, MetricsPort: %d, Backends: %v",
-		c.LogLevel, c.ServerPort, c.ServerHost, c.MetricsPort, c.Backends,
+		"LogLevel: %s, ServerPort: %d, ServerHost: %s, PublicURL: %s, MetricsPort: %d, S3BucketName: %s, Backends: %v",
+		c.LogLevel, c.ServerPort, c.ServerHost, c.PublicURL, c.MetricsPort, c.S3BucketName, c.Backends,
 	)
 }
 

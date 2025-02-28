@@ -24,23 +24,13 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-type Middleware interface {
-	// WrapHandler wraps the given HTTP handler for instrumentation.
-	WrapHandler(handlerName string, handler http.Handler) http.HandlerFunc
-	WitHandlerName(handlerName string) func(http.Handler) http.Handler
-}
-
-type middleware struct {
+type metricsMiddleware struct {
 	buckets  []float64
 	registry prometheus.Registerer
 }
 
-// WrapHandler wraps the given HTTP handler for instrumentation:
-// It registers four metric collectors (if not already done) and reports HTTP
-// metrics to the (newly or already) registered collectors.
-// Each has a constant label named "handler" with the provided handlerName as
-// value.
-func (m *middleware) WrapHandler(handlerName string, handler http.Handler) http.HandlerFunc {
+// WitHandlerName returns a http.Handler middleware
+func (m *metricsMiddleware) WitHandlerName(handlerName string) func(http.Handler) http.Handler {
 	reg := prometheus.WrapRegistererWith(prometheus.Labels{"handler": handlerName}, m.registry)
 
 	// "method" and "code" are native promhttp labels.
@@ -80,47 +70,45 @@ func (m *middleware) WrapHandler(handlerName string, handler http.Handler) http.
 	// is run, so model_extract middleware will already have run.
 	opts := promhttp.WithLabelFromCtx("model",
 		func(ctx context.Context) string {
-			return ctx.Value(CTX_REQ_MODEL_KEY).(string)
+			// Not all routes have model
+			model, ok := ctx.Value(CTX_REQ_MODEL_KEY).(string)
+			if !ok {
+				return ""
+			}
+
+			return model
 		},
 	)
 
 	// Wraps the provided http.Handler to observe the request result with the provided metrics.
-	base := promhttp.InstrumentHandlerCounter(
-		requestsTotal,
-		promhttp.InstrumentHandlerDuration(
-			requestDuration,
-			promhttp.InstrumentHandlerRequestSize(
-				requestSize,
-				promhttp.InstrumentHandlerResponseSize(
-					responseSize,
-					handler,
+	return func(handler http.Handler) http.Handler {
+		return promhttp.InstrumentHandlerCounter(
+			requestsTotal,
+			promhttp.InstrumentHandlerDuration(
+				requestDuration,
+				promhttp.InstrumentHandlerRequestSize(
+					requestSize,
+					promhttp.InstrumentHandlerResponseSize(
+						responseSize,
+						handler,
+						opts,
+					),
 					opts,
 				),
 				opts,
 			),
 			opts,
-		),
-		opts,
-	)
-
-	return base.ServeHTTP
-}
-
-// WitHandlerName returns a function that wraps the given HTTP handler for
-// instrumentation with the provided handlerName.
-func (m *middleware) WitHandlerName(handlerName string) func(http.Handler) http.Handler {
-	return func(handler http.Handler) http.Handler {
-		return m.WrapHandler(handlerName, handler)
+		)
 	}
 }
 
 // NewMetricsMiddleware returns a Middleware interface.
-func NewMetricsMiddleware(registry prometheus.Registerer, buckets []float64) Middleware {
+func NewMetricsMiddleware(registry prometheus.Registerer, buckets []float64) *metricsMiddleware {
 	if buckets == nil {
 		buckets = prometheus.ExponentialBuckets(0.1, 1.5, 5)
 	}
 
-	return &middleware{
+	return &metricsMiddleware{
 		buckets:  buckets,
 		registry: registry,
 	}

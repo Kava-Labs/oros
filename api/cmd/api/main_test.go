@@ -8,17 +8,19 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
+	"net/textproto"
 	"net/url"
 	"os"
 	"os/exec"
 	"regexp"
-	"strconv"
 	"strings"
 	"syscall"
 	"testing"
 	"time"
 
+	"github.com/kava-labs/kavachat/api/cmd/api/handlers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -35,6 +37,8 @@ type testConfig struct {
 	port              int
 	host              string
 	metricsServerPort int
+	s3BucketName      string
+	publicURL         string
 }
 
 var httpTestCases []*HttpTestCase
@@ -49,6 +53,9 @@ func newDefaultTestConfig() testConfig {
 		port:              8080,
 		host:              "127.0.0.1",
 		metricsServerPort: 9090,
+		// Matches localstack seed script in ./aws/bucket.sh
+		s3BucketName: "test-bucket",
+		publicURL:    "https://api.server.io",
 	}
 }
 
@@ -93,6 +100,19 @@ func startProxyCmd(context context.Context, config testConfig, args ...string) *
 		fmt.Sprintf("KAVACHAT_API_PORT=%d", config.port),
 		fmt.Sprintf("KAVACHAT_API_HOST=%s", config.host),
 		fmt.Sprintf("KAVACHAT_API_METRICS_PORT=%d", config.metricsServerPort),
+		fmt.Sprintf("KAVACHAT_API_S3_BUCKET=%s", config.s3BucketName),
+		fmt.Sprintf("KAVACHAT_API_PUBLIC_URL=%s", config.publicURL),
+
+		// Set AWS S3 testing env vars  for localstack - handlers use
+		// LoadDefaultConfig for AWS credentials so they are read directly from env
+		// instead of server config
+
+		// Endpoint needs to be IP instead of localhost or gets host error for some reason:
+		// dial tcp: lookup test-bucket.localhost: no such host
+		fmt.Sprintf("AWS_ENDPOINT_URL=%s", "http://127.0.0.1:4566"),
+		fmt.Sprintf("AWS_ACCESS_KEY_ID=%s", "test"),
+		fmt.Sprintf("AWS_SECRET_ACCESS_KEY=%s", "test"),
+		fmt.Sprintf("AWS_REGION=%s", "us-east-1"),
 	)
 
 	return cmd
@@ -242,7 +262,7 @@ func launchApiServer(ctx context.Context, conf testConfig) (string, func() error
 		return "", shutdownServer, fmt.Errorf("could not obtain stdout pipe: %w", err)
 	}
 
-	scanner := bufio.NewScanner(stdout)
+	scannerStdout := bufio.NewScanner(stdout)
 
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
@@ -257,58 +277,20 @@ func launchApiServer(ctx context.Context, conf testConfig) (string, func() error
 		}
 	}()
 
-	err = cmd.Start()
-	if err != nil {
-		return "", shutdownServer, err
-	}
-
-	getPort, readerErr := func() (chan int, chan error) {
-		port := make(chan int)
-		readErr := make(chan error)
-
-		portMatcher, err := regexp.Compile("serving API on (?:\\d{1,3}\\.){3}\\d{1,3}:(\\d+)")
-		if err != nil {
-			panic(err)
+	go func() {
+		for scannerStdout.Scan() {
+			fmt.Println(scannerStdout.Text())
 		}
-
-		go func() {
-			for scanner.Scan() {
-				line := scanner.Text()
-				fmt.Println(line)
-
-				matches := portMatcher.FindStringSubmatch(line)
-				if len(matches) > 1 {
-					parsedPort, err := strconv.Atoi(matches[1])
-					if err == nil {
-						port <- parsedPort
-					} else {
-						readErr <- err
-					}
-
-					break
-				}
-			}
-			close(port)
-		}()
-
-		return port, readErr
 	}()
 
-	port := 0
-	err = nil
-	select {
-	case port = <-getPort:
-	case err = <-readerErr:
-	case <-ctx.Done():
-		err = ctx.Err()
-	}
+	err = cmd.Start()
 	if err != nil {
 		return "", shutdownServer, err
 	}
 
 	waitUntilReady := func(ctx context.Context) chan error {
 		ready := make(chan error)
-		requestURL := fmt.Sprintf("http://localhost:%d/v1/healthcheck", port)
+		requestURL := fmt.Sprintf("http://localhost:%d/v1/healthcheck", conf.port)
 		go func() {
 			for ctx.Err() == nil {
 				resp, err := http.Get(requestURL)
@@ -333,7 +315,7 @@ func launchApiServer(ctx context.Context, conf testConfig) (string, func() error
 		return "", shutdownServer, fmt.Errorf("server is not ready: %w", err)
 	}
 
-	return fmt.Sprintf("http://localhost:%d", port), shutdownServer, nil
+	return fmt.Sprintf("http://localhost:%d", conf.port), shutdownServer, nil
 }
 
 func TestHttpHealthCheck(t *testing.T) {
@@ -455,4 +437,111 @@ func TestChatCompletionProxy(t *testing.T) {
 			assert.Equal(t, string(tc.Response.Body), string(data))
 		})
 	}
+}
+
+func TestFileUpload(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode.")
+	}
+
+	// Check if localstack is running by querying /_localstack/health
+	localstackHealthUrl := "http://localhost:4566/_localstack/health"
+	response, err := http.Get(localstackHealthUrl)
+	require.NoError(t, err, "expected localstack to be running")
+
+	// -------------------------------------------------------------------------
+	// Start API server
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(2*time.Second))
+	defer cancel()
+
+	serverConfig := newDefaultTestConfig()
+	serverUrl, shutdown, err := launchApiServer(ctx, serverConfig)
+	require.NoError(t, err, "expected server to start without error")
+	defer shutdown()
+
+	// Upload /v1/files
+	fileContent := []byte("test image content")
+	fileContentType := "image/jpeg"
+	body, contentType := createMultipartBody(
+		t,
+		"file",
+		"test.jpg",
+		fileContent,
+		fileContentType,
+	)
+
+	uploadUrl, err := url.JoinPath(serverUrl, "/v1/files")
+	require.NoError(t, err, "could not build upload url")
+
+	client := &http.Client{}
+	response, err = client.Post(uploadUrl, contentType, body)
+	require.NoError(t, err)
+	defer response.Body.Close()
+
+	if response.StatusCode == http.StatusInternalServerError {
+		data, err := io.ReadAll(response.Body)
+		require.NoError(t, err)
+		t.Fatalf("could not upload file: %s", data)
+	}
+
+	require.Equal(t, http.StatusCreated, response.StatusCode, "expected successful file upload")
+
+	// Read response
+	var fileResponse handlers.FileUploadResponse
+	err = json.NewDecoder(response.Body).Decode(&fileResponse)
+	require.NoError(t, err)
+
+	assert.NotEmpty(t, fileResponse.ID)
+	expectedPath := fmt.Sprintf("/v1/files/%s", fileResponse.ID)
+	expectedURL := serverConfig.publicURL + expectedPath
+	assert.Equal(t, expectedURL, fileResponse.URL)
+
+	// -------------------------------------------------------------------------
+	// Download /v1/files/{id}
+	downloadUrl, err := url.JoinPath(serverUrl, expectedPath)
+	require.NoError(t, err, "could not build download url")
+
+	response, err = client.Get(downloadUrl)
+	require.NoError(t, err)
+	defer response.Body.Close()
+
+	require.Equalf(t, http.StatusOK, response.StatusCode, "expected successful file download %s", downloadUrl)
+
+	// Check headers
+	assert.Equal(t, "inline; filename=\"test.jpg\"", response.Header.Get("Content-Disposition"))
+	assert.Equal(t, fileContentType, response.Header.Get("Content-Type"))
+
+	data, err := io.ReadAll(response.Body)
+	require.NoError(t, err)
+
+	assert.Equal(t, fileContent, data)
+}
+
+func createMultipartBody(
+	t *testing.T,
+	fieldName string,
+	fileName string,
+	fileContent []byte,
+	fileContentType string,
+) (*bytes.Buffer, string) {
+	t.Helper()
+
+	var b bytes.Buffer
+	writer := multipart.NewWriter(&b)
+
+	header := make(textproto.MIMEHeader)
+	header.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, fieldName, fileName))
+	header.Set("Content-Type", fileContentType)
+
+	part, err := writer.CreatePart(header)
+	require.NoError(t, err)
+
+	_, err = io.Copy(part, bytes.NewReader(fileContent))
+	require.NoError(t, err)
+
+	err = writer.Close()
+	require.NoError(t, err)
+
+	return &b, writer.FormDataContentType()
 }
