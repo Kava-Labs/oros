@@ -13,7 +13,7 @@ COPY go.mod go.sum ./
 RUN go mod download && go mod verify
 
 COPY . .
-RUN go build -v -o /bin/kavachat-api ./cmd/api/
+RUN go build -v -o /bin/kavachat-api ./cmd/api
 
 # Create a minimal image
 FROM debian:bookworm-slim

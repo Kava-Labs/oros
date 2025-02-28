@@ -16,9 +16,9 @@ import (
 	chimiddleware "github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 
-	"github.com/kava-labs/kavachat/api/cmd/api/config"
-	"github.com/kava-labs/kavachat/api/cmd/api/handlers"
-	"github.com/kava-labs/kavachat/api/cmd/api/middleware"
+	"github.com/kava-labs/kavachat/api/internal/config"
+	"github.com/kava-labs/kavachat/api/internal/handlers"
+	"github.com/kava-labs/kavachat/api/internal/middleware"
 )
 
 func main() {

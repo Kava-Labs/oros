@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/kava-labs/kavachat/api/cmd/api/config"
+	"github.com/kava-labs/kavachat/api/internal/config"
 	"github.com/stretchr/testify/require"
 )
 
