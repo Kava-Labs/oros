@@ -3,13 +3,9 @@ import { CancelChatIcon, SendChatIcon } from '../assets';
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useAppContext } from '../context/useAppContext';
 import { InputAdornmentMessage } from './InputAdornmentMessage';
-<<<<<<< HEAD
 import { ConversationHistory } from '../context/types';
 import { hasSufficientRemainingTokens } from '../utils/conversation/hasSufficientRemainingTokens';
-=======
-import { isWithinTokenLimit } from 'gpt-tokenizer';
 import { useManageContextWarning } from '../hooks/useManageContextWarning';
->>>>>>> 46adced (feat: show input warning)
 
 const DEFAULT_HEIGHT = '30px';
 
@@ -160,16 +156,12 @@ const ChatInput = ({
             aria-label="Send Chat"
             disabled={
               (!isRequesting && inputValue.length === 0) ||
-<<<<<<< HEAD
               !hasSufficientRemainingTokens(
                 modelConfig.id,
                 inputValue,
                 remainingContextWindow,
-              )
-=======
-              !isWithinTokenLimit(inputValue, modelConfig.contextLength) ||
+              ) ||
               shouldDisableChat
->>>>>>> 829815d (feat: lock out once tokens remaining is dangerously low)
             }
           >
             {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
