@@ -4,11 +4,20 @@
   gap: var(--spacing-sm);
   padding: var(--spacing-sm);
   width: 98%;
-  background-color: var(--colors-accentTwoMuted);
   font-size: 1.1rem;
   color: var(--colors-textPrimary);
   margin-bottom: -1rem;
   border-radius: var(--borderRadius-sm);
+}
+
+.cautionBanner {
+  composes: banner;
+  background-color: var(--colors-accentTwoMuted);
+}
+
+.warningBanner {
+  composes: banner;
+  background-color: var(--colors-accentMuted);
 }
 
 .message {
@@ -40,4 +49,8 @@
 
 .closeIcon:hover {
   background: none;
+}
+
+.hiddenCloseIcon {
+  visibility: hidden;
 }

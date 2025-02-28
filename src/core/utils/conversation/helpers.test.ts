@@ -355,7 +355,7 @@ describe('formatContentSnippet', () => {
   });
 });
 
-describe('calculateContextMetrics', () => {
+describe('calculateGptContextMetrics', () => {
   const maxTokens = blockchainModels['gpt-4o'].contextLength;
 
   it('initializing with system prompt', async () => {

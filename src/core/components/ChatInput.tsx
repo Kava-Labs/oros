@@ -5,6 +5,7 @@ import { useAppContext } from '../context/useAppContext';
 import { InputAdornmentMessage } from './InputAdornmentMessage';
 import { ConversationHistory } from '../context/types';
 import { hasSufficientRemainingTokens } from '../utils/conversation/hasSufficientRemainingTokens';
+import { useManageContextWarning } from '../hooks/useManageContextWarning';
 
 const DEFAULT_HEIGHT = '30px';
 
@@ -21,6 +22,14 @@ const ChatInput = ({
 }: ChatInputProps) => {
   const [showInputAdornmentMessage, setShowInputAdornmentMessage] =
     useState(false);
+  const [dismissWarning, setDismissWarning] = useState(false);
+
+  const { shouldDisableChat } = useManageContextWarning(
+    dismissWarning,
+    setDismissWarning,
+    setShowInputAdornmentMessage,
+  );
+
   const [inputValue, setInputValue] = useState('');
 
   const { isRequesting, modelConfig, conversationID } = useAppContext();
@@ -115,10 +124,15 @@ const ChatInput = ({
 
   return (
     <>
-      <InputAdornmentMessage
-        showInputAdornmentMessage={showInputAdornmentMessage}
-        setShowInputAdornmentMessage={setShowInputAdornmentMessage}
-      />
+      {showInputAdornmentMessage && (
+        <InputAdornmentMessage
+          shouldDisableChat={shouldDisableChat}
+          onCloseClick={() => {
+            setShowInputAdornmentMessage(false);
+            setDismissWarning(true);
+          }}
+        />
+      )}
       <div className={styles.controls}>
         <div className={styles.inputContainer}>
           <textarea
@@ -146,7 +160,8 @@ const ChatInput = ({
                 modelConfig.id,
                 inputValue,
                 remainingContextWindow,
-              )
+              ) ||
+              shouldDisableChat
             }
           >
             {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
