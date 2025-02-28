@@ -12,7 +12,8 @@ describe('estimateTokenUsage', () => {
 
     // "Hello, how are you?" is 19 chars, so ~5 tokens
     // "I am doing well, thank you for asking!" is 42 chars, so ~10 tokens
-    expect(result.totalTokens).toBe(15);
+    //  Two messages - 10 overhead tokens
+    expect(result.totalTokens).toBe(25);
   });
 
   it('should handle empty messages', () => {
@@ -23,7 +24,7 @@ describe('estimateTokenUsage', () => {
 
     const result = estimateTokenUsage(messages);
 
-    expect(result.totalTokens).toBe(0);
+    expect(result.totalTokens).toBe(10);
   });
 
   it('should correctly categorize tokens by role', () => {
@@ -39,6 +40,7 @@ describe('estimateTokenUsage', () => {
 
     //  User messages + system = (14 + 14 + 14)/4 ≈ 11 tokens
     //  Assistant messages = (20 + 20)/4 ≈ 10 tokens
-    expect(result.totalTokens).toBe(22);
+    //  Five messages = 25 overhead tokens
+    expect(result.totalTokens).toBe(47);
   });
 });
