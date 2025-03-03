@@ -50,9 +50,13 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
     <div className={styles.conversationContainer} data-testid="conversation">
       {messages.map((message, index) => {
         if (message.role === 'user') {
+          let hasImage = false;
+
           let content: string =
             typeof message.content === 'string' ? message.content : '';
           if (Array.isArray(message.content)) {
+            hasImage =
+              message.content.find((c) => c.type === 'image_url') !== undefined;
             // todo: we also need to render the images not only the user prompt
             for (const msgContent of message.content) {
               if (msgContent.type === 'text') {
@@ -70,9 +74,26 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
           }
 
           return (
-            <div key={index} className={styles.userInputContainer}>
-              <Content role={message.role} content={content} />
-            </div>
+            <>
+              <div
+                style={{
+                  marginLeft: 'auto',
+                  marginBottom: '4px',
+                  marginTop: '4px',
+                }}
+              >
+                {hasImage ? (
+                  <img
+                    width="128px"
+                    height="128px"
+                    src={message.content[1].image_url.url}
+                  />
+                ) : null}
+              </div>
+              <div key={index} className={styles.userInputContainer}>
+                <Content role={message.role} content={content} />
+              </div>
+            </>
           );
         }
 

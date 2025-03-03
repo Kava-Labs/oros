@@ -140,20 +140,22 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     <div>
       {/* {image upload preview} */}
       {uploadUrl ? (
-        <div
-          className={styles.imageCard}
-          onMouseEnter={() => setImgHover(true)}
-          onMouseLeave={() => setImgHover(false)}
-        >
-          <img
-            width="56px"
-            height="56px"
-            className={styles.cardImage}
-            src={uploadUrl}
-          />
-          {imgHover ? (
-            <X onClick={() => setUploadUrl('')} className={styles.xIcon} />
-          ) : null}
+        <div className={styles.imageCardContainer}>
+          <div
+            className={styles.imageCard}
+            onMouseEnter={() => setImgHover(true)}
+            onMouseLeave={() => setImgHover(false)}
+          >
+            <img
+              width="56px"
+              height="56px"
+              className={styles.cardImage}
+              src={uploadUrl}
+            />
+            {imgHover ? (
+              <X onClick={() => setUploadUrl('')} className={styles.xIcon} />
+            ) : null}
+          </div>
         </div>
       ) : null}
 
