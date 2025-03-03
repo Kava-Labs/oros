@@ -351,19 +351,24 @@ async function doChat(
   progressStore.setText('Thinking');
   const { id, tools } = modelConfig;
   try {
-    const messages = messageHistoryStore.getSnapshot().map((msg) => {
-      if ('reasoningContent' in msg) {
-        delete msg.reasoningContent;
-      }
-      return msg;
-    });
+    // Create a copy of messages without reasoningContent to stream to the model
+    // but don't modify the original messages in the store which we will render to the UI
+    const messagesWithoutReasoningContent = messageHistoryStore
+      .getSnapshot()
+      .map((msg) => {
+        const msgCopy = { ...msg };
+        if ('reasoningContent' in msgCopy) {
+          delete msgCopy.reasoningContent;
+        }
+        return msgCopy;
+      });
 
     let finalChunk: ChatCompletionChunk | undefined;
 
     const stream = await client.chat.completions.create(
       {
         model: id,
-        messages: messages,
+        messages: messagesWithoutReasoningContent,
         tools: tools,
         stream: true,
       },
