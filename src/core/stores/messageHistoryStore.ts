@@ -1,4 +1,5 @@
 import type {
+  ChatCompletionAssistantMessageParam,
   ChatCompletionMessageParam,
   ChatCompletionToolMessageParam,
 } from 'openai/resources/index';
@@ -14,6 +15,7 @@ export interface ReasoningAssistantMessage {
 export type ChatMessage =
   | ChatCompletionMessageParam
   | ChatCompletionToolMessageParam
+  | ChatCompletionAssistantMessageParam
   | ReasoningAssistantMessage;
 
 export class MessageHistoryStore {

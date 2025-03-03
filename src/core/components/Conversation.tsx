@@ -2,14 +2,14 @@ import styles from './Conversation.module.css';
 import { memo } from 'react';
 import { useSyncExternalStore } from 'react';
 import { UserMessage } from './UserMessage';
-import { ToolCallProgressCards } from './ToolCallProgressCards';
-import { AssistantMessageContainer } from './AssistantMessageContainer';
 import { ToolMessageContainer } from './ToolMessageContainer';
-import { LoadingState } from './LoadingState';
+import { StreamingMessage } from './StreamingMessage';
 import { ErrorMessage } from './ErrorMessage';
 import { ChatCompletionAssistantMessageParam } from 'openai/resources/index';
 import { useMessageHistory } from '../hooks/useMessageHistory';
 import { useAppContext } from '../context/useAppContext';
+import { ToolCallProgressCards } from './ToolCallProgressCards';
+import AssistantMessage from './AssistantMessage';
 
 export interface ConversationProps {
   onRendered(): void;
@@ -36,8 +36,7 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
 
         if (message.role === 'assistant' && message.content) {
           return (
-            <AssistantMessageContainer
-              key={index}
+            <AssistantMessage
               content={message.content as string}
               reasoningContent={
                 'reasoningContent' in message
@@ -63,7 +62,7 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
         return null;
       })}
 
-      {isRequesting && <LoadingState onRendered={onRendered} />}
+      {isRequesting && <StreamingMessage onRendered={onRendered} />}
 
       {errorText.length > 0 && (
         <ErrorMessage errorText={errorText} onRendered={onRendered} />
