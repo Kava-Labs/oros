@@ -1,4 +1,3 @@
-import styles from '../../App.module.css';
 import { SearchHistoryButton } from '../assets/SearchHistoryButton';
 import ButtonIcon from './ButtonIcon';
 import { X as CloseX } from 'lucide-react';
@@ -15,7 +14,7 @@ export const MobileSideBar = ({
   setIsMobileSideBarOpen,
 }: MobileSideBarProps) => {
   return (
-    <div className={styles.buttonGroup}>
+    <>
       <SearchHistoryButton
         isSearchHistoryOpen={isSearchHistoryOpen}
         setIsSearchHistoryOpen={setIsSearchHistoryOpen}
@@ -30,6 +29,6 @@ export const MobileSideBar = ({
         aria-label="Close Menu"
         onClick={() => setIsMobileSideBarOpen(false)}
       />
-    </div>
+    </>
   );
 };

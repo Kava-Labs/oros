@@ -35,21 +35,23 @@ export const App = () => {
           >
             <div className={styles.sidebarHeader}>
               <KavaAILogo height={20} />
-              {isMobile && isMobileSideBarOpen && (
-                <MobileSideBar
-                  isSearchHistoryOpen={isSearchHistoryOpen}
-                  setIsSearchHistoryOpen={setIsSearchHistoryOpen}
-                  setIsMobileSideBarOpen={setIsMobileSideBarOpen}
-                />
-              )}
-              {!isMobile && !isDesktopSideBarHidden && (
-                <DesktopSideBar
-                  isSearchHistoryOpen={isSearchHistoryOpen}
-                  setIsSearchHistoryOpen={setIsSearchHistoryOpen}
-                  setIsMobileSideBarOpen={setIsMobileSideBarOpen}
-                  setIsDesktopSideBarHidden={setIsDesktopSideBarHidden}
-                />
-              )}
+              <div className={styles.buttonGroup}>
+                {isMobile && isMobileSideBarOpen && (
+                  <MobileSideBar
+                    isSearchHistoryOpen={isSearchHistoryOpen}
+                    setIsSearchHistoryOpen={setIsSearchHistoryOpen}
+                    setIsMobileSideBarOpen={setIsMobileSideBarOpen}
+                  />
+                )}
+                {!isMobile && !isDesktopSideBarHidden && (
+                  <DesktopSideBar
+                    isSearchHistoryOpen={isSearchHistoryOpen}
+                    setIsSearchHistoryOpen={setIsSearchHistoryOpen}
+                    setIsMobileSideBarOpen={setIsMobileSideBarOpen}
+                    setIsDesktopSideBarHidden={setIsDesktopSideBarHidden}
+                  />
+                )}
+              </div>
             </div>
 
             <div className={styles.sidebarContent}>

@@ -1,4 +1,3 @@
-import styles from '../../App.module.css';
 import { SearchHistoryButton } from '../assets/SearchHistoryButton';
 import ButtonIcon from './ButtonIcon';
 import { PanelLeftClose } from 'lucide-react';
@@ -17,7 +16,7 @@ export const DesktopSideBar = ({
   setIsDesktopSideBarHidden,
 }: MobileSideBarProps) => {
   return (
-    <div className={styles.buttonGroup}>
+    <>
       <SearchHistoryButton
         isSearchHistoryOpen={isSearchHistoryOpen}
         setIsSearchHistoryOpen={setIsSearchHistoryOpen}
@@ -32,6 +31,6 @@ export const DesktopSideBar = ({
         aria-label="Close Menu"
         onClick={() => setIsDesktopSideBarHidden(true)}
       />
-    </div>
+    </>
   );
 };
