@@ -57,10 +57,15 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
   }
 
   private isMobileDevice(): boolean {
-    // Use regex to detect mobile devices
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-      window.navigator.userAgent,
-    );
+    // use regex to detect mobile devices
+    const isMobileUserAgent =
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        window.navigator.userAgent,
+      );
+
+    const isMobileViewport = window.innerWidth <= 768;
+
+    return isMobileUserAgent && isMobileViewport;
   }
 
   private async validateBalance(
