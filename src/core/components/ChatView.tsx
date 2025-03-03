@@ -1,32 +1,22 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import styles from './ChatView.module.css';
-import { useTheme } from '../../shared/theme/useTheme';
 import { Conversation } from './Conversation';
 import { NavBar } from './NavBar';
-import type { ChatMessage } from '../stores/messageHistoryStore';
 import { useMessageHistory } from '../hooks/useMessageHistory';
 import ChatInput from './ChatInput';
+import { LandingContent } from './LandingContent';
+import { defaultCautionText } from '../../features/blockchain/config';
 
 export interface ChatViewProps {
-  messages: ChatMessage[];
-  cautionText: string;
-  onSubmit(value: string): void;
-  onCancel(): void;
   onMenu(): void;
   onPanelOpen(): void;
   isPanelOpen: boolean;
-  introText: string;
 }
 
 export const ChatView = ({
-  messages,
-  cautionText,
-  onSubmit,
-  onCancel,
   onMenu,
   onPanelOpen,
   isPanelOpen,
-  introText,
 }: ChatViewProps) => {
   const { hasMessages } = useMessageHistory();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -73,8 +63,6 @@ export const ChatView = ({
     }
   }, [shouldAutoScroll, scrollToBottom]);
 
-  const { logo: Logo } = useTheme();
-
   return (
     <div className={styles.chatview} data-testid="chatview">
       <div ref={containerRef} className={styles.scrollContainer}>
@@ -90,40 +78,18 @@ export const ChatView = ({
           <div
             className={`${styles.chatContent} ${hasMessages ? styles.fullHeight : ''}`}
           >
-            {hasMessages && (
-              <Conversation
-                messages={messages}
-                onRendered={handleContentRendered}
-              />
-            )}
+            {hasMessages && <Conversation onRendered={handleContentRendered} />}
           </div>
 
           <div
             className={`${styles.controlsContainer} ${hasMessages ? styles.positionSticky : ''}`}
             data-testid="controls"
           >
-            {!hasMessages && (
-              <div className={styles.startContent}>
-                <div className={styles.startLogoContainer}>
-                  {Logo && (
-                    <Logo
-                      width="100%"
-                      height="auto"
-                      className={styles.startLogo}
-                    />
-                  )}
-                </div>
-                <h1 className={styles.introText}>{introText}</h1>
-              </div>
-            )}
+            {!hasMessages && <LandingContent />}
 
-            <ChatInput
-              onSubmit={onSubmit}
-              onCancel={onCancel}
-              setShouldAutoScroll={setShouldAutoScroll}
-            />
+            <ChatInput setShouldAutoScroll={setShouldAutoScroll} />
             <div className={styles.importantInfo}>
-              <span>{cautionText}</span>
+              <span>{defaultCautionText}</span>
             </div>
           </div>
         </div>

@@ -2,6 +2,7 @@ import { TextSearch } from 'lucide-react';
 import ButtonIcon from '../components/ButtonIcon';
 import type { ButtonIconProps } from '../components/ButtonIcon';
 import SearchHistoryModal from '../components/SearchHistoryModal';
+import { useAppContext } from '../context/useAppContext';
 
 // Only need to specify props specific to SearchChatButton
 // Omit the required props from ButtonIcon that we're providing
@@ -17,6 +18,7 @@ export const SearchHistoryButton = ({
   className,
   ...buttonProps
 }: SearchHistoryButtonProps) => {
+  const { hasConversations } = useAppContext();
   const onSearchHistoryButtonClick = () => {
     setIsSearchHistoryOpen(true);
   };
@@ -24,6 +26,7 @@ export const SearchHistoryButton = ({
   return (
     <>
       <ButtonIcon
+        disabled={!hasConversations}
         onClick={onSearchHistoryButtonClick}
         icon={TextSearch}
         className={className || ''}

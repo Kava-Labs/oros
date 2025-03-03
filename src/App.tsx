@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { ChatView } from './core/components/ChatView';
-import { defaultCautionText } from './features/blockchain/config/prompts/defaultPrompts';
 import { useAppContext } from './core/context/useAppContext';
 import styles from './App.module.css';
 import { ChatHistory } from './core/components/ChatHistory';
@@ -8,19 +7,10 @@ import { useIsMobile } from './shared/theme/useIsMobile';
 import { X as CloseX, PanelLeftClose } from 'lucide-react';
 import KavaAILogo from './core/assets/KavaAILogo';
 import ButtonIcon from './core/components/ButtonIcon';
-import { useMessageHistory } from './core/hooks/useMessageHistory';
 import { SearchHistoryButton } from './core/assets/SearchHistoryButton';
 
 export const App = () => {
-  const {
-    isReady,
-    modelConfig,
-    handleChatCompletion,
-    handleCancel,
-    hasConversations,
-  } = useAppContext();
-  const { messages } = useMessageHistory();
-
+  const { isReady } = useAppContext();
   const isMobile = useIsMobile();
 
   /*
@@ -38,7 +28,7 @@ export const App = () => {
           <div
             className={`${styles.backdrop} ${isMobileSideBarOpen ? styles.isOpen : ''}`}
             onClick={() => setIsMobileSideBarOpen(false)}
-          ></div>
+          />
 
           <div
             className={`${styles.sidebar} ${isMobileSideBarOpen ? styles.isOpen : ''} ${isDesktopSideBarHidden ? styles.isHidden : ''}`}
@@ -48,7 +38,6 @@ export const App = () => {
               {isMobile && isMobileSideBarOpen && (
                 <div className={styles.buttonGroup}>
                   <SearchHistoryButton
-                    disabled={!hasConversations}
                     isSearchHistoryOpen={isSearchHistoryOpen}
                     setIsSearchHistoryOpen={setIsSearchHistoryOpen}
                     setIsMobileSideBarOpen={setIsMobileSideBarOpen}
@@ -67,7 +56,6 @@ export const App = () => {
               {!isMobile && !isDesktopSideBarHidden && (
                 <div className={styles.buttonGroup}>
                   <SearchHistoryButton
-                    disabled={!hasConversations}
                     isSearchHistoryOpen={isSearchHistoryOpen}
                     setIsSearchHistoryOpen={setIsSearchHistoryOpen}
                     setIsMobileSideBarOpen={setIsMobileSideBarOpen}
@@ -92,14 +80,9 @@ export const App = () => {
 
           <div className={styles.content}>
             <ChatView
-              introText={modelConfig.introText}
-              cautionText={defaultCautionText}
-              messages={messages}
-              onSubmit={handleChatCompletion}
               onMenu={() => setIsMobileSideBarOpen(true)}
               onPanelOpen={() => setIsDesktopSideBarHidden(false)}
               isPanelOpen={!isDesktopSideBarHidden}
-              onCancel={handleCancel}
             />
           </div>
         </div>
