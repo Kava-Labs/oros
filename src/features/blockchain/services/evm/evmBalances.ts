@@ -7,6 +7,7 @@ import {
   chainRegistry,
   EVMChainConfig,
 } from '../../config/chainsRegistry';
+import { validateChain, validateWallet } from '../../utils/wallet';
 
 type EvmBalanceQueryParams = {
   chainName: string;
@@ -22,36 +23,9 @@ export class EvmBalancesQuery implements ChainQuery<EvmBalanceQueryParams> {
   walletMustMatchChainID = false;
   needsWallet = [WalletTypes.METAMASK];
 
-  private isMobileDevice(): boolean {
-    // use regex to detect mobile devices
-    const isMobileUserAgent =
-      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-        window.navigator.userAgent,
-      );
-
-    const isMobileViewport = window.innerWidth <= 768;
-
-    return isMobileUserAgent && isMobileViewport;
-  }
-
   validate(params: EvmBalanceQueryParams, walletStore: WalletStore): boolean {
-    if (this.isMobileDevice()) {
-      throw new Error('Use a desktop device to connect a wallet');
-    }
-
-    if (!walletStore.getSnapshot().isWalletConnected) {
-      throw new Error('please connect to a compatible wallet');
-    }
-
-    if (Array.isArray(this.needsWallet)) {
-      if (!this.needsWallet.includes(walletStore.getSnapshot().walletType)) {
-        throw new Error('please connect to a compatible wallet');
-      }
-    }
-
-    if (!chainRegistry[this.chainType][params.chainName]) {
-      throw new Error(`unknown chain name ${params.chainName}`);
-    }
+    validateWallet(walletStore, this.needsWallet);
+    validateChain(this.chainType, params.chainName);
 
     return true;
   }
