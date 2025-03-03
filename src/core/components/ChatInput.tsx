@@ -176,78 +176,70 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
           }}
         />
       )}
-      <div>
-        {/* {image upload preview} */}
-        {uploadUrl ? (
-          <div
-            className={styles.imageCard}
-            onMouseEnter={() => setImgHover(true)}
-            onMouseLeave={() => setImgHover(false)}
+      {uploadUrl ? (
+        <div className={styles.imageCardContainer}>
+          <img
+            width="56px"
+            height="56px"
+            className={styles.cardImage}
+            src={uploadUrl}
+          />
+          {imgHover ? (
+            <X onClick={() => setUploadUrl('')} className={styles.xIcon} />
+          ) : null}
+        </div>
+      ) : null}
+      <div className={styles.controls}>
+        <div className={styles.inputContainer}>
+          <textarea
+            className={styles.input}
+            data-testid="chat-view-input"
+            rows={1}
+            value={inputValue}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            ref={inputRef}
+            placeholder="Ask anything..."
+          />
+        </div>
+        <div className={styles.buttonContainer}>
+          <button
+            data-testid="chat-view-button"
+            ref={buttonRef}
+            className={styles.sendChatButton}
+            type="submit"
+            onClick={handleButtonClick}
+            aria-label="Send Chat"
+            disabled={
+              (!isRequesting && inputValue.length === 0) ||
+              !hasSufficientRemainingTokens(
+                modelConfig.id,
+                inputValue,
+                remainingContextWindow,
+              ) ||
+              shouldDisableChat
+            }
           >
-            <img
-              width="56px"
-              height="56px"
-              className={styles.cardImage}
-              src={uploadUrl}
+            {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
+          </button>
+          <div className={styles.uploadInputFieldContainer}>
+            <input
+              ref={uploadRef}
+              type="file"
+              className={styles.uploadInputField}
+              onChange={handleUpload}
             />
-            {imgHover ? (
-              <X onClick={() => setUploadUrl('')} className={styles.xIcon} />
-            ) : null}
           </div>
-        ) : null}
 
-        <div className={styles.controls}>
-          <div className={styles.inputContainer}>
-            <textarea
-              className={styles.input}
-              data-testid="chat-view-input"
-              rows={1}
-              value={inputValue}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              ref={inputRef}
-              placeholder="Ask anything..."
-            />
-          </div>
-          <div className={styles.buttonContainer}>
-            <button
-              data-testid="chat-view-button"
-              ref={buttonRef}
-              className={styles.sendChatButton}
-              type="submit"
-              onClick={handleButtonClick}
-              aria-label="Send Chat"
-              disabled={
-                (!isRequesting && inputValue.length === 0) ||
-                !hasSufficientRemainingTokens(
-                  modelConfig.id,
-                  inputValue,
-                  remainingContextWindow,
-                ) ||
-                shouldDisableChat
-              }
-            >
-              {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
-            </button>
-            <div className={styles.uploadInputFieldContainer}>
-              <input
-                ref={uploadRef}
-                type="file"
-                className={styles.uploadInputField}
-                onChange={handleUpload}
-              />
-            </div>
-
-            <Paperclip
-              onMouseEnter={() => setHover(true)}
-              onMouseLeave={() => setHover(false)}
-              color={hover ? '#FFFFFF' : 'rgb(180 180 180)'}
-              width="30px"
-              height="30px"
-              cursor="pointer"
-              onClick={() => uploadRef.current?.click()}
-            />
-          </div>
+          <Paperclip
+            onMouseEnter={() => setHover(true)}
+            onMouseLeave={() => setHover(false)}
+            color={hover ? '#FFFFFF' : 'rgb(180 180 180)'}
+            width="30px"
+            height="30px"
+            cursor="pointer"
+            onClick={() => uploadRef.current?.click()}
+          />
         </div>
       </div>
     </>

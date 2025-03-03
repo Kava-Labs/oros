@@ -98,6 +98,14 @@
   display: none;
 }
 
+.imageCardContainer {
+  background-color: var(--colors-bgTertiary);
+  border-top-left-radius: var(--borderRadius-md);
+  border-top-right-radius: var(--borderRadius-md);
+  padding: 4px;
+  margin-bottom: -10px;
+}
+
 .imageCard {
   position: relative;
   width: 56px;
