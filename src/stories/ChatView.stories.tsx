@@ -2,13 +2,15 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 import { ChatView, ChatViewProps } from '../core/components/ChatView';
 import { mockChatMessages, markDownSpecChatMessages } from './mockdata';
-import { defaultIntroText } from '../features/blockchain/config';
 import type { Decorator } from '@storybook/react';
 import { ThemeProvider } from '../shared/theme/themeProvider';
 import { AppContextProvider } from '../core/context/AppContextProvider';
 import { TextStreamStore } from '../core/stores/textStreamStore';
 import { ToolCallStreamStore } from '../core/stores/toolCallStreamStore';
-import { MessageHistoryStore } from '../core/stores/messageHistoryStore';
+import {
+  ChatMessage,
+  MessageHistoryStore,
+} from '../core/stores/messageHistoryStore';
 import { WalletStore } from '../features/blockchain/stores/walletStore';
 
 const messageStore = new TextStreamStore();
@@ -21,27 +23,35 @@ const errorStore = new TextStreamStore();
 
 const withProviders =
   (
+    messages: ChatMessage[],
     _ = {
       isRequesting: false,
       isReady: true,
-      errorText: '',
     },
   ): Decorator =>
-  (Story) => (
-    <ThemeProvider>
-      <AppContextProvider
-        errorStore={errorStore}
-        thinkingStore={thinkingStore}
-        progressStore={progressStore}
-        messageStore={messageStore}
-        toolCallStreamStore={toolCallStreamStore}
-        walletStore={walletStore}
-        messageHistoryStore={messageHistoryStore}
-      >
-        <Story />
-      </AppContextProvider>
-    </ThemeProvider>
-  );
+  (Story) => {
+    if (messages.length > 0) {
+      messageHistoryStore.setMessages(messages);
+    } else {
+      messageHistoryStore.reset();
+    }
+
+    return (
+      <ThemeProvider>
+        <AppContextProvider
+          errorStore={errorStore}
+          thinkingStore={thinkingStore}
+          progressStore={progressStore}
+          messageStore={messageStore}
+          toolCallStreamStore={toolCallStreamStore}
+          walletStore={walletStore}
+          messageHistoryStore={messageHistoryStore}
+        >
+          <Story />
+        </AppContextProvider>
+      </ThemeProvider>
+    );
+  };
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
@@ -59,18 +69,13 @@ const meta = {
   //},
   // Use `fn` to spy on the onClick arg, which will appear in the actions panel once invoked: https://storybook.js.org/docs/essentials/actions#action-args
   //args: { onClick: fn() },
-  decorators: [withProviders()],
+  decorators: [withProviders([])],
 } satisfies Meta<typeof ChatView>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 const args: ChatViewProps = {
-  introText: defaultIntroText,
-  messages: mockChatMessages,
-  onSubmit: fn(),
-  onCancel: fn(),
-  cautionText: '',
   onMenu: fn(),
   onPanelOpen: fn(),
   isPanelOpen: false,
@@ -82,6 +87,12 @@ export const Primary: Story = {
     viewport: { defaultViewport: 'reset' },
   },
   args,
+  decorators: [
+    withProviders(mockChatMessages, {
+      isRequesting: false,
+      isReady: true,
+    }),
+  ],
 };
 
 export const MarkdownSpec: Story = {
@@ -90,10 +101,13 @@ export const MarkdownSpec: Story = {
       viewport: { defaultViewport: 'reset' },
     },
   },
-  args: {
-    ...args,
-    messages: markDownSpecChatMessages,
-  },
+  args,
+  decorators: [
+    withProviders(markDownSpecChatMessages, {
+      isRequesting: false,
+      isReady: true,
+    }),
+  ],
 };
 
 export const OnPhoneSmall: Story = {
@@ -102,10 +116,9 @@ export const OnPhoneSmall: Story = {
   },
   args,
   decorators: [
-    withProviders({
+    withProviders(mockChatMessages, {
       isRequesting: false,
       isReady: true,
-      errorText: '',
     }),
   ],
 };
@@ -115,41 +128,37 @@ export const OnPhoneLarge: Story = {
     viewport: { defaultViewport: 'mobile2' },
   },
   args,
+  decorators: [
+    withProviders(mockChatMessages, {
+      isRequesting: false,
+      isReady: true,
+    }),
+  ],
 };
 
 export const NoMessages: Story = {
   parameters: {
     viewport: { defaultViewport: 'reset' },
   },
-  args: {
-    ...args,
-    messages: [],
-  },
+  args,
 };
 
 export const NoMessagesOnPhoneSmall: Story = {
   parameters: {
     viewport: { defaultViewport: 'mobile1' },
   },
-  args: {
-    ...args,
-    messages: [],
-  },
+  args,
 };
 
 export const RequestInProgress: Story = {
   parameters: {
     viewport: { defaultViewport: 'reset' },
   },
-  args: {
-    ...args,
-    messages: [],
-  },
+  args,
   decorators: [
-    withProviders({
+    withProviders(mockChatMessages, {
       isRequesting: true,
       isReady: true,
-      errorText: '',
     }),
   ],
 };

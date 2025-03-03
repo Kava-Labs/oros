@@ -12,7 +12,6 @@ import { SearchHistoryButton } from './core/assets/SearchHistoryButton';
 
 export const App = () => {
   const { isReady } = useAppContext();
-  const { messages } = useMessageHistory();
 
   const isMobile = useIsMobile();
 
@@ -83,7 +82,6 @@ export const App = () => {
 
           <div className={styles.content}>
             <ChatView
-              messages={messages}
               onMenu={() => setIsMobileSideBarOpen(true)}
               onPanelOpen={() => setIsDesktopSideBarHidden(false)}
               isPanelOpen={!isDesktopSideBarHidden}

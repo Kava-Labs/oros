@@ -2,21 +2,18 @@ import { useRef, useState, useCallback, useEffect } from 'react';
 import styles from './ChatView.module.css';
 import { Conversation } from './Conversation';
 import { NavBar } from './NavBar';
-import type { ChatMessage } from '../stores/messageHistoryStore';
 import { useMessageHistory } from '../hooks/useMessageHistory';
 import ChatInput from './ChatInput';
 import { LandingContent } from './LandingContent';
 import { defaultCautionText } from '../../features/blockchain/config';
 
 export interface ChatViewProps {
-  messages: ChatMessage[];
   onMenu(): void;
   onPanelOpen(): void;
   isPanelOpen: boolean;
 }
 
 export const ChatView = ({
-  messages,
   onMenu,
   onPanelOpen,
   isPanelOpen,
@@ -81,12 +78,7 @@ export const ChatView = ({
           <div
             className={`${styles.chatContent} ${hasMessages ? styles.fullHeight : ''}`}
           >
-            {hasMessages && (
-              <Conversation
-                messages={messages}
-                onRendered={handleContentRendered}
-              />
-            )}
+            {hasMessages && <Conversation onRendered={handleContentRendered} />}
           </div>
 
           <div

@@ -20,10 +20,9 @@ import {
 import KavaIcon from '../assets/KavaIcon';
 import AssistantMessage from './AssistantMessage';
 import { ThinkingContent } from './ThinkingContent';
-import type { ChatMessage } from '../stores/messageHistoryStore';
+import { useMessageHistory } from '../hooks/useMessageHistory';
 
 export interface ConversationProps {
-  messages: ChatMessage[];
   onRendered(): void;
 }
 
@@ -31,7 +30,7 @@ const StreamingTextContent = (message: string, onRendered: () => void) => {
   return <Content role="assistant" content={message} onRendered={onRendered} />;
 };
 
-const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
+const ConversationComponent = ({ onRendered }: ConversationProps) => {
   const {
     errorStore,
     isRequesting,
@@ -45,6 +44,8 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
     errorStore.subscribe,
     errorStore.getSnapshot,
   );
+
+  const { messages } = useMessageHistory();
 
   return (
     <div className={styles.conversationContainer} data-testid="conversation">
