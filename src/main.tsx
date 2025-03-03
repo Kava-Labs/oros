@@ -47,11 +47,20 @@ import {
   toolCallStreamStore,
   errorStore,
 } from './core/stores/stores.ts';
+import { idbDatabase } from './core/utils/idb/idb.ts';
 
 //
 // Render!
 //
 const root = createRoot(document.getElementById('root')!);
+
+idbDatabase()
+  .then(() => {
+    console.debug('indexedDB initialized');
+  })
+  .catch((err) => {
+    console.error('failed to open indexedDB', err);
+  });
 
 root.render(
   <StrictMode>
