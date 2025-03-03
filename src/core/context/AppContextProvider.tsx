@@ -352,9 +352,8 @@ async function doChat(
   const { id, tools } = modelConfig;
   try {
     // Create a copy of messages without reasoningContent for the API call
-    // but don't modify the original messages in the store
+    // but don't modify the original messages in the store which we will render to the UI
     const apiMessages = messageHistoryStore.getSnapshot().map((msg) => {
-      // Create a shallow copy to avoid modifying the original
       const msgCopy = { ...msg };
       if ('reasoningContent' in msgCopy) {
         delete msgCopy.reasoningContent;
@@ -367,7 +366,7 @@ async function doChat(
     const stream = await client.chat.completions.create(
       {
         model: id,
-        messages: apiMessages, // Use the copy without reasoning content
+        messages: apiMessages,
         tools: tools,
         stream: true,
       },
