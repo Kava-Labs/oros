@@ -84,8 +84,8 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
               >
                 {hasImage ? (
                   <img
-                    width="128px"
-                    height="128px"
+                    width="256px"
+                    height="256px"
                     src={message.content[1].image_url.url}
                   />
                 ) : null}
