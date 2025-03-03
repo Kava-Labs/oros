@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { ChatView } from './core/components/ChatView';
-import { defaultCautionText } from './features/blockchain/config/prompts/defaultPrompts';
 import { useAppContext } from './core/context/useAppContext';
 import styles from './App.module.css';
 import { ChatHistory } from './core/components/ChatHistory';
@@ -12,13 +11,7 @@ import { useMessageHistory } from './core/hooks/useMessageHistory';
 import { SearchHistoryButton } from './core/assets/SearchHistoryButton';
 
 export const App = () => {
-  const {
-    isReady,
-    modelConfig,
-    handleChatCompletion,
-    handleCancel,
-    hasConversations,
-  } = useAppContext();
+  const { isReady } = useAppContext();
   const { messages } = useMessageHistory();
 
   const isMobile = useIsMobile();
@@ -48,7 +41,6 @@ export const App = () => {
               {isMobile && isMobileSideBarOpen && (
                 <div className={styles.buttonGroup}>
                   <SearchHistoryButton
-                    disabled={!hasConversations}
                     isSearchHistoryOpen={isSearchHistoryOpen}
                     setIsSearchHistoryOpen={setIsSearchHistoryOpen}
                     setIsMobileSideBarOpen={setIsMobileSideBarOpen}
@@ -67,7 +59,6 @@ export const App = () => {
               {!isMobile && !isDesktopSideBarHidden && (
                 <div className={styles.buttonGroup}>
                   <SearchHistoryButton
-                    disabled={!hasConversations}
                     isSearchHistoryOpen={isSearchHistoryOpen}
                     setIsSearchHistoryOpen={setIsSearchHistoryOpen}
                     setIsMobileSideBarOpen={setIsMobileSideBarOpen}
@@ -92,14 +83,10 @@ export const App = () => {
 
           <div className={styles.content}>
             <ChatView
-              introText={modelConfig.introText}
-              cautionText={defaultCautionText}
               messages={messages}
-              onSubmit={handleChatCompletion}
               onMenu={() => setIsMobileSideBarOpen(true)}
               onPanelOpen={() => setIsDesktopSideBarHidden(false)}
               isPanelOpen={!isDesktopSideBarHidden}
-              onCancel={handleCancel}
             />
           </div>
         </div>
