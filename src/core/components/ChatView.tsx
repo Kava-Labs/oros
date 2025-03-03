@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import styles from './ChatView.module.css';
-import { Conversation } from './Conversation';
+import { Conversation } from './Conversation/Conversation';
 import { NavBar } from './NavBar';
 import { useMessageHistory } from '../hooks/useMessageHistory';
 import ChatInput from './ChatInput';

@@ -5,11 +5,11 @@ import { UserMessage } from './UserMessage';
 import { ToolMessageContainer } from './ToolMessageContainer';
 import { StreamingMessage } from './StreamingMessage';
 import { ErrorMessage } from './ErrorMessage';
-import { ChatCompletionAssistantMessageParam } from 'openai/resources/index';
-import { useMessageHistory } from '../hooks/useMessageHistory';
-import { useAppContext } from '../context/useAppContext';
 import { ToolCallProgressCards } from './ToolCallProgressCards';
+import { ChatCompletionAssistantMessageParam } from 'openai/resources/index';
 import AssistantMessage from './AssistantMessage';
+import { useAppContext } from '../../context/useAppContext';
+import { useMessageHistory } from '../../hooks/useMessageHistory';
 
 export interface ConversationProps {
   onRendered(): void;
@@ -37,6 +37,7 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
         if (message.role === 'assistant' && message.content) {
           return (
             <AssistantMessage
+              key={index}
               content={message.content as string}
               reasoningContent={
                 'reasoningContent' in message

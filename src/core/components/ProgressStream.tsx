@@ -1,7 +1,7 @@
 import styles from './Conversation.module.css';
-import { StreamingText } from './StreamingText';
-import { StreamingTextContent } from './StreamingTextContent';
 import { useAppContext } from '../context/useAppContext';
+import { StreamingText } from './Conversation/StreamingText';
+import { StreamingTextContent } from './Conversation/StreamingTextContent';
 
 interface ProgressStreamProps {
   onRendered: () => void;

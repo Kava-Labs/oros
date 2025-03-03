@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useIsMobile } from '../../shared/theme/useIsMobile';
 import { ClipboardCheck, Copy } from 'lucide-react';
+import { useIsMobile } from '../../../shared/theme/useIsMobile';
 import styles from './Conversation.module.css';
-import KavaIcon from '../assets/KavaIcon';
+import KavaIcon from '../../assets/KavaIcon';
 import { Content } from './Content';
 import { ThinkingContent } from './ThinkingContent';
-import ButtonIcon from './ButtonIcon';
+import ButtonIcon from '.././ButtonIcon';
 
 const AssistantMessage = ({
   content,

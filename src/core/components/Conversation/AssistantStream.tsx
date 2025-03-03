@@ -1,4 +1,3 @@
-// File: components/AssistantStreaming.tsx
 import styles from './Conversation.module.css';
 import { ThinkingStream } from './ThinkingStream';
 import { MessageStream } from './MessageStream';

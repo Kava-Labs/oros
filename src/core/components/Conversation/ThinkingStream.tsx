@@ -1,6 +1,6 @@
 import { StreamingText } from './StreamingText';
 import { ThinkingContent } from './ThinkingContent';
-import { useAppContext } from '../context/useAppContext';
+import { useAppContext } from '../../context/useAppContext';
 
 interface ThinkingStreamProps {
   onRendered: () => void;

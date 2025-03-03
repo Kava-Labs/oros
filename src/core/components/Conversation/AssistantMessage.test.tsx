@@ -1,14 +1,14 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { vi } from 'vitest';
 import AssistantMessage from './AssistantMessage';
-import { useIsMobile } from '../../shared/theme/useIsMobile';
+import { useIsMobile } from '../../../shared/theme/useIsMobile';
 
 // Mock the required modules and hooks
 vi.mock('../../shared/theme/useIsMobile');
 
 /* Decided to mock these out instead of rendering them so we get
    a true unit test that isn't dependent on the other components.
-   
+
    The markup from those components will be tested inside those
    unit tests
 */

@@ -1,6 +1,6 @@
 import { StreamingText } from './StreamingText';
 import { StreamingTextContent } from './StreamingTextContent';
-import { useAppContext } from '../context/useAppContext';
+import { useAppContext } from '../../context/useAppContext';
 
 interface MessageStreamProps {
   onRendered: () => void;

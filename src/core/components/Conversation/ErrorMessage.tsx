@@ -1,5 +1,5 @@
 import styles from './Conversation.module.css';
-import KavaIcon from '../assets/KavaIcon';
+import KavaIcon from '../../assets/KavaIcon';
 import { Content } from './Content';
 
 interface ErrorMessageProps {

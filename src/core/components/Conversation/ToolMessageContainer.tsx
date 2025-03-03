@@ -1,16 +1,16 @@
-import { useAppContext } from '../context/useAppContext';
+import { useAppContext } from '../../context/useAppContext';
 import {
   chainNameToolCallParam,
   chainRegistry,
-} from '../../features/blockchain/config/chainsRegistry';
+} from '../../../features/blockchain/config/chainsRegistry';
 import {
   OperationResult,
   OperationType,
-} from '../../features/blockchain/types/chain';
+} from '../../../features/blockchain/types/chain';
 import {
   CompleteQueryDisplay,
   CompleteTxDisplay,
-} from '../../features/blockchain/components/displayCards';
+} from '../../../features/blockchain/components/displayCards';
 import {
   ChatCompletionAssistantMessageParam,
   ChatCompletionMessageToolCall,
