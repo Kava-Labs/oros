@@ -4,10 +4,10 @@ import { useAppContext } from './core/context/useAppContext';
 import styles from './App.module.css';
 import { ChatHistory } from './core/components/ChatHistory';
 import { useIsMobile } from './shared/theme/useIsMobile';
-import { X as CloseX, PanelLeftClose } from 'lucide-react';
 import KavaAILogo from './core/assets/KavaAILogo';
-import ButtonIcon from './core/components/ButtonIcon';
-import { SearchHistoryButton } from './core/assets/SearchHistoryButton';
+import { DesktopSideBar } from './core/components/DesktopSideBar';
+import { MobileSideBar } from './core/components/MobileSideBar';
+import { MobileBackdrop } from './core/components/MobileBackdrop';
 
 export const App = () => {
   const { isReady } = useAppContext();
@@ -25,9 +25,9 @@ export const App = () => {
     <>
       {isReady && (
         <div className={styles.app}>
-          <div
-            className={`${styles.backdrop} ${isMobileSideBarOpen ? styles.isOpen : ''}`}
-            onClick={() => setIsMobileSideBarOpen(false)}
+          <MobileBackdrop
+            styles={`${styles.backdrop} ${isMobileSideBarOpen ? styles.isOpen : ''}`}
+            onBackdropClick={() => setIsMobileSideBarOpen(false)}
           />
 
           <div
@@ -35,42 +35,23 @@ export const App = () => {
           >
             <div className={styles.sidebarHeader}>
               <KavaAILogo height={20} />
-              {isMobile && isMobileSideBarOpen && (
-                <div className={styles.buttonGroup}>
-                  <SearchHistoryButton
+              <div className={styles.buttonGroup}>
+                {isMobile && isMobileSideBarOpen && (
+                  <MobileSideBar
                     isSearchHistoryOpen={isSearchHistoryOpen}
                     setIsSearchHistoryOpen={setIsSearchHistoryOpen}
                     setIsMobileSideBarOpen={setIsMobileSideBarOpen}
                   />
-                  <ButtonIcon
-                    icon={CloseX}
-                    tooltip={{
-                      text: 'Close Menu',
-                      position: 'bottom',
-                    }}
-                    aria-label="Close Menu"
-                    onClick={() => setIsMobileSideBarOpen(false)}
-                  />
-                </div>
-              )}
-              {!isMobile && !isDesktopSideBarHidden && (
-                <div className={styles.buttonGroup}>
-                  <SearchHistoryButton
+                )}
+                {!isMobile && !isDesktopSideBarHidden && (
+                  <DesktopSideBar
                     isSearchHistoryOpen={isSearchHistoryOpen}
                     setIsSearchHistoryOpen={setIsSearchHistoryOpen}
                     setIsMobileSideBarOpen={setIsMobileSideBarOpen}
+                    setIsDesktopSideBarHidden={setIsDesktopSideBarHidden}
                   />
-                  <ButtonIcon
-                    icon={PanelLeftClose}
-                    tooltip={{
-                      text: 'Close Menu',
-                      position: 'bottom',
-                    }}
-                    aria-label="Close Menu"
-                    onClick={() => setIsDesktopSideBarHidden(true)}
-                  />
-                </div>
-              )}
+                )}
+              </div>
             </div>
 
             <div className={styles.sidebarContent}>
