@@ -27,7 +27,11 @@ import { OperationResult } from '../../features/blockchain/types/chain';
 import { ExecuteOperation } from '../../core/context/types';
 import { v4 as uuidv4 } from 'uuid';
 import { formatConversationTitle } from '../utils/conversation/helpers';
-import type { ChatCompletionContentPart } from 'openai/resources/index';
+import type {
+  ChatCompletionContentPart,
+  ChatCompletionMessageParam,
+} from 'openai/resources/index';
+import { getImage } from '../utils/idb/idb';
 
 let client: OpenAI | null = null;
 
@@ -357,16 +361,45 @@ async function doChat(
 ) {
   progressStore.setText('Thinking');
   const { id, tools } = modelConfig;
+
+  const messages: ChatCompletionMessageParam[] = [];
+
+  console.log(messageHistoryStore.getSnapshot());
+
+  for (const msg of messageHistoryStore.getSnapshot()) {
+    // we need a deep copy, spread operator will mutate deeply nested objects in the message store
+    const msgCopy = window.structuredClone
+      ? window.structuredClone(msg)
+      : JSON.parse(JSON.stringify(msg));
+
+    if ('reasoningContent' in msgCopy) {
+      delete msgCopy.reasoningContent;
+    }
+    messages.push(msgCopy);
+  }
+
+  const lastMsg = messages[messages.length - 1];
+  console.log(lastMsg, lastMsg && Array.isArray(lastMsg.content));
+  // if the last user message is a file upload
+  // take the id out of the image_url and replace it with the base64 imageURL from idb
+  if (lastMsg && Array.isArray(lastMsg.content)) {
+    for (const content of lastMsg.content) {
+      if (content.type === 'image_url') {
+        const img = await getImage(content.image_url.url);
+        if (img) {
+          content.image_url.url = img.data;
+        } else {
+          content.image_url.url = 'image not found!';
+        }
+      }
+    }
+  }
+
   try {
     const stream = await client.chat.completions.create(
       {
         model: id,
-        messages: messageHistoryStore.getSnapshot().map((msg) => {
-          if ('reasoningContent' in msg) {
-            delete msg.reasoningContent;
-          }
-          return msg;
-        }),
+        messages: messages,
         tools: tools,
         stream: true,
       },

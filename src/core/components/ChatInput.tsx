@@ -3,8 +3,12 @@ import { CancelChatIcon, SendChatIcon } from '../assets';
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useAppContext } from '../context/useAppContext';
 import { Paperclip, X } from 'lucide-react';
+import { saveImage } from '../utils/idb/idb';
+import { IdbImage } from './IdbImage';
 
 const DEFAULT_HEIGHT = '30px';
+
+const SUPPORTED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 interface ChatInputProps {
   setShouldAutoScroll: (s: boolean) => void;
@@ -20,7 +24,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const uploadRef = useRef<HTMLInputElement>(null);
 
-  const [uploadUrl, setUploadUrl] = useState<string>('');
+  const [imageID, setImageID] = useState<string>('');
 
   const handleInputChange = useCallback(
     (event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -53,7 +57,19 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       processedMessage = modelConfig.messageProcessors.preProcess(inputValue);
     }
 
-    if (uploadUrl.length) {
+    if (imageID.length) {
+      console.log([
+        {
+          type: 'text',
+          text: processedMessage,
+        },
+        {
+          type: 'image_url',
+          image_url: {
+            url: imageID,
+          },
+        },
+      ]);
       handleChatCompletion([
         {
           type: 'text',
@@ -62,12 +78,12 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
         {
           type: 'image_url',
           image_url: {
-            url: uploadUrl,
+            url: imageID,
           },
         },
       ]);
 
-      setUploadUrl('');
+      setImageID('');
     } else {
       handleChatCompletion(processedMessage);
     }
@@ -80,7 +96,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       inputRef.current.style.height = DEFAULT_HEIGHT;
     }
   }, [
-    uploadUrl,
+    imageID,
     isRequesting,
     inputValue,
     modelConfig.messageProcessors,
@@ -106,15 +122,19 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     if (event.target.files?.length) {
       const file = event.target.files[0];
       console.log(file);
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          if (e.target && typeof e.target.result === 'string') {
-            setUploadUrl(e.target.result);
-          }
-        };
-        reader.readAsDataURL(file);
+
+      if (!SUPPORTED_FILE_TYPES.includes(file.type)) {
+        alert('Invalid file type! Please upload a JPEG, PNG, or WebP image.');
       }
+
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        if (e.target && typeof e.target.result === 'string') {
+          const imgID = await saveImage(e.target.result);
+          setImageID(imgID);
+        }
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -139,21 +159,21 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
   return (
     <div>
       {/* {image upload preview} */}
-      {uploadUrl ? (
+      {imageID ? (
         <div className={styles.imageCardContainer}>
           <div
             className={styles.imageCard}
             onMouseEnter={() => setImgHover(true)}
             onMouseLeave={() => setImgHover(false)}
           >
-            <img
+            <IdbImage
+              id={imageID}
               width="56px"
               height="56px"
               className={styles.cardImage}
-              src={uploadUrl}
             />
             {imgHover ? (
-              <X onClick={() => setUploadUrl('')} className={styles.xIcon} />
+              <X onClick={() => setImageID('')} className={styles.xIcon} />
             ) : null}
           </div>
         </div>
@@ -188,6 +208,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
 
           <div className={styles.uploadInputFieldContainer}>
             <input
+              accept={SUPPORTED_FILE_TYPES.join(', ')}
               ref={uploadRef}
               type="file"
               className={styles.uploadInputField}

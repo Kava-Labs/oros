@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import styles from './Conversation.module.css';
 import { Content } from './Content';
 import { StreamingText } from './StreamingText';
@@ -21,6 +22,7 @@ import KavaIcon from '../assets/KavaIcon';
 import AssistantMessage from './AssistantMessage';
 import { ThinkingContent } from './ThinkingContent';
 import type { ChatMessage } from '../stores/messageHistoryStore';
+import { IdbImage } from './IdbImage';
 
 export interface ConversationProps {
   messages: ChatMessage[];
@@ -51,12 +53,19 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
       {messages.map((message, index) => {
         if (message.role === 'user') {
           let hasImage = false;
+          let imageID = '';
 
           let content: string =
             typeof message.content === 'string' ? message.content : '';
           if (Array.isArray(message.content)) {
             hasImage =
-              message.content.find((c) => c.type === 'image_url') !== undefined;
+              message.content.find((c) => {
+                if (c.type === 'image_url') {
+                  imageID = c.image_url.url;
+                  return true;
+                }
+                return false;
+              }) !== undefined;
             // todo: we also need to render the images not only the user prompt
             for (const msgContent of message.content) {
               if (msgContent.type === 'text') {
@@ -74,7 +83,7 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
           }
 
           return (
-            <>
+            <Fragment key={index}>
               <div
                 style={{
                   marginLeft: 'auto',
@@ -83,17 +92,13 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
                 }}
               >
                 {hasImage ? (
-                  <img
-                    width="256px"
-                    height="256px"
-                    src={message.content[1].image_url.url}
-                  />
+                  <IdbImage width="256px" height="256px" id={imageID} />
                 ) : null}
               </div>
-              <div key={index} className={styles.userInputContainer}>
+              <div className={styles.userInputContainer}>
                 <Content role={message.role} content={content} />
               </div>
-            </>
+            </Fragment>
           );
         }
 
