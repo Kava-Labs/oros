@@ -1,6 +1,6 @@
 import styles from './Conversation.module.css';
 import KavaIcon from '../../assets/KavaIcon';
-import { ProgressStream } from '.././ProgressStream';
+import { ProgressStream } from './ProgressStream';
 import { AssistantStream } from './AssistantStream';
 
 interface StreamingMessageProps {
