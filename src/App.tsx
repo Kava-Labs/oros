@@ -7,12 +7,10 @@ import { useIsMobile } from './shared/theme/useIsMobile';
 import { X as CloseX, PanelLeftClose } from 'lucide-react';
 import KavaAILogo from './core/assets/KavaAILogo';
 import ButtonIcon from './core/components/ButtonIcon';
-import { useMessageHistory } from './core/hooks/useMessageHistory';
 import { SearchHistoryButton } from './core/assets/SearchHistoryButton';
 
 export const App = () => {
   const { isReady } = useAppContext();
-
   const isMobile = useIsMobile();
 
   /*
@@ -30,7 +28,7 @@ export const App = () => {
           <div
             className={`${styles.backdrop} ${isMobileSideBarOpen ? styles.isOpen : ''}`}
             onClick={() => setIsMobileSideBarOpen(false)}
-          ></div>
+          />
 
           <div
             className={`${styles.sidebar} ${isMobileSideBarOpen ? styles.isOpen : ''} ${isDesktopSideBarHidden ? styles.isHidden : ''}`}
