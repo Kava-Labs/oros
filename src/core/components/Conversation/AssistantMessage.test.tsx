@@ -4,7 +4,7 @@ import AssistantMessage from './AssistantMessage';
 import { useIsMobile } from '../../../shared/theme/useIsMobile';
 
 // Mock the required modules and hooks
-vi.mock('../../shared/theme/useIsMobile');
+vi.mock('../../../shared/theme/useIsMobile');
 
 /* Decided to mock these out instead of rendering them so we get
    a true unit test that isn't dependent on the other components.
