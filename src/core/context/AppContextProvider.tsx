@@ -351,11 +351,15 @@ async function doChat(
   progressStore.setText('Thinking');
   const { id, tools } = modelConfig;
   try {
-    const messages = messageHistoryStore.getSnapshot().map((msg) => {
-      if ('reasoningContent' in msg) {
-        delete msg.reasoningContent;
+    // Create a copy of messages without reasoningContent for the API call
+    // but don't modify the original messages in the store
+    const apiMessages = messageHistoryStore.getSnapshot().map((msg) => {
+      // Create a shallow copy to avoid modifying the original
+      const msgCopy = { ...msg };
+      if ('reasoningContent' in msgCopy) {
+        delete msgCopy.reasoningContent;
       }
-      return msg;
+      return msgCopy;
     });
 
     let finalChunk: ChatCompletionChunk | undefined;
@@ -363,7 +367,7 @@ async function doChat(
     const stream = await client.chat.completions.create(
       {
         model: id,
-        messages: messages,
+        messages: apiMessages, // Use the copy without reasoning content
         tools: tools,
         stream: true,
       },
