@@ -147,10 +147,45 @@ export const AppContextProvider = (props: {
     [conversations],
   );
 
-  const handleModelChange = useCallback((modelName: SupportedModels) => {
-    const newConfig = getModelConfig(modelName);
-    setModelConfig(newConfig);
-  }, []);
+  const ensureCorrectSystemPrompt = useCallback(
+    (messageStore: MessageHistoryStore, modelConfig: ModelConfig) => {
+      const messages = messageStore.getSnapshot();
+      const systemPrompt = modelConfig.systemPrompt;
+
+      // If no messages, add the system message
+      if (messages.length === 0) {
+        messageStore.addMessage({
+          role: 'system',
+          content: systemPrompt,
+        });
+      } else if (messages[0].role === 'system') {
+        // If first message is system, update it
+        const updatedMessages = [...messages];
+        updatedMessages[0] = {
+          role: 'system',
+          content: systemPrompt,
+        };
+        messageStore.setMessages(updatedMessages);
+      }
+    },
+    [],
+  );
+
+  const handleModelChange = useCallback(
+    (modelName: SupportedModels) => {
+      const newConfig = getModelConfig(modelName);
+      setModelConfig(newConfig);
+
+      // Only update system prompt if there are no user messages yet
+      const messages = messageHistoryStore.getSnapshot();
+      const hasUserMessages = messages.some((msg) => msg.role === 'user');
+
+      if (!hasUserMessages) {
+        ensureCorrectSystemPrompt(messageHistoryStore, newConfig);
+      }
+    },
+    [messageHistoryStore, ensureCorrectSystemPrompt],
+  );
 
   const { executeOperation, isOperationValidated } = useExecuteOperation(
     registry,
@@ -176,8 +211,10 @@ export const AppContextProvider = (props: {
   );
 
   const startNewChat = useCallback(() => {
-    setConversation(newConversation());
-  }, []);
+    const newConv = newConversation();
+    ensureCorrectSystemPrompt(newConv.messageHistoryStore, modelConfig);
+    setConversation(newConv);
+  }, [modelConfig, ensureCorrectSystemPrompt]);
 
   useEffect(() => {
     try {
@@ -193,15 +230,6 @@ export const AppContextProvider = (props: {
 
     setIsReady(true);
   }, []);
-
-  useEffect(() => {
-    if (!messageHistoryStore.getSnapshot().length) {
-      messageHistoryStore.addMessage({
-        role: 'system' as const,
-        content: modelConfig.systemPrompt,
-      });
-    }
-  }, [messageHistoryStore, modelConfig.systemPrompt]);
 
   // abort controller for cancelling openai request
   const controllerRef = useRef<AbortController | null>(null);
@@ -296,13 +324,6 @@ export const AppContextProvider = (props: {
     }
   }, [toolCallStreamStore]);
 
-  const handleReset = useCallback(() => {
-    handleCancel();
-    messageHistoryStore.setMessages([
-      { role: 'system' as const, content: modelConfig.systemPrompt },
-    ]);
-  }, [handleCancel, messageHistoryStore, modelConfig.systemPrompt]);
-
   return (
     <AppContext.Provider
       value={{
@@ -316,7 +337,6 @@ export const AppContextProvider = (props: {
         modelConfig,
         handleModelChange,
         startNewChat,
-        handleReset,
         handleCancel,
         handleChatCompletion,
         thinkingStore,
