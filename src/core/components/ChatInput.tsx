@@ -264,33 +264,39 @@ const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
     };
   }, [setDragState]);
 
-  const [hoverImageId, setHoverImageId] = useState<string | null>(null);
+  const [_, setHoverImageId] = useState<string | null>(null);
 
   const { colors } = useTheme();
 
   return (
-    <div>
-      {/* Image upload previews */}
+    <div className={styles.chatInputContainer}>
+      {/* Image preview section - now positioned above input */}
       {imageIDs.length > 0 && (
-        <div className={styles.imageCardContainer}>
-          {imageIDs.map((id) => (
-            <div
-              key={id}
-              className={styles.imageCard}
-              onMouseEnter={() => setHoverImageId(id)}
-              onMouseLeave={() => setHoverImageId(null)}
-            >
-              <IdbImage
-                id={id}
-                width="56px"
-                height="56px"
-                className={styles.cardImage}
-              />
-              {hoverImageId === id && (
-                <X onClick={() => removeImage(id)} className={styles.xIcon} />
-              )}
-            </div>
-          ))}
+        <div className={styles.imagePreviewContainer}>
+          <div className={styles.imagePreviewWrapper}>
+            {imageIDs.map((id) => (
+              <div
+                key={id}
+                className={styles.imageCard}
+                onMouseEnter={() => setHoverImageId(id)}
+                onMouseLeave={() => setHoverImageId(null)}
+              >
+                <IdbImage
+                  id={id}
+                  width="56px"
+                  height="56px"
+                  className={styles.cardImage}
+                />
+                <button
+                  className={styles.removeButton}
+                  onClick={() => removeImage(id)}
+                  aria-label="Remove image"
+                >
+                  <X className={styles.xIcon} size={14} />
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
