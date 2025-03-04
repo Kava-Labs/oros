@@ -106,23 +106,26 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     }
   };
 
+  const processFile = async (file: File) => {
+    if (!SUPPORTED_FILE_TYPES.includes(file.type)) {
+      alert('Invalid file type! Please upload a JPEG, PNG, or WebP image.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      if (e.target && typeof e.target.result === 'string') {
+        const imgID = await saveImage(e.target.result);
+        setImageID(imgID);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files?.length) {
       const file = event.target.files[0];
-      console.log(file);
-
-      if (!SUPPORTED_FILE_TYPES.includes(file.type)) {
-        alert('Invalid file type! Please upload a JPEG, PNG, or WebP image.');
-      }
-
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        if (e.target && typeof e.target.result === 'string') {
-          const imgID = await saveImage(e.target.result);
-          setImageID(imgID);
-        }
-      };
-      reader.readAsDataURL(file);
+      processFile(file);
     }
   };
 
@@ -140,8 +143,35 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     }
   }, []);
 
-  const [hover, setHover] = useState(false);
+  // Set up global drag and drop handlers
+  useEffect(() => {
+    const handleDragOver = (e: DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
 
+    const handleDrop = (e: DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const files = e.dataTransfer?.files;
+      if (files && files.length > 0) {
+        processFile(files[0]); // Process only the first file
+      }
+    };
+
+    // Add event listeners to document
+    document.addEventListener('dragover', handleDragOver);
+    document.addEventListener('drop', handleDrop);
+
+    return () => {
+      // Clean up
+      document.removeEventListener('dragover', handleDragOver);
+      document.removeEventListener('drop', handleDrop);
+    };
+  }, []);
+
+  const [hover, setHover] = useState(false);
   const [imgHover, setImgHover] = useState(false);
 
   return (

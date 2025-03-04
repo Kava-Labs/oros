@@ -146,3 +146,27 @@
 .xIcon:hover {
   background-color: rgba(0, 0, 0, 0.8);
 }
+
+
+.dragging {
+  border: 2px dashed #4f8aff;
+  background-color: rgba(79, 138, 255, 0.05);
+}
+
+.dropPreview {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 2px dashed #4f8aff;
+  border-radius: 8px;
+  background-color: rgba(79, 138, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.dropPreview span {
+  color: #4f8aff;
+  font-weight: 500;
+}

@@ -101,6 +101,50 @@
   color: var(--colors-textMuted);
 }
 
+.inputWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.dropPreview {
+  width: 100%;
+  padding: 16px;
+  border: 2px dashed #4f8aff;
+  border-radius: 8px;
+  background-color: rgba(79, 138, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+  position: absolute;
+  left: 0;
+  z-index: 10;
+}
+
+.previewAbove {
+  bottom: 100%;
+  margin-bottom: var(--spacing-sm);
+}
+
+.previewBelow {
+  top: 100%;
+  margin-top: var(--spacing-lg);
+}
+
+.dropPreview span {
+  color: #4f8aff;
+  font-weight: 500;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 @media (max-width: 768px) {
   .startLogoContainer {
     width: 212px;
