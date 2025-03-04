@@ -44,7 +44,6 @@ export type AppContextType = {
   handleModelChange: (modelName: SupportedModels) => void;
   startNewChat: () => void;
   executeOperation: ExecuteOperation;
-  handleReset: () => void;
   handleChatCompletion: (
     value: string | Array<ChatCompletionContentPart>,
   ) => void;
