@@ -362,9 +362,60 @@ async function doChat(
   progressStore.setText('Thinking');
   const { id, tools } = modelConfig;
 
+  const lastMsg =
+    messageHistoryStore.getSnapshot()[
+      messageHistoryStore.getSnapshot().length - 1
+    ];
+
+  let isFileUpload = false;
+  let imageID = '';
+  let userPromptForImage = '';
+  // if the last user message is a file upload
+  // take the id out of the image_url and replace it with the base64 imageURL from idb
+  if (lastMsg && Array.isArray(lastMsg.content)) {
+    for (const content of lastMsg.content) {
+      if (content.type === 'image_url') {
+        isFileUpload = true;
+        imageID = content.image_url.url;
+        const img = await getImage(content.image_url.url);
+        if (img) {
+          content.image_url.url = img.data;
+        } else {
+          content.image_url.url = 'image not found!';
+        }
+      }
+      if (content.type === 'text') {
+        userPromptForImage = content.text;
+      }
+    }
+  }
+
+  if (isFileUpload) {
+    const imageDetails = await analyzeImage(client, lastMsg);
+
+    messageHistoryStore.setMessages([
+      ...messageHistoryStore.getSnapshot().slice(0, -1),
+      {
+        role: 'system',
+        content: JSON.stringify(
+          {
+            context: 'User Image Uploaded and Analyzed by a vision model',
+            imageID,
+            imageDetails,
+          },
+          null,
+          2,
+        ),
+      },
+      {
+        role: 'user',
+        content: userPromptForImage,
+      },
+    ]);
+  }
+
   const messages: ChatCompletionMessageParam[] = [];
 
-  console.log(messageHistoryStore.getSnapshot());
 
   for (const msg of messageHistoryStore.getSnapshot()) {
     // we need a deep copy, spread operator will mutate deeply nested objects in the message store
@@ -376,23 +427,6 @@ async function doChat(
       delete msgCopy.reasoningContent;
     }
     messages.push(msgCopy);
-  }
-
-  const lastMsg = messages[messages.length - 1];
-  console.log(lastMsg, lastMsg && Array.isArray(lastMsg.content));
-  // if the last user message is a file upload
-  // take the id out of the image_url and replace it with the base64 imageURL from idb
-  if (lastMsg && Array.isArray(lastMsg.content)) {
-    for (const content of lastMsg.content) {
-      if (content.type === 'image_url') {
-        const img = await getImage(content.image_url.url);
-        if (img) {
-          content.image_url.url = img.data;
-        } else {
-          content.image_url.url = 'image not found!';
-        }
-      }
-    }
   }
 
   try {
@@ -626,3 +660,17 @@ async function syncWithLocalStorage(
   allConversations[conversationID] = history;
   localStorage.setItem('conversations', JSON.stringify(allConversations));
 }
+
+const analyzeImage = async (
+  client: OpenAI,
+  msg: ChatCompletionMessageParam,
+) => {
+  const data = await client.chat.completions.create({
+    model: 'qwen2.5-vl-7b-instruct',
+    messages: [msg], // todo: add system prompt for qwen
+  });
+
+  const imageDetails = data.choices[0].message.content;
+
+  return imageDetails ? imageDetails : '';
+};

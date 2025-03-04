@@ -58,18 +58,6 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     }
 
     if (imageID.length) {
-      console.log([
-        {
-          type: 'text',
-          text: processedMessage,
-        },
-        {
-          type: 'image_url',
-          image_url: {
-            url: imageID,
-          },
-        },
-      ]);
       handleChatCompletion([
         {
           type: 'text',

@@ -73,7 +73,17 @@ const ConversationComponent = ({ messages, onRendered }: ConversationProps) => {
                 break;
               }
             }
+          } else if (index > 1 && messages[index - 1].role === 'system') {
+            const prevMsg = messages[index - 1];
+            if (
+              typeof prevMsg.content === 'string' &&
+              prevMsg.content.includes('imageID')
+            ) {
+              hasImage = true;
+              imageID = JSON.parse(prevMsg.content).imageID;
+            }
           }
+
           if (!content.length) {
             // useful warning to catch bugs during dev
             console.warn(
