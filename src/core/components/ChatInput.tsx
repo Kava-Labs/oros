@@ -153,7 +153,6 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       reader.onload = async (e) => {
         if (e.target && typeof e.target.result === 'string') {
           const imgID = await saveImage(e.target.result);
-          // Add new image ID to the array
           setImageIDs((prevIDs) => [...prevIDs, imgID]);
         }
       };
@@ -168,7 +167,6 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
         processFile(file);
       });
 
-      // Clear the input value to allow selecting the same file again
       if (uploadRef.current) {
         uploadRef.current.value = '';
       }
@@ -198,11 +196,10 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       e.preventDefault();
       e.stopPropagation();
 
-      //  Check if we can access the file type during drag
+      //  Check if we can access the file type during drag & validate
       if (e.dataTransfer?.items && e.dataTransfer.items.length > 0) {
         const item = e.dataTransfer.items[0];
 
-        //  Validate during drag if possible
         if (item.kind === 'file') {
           const fileType = item.type;
           const isValid = SUPPORTED_FILE_TYPES.includes(fileType);
@@ -256,7 +253,8 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       }
     };
 
-    // Add event listeners to the document (entire app)
+    // Add event listeners to the entire app so the user
+    // doesn't have to specifically target the input
     document.addEventListener('dragenter', handleDragEnter);
     document.addEventListener('dragover', handleDragOver);
     document.addEventListener('dragleave', handleDragLeave);
