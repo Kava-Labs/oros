@@ -15,14 +15,17 @@ const SUPPORTED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 interface ChatInputProps {
   setShouldAutoScroll: (s: boolean) => void;
-  setDragState: (
+  handleDragState: (
     isDragging: boolean,
     isValidFile?: boolean,
     errorMessage?: string,
   ) => void;
 }
 
-const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
+const ChatInput = ({
+  setShouldAutoScroll,
+  handleDragState,
+}: ChatInputProps) => {
   const [inputValue, setInputValue] = useState('');
 
   const { isRequesting, modelConfig, handleChatCompletion, handleCancel } =
@@ -122,58 +125,62 @@ const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
     }
   };
 
-  const processFile = async (file: File) => {
-    if (!SUPPORTED_FILE_TYPES.includes(file.type)) {
-      // Set error state
-      setIsDragValid(false);
-      setDragErrorMessage(
-        'Invalid file type! Please upload a JPEG, PNG, or WebP image.',
-      );
-
-      // Clear the error message after a short delay
-      setTimeout(() => {
-        setIsDragging(false);
-        setIsDragValid(true);
-        setDragErrorMessage('');
-      }, 1500);
-
-      // Also notify parent if needed
-      if (setDragState) {
-        setDragState(
-          true,
-          false,
+  const processFile = useCallback(
+    async (file: File) => {
+      if (!SUPPORTED_FILE_TYPES.includes(file.type)) {
+        // Set error state
+        setIsDragValid(false);
+        setDragErrorMessage(
           'Invalid file type! Please upload a JPEG, PNG, or WebP image.',
         );
-        setTimeout(() => setDragState(false), 1500);
+
+        // Clear the error message after a short delay
+        setTimeout(() => {
+          setIsDragging(false);
+          setIsDragValid(true);
+          setDragErrorMessage('');
+        }, 1500);
+
+        // Also notify parent if needed
+        if (handleDragState) {
+          const isDragging = true;
+          const isValidFile = false;
+          handleDragState(
+            isDragging,
+            isValidFile,
+            'Invalid file type! Please upload a JPEG, PNG, or WebP image.',
+          );
+          setTimeout(() => handleDragState(false), 1500);
+        }
+
+        return;
       }
 
-      return;
-    }
+      // Reset drag states
+      setIsDragging(false);
+      setIsDragValid(true);
+      setDragErrorMessage('');
 
-    // Reset drag states
-    setIsDragging(false);
-    setIsDragValid(true);
-    setDragErrorMessage('');
-
-    // Also reset parent drag state if needed
-    if (setDragState) {
-      setDragState(false);
-    }
-
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      if (e.target && typeof e.target.result === 'string') {
-        const imgID = await saveImage(e.target.result);
-        // Add new image ID to the array
-        setImageIDs((prevIDs) => [...prevIDs, imgID]);
+      // Also reset parent drag state if needed
+      if (handleDragState) {
+        handleDragState(false);
       }
-    };
-    reader.readAsDataURL(file);
-  };
+
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        if (e.target && typeof e.target.result === 'string') {
+          const imgID = await saveImage(e.target.result);
+          // Add new image ID to the array
+          setImageIDs((prevIDs) => [...prevIDs, imgID]);
+        }
+      };
+      reader.readAsDataURL(file);
+    },
+    [handleDragState],
+  );
 
   const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files?.length) {
-      // Process each file in the selection
       Array.from(event.target.files).forEach((file) => {
         processFile(file);
       });
@@ -185,7 +192,6 @@ const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
     }
   };
 
-  // Function to remove a specific image
   const removeImage = (imageIdToRemove: string) => {
     setImageIDs((prevIDs) => prevIDs.filter((id) => id !== imageIdToRemove));
   };

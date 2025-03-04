@@ -27,7 +27,7 @@ export const ChatView = ({
   const { hasMessages } = useMessageHistory();
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const [_, setDragState] = useState({
+  const [, setDragState] = useState({
     isDragging: false,
     isValidFile: true,
     errorMessage: '',
@@ -129,20 +129,9 @@ export const ChatView = ({
             )}
 
             <div className={styles.inputWrapper}>
-              {/* Drag and Drop Preview Element - Show ABOVE input when messages exist */}
-              {/*{dragState.isDragging && hasMessages && (*/}
-              {/*  <div*/}
-              {/*    className={`${styles.dropPreview} ${styles.previewAbove} ${!dragState.isValidFile ? styles.previewError : ''}`}*/}
-              {/*  >*/}
-              {/*    <span>*/}
-              {/*      {dragState.errorMessage || 'Drop your file to upload'}*/}
-              {/*    </span>*/}
-              {/*  </div>*/}
-              {/*)}*/}
-
               <ChatInput
                 setShouldAutoScroll={setShouldAutoScroll}
-                setDragState={handleDragState}
+                handleDragState={handleDragState}
               />
             </div>
 
