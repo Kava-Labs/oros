@@ -1,9 +1,3 @@
-.chatInputContainer {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
 .controls {
   display: flex;
   flex-direction: row;

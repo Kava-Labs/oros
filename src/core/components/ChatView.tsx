@@ -113,9 +113,7 @@ export const ChatView = ({
               </div>
             )}
 
-            <div>
-              <ChatInput setShouldAutoScroll={setShouldAutoScroll} />
-            </div>
+            <ChatInput setShouldAutoScroll={setShouldAutoScroll} />
 
             <div className={styles.importantInfo}>
               <span>{cautionText}</span>

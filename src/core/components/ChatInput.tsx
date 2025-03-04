@@ -140,7 +140,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
         //  Present the error for a short time, then reset
         setTimeout(() => {
           resetDragState();
-        }, 1500);
+        }, 1000);
 
         return;
       }
@@ -273,7 +273,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
   const { colors } = useTheme();
 
   return (
-    <div className={styles.chatInputContainer}>
+    <div>
       {imageIDs.length > 0 && (
         <div className={styles.imagePreviewContainer}>
           <div className={styles.imagePreviewWrapper}>
