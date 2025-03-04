@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import styles from './ThinkingContent.module.css';
-import { BrainIcon } from '../assets/BrainIcon';
-import { useTheme } from '../../shared/theme/useTheme';
+import { BrainIcon } from '../../assets/BrainIcon';
+import { useTheme } from '../../../shared/theme/useTheme';
 
 interface ThinkingContentProps {
   content: string;
