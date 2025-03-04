@@ -297,7 +297,6 @@ const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
 
   return (
     <div className={styles.chatInputContainer}>
-      {/* Image preview section - now positioned above input */}
       {imageIDs.length > 0 && (
         <div className={styles.imagePreviewContainer}>
           <div className={styles.imagePreviewWrapper}>
