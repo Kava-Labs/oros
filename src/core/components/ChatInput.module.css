@@ -105,9 +105,9 @@
 
 /* New image preview styling */
 .imagePreviewContainer {
-  margin-bottom: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
   border-radius: var(--borderRadius-md);
-  background-color: var(--colors-bgSecondary);
+  background-color: var(--colors-bgTertiary);
   padding: var(--spacing-sm);
   max-width: 100%;
   overflow-x: auto;
@@ -170,8 +170,7 @@
 
 /* Drop zone styling */
 .dragging {
-  border: 2px dashed #4f8aff !important;
-  background-color: rgba(79, 138, 255, 0.05) !important;
+  border: 2px dashed #4f8aff;
   transition: all 0.2s ease;
 }
 
@@ -192,12 +191,5 @@
 
 .dropZoneError {
   color: #ff4f4f;
-}
-
-.dragging {
-  border: 2px dashed #4f8aff;
-}
-
-.dragging.dropZoneError {
-  border-color: #ff4f4f;
+  border-color: #ff4f4f !important;
 }

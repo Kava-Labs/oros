@@ -32,6 +32,7 @@ const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const uploadRef = useRef<HTMLInputElement>(null);
 
+  // Change from single imageID to array of image IDs
   const [imageIDs, setImageIDs] = useState<string[]>([]);
 
   const handleInputChange = useCallback(
@@ -66,6 +67,7 @@ const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
     }
 
     if (imageIDs.length > 0) {
+      // Create array with text content first
       const messageContent: ChatCompletionContentPart[] = [
         {
           type: 'text',
@@ -73,6 +75,7 @@ const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
         },
       ];
 
+      // Add each image as a separate content item
       imageIDs.forEach((id) => {
         messageContent.push({
           type: 'image_url',
@@ -83,6 +86,7 @@ const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
       });
 
       handleChatCompletion(messageContent);
+
       setImageIDs([]);
     } else {
       handleChatCompletion(processedMessage);
@@ -293,6 +297,7 @@ const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
 
   return (
     <div className={styles.chatInputContainer}>
+      {/* Image preview section - now positioned above input */}
       {imageIDs.length > 0 && (
         <div className={styles.imagePreviewContainer}>
           <div className={styles.imagePreviewWrapper}>
@@ -309,15 +314,13 @@ const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
                   height="56px"
                   className={styles.cardImage}
                 />
-                {
-                  <button
-                    className={styles.removeButton}
-                    onClick={() => removeImage(id)}
-                    aria-label="Remove image"
-                  >
-                    <X className={styles.xIcon} size={14} />
-                  </button>
-                }
+                <ButtonIcon
+                  icon={X}
+                  className={styles.removeButton}
+                  onClick={() => removeImage(id)}
+                  aria-label="Remove image"
+                  size={14}
+                />
               </div>
             ))}
           </div>
@@ -326,7 +329,7 @@ const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
 
       <div
         ref={controlsRef}
-        className={`${styles.controls} ${isDragging ? styles.dragging : ''}`}
+        className={`${styles.controls} ${isDragging ? styles.dragging : ''} ${isDragging && !isDragValid ? styles.dropZoneError : ''}`}
       >
         <div className={styles.inputContainer}>
           {isDragging ? (
