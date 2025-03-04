@@ -7,6 +7,7 @@ import { saveImage } from '../utils/idb/idb';
 import { IdbImage } from './IdbImage';
 import ButtonIcon from './ButtonIcon';
 import { useTheme } from '../../shared/theme/useTheme';
+import { ChatCompletionContentPart } from 'openai/resources/index';
 
 const DEFAULT_HEIGHT = '30px';
 
@@ -14,9 +15,14 @@ const SUPPORTED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 interface ChatInputProps {
   setShouldAutoScroll: (s: boolean) => void;
+  setDragState: (
+    isDragging: boolean,
+    isValidFile?: boolean,
+    errorMessage?: string,
+  ) => void;
 }
 
-const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
+const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
   const [inputValue, setInputValue] = useState('');
 
   const { isRequesting, modelConfig, handleChatCompletion, handleCancel } =
@@ -26,7 +32,8 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const uploadRef = useRef<HTMLInputElement>(null);
 
-  const [imageID, setImageID] = useState<string>('');
+  // Change from single imageID to array of image IDs
+  const [imageIDs, setImageIDs] = useState<string[]>([]);
 
   const handleInputChange = useCallback(
     (event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -50,7 +57,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       return;
     }
 
-    if (inputValue === '') {
+    if (inputValue === '' && imageIDs.length === 0) {
       return;
     }
 
@@ -59,21 +66,28 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       processedMessage = modelConfig.messageProcessors.preProcess(inputValue);
     }
 
-    if (imageID.length) {
-      handleChatCompletion([
+    if (imageIDs.length > 0) {
+      // Create array with text content first
+      const messageContent: ChatCompletionContentPart[] = [
         {
           type: 'text',
           text: processedMessage,
         },
-        {
+      ];
+
+      // Add each image as a separate content item
+      imageIDs.forEach((id) => {
+        messageContent.push({
           type: 'image_url',
           image_url: {
-            url: imageID,
+            url: id,
           },
-        },
-      ]);
+        });
+      });
 
-      setImageID('');
+      handleChatCompletion(messageContent);
+
+      setImageIDs([]);
     } else {
       handleChatCompletion(processedMessage);
     }
@@ -86,7 +100,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       inputRef.current.style.height = DEFAULT_HEIGHT;
     }
   }, [
-    imageID,
+    imageIDs,
     isRequesting,
     inputValue,
     modelConfig.messageProcessors,
@@ -110,15 +124,30 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
 
   const processFile = async (file: File) => {
     if (!SUPPORTED_FILE_TYPES.includes(file.type)) {
-      alert('Invalid file type! Please upload a JPEG, PNG, or WebP image.');
+      // Instead of an alert, set the drag state with an error
+      setDragState(
+        true,
+        false,
+        'Invalid file type! Please upload a JPEG, PNG, or WebP image.',
+      );
+
+      // Clear the error message after a shorter delay
+      setTimeout(() => {
+        setDragState(false);
+      }, 1500);
+
       return;
     }
+
+    // Reset drag state
+    setDragState(false);
 
     const reader = new FileReader();
     reader.onload = async (e) => {
       if (e.target && typeof e.target.result === 'string') {
         const imgID = await saveImage(e.target.result);
-        setImageID(imgID);
+        // Add new image ID to the array
+        setImageIDs((prevIDs) => [...prevIDs, imgID]);
       }
     };
     reader.readAsDataURL(file);
@@ -126,9 +155,21 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
 
   const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files?.length) {
-      const file = event.target.files[0];
-      processFile(file);
+      // Process each file in the selection
+      Array.from(event.target.files).forEach((file) => {
+        processFile(file);
+      });
+
+      // Clear the input value to allow selecting the same file again
+      if (uploadRef.current) {
+        uploadRef.current.value = '';
+      }
     }
+  };
+
+  // Function to remove a specific image
+  const removeImage = (imageIdToRemove: string) => {
+    setImageIDs((prevIDs) => prevIDs.filter((id) => id !== imageIdToRemove));
   };
 
   // Reset textarea height when input is cleared
@@ -147,58 +188,111 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
 
   // Set up global drag and drop handlers
   useEffect(() => {
+    const handleDragEnter = (e: DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      // Check if we can access the file type during drag
+      if (e.dataTransfer?.items && e.dataTransfer.items.length > 0) {
+        const item = e.dataTransfer.items[0];
+
+        // If we can determine the file type during drag, validate it
+        if (item.kind === 'file') {
+          const fileType = item.type;
+          const isValid = SUPPORTED_FILE_TYPES.includes(fileType);
+          setDragState(
+            true,
+            isValid,
+            isValid
+              ? undefined
+              : 'Invalid file type! Please upload a JPEG, PNG, or WebP image.',
+          );
+        } else {
+          // If we can't determine file type, just show the generic drag state
+          setDragState(true);
+        }
+      } else {
+        // Generic drag state if we can't access file info
+        setDragState(true);
+      }
+    };
+
     const handleDragOver = (e: DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
+      // Keep the dragging state active, but don't update validation here
+    };
+
+    const handleDragLeave = (e: DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      // Only reset if leaving the window or moving to a child element
+      if (e.relatedTarget === null) {
+        setDragState(false);
+      }
     };
 
     const handleDrop = (e: DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
 
+      // Reset the general drag state
+      setDragState(false);
+
       const files = e.dataTransfer?.files;
       if (files && files.length > 0) {
-        processFile(files[0]); // Process only the first file
+        // Process all dropped files
+        Array.from(files).forEach((file) => {
+          processFile(file);
+        });
       }
     };
 
     // Add event listeners to document
+    document.addEventListener('dragenter', handleDragEnter);
     document.addEventListener('dragover', handleDragOver);
+    document.addEventListener('dragleave', handleDragLeave);
     document.addEventListener('drop', handleDrop);
 
     return () => {
       // Clean up
+      document.removeEventListener('dragenter', handleDragEnter);
       document.removeEventListener('dragover', handleDragOver);
+      document.removeEventListener('dragleave', handleDragLeave);
       document.removeEventListener('drop', handleDrop);
     };
-  }, []);
+  }, [setDragState]);
 
-  const [imgHover, setImgHover] = useState(false);
+  const [hoverImageId, setHoverImageId] = useState<string | null>(null);
 
   const { colors } = useTheme();
 
   return (
     <div>
-      {/* {image upload preview} */}
-      {imageID ? (
+      {/* Image upload previews */}
+      {imageIDs.length > 0 && (
         <div className={styles.imageCardContainer}>
-          <div
-            className={styles.imageCard}
-            onMouseEnter={() => setImgHover(true)}
-            onMouseLeave={() => setImgHover(false)}
-          >
-            <IdbImage
-              id={imageID}
-              width="56px"
-              height="56px"
-              className={styles.cardImage}
-            />
-            {imgHover ? (
-              <X onClick={() => setImageID('')} className={styles.xIcon} />
-            ) : null}
-          </div>
+          {imageIDs.map((id) => (
+            <div
+              key={id}
+              className={styles.imageCard}
+              onMouseEnter={() => setHoverImageId(id)}
+              onMouseLeave={() => setHoverImageId(null)}
+            >
+              <IdbImage
+                id={id}
+                width="56px"
+                height="56px"
+                className={styles.cardImage}
+              />
+              {hoverImageId === id && (
+                <X onClick={() => removeImage(id)} className={styles.xIcon} />
+              )}
+            </div>
+          ))}
         </div>
-      ) : null}
+      )}
 
       <div className={styles.controls}>
         <div className={styles.inputContainer}>
@@ -222,7 +316,9 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
             type="submit"
             onClick={handleButtonClick}
             aria-label="Send Chat"
-            disabled={!isRequesting && inputValue.length === 0}
+            disabled={
+              !isRequesting && inputValue.length === 0 && imageIDs.length === 0
+            }
           >
             {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
           </button>
@@ -234,6 +330,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
               type="file"
               className={styles.uploadInputField}
               onChange={handleUpload}
+              multiple // Allow multiple file selection
             />
           </div>
 
@@ -248,16 +345,6 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
               backgroundColor: colors.bgPrimary,
             }}
           />
-
-          {/*<Paperclip*/}
-          {/*  onMouseEnter={() => setHover(true)}*/}
-          {/*  onMouseLeave={() => setHover(false)}*/}
-          {/*  color={hover ? '#FFFFFF' : 'rgb(180 180 180)'}*/}
-          {/*  width="30px"*/}
-          {/*  height="30px"*/}
-          {/*  cursor="pointer"*/}
-          {/*  onClick={() => uploadRef.current?.click()}*/}
-          {/*/>*/}
         </div>
       </div>
     </div>

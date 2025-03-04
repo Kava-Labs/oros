@@ -136,6 +136,15 @@
   font-weight: 500;
 }
 
+.previewError {
+  border-color: #ff4f4f;
+  background-color: rgba(255, 79, 79, 0.1);
+}
+
+.previewError span {
+  color: #ff4f4f;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
