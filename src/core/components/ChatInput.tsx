@@ -74,7 +74,6 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     }
 
     if (imageIDs.length > 0) {
-      // Create array with text content first
       const messageContent: ChatCompletionContentPart[] = [
         {
           type: 'text',
@@ -82,7 +81,6 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
         },
       ];
 
-      // Add each image as a separate content item
       imageIDs.forEach((id) => {
         messageContent.push({
           type: 'image_url',
@@ -139,7 +137,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
             'Invalid file type! Please upload a JPEG, PNG, or WebP image.',
         });
 
-        // Clear the error message after a short delay
+        //  Present the error for a short time, then reset
         setTimeout(() => {
           resetDragState();
         }, 1500);
@@ -147,7 +145,6 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
         return;
       }
 
-      // Reset drag states
       resetDragState();
 
       const reader = new FileReader();

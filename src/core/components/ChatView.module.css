@@ -101,11 +101,6 @@
   color: var(--colors-textMuted);
 }
 
-.inputWrapper {
-  position: relative;
-  width: 100%;
-}
-
 @media (max-width: 768px) {
   .startLogoContainer {
     width: 212px;

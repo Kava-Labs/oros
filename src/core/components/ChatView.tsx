@@ -113,7 +113,7 @@ export const ChatView = ({
               </div>
             )}
 
-            <div className={styles.inputWrapper}>
+            <div>
               <ChatInput setShouldAutoScroll={setShouldAutoScroll} />
             </div>
 
