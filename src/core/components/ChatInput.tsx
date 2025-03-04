@@ -15,18 +15,23 @@ const SUPPORTED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 interface ChatInputProps {
   setShouldAutoScroll: (s: boolean) => void;
-  handleDragState: (
-    isDragging: boolean,
-    isValidFile?: boolean,
-    errorMessage?: string,
-  ) => void;
 }
 
-const ChatInput = ({
-  setShouldAutoScroll,
-  handleDragState,
-}: ChatInputProps) => {
+const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
   const [inputValue, setInputValue] = useState('');
+
+  const baseDragState = {
+    isDragging: false,
+    isSupportedFile: true,
+    errorMessage: '',
+  };
+
+  const [dragState, setDragState] = useState(baseDragState);
+  const { isDragging, isSupportedFile, errorMessage } = dragState;
+
+  const resetDragState = () => {
+    setDragState(baseDragState);
+  };
 
   const { isRequesting, modelConfig, handleChatCompletion, handleCancel } =
     useAppContext();
@@ -35,7 +40,6 @@ const ChatInput = ({
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const uploadRef = useRef<HTMLInputElement>(null);
 
-  // Change from single imageID to array of image IDs
   const [imageIDs, setImageIDs] = useState<string[]>([]);
 
   const handleInputChange = useCallback(
@@ -128,43 +132,23 @@ const ChatInput = ({
   const processFile = useCallback(
     async (file: File) => {
       if (!SUPPORTED_FILE_TYPES.includes(file.type)) {
-        // Set error state
-        setIsDragValid(false);
-        setDragErrorMessage(
-          'Invalid file type! Please upload a JPEG, PNG, or WebP image.',
-        );
+        setDragState({
+          isDragging: true,
+          isSupportedFile: false,
+          errorMessage:
+            'Invalid file type! Please upload a JPEG, PNG, or WebP image.',
+        });
 
         // Clear the error message after a short delay
         setTimeout(() => {
-          setIsDragging(false);
-          setIsDragValid(true);
-          setDragErrorMessage('');
+          resetDragState();
         }, 1500);
-
-        // Also notify parent if needed
-        if (handleDragState) {
-          const isDragging = true;
-          const isValidFile = false;
-          handleDragState(
-            isDragging,
-            isValidFile,
-            'Invalid file type! Please upload a JPEG, PNG, or WebP image.',
-          );
-          setTimeout(() => handleDragState(false), 1500);
-        }
 
         return;
       }
 
       // Reset drag states
-      setIsDragging(false);
-      setIsDragValid(true);
-      setDragErrorMessage('');
-
-      // Also reset parent drag state if needed
-      if (handleDragState) {
-        handleDragState(false);
-      }
+      resetDragState();
 
       const reader = new FileReader();
       reader.onload = async (e) => {
@@ -176,7 +160,7 @@ const ChatInput = ({
       };
       reader.readAsDataURL(file);
     },
-    [handleDragState],
+    [resetDragState],
   );
 
   const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -210,13 +194,6 @@ const ChatInput = ({
     }
   }, []);
 
-  // Track drag state internally
-  const [isDragging, setIsDragging] = useState(false);
-  const [isDragValid, setIsDragValid] = useState(true);
-  const [dragErrorMessage, setDragErrorMessage] = useState('');
-  const controlsRef = useRef<HTMLDivElement>(null);
-
-  // Set up drag and drop handlers for the entire app
   useEffect(() => {
     const handleDragEnter = (e: DragEvent) => {
       e.preventDefault();
@@ -230,22 +207,24 @@ const ChatInput = ({
         if (item.kind === 'file') {
           const fileType = item.type;
           const isValid = SUPPORTED_FILE_TYPES.includes(fileType);
-          setIsDragValid(isValid);
-          setDragErrorMessage(
-            isValid
+          setDragState({
+            isDragging: true,
+            isSupportedFile: isValid,
+            errorMessage: isValid
               ? ''
               : 'Invalid file type! Please upload a JPEG, PNG, or WebP image.',
-          );
+          });
         }
       }
-
-      setIsDragging(true);
     };
 
     const handleDragOver = (e: DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      setIsDragging(true);
+      setDragState((prev) => ({
+        ...prev,
+        isDragging: true,
+      }));
     };
 
     const handleDragLeave = (e: DragEvent) => {
@@ -254,7 +233,10 @@ const ChatInput = ({
 
       //  Reset if leaving the document (going outside the window)
       if (e.relatedTarget === null) {
-        setIsDragging(false);
+        setDragState((prev) => ({
+          ...prev,
+          isDragging: false,
+        }));
       }
     };
 
@@ -262,7 +244,10 @@ const ChatInput = ({
       e.preventDefault();
       e.stopPropagation();
 
-      setIsDragging(false);
+      setDragState((prev) => ({
+        ...prev,
+        isDragging: false,
+      }));
 
       const files = e.dataTransfer?.files;
       if (files && files.length > 0) {
@@ -279,7 +264,6 @@ const ChatInput = ({
     document.addEventListener('drop', handleDrop);
 
     return () => {
-      // Clean up
       document.removeEventListener('dragenter', handleDragEnter);
       document.removeEventListener('dragover', handleDragOver);
       document.removeEventListener('dragleave', handleDragLeave);
@@ -323,15 +307,14 @@ const ChatInput = ({
       )}
 
       <div
-        ref={controlsRef}
-        className={`${styles.controls} ${isDragging ? styles.dragging : ''} ${isDragging && !isDragValid ? styles.dropZoneError : ''}`}
+        className={`${styles.controls} ${isDragging ? styles.dragging : ''} ${isDragging && !isSupportedFile ? styles.dropZoneError : ''}`}
       >
         <div className={styles.inputContainer}>
           {isDragging ? (
             <div
-              className={`${styles.dropZone} ${!isDragValid ? styles.dropZoneError : ''}`}
+              className={`${styles.dropZone} ${!isSupportedFile ? styles.dropZoneError : ''}`}
             >
-              <span>{dragErrorMessage || 'Drop your image to upload'}</span>
+              <span>{errorMessage || 'Drop your image to upload'}</span>
             </div>
           ) : (
             <textarea

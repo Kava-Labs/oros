@@ -27,23 +27,8 @@ export const ChatView = ({
   const { hasMessages } = useMessageHistory();
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const [, setDragState] = useState({
-    isDragging: false,
-    isValidFile: true,
-    errorMessage: '',
-  });
-
   // Track if we should auto-scroll
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
-
-  // Handle drag state from child components
-  const handleDragState = (
-    isDragging: boolean,
-    isValidFile = true,
-    errorMessage = '',
-  ) => {
-    setDragState({ isDragging, isValidFile, errorMessage });
-  };
 
   // Handle scroll events
   const handleScroll = useCallback(() => {
@@ -129,10 +114,7 @@ export const ChatView = ({
             )}
 
             <div className={styles.inputWrapper}>
-              <ChatInput
-                setShouldAutoScroll={setShouldAutoScroll}
-                handleDragState={handleDragState}
-              />
+              <ChatInput setShouldAutoScroll={setShouldAutoScroll} />
             </div>
 
             <div className={styles.importantInfo}>
