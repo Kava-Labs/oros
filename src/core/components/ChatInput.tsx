@@ -212,16 +212,15 @@ const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
 
   // Set up drag and drop handlers for the entire app
   useEffect(() => {
-    // Handler functions
     const handleDragEnter = (e: DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
 
-      // Check if we can access the file type during drag
+      //  Check if we can access the file type during drag
       if (e.dataTransfer?.items && e.dataTransfer.items.length > 0) {
         const item = e.dataTransfer.items[0];
 
-        // If we can determine the file type during drag, validate it
+        //  Validate during drag if possible
         if (item.kind === 'file') {
           const fileType = item.type;
           const isValid = SUPPORTED_FILE_TYPES.includes(fileType);
@@ -240,7 +239,6 @@ const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
     const handleDragOver = (e: DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      // Keep the dragging state active
       setIsDragging(true);
     };
 
@@ -248,7 +246,7 @@ const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
       e.preventDefault();
       e.stopPropagation();
 
-      // Only reset if leaving the document (going outside the window)
+      //  Reset if leaving the document (going outside the window)
       if (e.relatedTarget === null) {
         setIsDragging(false);
       }
@@ -258,21 +256,13 @@ const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
       e.preventDefault();
       e.stopPropagation();
 
-      // Reset the drag state
       setIsDragging(false);
 
-      // Only handle drops specifically on the controls element
-      if (
-        controlsRef.current &&
-        controlsRef.current.contains(e.target as Node)
-      ) {
-        const files = e.dataTransfer?.files;
-        if (files && files.length > 0) {
-          // Process all dropped files
-          Array.from(files).forEach((file) => {
-            processFile(file);
-          });
-        }
+      const files = e.dataTransfer?.files;
+      if (files && files.length > 0) {
+        Array.from(files).forEach((file) => {
+          processFile(file);
+        });
       }
     };
 
@@ -289,7 +279,7 @@ const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
       document.removeEventListener('dragleave', handleDragLeave);
       document.removeEventListener('drop', handleDrop);
     };
-  }, []);
+  }, [processFile]);
 
   const [, setHoverImageId] = useState<string | null>(null);
 
