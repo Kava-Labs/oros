@@ -105,7 +105,7 @@
 
 /* New image preview styling */
 .imagePreviewContainer {
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
   border-radius: var(--borderRadius-md);
   background-color: var(--colors-bgSecondary);
   padding: var(--spacing-sm);
@@ -125,6 +125,10 @@
   height: 56px;
   border-radius: 4px;
   overflow: hidden;
+}
+
+.imageCard:hover .cardImage {
+  transform: scale(1.05);
 }
 
 .cardImage {
@@ -164,25 +168,36 @@
   background-color: var(--colors-bgPrimary);
 }
 
+/* Drop zone styling */
 .dragging {
-  border: 2px dashed #4f8aff;
-  background-color: rgba(79, 138, 255, 0.05);
+  border: 2px dashed #4f8aff !important;
+  background-color: rgba(79, 138, 255, 0.05) !important;
+  transition: all 0.2s ease;
 }
 
-.dropPreview {
+.dropZone {
   width: 100%;
-  padding: 12px;
-  margin-bottom: 1px;
-  border: 2px dashed #4f8aff;
-  border-radius: 8px;
-  background-color: rgba(79, 138, 255, 0.1);
+  min-height: 30px;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  pointer-events: none;
-}
-
-.dropPreview span {
   color: #4f8aff;
   font-weight: 500;
+  background-color: transparent;
+  font-size: 1.6rem;
+  padding-top: 4px;
+  text-align: center;
+}
+
+.dropZoneError {
+  color: #ff4f4f;
+}
+
+.dragging {
+  border: 2px dashed #4f8aff;
+}
+
+.dragging.dropZoneError {
+  border-color: #ff4f4f;
 }

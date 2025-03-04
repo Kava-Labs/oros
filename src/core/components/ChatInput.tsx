@@ -32,7 +32,6 @@ const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const uploadRef = useRef<HTMLInputElement>(null);
 
-  // Change from single imageID to array of image IDs
   const [imageIDs, setImageIDs] = useState<string[]>([]);
 
   const handleInputChange = useCallback(
@@ -67,7 +66,6 @@ const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
     }
 
     if (imageIDs.length > 0) {
-      // Create array with text content first
       const messageContent: ChatCompletionContentPart[] = [
         {
           type: 'text',
@@ -75,7 +73,6 @@ const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
         },
       ];
 
-      // Add each image as a separate content item
       imageIDs.forEach((id) => {
         messageContent.push({
           type: 'image_url',
@@ -86,7 +83,6 @@ const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
       });
 
       handleChatCompletion(messageContent);
-
       setImageIDs([]);
     } else {
       handleChatCompletion(processedMessage);
@@ -124,23 +120,41 @@ const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
 
   const processFile = async (file: File) => {
     if (!SUPPORTED_FILE_TYPES.includes(file.type)) {
-      // Instead of an alert, set the drag state with an error
-      setDragState(
-        true,
-        false,
+      // Set error state
+      setIsDragValid(false);
+      setDragErrorMessage(
         'Invalid file type! Please upload a JPEG, PNG, or WebP image.',
       );
 
-      // Clear the error message after a shorter delay
+      // Clear the error message after a short delay
       setTimeout(() => {
-        setDragState(false);
+        setIsDragging(false);
+        setIsDragValid(true);
+        setDragErrorMessage('');
       }, 1500);
+
+      // Also notify parent if needed
+      if (setDragState) {
+        setDragState(
+          true,
+          false,
+          'Invalid file type! Please upload a JPEG, PNG, or WebP image.',
+        );
+        setTimeout(() => setDragState(false), 1500);
+      }
 
       return;
     }
 
-    // Reset drag state
-    setDragState(false);
+    // Reset drag states
+    setIsDragging(false);
+    setIsDragValid(true);
+    setDragErrorMessage('');
+
+    // Also reset parent drag state if needed
+    if (setDragState) {
+      setDragState(false);
+    }
 
     const reader = new FileReader();
     reader.onload = async (e) => {
@@ -186,8 +200,15 @@ const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
     }
   }, []);
 
-  // Set up global drag and drop handlers
+  // Track drag state internally
+  const [isDragging, setIsDragging] = useState(false);
+  const [isDragValid, setIsDragValid] = useState(true);
+  const [dragErrorMessage, setDragErrorMessage] = useState('');
+  const controlsRef = useRef<HTMLDivElement>(null);
+
+  // Set up drag and drop handlers for the entire app
   useEffect(() => {
+    // Handler functions
     const handleDragEnter = (e: DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
@@ -200,36 +221,32 @@ const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
         if (item.kind === 'file') {
           const fileType = item.type;
           const isValid = SUPPORTED_FILE_TYPES.includes(fileType);
-          setDragState(
-            true,
-            isValid,
+          setIsDragValid(isValid);
+          setDragErrorMessage(
             isValid
-              ? undefined
+              ? ''
               : 'Invalid file type! Please upload a JPEG, PNG, or WebP image.',
           );
-        } else {
-          // If we can't determine file type, just show the generic drag state
-          setDragState(true);
         }
-      } else {
-        // Generic drag state if we can't access file info
-        setDragState(true);
       }
+
+      setIsDragging(true);
     };
 
     const handleDragOver = (e: DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      // Keep the dragging state active, but don't update validation here
+      // Keep the dragging state active
+      setIsDragging(true);
     };
 
     const handleDragLeave = (e: DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
 
-      // Only reset if leaving the window or moving to a child element
+      // Only reset if leaving the document (going outside the window)
       if (e.relatedTarget === null) {
-        setDragState(false);
+        setIsDragging(false);
       }
     };
 
@@ -237,19 +254,25 @@ const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
       e.preventDefault();
       e.stopPropagation();
 
-      // Reset the general drag state
-      setDragState(false);
+      // Reset the drag state
+      setIsDragging(false);
 
-      const files = e.dataTransfer?.files;
-      if (files && files.length > 0) {
-        // Process all dropped files
-        Array.from(files).forEach((file) => {
-          processFile(file);
-        });
+      // Only handle drops specifically on the controls element
+      if (
+        controlsRef.current &&
+        controlsRef.current.contains(e.target as Node)
+      ) {
+        const files = e.dataTransfer?.files;
+        if (files && files.length > 0) {
+          // Process all dropped files
+          Array.from(files).forEach((file) => {
+            processFile(file);
+          });
+        }
       }
     };
 
-    // Add event listeners to document
+    // Add event listeners to the document (entire app)
     document.addEventListener('dragenter', handleDragEnter);
     document.addEventListener('dragover', handleDragOver);
     document.addEventListener('dragleave', handleDragLeave);
@@ -262,15 +285,14 @@ const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
       document.removeEventListener('dragleave', handleDragLeave);
       document.removeEventListener('drop', handleDrop);
     };
-  }, [setDragState]);
+  }, []);
 
-  const [_, setHoverImageId] = useState<string | null>(null);
+  const [, setHoverImageId] = useState<string | null>(null);
 
   const { colors } = useTheme();
 
   return (
     <div className={styles.chatInputContainer}>
-      {/* Image preview section - now positioned above input */}
       {imageIDs.length > 0 && (
         <div className={styles.imagePreviewContainer}>
           <div className={styles.imagePreviewWrapper}>
@@ -287,31 +309,44 @@ const ChatInput = ({ setShouldAutoScroll, setDragState }: ChatInputProps) => {
                   height="56px"
                   className={styles.cardImage}
                 />
-                <button
-                  className={styles.removeButton}
-                  onClick={() => removeImage(id)}
-                  aria-label="Remove image"
-                >
-                  <X className={styles.xIcon} size={14} />
-                </button>
+                {
+                  <button
+                    className={styles.removeButton}
+                    onClick={() => removeImage(id)}
+                    aria-label="Remove image"
+                  >
+                    <X className={styles.xIcon} size={14} />
+                  </button>
+                }
               </div>
             ))}
           </div>
         </div>
       )}
 
-      <div className={styles.controls}>
+      <div
+        ref={controlsRef}
+        className={`${styles.controls} ${isDragging ? styles.dragging : ''}`}
+      >
         <div className={styles.inputContainer}>
-          <textarea
-            className={styles.input}
-            data-testid="chat-view-input"
-            rows={1}
-            value={inputValue}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            ref={inputRef}
-            placeholder="Ask anything..."
-          />
+          {isDragging ? (
+            <div
+              className={`${styles.dropZone} ${!isDragValid ? styles.dropZoneError : ''}`}
+            >
+              <span>{dragErrorMessage || 'Drop your image to upload'}</span>
+            </div>
+          ) : (
+            <textarea
+              className={styles.input}
+              data-testid="chat-view-input"
+              rows={1}
+              value={inputValue}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              ref={inputRef}
+              placeholder="Ask anything..."
+            />
+          )}
         </div>
 
         <div className={styles.buttonContainer}>

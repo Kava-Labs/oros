@@ -27,7 +27,7 @@ export const ChatView = ({
   const { hasMessages } = useMessageHistory();
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const [dragState, setDragState] = useState({
+  const [_, setDragState] = useState({
     isDragging: false,
     isValidFile: true,
     errorMessage: '',
@@ -130,31 +130,20 @@ export const ChatView = ({
 
             <div className={styles.inputWrapper}>
               {/* Drag and Drop Preview Element - Show ABOVE input when messages exist */}
-              {dragState.isDragging && hasMessages && (
-                <div
-                  className={`${styles.dropPreview} ${styles.previewAbove} ${!dragState.isValidFile ? styles.previewError : ''}`}
-                >
-                  <span>
-                    {dragState.errorMessage || 'Drop your image to upload'}
-                  </span>
-                </div>
-              )}
+              {/*{dragState.isDragging && hasMessages && (*/}
+              {/*  <div*/}
+              {/*    className={`${styles.dropPreview} ${styles.previewAbove} ${!dragState.isValidFile ? styles.previewError : ''}`}*/}
+              {/*  >*/}
+              {/*    <span>*/}
+              {/*      {dragState.errorMessage || 'Drop your file to upload'}*/}
+              {/*    </span>*/}
+              {/*  </div>*/}
+              {/*)}*/}
 
               <ChatInput
                 setShouldAutoScroll={setShouldAutoScroll}
                 setDragState={handleDragState}
               />
-
-              {/* Drag and Drop Preview Element - Show BELOW input when no messages */}
-              {dragState.isDragging && !hasMessages && (
-                <div
-                  className={`${styles.dropPreview} ${styles.previewBelow} ${!dragState.isValidFile ? styles.previewError : ''}`}
-                >
-                  <span>
-                    {dragState.errorMessage || 'Drop your image to upload'}
-                  </span>
-                </div>
-              )}
             </div>
 
             <div className={styles.importantInfo}>
