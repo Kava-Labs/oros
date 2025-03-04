@@ -5,6 +5,8 @@ import { useAppContext } from '../context/useAppContext';
 import { Paperclip, X } from 'lucide-react';
 import { saveImage } from '../utils/idb/idb';
 import { IdbImage } from './IdbImage';
+import ButtonIcon from './ButtonIcon';
+import { useTheme } from '../../shared/theme/useTheme';
 
 const DEFAULT_HEIGHT = '30px';
 
@@ -171,8 +173,9 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     };
   }, []);
 
-  const [hover, setHover] = useState(false);
   const [imgHover, setImgHover] = useState(false);
+
+  const { colors } = useTheme();
 
   return (
     <div>
@@ -234,15 +237,27 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
             />
           </div>
 
-          <Paperclip
-            onMouseEnter={() => setHover(true)}
-            onMouseLeave={() => setHover(false)}
-            color={hover ? '#FFFFFF' : 'rgb(180 180 180)'}
-            width="30px"
-            height="30px"
-            cursor="pointer"
+          <ButtonIcon
+            icon={Paperclip}
+            aria-label="Attach file icon"
+            className={styles.attachIcon}
             onClick={() => uploadRef.current?.click()}
+            tooltip={{
+              text: 'Attach file - max 4, 8MB each',
+              position: 'bottom',
+              backgroundColor: colors.bgPrimary,
+            }}
           />
+
+          {/*<Paperclip*/}
+          {/*  onMouseEnter={() => setHover(true)}*/}
+          {/*  onMouseLeave={() => setHover(false)}*/}
+          {/*  color={hover ? '#FFFFFF' : 'rgb(180 180 180)'}*/}
+          {/*  width="30px"*/}
+          {/*  height="30px"*/}
+          {/*  cursor="pointer"*/}
+          {/*  onClick={() => uploadRef.current?.click()}*/}
+          {/*/>*/}
         </div>
       </div>
     </div>

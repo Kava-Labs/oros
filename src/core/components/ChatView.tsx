@@ -171,7 +171,7 @@ export const ChatView = ({
               {/* Drag and Drop Preview Element - Show ABOVE input when messages exist */}
               {isDragging && hasMessages && (
                 <div className={`${styles.dropPreview} ${styles.previewAbove}`}>
-                  <span>Drop your image to upload</span>
+                  <span>Drop your file to upload</span>
                 </div>
               )}
 
@@ -180,7 +180,7 @@ export const ChatView = ({
               {/* Drag and Drop Preview Element - Show BELOW input when no messages */}
               {isDragging && !hasMessages && (
                 <div className={`${styles.dropPreview} ${styles.previewBelow}`}>
-                  <span>Drop your image to upload</span>
+                  <span>Drop your file to upload</span>
                 </div>
               )}
             </div>

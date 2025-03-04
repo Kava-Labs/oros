@@ -111,9 +111,6 @@
   width: 56px;
   height: 56px;
   margin: 1rem;
-  /* overflow: hidden; */
-  /* border-radius: 8px; */
-  /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
 }
 
 .cardImage {
@@ -169,4 +166,8 @@
 .dropPreview span {
   color: #4f8aff;
   font-weight: 500;
+}
+
+.attachIcon:hover {
+  background-color: var(--colors-bgPrimary);
 }
