@@ -20,18 +20,20 @@ interface ChatInputProps {
 const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
   const [inputValue, setInputValue] = useState('');
 
-  const baseDragState = {
+  const [dragState, setDragState] = useState({
     isDragging: false,
     isSupportedFile: true,
     errorMessage: '',
-  };
-
-  const [dragState, setDragState] = useState(baseDragState);
+  });
   const { isDragging, isSupportedFile, errorMessage } = dragState;
 
-  const resetDragState = () => {
-    setDragState(baseDragState);
-  };
+  const resetDragState = useCallback(() => {
+    setDragState({
+      isDragging: false,
+      isSupportedFile: true,
+      errorMessage: '',
+    });
+  }, []);
 
   const { isRequesting, modelConfig, handleChatCompletion, handleCancel } =
     useAppContext();
