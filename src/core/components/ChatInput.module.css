@@ -71,9 +71,8 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition:
-    background-color 0.3s ease,
-    opacity 0.2s ease;
+  transition: background-color 0.3s ease,
+  opacity 0.2s ease;
 
   &:active {
     opacity: 0.6;
@@ -98,22 +97,27 @@
   display: none;
 }
 
-.imageCardContainer {
+.imagePreviewContainer {
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--borderRadius-md);
   background-color: var(--colors-bgTertiary);
-  border-top-left-radius: var(--borderRadius-md);
-  border-top-right-radius: var(--borderRadius-md);
-  padding: 4px;
-  margin-bottom: -10px;
+  padding: var(--spacing-sm);
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.imagePreviewWrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
 }
 
 .imageCard {
   position: relative;
   width: 56px;
   height: 56px;
-  margin: 1rem;
-  /* overflow: hidden; */
-  /* border-radius: 8px; */
-  /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
+  border-radius: 4px;
+  overflow: hidden;
 }
 
 .cardImage {
@@ -127,12 +131,12 @@
   transform: scale(1.05);
 }
 
-.xIcon {
+.removeButton {
   position: absolute;
-  top: 0px;
-  left: 0px;
-  width: 15px;
-  height: 15px;
+  top: 0;
+  right: 0;
+  width: 2rem;
+  height: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -143,6 +147,36 @@
   transition: background-color 0.2s ease;
 }
 
-.xIcon:hover {
-  background-color: rgba(0, 0, 0, 0.8);
+.removeButton:hover {
+  background-color: var(--colors-bgSecondary);
+}
+
+.attachIcon:hover {
+  background-color: var(--colors-bgPrimary);
+}
+
+.dragging {
+  border: 2px dashed var(--colors-link);
+  transition: all 0.2s ease;
+}
+
+.dropZone {
+  width: 100%;
+  min-height: 30px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--colors-link);
+  opacity: 0.4;
+  font-weight: 500;
+  background-color: transparent;
+  font-size: 1.6rem;
+  padding-top: 4px;
+  text-align: center;
+}
+
+.dropZoneError {
+  color: var(--colors-accentTransparent);
+  border-color: var(--colors-accentTransparent);
 }

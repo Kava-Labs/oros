@@ -12,6 +12,7 @@ interface TooltipProps {
   text: string;
   position?: TooltipPosition;
   delay?: number;
+  backgroundColor?: string;
 }
 
 export interface ButtonIconProps
@@ -49,9 +50,19 @@ const ButtonIcon = ({
     : 'top';
   const tooltipDelay = isTooltipProps(tooltip) ? tooltip.delay : undefined;
 
-  const tooltipStyle = tooltipDelay
-    ? { transitionDelay: `${tooltipDelay}ms` }
+  const backgroundColorOveride = isTooltipProps(tooltip)
+    ? tooltip.backgroundColor
     : undefined;
+
+  const tooltipStyle = tooltipDelay
+    ? {
+        transitionDelay: `${tooltipDelay}ms`,
+      }
+    : backgroundColorOveride
+      ? {
+          backgroundColor: `${backgroundColorOveride}`,
+        }
+      : undefined;
 
   return (
     <button
