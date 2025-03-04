@@ -103,7 +103,6 @@
   display: none;
 }
 
-/* New image preview styling */
 .imagePreviewContainer {
   margin-bottom: var(--spacing-sm);
   border-radius: var(--borderRadius-md);
@@ -127,10 +126,6 @@
   overflow: hidden;
 }
 
-.imageCard:hover .cardImage {
-  transform: scale(1.05);
-}
-
 .cardImage {
   width: 100%;
   height: 100%;
@@ -138,39 +133,36 @@
   border-radius: 4px;
 }
 
+.imageCard:hover .cardImage {
+  transform: scale(1.05);
+}
+
 .removeButton {
   position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 20px;
-  height: 20px;
+  top: 0;
+  right: 0;
+  width: 2rem;
+  height: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: rgba(0, 0, 0, 0.6);
   border-radius: 50%;
-  border: none;
-  padding: 0;
   color: white;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
 .removeButton:hover {
-  background-color: rgba(0, 0, 0, 0.8);
-}
-
-.xIcon {
-  color: white;
+  background-color: var(--colors-bgSecondary);
 }
 
 .attachIcon:hover {
   background-color: var(--colors-bgPrimary);
 }
 
-/* Drop zone styling */
 .dragging {
-  border: 2px dashed #4f8aff;
+  border: 2px dashed var(--colors-link);
   transition: all 0.2s ease;
 }
 
@@ -181,7 +173,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #4f8aff;
+  color: var(--colors-link);
+  opacity: 0.4;
   font-weight: 500;
   background-color: transparent;
   font-size: 1.6rem;
@@ -190,6 +183,6 @@
 }
 
 .dropZoneError {
-  color: #ff4f4f;
-  border-color: #ff4f4f !important;
+  color: var(--colors-accentTransparent);
+  border-color: var(--colors-accentTransparent);
 }
