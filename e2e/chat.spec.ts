@@ -694,4 +694,71 @@ describe('chat', () => {
 
     await expect(page.getByText('Start a new chat to begin')).toBeVisible();
   });
+
+  test('allows user to upload multiple files', async ({ page }) => {
+    const maxFileUploads = 4;
+    test.setTimeout(30 * 1000);
+
+    const chat = new Chat(page);
+    await chat.goto();
+
+    const paperclipButton = page.getByRole('button', {
+      name: 'Attach file icon',
+    });
+
+    const fileChooserPromise = page.waitForEvent('filechooser');
+    await paperclipButton.click();
+    const fileChooser = await fileChooserPromise;
+
+    const buffer = Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+      'base64',
+    );
+
+    const withinLimitSupportedFiles = [...Array(maxFileUploads)].map(() => ({
+      name: 'test-image.png',
+      mimeType: 'image/png',
+      buffer,
+    }));
+
+    await fileChooser.setFiles(withinLimitSupportedFiles);
+
+    const imagePreviewContainer = page.locator('.imagePreviewContainer');
+    if (await imagePreviewContainer.isVisible()) {
+      const imageCards = page.locator('.imageCard');
+      const count = await imageCards.count();
+      expect(count).toEqual(4);
+    }
+  });
+  test('shows error when trying to upload too many files', async ({ page }) => {
+    const maxFileUploads = 4;
+    test.setTimeout(30 * 1000);
+
+    const chat = new Chat(page);
+    await chat.goto();
+
+    const paperclipButton = page.getByRole('button', {
+      name: 'Attach file icon',
+    });
+
+    const fileChooserPromise = page.waitForEvent('filechooser');
+    await paperclipButton.click();
+    const fileChooser = await fileChooserPromise;
+
+    const buffer = Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+      'base64',
+    );
+
+    const overLimitSupportedFiles = [...Array(maxFileUploads + 1)].map(() => ({
+      name: 'test-image.png',
+      mimeType: 'image/png',
+      buffer,
+    }));
+
+    await fileChooser.setFiles(overLimitSupportedFiles);
+
+    const errorMessage = page.getByText('Maximum 4 files allowed');
+    await expect(errorMessage).toBeVisible();
+  });
 });

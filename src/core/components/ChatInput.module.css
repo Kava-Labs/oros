@@ -160,7 +160,7 @@
   background-color: var(--colors-bgPrimary);
 }
 
-.dragging {
+.active {
   border: 2px dashed var(--colors-accentTwoTransparent);
   transition: all 0.2s ease;
 }

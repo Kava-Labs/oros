@@ -20,6 +20,8 @@ const DEFAULT_HEIGHT = '30px';
 
 const SUPPORTED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
+const MAX_FILE_UPLOADS = 4;
+
 interface ChatInputProps {
   setShouldAutoScroll: (s: boolean) => void;
 }
@@ -37,16 +39,16 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
 
   const [inputValue, setInputValue] = useState('');
 
-  const [dragState, setDragState] = useState({
-    isDragging: false,
+  const [uploadingState, setUploadingState] = useState({
+    isActive: false,
     isSupportedFile: true,
     errorMessage: '',
   });
-  const { isDragging, isSupportedFile, errorMessage } = dragState;
+  const { isActive, isSupportedFile, errorMessage } = uploadingState;
 
-  const resetDragState = useCallback(() => {
-    setDragState({
-      isDragging: false,
+  const resetUploadState = useCallback(() => {
+    setUploadingState({
+      isActive: false,
       isSupportedFile: true,
       errorMessage: '',
     });
@@ -147,11 +149,32 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     }
   };
 
+  const hasAvailableUploads = useCallback((): boolean => {
+    if (imageIDs.length >= MAX_FILE_UPLOADS) {
+      setUploadingState({
+        isActive: true,
+        isSupportedFile: false,
+        errorMessage: `Maximum ${MAX_FILE_UPLOADS} files allowed!`,
+      });
+
+      setTimeout(() => {
+        resetUploadState();
+      }, 2000);
+
+      return false;
+    }
+    return true;
+  }, [imageIDs.length, resetUploadState]);
+
   const processFile = useCallback(
     async (file: File) => {
+      if (!hasAvailableUploads()) {
+        return;
+      }
+
       if (!SUPPORTED_FILE_TYPES.includes(file.type)) {
-        setDragState({
-          isDragging: true,
+        setUploadingState({
+          isActive: true,
           isSupportedFile: false,
           errorMessage:
             'Invalid file type! Please upload a JPEG, PNG, or WebP image.',
@@ -159,13 +182,13 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
 
         //  Present the error for a short time, then reset
         setTimeout(() => {
-          resetDragState();
+          resetUploadState();
         }, 1000);
 
         return;
       }
 
-      resetDragState();
+      resetUploadState();
 
       const reader = new FileReader();
       reader.onload = async (e) => {
@@ -176,14 +199,27 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       };
       reader.readAsDataURL(file);
     },
-    [resetDragState],
+    [resetUploadState, hasAvailableUploads],
   );
 
   const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files?.length) {
-      Array.from(event.target.files).forEach((file) => {
-        processFile(file);
-      });
+      const totalFilesAfterUpdate = imageIDs.length + event.target.files.length;
+      if (totalFilesAfterUpdate > MAX_FILE_UPLOADS) {
+        setUploadingState({
+          isActive: true,
+          isSupportedFile: false,
+          errorMessage: `Maximum ${MAX_FILE_UPLOADS} files allowed.`,
+        });
+
+        setTimeout(() => {
+          resetUploadState();
+        }, 2000);
+      } else {
+        Array.from(event.target.files).forEach((file) => {
+          processFile(file);
+        });
+      }
 
       if (uploadRef.current) {
         uploadRef.current.value = '';
@@ -227,6 +263,10 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       e.preventDefault();
       e.stopPropagation();
 
+      if (!hasAvailableUploads()) {
+        return;
+      }
+
       //  Check if we can access the file type during drag & validate
       if (e.dataTransfer?.items && e.dataTransfer.items.length > 0) {
         const item = e.dataTransfer.items[0];
@@ -234,8 +274,8 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
         if (item.kind === 'file') {
           const fileType = item.type;
           const isValid = SUPPORTED_FILE_TYPES.includes(fileType);
-          setDragState({
-            isDragging: true,
+          setUploadingState({
+            isActive: true,
             isSupportedFile: isValid,
             errorMessage: isValid
               ? ''
@@ -248,9 +288,9 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     const handleDragOver = (e: DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      setDragState((prev) => ({
+      setUploadingState((prev) => ({
         ...prev,
-        isDragging: true,
+        isActive: true,
       }));
     };
 
@@ -260,9 +300,9 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
 
       //  Reset if leaving the document (going outside the window)
       if (e.relatedTarget === null) {
-        setDragState((prev) => ({
+        setUploadingState((prev) => ({
           ...prev,
-          isDragging: false,
+          isActive: false,
         }));
       }
     };
@@ -271,16 +311,29 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       e.preventDefault();
       e.stopPropagation();
 
-      setDragState((prev) => ({
+      setUploadingState((prev) => ({
         ...prev,
-        isDragging: false,
+        isActive: false,
       }));
 
       const files = e.dataTransfer?.files;
       if (files && files.length > 0) {
-        Array.from(files).forEach((file) => {
-          processFile(file);
-        });
+        const totalFilesAfterDrop = imageIDs.length + files.length;
+        if (totalFilesAfterDrop > MAX_FILE_UPLOADS) {
+          setUploadingState({
+            isActive: true,
+            isSupportedFile: false,
+            errorMessage: `Maximum ${MAX_FILE_UPLOADS} files allowed.`,
+          });
+
+          setTimeout(() => {
+            resetUploadState();
+          }, 2000);
+        } else {
+          Array.from(files).forEach((file) => {
+            processFile(file);
+          });
+        }
       }
     };
 
@@ -297,7 +350,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       document.removeEventListener('dragleave', handleDragLeave);
       document.removeEventListener('drop', handleDrop);
     };
-  }, [processFile]);
+  }, [processFile, imageIDs.length, hasAvailableUploads, resetUploadState]);
 
   const [, setHoverImageId] = useState<string | null>(null);
 
@@ -355,10 +408,10 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       )}
 
       <div
-        className={`${styles.controls} ${isDragging ? styles.dragging : ''} ${isDragging && !isSupportedFile ? styles.dropZoneError : ''}`}
+        className={`${styles.controls} ${isActive ? styles.active : ''} ${isActive && !isSupportedFile ? styles.dropZoneError : ''}`}
       >
         <div className={styles.inputContainer}>
-          {isDragging ? (
+          {isActive ? (
             <div
               className={`${styles.dropZone} ${!isSupportedFile ? styles.dropZoneError : ''}`}
             >
@@ -388,6 +441,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
                   className={styles.uploadInputField}
                   onChange={handleUpload}
                   multiple // Allow multiple file selection
+                  disabled={imageIDs.length >= MAX_FILE_UPLOADS}
                 />
               </div>
 
@@ -395,13 +449,17 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
                 icon={Paperclip}
                 size={16}
                 aria-label="Attach file icon"
-                className={styles.attachIcon}
-                onClick={() => uploadRef.current?.click()}
+                className={`${styles.attachIcon} ${imageIDs.length >= MAX_FILE_UPLOADS ? styles.disabled : ''}`}
+                onClick={() =>
+                  imageIDs.length < MAX_FILE_UPLOADS &&
+                  uploadRef.current?.click()
+                }
                 tooltip={{
                   text: 'Attach file - max 4, 8MB each',
                   position: 'bottom',
                   backgroundColor: colors.bgPrimary,
                 }}
+                disabled={imageIDs.length >= MAX_FILE_UPLOADS}
               />
             </>
           )}
