@@ -3,12 +3,6 @@ import { Chat } from './Chat';
 import { MetaMask } from './Metamask';
 import { ethers } from 'ethers';
 import { devices } from '@playwright/test';
-import * as path from 'path';
-import { fileURLToPath } from 'url';
-
-// @ts-ignore
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 describe('chat', () => {
   test('renders intro messages by model', async ({ page }) => {
