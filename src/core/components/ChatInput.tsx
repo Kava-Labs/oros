@@ -22,6 +22,8 @@ const SUPPORTED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 const MAX_FILE_UPLOADS = 4;
 
+const MAX_FILE_BYTES = 8 * 1024 * 1024;
+
 interface ChatInputProps {
   setShouldAutoScroll: (s: boolean) => void;
 }
@@ -169,6 +171,21 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
   const processFile = useCallback(
     async (file: File) => {
       if (!hasAvailableUploads()) {
+        return;
+      }
+
+      if (file.size > MAX_FILE_BYTES) {
+        setUploadingState({
+          isActive: true,
+          isSupportedFile: false,
+          errorMessage: 'File too large! Maximum file size is 8MB.',
+        });
+
+        // Present the error for a short time, then reset
+        setTimeout(() => {
+          resetUploadState();
+        }, 2000);
+
         return;
       }
 
@@ -329,6 +346,19 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
           setTimeout(() => {
             resetUploadState();
           }, 2000);
+        } else if (
+          Array.from(files).filter((file) => file.size > MAX_FILE_BYTES)
+        ) {
+          setUploadingState({
+            isActive: true,
+            isSupportedFile: false,
+            errorMessage: 'File too large! Maximum file size is 8MB.',
+          });
+
+          setTimeout(() => {
+            resetUploadState();
+          }, 2000);
+          return;
         } else {
           Array.from(files).forEach((file) => {
             processFile(file);
