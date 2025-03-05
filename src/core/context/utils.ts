@@ -42,6 +42,13 @@ const analyzeImage = async (
     messages: [msg], // todo: add system prompt for qwen
   });
 
+  console.log(data);
+
+  // todo: needs better error handling
+  if (!data.choices) {
+    return JSON.stringify(data);
+  }
+
   const imageDetails = data.choices[0].message.content;
 
   return imageDetails ? imageDetails : '';
@@ -141,7 +148,7 @@ export async function doChat(
     ];
 
   let isFileUpload = false;
-  let imageID = '';
+  const imageIDs: string[] = [];
   let userPromptForImage = '';
 
   const visionModelMsg: ChatCompletionMessageParam = {
@@ -160,7 +167,7 @@ export async function doChat(
     for (const content of lastMsg.content) {
       if (content.type === 'image_url') {
         isFileUpload = true;
-        imageID = content.image_url.url;
+        imageIDs.push(content.image_url.url);
         const img = await getImage(content.image_url.url);
         (visionModelMsg.content as ChatCompletionContentPart[]).push({
           type: 'image_url',
@@ -185,7 +192,7 @@ export async function doChat(
         content: JSON.stringify(
           {
             context: 'User Image Uploaded and Analyzed by a vision model',
-            imageID,
+            imageIDs,
             imageDetails,
           },
           null,

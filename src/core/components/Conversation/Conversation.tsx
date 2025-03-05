@@ -31,7 +31,7 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
       {messages.map((message, index) => {
         if (message.role === 'user') {
           let hasImage = false;
-          let imageID = '';
+          let imageIDs: string[] = [];
 
           let content: string =
             typeof message.content === 'string' ? message.content : '';
@@ -39,7 +39,7 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
             hasImage =
               message.content.find((c) => {
                 if (c.type === 'image_url') {
-                  imageID = c.image_url.url;
+                  imageIDs.push(c.image_url.url);
                   return true;
                 }
                 return false;
@@ -54,10 +54,10 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
             const prevMsg = messages[index - 1];
             if (
               typeof prevMsg.content === 'string' &&
-              prevMsg.content.includes('"imageID":')
+              prevMsg.content.includes('"imageIDs":')
             ) {
               hasImage = true;
-              imageID = JSON.parse(prevMsg.content).imageID;
+              imageIDs = JSON.parse(prevMsg.content).imageIDs;
             }
           }
 
@@ -71,17 +71,21 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
 
           return (
             <Fragment key={index}>
-              <div
-                style={{
-                  marginLeft: 'auto',
-                  marginBottom: '4px',
-                  marginTop: '4px',
-                }}
-              >
-                {hasImage ? (
-                  <IdbImage width="256px" height="256px" id={imageID} />
-                ) : null}
-              </div>
+              {hasImage
+                ? imageIDs.map((imageID) => (
+                    <div
+                      key={imageID}
+                      style={{
+                        marginLeft: 'auto',
+                        marginBottom: '4px',
+                        marginTop: '4px',
+                      }}
+                    >
+                      <IdbImage width="256px" height="256px" id={imageID} />
+                    </div>
+                  ))
+                : null}
+
               <div className={styles.userInputContainer}>
                 <Content role={message.role} content={content} />
               </div>
