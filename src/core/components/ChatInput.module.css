@@ -151,6 +151,11 @@
   background-color: var(--colors-bgSecondary);
 }
 
+
+.attachIcon {
+  margin-right: var(--spacing-xs);
+}
+
 .attachIcon:hover {
   background-color: var(--colors-bgPrimary);
 }

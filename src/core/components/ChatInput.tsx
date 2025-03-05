@@ -378,17 +378,6 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
           )}
         </div>
         <div className={styles.buttonContainer}>
-          <button
-            data-testid="chat-view-button"
-            ref={buttonRef}
-            className={styles.sendChatButton}
-            type="submit"
-            onClick={handleButtonClick}
-            aria-label="Send Chat"
-            disabled={disableSubmit}
-          >
-            {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
-          </button>
           {SUPPORT_FILE_UPLOAD && (
             <>
               <div className={styles.uploadInputFieldContainer}>
@@ -404,6 +393,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
 
               <ButtonIcon
                 icon={Paperclip}
+                size={16}
                 aria-label="Attach file icon"
                 className={styles.attachIcon}
                 onClick={() => uploadRef.current?.click()}
@@ -415,6 +405,17 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
               />
             </>
           )}
+          <button
+            data-testid="chat-view-button"
+            ref={buttonRef}
+            className={styles.sendChatButton}
+            type="submit"
+            onClick={handleButtonClick}
+            aria-label="Send Chat"
+            disabled={disableSubmit}
+          >
+            {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
+          </button>
         </div>
       </div>
     </>
