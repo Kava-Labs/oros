@@ -708,8 +708,7 @@ describe('chat', () => {
     await paperclipButton.click();
     const fileChooser = await fileChooserPromise;
 
-    const eightMBPlus = 7 * 1024 * 1024 + 1024; // 7MB
-    const buffer = Buffer.alloc(eightMBPlus, 'x');
+    const buffer = Buffer.alloc(7 * 1024 * 1024 + 1024, 'x');
 
     const fileWithinLimit = {
       name: 'withinLimit-image.png',
@@ -812,9 +811,8 @@ describe('chat', () => {
     await paperclipButton.click();
     const fileChooser = await fileChooserPromise;
 
-    // Create a buffer slightly larger than 8MB
-    const eightMBPlus = 8 * 1024 * 1024 + 1024; // 8MB + 1KB
-    const largeBuffer = Buffer.alloc(eightMBPlus, 'x');
+    //  9MB
+    const largeBuffer = Buffer.alloc(9 * 1024 * 1024 + 1024, 'x');
 
     const oversizedFile = {
       name: 'oversized-image.png',
@@ -824,7 +822,6 @@ describe('chat', () => {
 
     await fileChooser.setFiles([oversizedFile]);
 
-    // Check for the error message
     const errorMessage = page.getByText(
       'File too large! Maximum file size is 8MB.',
     );
