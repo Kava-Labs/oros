@@ -89,8 +89,8 @@
 }
 
 .uploadInputFieldContainer {
-  margin-left: 0.4rem;
-  margin-right: 0.4rem;
+  margin-left: var(--spacing-xs);
+  margin-right: var(--spacing-xs);
 }
 
 .uploadInputField {
@@ -114,9 +114,9 @@
 
 .imageCard {
   position: relative;
-  width: 56px;
-  height: 56px;
-  border-radius: 4px;
+  width: 5.6rem;
+  height: 5.6rem;
+  border-radius: var(--borderRadius-xs);
   overflow: hidden;
 }
 
@@ -133,14 +133,14 @@
 
 .removeButton {
   position: absolute;
-  top: 0;
-  right: 0;
-  width: 2rem;
-  height: 2rem;
+  top: -0.1rem;
+  left: -0.2rem;
+  width: var(--spacing-md);
+  height: var(--spacing-md);
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: var(--colors-bgQuaternary);
   border-radius: 50%;
   color: white;
   cursor: pointer;
@@ -170,8 +170,7 @@
   color: var(--colors-accentTwoTransparent);
   font-weight: 500;
   background-color: transparent;
-  font-size: 1.6rem;
-  padding-top: 4px;
+  padding-top: var(--spacing-xs);
   text-align: center;
 }
 
