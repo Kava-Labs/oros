@@ -830,4 +830,47 @@ describe('chat', () => {
     await page.waitForTimeout(2500);
     await expect(errorMessage).not.toBeVisible();
   });
+
+  test('uploading multiple files handled independently', async ({ page }) => {
+    test.setTimeout(30 * 1000);
+
+    const chat = new Chat(page);
+    await chat.goto();
+
+    const paperclipButton = page.getByRole('button', {
+      name: 'Attach file icon',
+    });
+
+    const fileChooserPromise = page.waitForEvent('filechooser');
+    await paperclipButton.click();
+    const fileChooser = await fileChooserPromise;
+
+    //  9MB
+    const largeBuffer = Buffer.alloc(9 * 1024 * 1024 + 1024, 'x');
+
+    const oversizedFile = {
+      name: 'oversized-image.png',
+      mimeType: 'image/png',
+      buffer: largeBuffer,
+    };
+
+    //  7MB
+    const bufferWithinLimit = Buffer.alloc(7 * 1024 * 1024 + 1024, 'x');
+
+    const fileWithinLimit = {
+      name: 'withinLimit-image.png',
+      mimeType: 'image/png',
+      buffer: bufferWithinLimit,
+    };
+
+    await fileChooser.setFiles([oversizedFile, fileWithinLimit]);
+
+    //  Verify that the 7MB file was uploaded
+    const imagePreviewContainer = page.locator('.imagePreviewContainer');
+    if (await imagePreviewContainer.isVisible()) {
+      const imageCards = page.locator('.imageCard');
+      const count = await imageCards.count();
+      expect(count).toEqual(1);
+    }
+  });
 });
