@@ -85,10 +85,6 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       return;
     }
 
-    if (inputValue === '' && imageIDs.length === 0) {
-      return;
-    }
-
     let processedMessage = inputValue;
     if (modelConfig.messageProcessors?.preProcess) {
       processedMessage = modelConfig.messageProcessors.preProcess(inputValue);
