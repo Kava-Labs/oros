@@ -180,7 +180,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
             'Invalid file type! Please upload a JPEG, PNG, or WebP image.',
         });
 
-        // Present the error for a short time, then reset
+        //  Present the error for a short time, then reset
         setTimeout(() => {
           resetUploadState();
         }, 1000);
@@ -267,7 +267,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
         return;
       }
 
-      // Check if we can access the file type during drag & validate
+      //  Check if we can access the file type during drag & validate
       if (e.dataTransfer?.items && e.dataTransfer.items.length > 0) {
         const item = e.dataTransfer.items[0];
 
@@ -298,7 +298,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       e.preventDefault();
       e.stopPropagation();
 
-      // Reset if leaving the document (going outside the window)
+      //  Reset if leaving the document (going outside the window)
       if (e.relatedTarget === null) {
         setUploadingState((prev) => ({
           ...prev,
@@ -441,7 +441,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
                   className={styles.uploadInputField}
                   onChange={handleUpload}
                   multiple // Allow multiple file selection
-                  disabled={imageIDs.length >= MAX_FILE_UPLOADS} // Disable when limit reached
+                  disabled={imageIDs.length >= MAX_FILE_UPLOADS}
                 />
               </div>
 
