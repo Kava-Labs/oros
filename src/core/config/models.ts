@@ -62,6 +62,4 @@ const defaultModelFromQueryParams = () => {
 
 export const DEFAULT_MODEL_NAME = defaultModelFromQueryParams()
   ? defaultModelFromQueryParams()!
-  : import.meta.env.VITE_FEAT_UPDATED_DESIGN
-    ? 'deepseek-r1'
-    : 'gpt-4o';
+  : 'deepseek-r1';
