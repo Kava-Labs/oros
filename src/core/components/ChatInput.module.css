@@ -156,7 +156,7 @@
 }
 
 .dragging {
-  border: 2px dashed var(--colors-link);
+  border: 2px dashed var(--colors-accentTwoTransparent);
   transition: all 0.2s ease;
 }
 
@@ -167,8 +167,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--colors-link);
-  opacity: 0.4;
+  color: var(--colors-accentTwoTransparent);
   font-weight: 500;
   background-color: transparent;
   font-size: 1.6rem;

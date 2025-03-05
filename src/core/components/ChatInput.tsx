@@ -374,7 +374,8 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
             aria-label="Send Chat"
             disabled={
               (!isRequesting &&
-                (inputValue.length === 0 || imageIDs.length === 0)) ||
+                inputValue.length === 0 &&
+                imageIDs.length === 0) ||
               !hasSufficientRemainingTokens(
                 modelConfig.id,
                 inputValue,
