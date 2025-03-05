@@ -14,9 +14,11 @@ import {
 import { formatConversationTitle } from '../utils/conversation/helpers';
 import {
   ChatCompletionChunk,
+  ChatCompletionContentPart,
   ChatCompletionMessageParam,
 } from 'openai/resources/index';
 import { getImage } from '../utils/idb/idb';
+import { visionModelPrompt } from '../../features/reasoning/config/prompts/defaultPrompts';
 
 export const newConversation = () => {
   return {
@@ -141,6 +143,17 @@ export async function doChat(
   let isFileUpload = false;
   let imageID = '';
   let userPromptForImage = '';
+
+  const visionModelMsg: ChatCompletionMessageParam = {
+    role: 'user',
+    content: [
+      {
+        type: 'text',
+        text: visionModelPrompt,
+      },
+    ],
+  };
+
   // if the last user message is a file upload
   // take the id out of the image_url and replace it with the base64 imageURL from idb
   if (lastMsg && Array.isArray(lastMsg.content)) {
@@ -149,11 +162,12 @@ export async function doChat(
         isFileUpload = true;
         imageID = content.image_url.url;
         const img = await getImage(content.image_url.url);
-        if (img) {
-          content.image_url.url = img.data;
-        } else {
-          content.image_url.url = 'image not found!';
-        }
+        (visionModelMsg.content as ChatCompletionContentPart[]).push({
+          type: 'image_url',
+          image_url: {
+            url: img ? img.data : 'image not found!',
+          },
+        });
       }
       if (content.type === 'text') {
         userPromptForImage = content.text;
@@ -162,7 +176,7 @@ export async function doChat(
   }
 
   if (isFileUpload) {
-    const imageDetails = await analyzeImage(client, lastMsg);
+    const imageDetails = await analyzeImage(client, visionModelMsg);
 
     messageHistoryStore.setMessages([
       ...messageHistoryStore.getSnapshot().slice(0, -1),
