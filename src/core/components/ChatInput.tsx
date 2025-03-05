@@ -88,10 +88,6 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       return;
     }
 
-    if (inputValue === '' && imageIDs.length === 0) {
-      return;
-    }
-
     let processedMessage = inputValue;
     if (modelConfig.messageProcessors?.preProcess) {
       processedMessage = modelConfig.messageProcessors.preProcess(inputValue);
@@ -307,6 +303,17 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
 
   const { colors } = useTheme();
 
+  const noUserInput = inputValue.length === 0 && imageIDs.length === 0;
+
+  const insufficientContext =
+    !hasSufficientRemainingTokens(
+      modelConfig.id,
+      inputValue,
+      remainingContextWindow,
+    ) || shouldDisableChat;
+
+  const disableSubmit = (!isRequesting && noUserInput) || insufficientContext;
+
   return (
     <>
       {showInputAdornmentMessage && (
@@ -378,17 +385,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
             type="submit"
             onClick={handleButtonClick}
             aria-label="Send Chat"
-            disabled={
-              (!isRequesting &&
-                inputValue.length === 0 &&
-                imageIDs.length === 0) ||
-              !hasSufficientRemainingTokens(
-                modelConfig.id,
-                inputValue,
-                remainingContextWindow,
-              ) ||
-              shouldDisableChat
-            }
+            disabled={disableSubmit}
           >
             {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
           </button>
