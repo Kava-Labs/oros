@@ -36,21 +36,19 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
           let content: string =
             typeof message.content === 'string' ? message.content : '';
           if (Array.isArray(message.content)) {
-            hasImage =
-              message.content.find((c) => {
-                if (c.type === 'image_url') {
-                  imageIDs.push(c.image_url.url);
-                  return true;
-                }
-                return false;
-              }) !== undefined;
+            message.content.forEach((c) => {
+              if (c.type === 'image_url') {
+                imageIDs.push(c.image_url.url);
+                hasImage = true;
+              }
+            });
             for (const msgContent of message.content) {
               if (msgContent.type === 'text') {
                 content = msgContent.text;
                 break;
               }
             }
-          } else if (index > 1 && messages[index - 1].role === 'system') {
+          } else if (messages[index - 1].role === 'system') {
             const prevMsg = messages[index - 1];
             if (
               typeof prevMsg.content === 'string' &&
