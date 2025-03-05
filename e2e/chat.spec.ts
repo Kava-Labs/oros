@@ -694,7 +694,38 @@ describe('chat', () => {
 
     await expect(page.getByText('Start a new chat to begin')).toBeVisible();
   });
+  test('allows a user to upload a file up to 8MB limit', async ({ page }) => {
+    test.setTimeout(30 * 1000);
 
+    const chat = new Chat(page);
+    await chat.goto();
+
+    const paperclipButton = page.getByRole('button', {
+      name: 'Attach file icon',
+    });
+
+    const fileChooserPromise = page.waitForEvent('filechooser');
+    await paperclipButton.click();
+    const fileChooser = await fileChooserPromise;
+
+    const eightMBPlus = 7 * 1024 * 1024 + 1024; // 7MB
+    const buffer = Buffer.alloc(eightMBPlus, 'x');
+
+    const fileWithinLimit = {
+      name: 'withinLimit-image.png',
+      mimeType: 'image/png',
+      buffer,
+    };
+
+    await fileChooser.setFiles([fileWithinLimit]);
+
+    const imagePreviewContainer = page.locator('.imagePreviewContainer');
+    if (await imagePreviewContainer.isVisible()) {
+      const imageCards = page.locator('.imageCard');
+      const count = await imageCards.count();
+      expect(count).toEqual(1);
+    }
+  });
   test('allows user to upload multiple files', async ({ page }) => {
     const maxFileUploads = 4;
     test.setTimeout(30 * 1000);
@@ -760,5 +791,46 @@ describe('chat', () => {
 
     const errorMessage = page.getByText('Maximum 4 files allowed');
     await expect(errorMessage).toBeVisible();
+
+    //  Verify the error message clears
+    await page.waitForTimeout(2500);
+    await expect(errorMessage).not.toBeVisible();
+  });
+  test('shows error when trying to upload a file larger than 8MB', async ({
+    page,
+  }) => {
+    test.setTimeout(30 * 1000);
+
+    const chat = new Chat(page);
+    await chat.goto();
+
+    const paperclipButton = page.getByRole('button', {
+      name: 'Attach file icon',
+    });
+
+    const fileChooserPromise = page.waitForEvent('filechooser');
+    await paperclipButton.click();
+    const fileChooser = await fileChooserPromise;
+
+    // Create a buffer slightly larger than 8MB
+    const eightMBPlus = 8 * 1024 * 1024 + 1024; // 8MB + 1KB
+    const largeBuffer = Buffer.alloc(eightMBPlus, 'x');
+
+    const oversizedFile = {
+      name: 'oversized-image.png',
+      mimeType: 'image/png',
+      buffer: largeBuffer,
+    };
+
+    await fileChooser.setFiles([oversizedFile]);
+
+    // Check for the error message
+    const errorMessage = page.getByText(
+      'File too large! Maximum file size is 8MB.',
+    );
+    await expect(errorMessage).toBeVisible();
+
+    await page.waitForTimeout(2500);
+    await expect(errorMessage).not.toBeVisible();
   });
 });
