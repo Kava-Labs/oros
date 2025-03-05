@@ -38,6 +38,7 @@ func (h mergedModelsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		client := backend.GetClient()
 
 		reqModels, err := client.DoRequest(
+			r.Context(),
 			http.MethodGet,
 			"/models",
 			nil,
