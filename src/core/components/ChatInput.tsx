@@ -13,6 +13,9 @@ import ButtonIcon from './ButtonIcon';
 import { useTheme } from '../../shared/theme/useTheme';
 import { ChatCompletionContentPart } from 'openai/resources/index';
 
+const SUPPORT_FILE_UPLOAD =
+  import.meta.env.VITE_FEAT_SUPPORT_FILE_UPLOAD === 'true';
+
 const DEFAULT_HEIGHT = '30px';
 
 const SUPPORTED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -221,6 +224,9 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     : modelConfig.contextLength;
 
   useEffect(() => {
+    if (!SUPPORT_FILE_UPLOAD) {
+      return;
+    }
     const handleDragEnter = (e: DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
@@ -386,28 +392,32 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
           >
             {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
           </button>
-          <div className={styles.uploadInputFieldContainer}>
-            <input
-              accept={SUPPORTED_FILE_TYPES.join(', ')}
-              ref={uploadRef}
-              type="file"
-              className={styles.uploadInputField}
-              onChange={handleUpload}
-              multiple // Allow multiple file selection
-            />
-          </div>
+          {SUPPORT_FILE_UPLOAD && (
+            <>
+              <div className={styles.uploadInputFieldContainer}>
+                <input
+                  accept={SUPPORTED_FILE_TYPES.join(', ')}
+                  ref={uploadRef}
+                  type="file"
+                  className={styles.uploadInputField}
+                  onChange={handleUpload}
+                  multiple // Allow multiple file selection
+                />
+              </div>
 
-          <ButtonIcon
-            icon={Paperclip}
-            aria-label="Attach file icon"
-            className={styles.attachIcon}
-            onClick={() => uploadRef.current?.click()}
-            tooltip={{
-              text: 'Attach file - max 4, 8MB each',
-              position: 'bottom',
-              backgroundColor: colors.bgPrimary,
-            }}
-          />
+              <ButtonIcon
+                icon={Paperclip}
+                aria-label="Attach file icon"
+                className={styles.attachIcon}
+                onClick={() => uploadRef.current?.click()}
+                tooltip={{
+                  text: 'Attach file - max 4, 8MB each',
+                  position: 'bottom',
+                  backgroundColor: colors.bgPrimary,
+                }}
+              />
+            </>
+          )}
         </div>
       </div>
     </>
