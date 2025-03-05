@@ -13,6 +13,7 @@ import {
   EVMChainConfig,
 } from '../../../config/chainsRegistry';
 import { ConnectWalletPrompt } from '../../../components/ConnectWalletPrompt';
+import { validateChain, validateWallet } from '../../../utils/wallet';
 
 interface SendToolParams {
   chainName: string;
@@ -54,13 +55,6 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
 
   inProgressComponent() {
     return this.hasValidWallet ? InProgressTxDisplay : ConnectWalletPrompt;
-  }
-
-  private isMobileDevice(): boolean {
-    // Use regex to detect mobile devices
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-      window.navigator.userAgent,
-    );
   }
 
   private async validateBalance(
@@ -116,27 +110,13 @@ export class EvmTransferMessage implements ChainMessage<SendToolParams> {
     params: SendToolParams,
     walletStore: WalletStore,
   ): Promise<boolean> {
-    if (this.isMobileDevice()) {
-      throw new Error('Use a desktop device to connect a wallet');
-    }
-
     this.hasValidWallet = false;
-    if (!walletStore.getSnapshot().isWalletConnected) {
-      throw new Error('please connect to a compatible wallet');
-    }
 
-    if (Array.isArray(this.needsWallet)) {
-      if (!this.needsWallet.includes(walletStore.getSnapshot().walletType)) {
-        throw new Error('please connect to a compatible wallet');
-      }
-    }
+    validateWallet(walletStore, this.needsWallet);
+    validateChain(this.chainType, params.chainName);
 
     //  wallet checks have passed
     this.hasValidWallet = true;
-
-    if (!chainRegistry[this.chainType][params.chainName]) {
-      throw new Error(`unknown chain name ${params.chainName}`);
-    }
 
     const { toAddress, amount, denom } = params;
 
