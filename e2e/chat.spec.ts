@@ -708,7 +708,6 @@ describe('chat', () => {
 
     const fileChooserPromise = page.waitForEvent('filechooser');
     await paperclipButton.click();
-
     const fileChooser = await fileChooserPromise;
 
     const buffer = Buffer.from(
@@ -744,7 +743,6 @@ describe('chat', () => {
 
     const fileChooserPromise = page.waitForEvent('filechooser');
     await paperclipButton.click();
-
     const fileChooser = await fileChooserPromise;
 
     const buffer = Buffer.from(
