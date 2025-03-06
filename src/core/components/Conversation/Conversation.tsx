@@ -29,6 +29,8 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
   return (
     <div className={styles.conversationContainer} data-testid="conversation">
       {messages.map((message, index) => {
+        // console.log(index);
+        // console.log(index - 1);
         if (message.role === 'user') {
           let hasImage = false;
           let imageIDs: string[] = [];
@@ -48,7 +50,7 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
                 break;
               }
             }
-          } else if (messages[index - 1].role === 'system') {
+          } else if (index > 0 && messages[index - 1].role === 'system') {
             const prevMsg = messages[index - 1];
             if (
               typeof prevMsg.content === 'string' &&
@@ -90,7 +92,11 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
                 : null}
 
               <div className={styles.userInputContainer}>
-                <Content role={message.role} content={content} />
+                <Content
+                  role={message.role}
+                  content={content}
+                  data-testid="user-message"
+                />
               </div>
             </Fragment>
           );
