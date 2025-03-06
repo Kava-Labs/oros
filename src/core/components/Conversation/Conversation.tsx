@@ -29,8 +29,6 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
   return (
     <div className={styles.conversationContainer} data-testid="conversation">
       {messages.map((message, index) => {
-        // console.log(index);
-        // console.log(index - 1);
         if (message.role === 'user') {
           let hasImage = false;
           let imageIDs: string[] = [];

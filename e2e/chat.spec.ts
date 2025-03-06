@@ -894,4 +894,42 @@ describe('chat', () => {
       expect(count).toEqual(1);
     }
   });
+  test('image previews are cleared on model switch', async ({ page }) => {
+    test.setTimeout(30 * 1000);
+
+    const chat = new Chat(page);
+    await chat.goto();
+
+    const paperclipButton = page.getByRole('button', {
+      name: 'Attach file icon',
+    });
+
+    const imagePath = join(process.cwd(), 'e2e/images/orosLogo.png');
+
+    const buffer = fs.readFileSync(imagePath);
+
+    const fileChooserPromise = page.waitForEvent('filechooser');
+    await paperclipButton.click();
+    const fileChooser = await fileChooserPromise;
+
+    const fileWithinLimit = {
+      name: 'orosLogo.png',
+      mimeType: 'image/png',
+      buffer,
+    };
+
+    await fileChooser.setFiles([fileWithinLimit]);
+
+    const imagePreviewContainer = page.locator('.imagePreviewContainer');
+
+    if (await imagePreviewContainer.isVisible()) {
+      const imageCards = page.locator('.imageCard');
+      const count = await imageCards.count();
+      expect(count).toEqual(1);
+    }
+
+    await chat.switchToBlockchainModel();
+
+    expect(await imagePreviewContainer.isVisible()).toBe(false);
+  });
 });
