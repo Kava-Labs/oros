@@ -708,14 +708,11 @@ describe('chat', () => {
     await paperclipButton.click();
     const fileChooser = await fileChooserPromise;
 
-    const buffer = Buffer.from(
-      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
-      'base64',
-    );
+    const buffer = Buffer.alloc(7 * 1024 * 1024 + 1024, 'x');
 
     const fileWithinLimit = {
-      name: 'withinLimit-image.jpeg',
-      mimeType: 'image/jpeg',
+      name: 'withinLimit-image.png',
+      mimeType: 'image/png',
       buffer,
     };
 
