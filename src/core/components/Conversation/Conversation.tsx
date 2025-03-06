@@ -70,7 +70,7 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
           return (
             <Fragment key={index}>
               {hasImage
-                ? imageIDs.map((imageID, i) => (
+                ? imageIDs.map((imageID) => (
                     <div
                       key={imageID}
                       style={{
@@ -79,12 +79,7 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
                         marginTop: '4px',
                       }}
                     >
-                      <IdbImage
-                        width="256px"
-                        height="256px"
-                        id={imageID}
-                        aria-label={`User uploaded image ${i + 1}`}
-                      />
+                      <IdbImage width="256px" height="256px" id={imageID} />
                     </div>
                   ))
                 : null}
