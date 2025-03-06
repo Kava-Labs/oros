@@ -482,49 +482,51 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
           )}
         </div>
         <div className={styles.buttonContainer}>
-          {SUPPORT_FILE_UPLOAD && modelSupportsUpload && (
-            <>
-              <div className={styles.uploadInputFieldContainer}>
-                <input
-                  accept={SUPPORTED_FILE_TYPES.join(', ')}
-                  ref={uploadRef}
-                  type="file"
-                  className={styles.uploadInputField}
-                  onChange={handleUpload}
-                  multiple // Allow multiple file selection
+          <div className={styles.buttonWrapper}>
+            {SUPPORT_FILE_UPLOAD && modelSupportsUpload && (
+              <>
+                <div className={styles.uploadInputFieldContainer}>
+                  <input
+                    accept={SUPPORTED_FILE_TYPES.join(', ')}
+                    ref={uploadRef}
+                    type="file"
+                    className={styles.uploadInputField}
+                    onChange={handleUpload}
+                    multiple // Allow multiple file selection
+                    disabled={imageIDs.length >= MAX_FILE_UPLOADS}
+                  />
+                </div>
+
+                <ButtonIcon
+                  icon={Paperclip}
+                  size={16}
+                  aria-label="Attach file icon"
+                  className={`${styles.attachIcon} ${imageIDs.length >= MAX_FILE_UPLOADS ? styles.disabled : ''}`}
+                  onClick={() =>
+                    imageIDs.length < MAX_FILE_UPLOADS &&
+                    uploadRef.current?.click()
+                  }
+                  tooltip={{
+                    text: 'Attach file - max 4, 8MB each',
+                    position: 'bottom',
+                    backgroundColor: colors.bgPrimary,
+                  }}
                   disabled={imageIDs.length >= MAX_FILE_UPLOADS}
                 />
-              </div>
-
-              <ButtonIcon
-                icon={Paperclip}
-                size={16}
-                aria-label="Attach file icon"
-                className={`${styles.attachIcon} ${imageIDs.length >= MAX_FILE_UPLOADS ? styles.disabled : ''}`}
-                onClick={() =>
-                  imageIDs.length < MAX_FILE_UPLOADS &&
-                  uploadRef.current?.click()
-                }
-                tooltip={{
-                  text: 'Attach file - max 4, 8MB each',
-                  position: 'bottom',
-                  backgroundColor: colors.bgPrimary,
-                }}
-                disabled={imageIDs.length >= MAX_FILE_UPLOADS}
-              />
-            </>
-          )}
-          <button
-            data-testid="chat-view-button"
-            ref={buttonRef}
-            className={styles.sendChatButton}
-            type="submit"
-            onClick={handleButtonClick}
-            aria-label="Send Chat"
-            disabled={disableSubmit}
-          >
-            {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
-          </button>
+              </>
+            )}
+            <button
+              data-testid="chat-view-button"
+              ref={buttonRef}
+              className={styles.sendChatButton}
+              type="submit"
+              onClick={handleButtonClick}
+              aria-label="Send Chat"
+              disabled={disableSubmit}
+            >
+              {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
+            </button>
+          </div>
         </div>
       </div>
     </>

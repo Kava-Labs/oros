@@ -56,7 +56,13 @@
 .buttonContainer {
   flex-shrink: 0;
   display: flex;
+  align-items: flex-end;
+}
+
+.buttonWrapper {
+  display: flex;
   align-items: center;
+  gap: var(--spacing-xs);
 }
 
 .sendChatButton {
@@ -149,11 +155,6 @@
 
 .removeButton:hover {
   background-color: var(--colors-bgSecondary);
-}
-
-
-.attachIcon {
-  margin-right: var(--spacing-xs);
 }
 
 .attachIcon:hover {
