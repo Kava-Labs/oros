@@ -272,8 +272,10 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     ? currentConversation.tokensRemaining
     : modelConfig.contextLength;
 
+  const modelSupportsUpload = modelConfig.supportedFileTypes.length > 0;
+
   useEffect(() => {
-    if (!SUPPORT_FILE_UPLOAD) {
+    if (!SUPPORT_FILE_UPLOAD || !modelSupportsUpload) {
       return;
     }
     const handleDragEnter = (e: DragEvent) => {
@@ -380,7 +382,13 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       document.removeEventListener('dragleave', handleDragLeave);
       document.removeEventListener('drop', handleDrop);
     };
-  }, [processFile, imageIDs.length, hasAvailableUploads, resetUploadState]);
+  }, [
+    processFile,
+    imageIDs.length,
+    hasAvailableUploads,
+    resetUploadState,
+    modelSupportsUpload,
+  ]);
 
   const [, setHoverImageId] = useState<string | null>(null);
 
@@ -461,7 +469,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
           )}
         </div>
         <div className={styles.buttonContainer}>
-          {SUPPORT_FILE_UPLOAD && (
+          {SUPPORT_FILE_UPLOAD && modelSupportsUpload && (
             <>
               <div className={styles.uploadInputFieldContainer}>
                 <input
