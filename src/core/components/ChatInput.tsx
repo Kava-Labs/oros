@@ -70,6 +70,19 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
 
   const [imageIDs, setImageIDs] = useState<string[]>([]);
 
+  const prevModelIdRef = useRef(modelConfig.id);
+  const prevConversationRef = useRef(conversationID);
+
+  useEffect(() => {
+    if (
+      prevModelIdRef.current !== modelConfig.id ||
+      prevConversationRef.current !== conversationID
+    ) {
+      setImageIDs([]);
+      prevModelIdRef.current = modelConfig.id;
+      prevConversationRef.current = conversationID;
+    }
+  }, [conversationID, modelConfig.id]);
   const handleInputChange = useCallback(
     (event: ChangeEvent<HTMLTextAreaElement>) => {
       /**
