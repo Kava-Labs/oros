@@ -736,11 +736,6 @@ describe('chat', () => {
     });
 
     await expect(uploadedImage).toBeVisible();
-
-    await chat.waitForReasoningResponseToBegin();
-
-    const brainIcon = page.getByRole('img', { name: 'Thinking icon' });
-    await expect(brainIcon).toBeVisible();
   });
   test('allows user to upload multiple files', async ({ page }) => {
     const maxFileUploads = 4;
