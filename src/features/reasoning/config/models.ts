@@ -19,6 +19,7 @@ export const reasoningModels: Record<
     icon: KavaIcon,
     description: 'Logical Analysis',
     tools: [],
+    supportedFileTypes: ['image/jpeg', 'image/png', 'image/webp'],
     //  not running full 128K token context currently
     contextLength: 8192,
     contextLimitMonitor: calculateDeepseekTokenUsage,
