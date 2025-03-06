@@ -74,6 +74,7 @@ export const ThinkingContent = ({
           }}
         >
           <BrainIcon
+            aria-label="Thinking icon"
             color={colors.accentTwo}
             className={`${styles.icon} ${showLoadingState ? styles.pulsing : ''}`}
             style={{

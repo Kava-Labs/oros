@@ -3,6 +3,8 @@ import { Chat } from './Chat';
 import { MetaMask } from './Metamask';
 import { ethers } from 'ethers';
 import { devices } from '@playwright/test';
+import * as fs from 'fs';
+import { join } from 'path';
 
 describe('chat', () => {
   test('renders intro messages by model', async ({ page }) => {
@@ -704,14 +706,16 @@ describe('chat', () => {
       name: 'Attach file icon',
     });
 
+    const imagePath = join(process.cwd(), 'e2e/images/orosLogo.png');
+
+    const buffer = fs.readFileSync(imagePath);
+
     const fileChooserPromise = page.waitForEvent('filechooser');
     await paperclipButton.click();
     const fileChooser = await fileChooserPromise;
 
-    const buffer = Buffer.alloc(7 * 1024 * 1024 + 1024, 'x');
-
     const fileWithinLimit = {
-      name: 'withinLimit-image.png',
+      name: 'orosLogo.png',
       mimeType: 'image/png',
       buffer,
     };
@@ -724,6 +728,14 @@ describe('chat', () => {
       const count = await imageCards.count();
       expect(count).toEqual(1);
     }
+
+    await chat.submitMessage('Describe this image');
+
+    const uploadedImage = page.getByRole('img', {
+      name: 'User uploaded image 1',
+    });
+
+    await expect(uploadedImage).toBeVisible();
   });
   test('allows user to upload multiple files', async ({ page }) => {
     const maxFileUploads = 4;
@@ -758,6 +770,15 @@ describe('chat', () => {
       const imageCards = page.locator('.imageCard');
       const count = await imageCards.count();
       expect(count).toEqual(4);
+    }
+
+    await chat.submitMessage('Here are multiple images');
+
+    for (let i = 1; i <= maxFileUploads; i++) {
+      const uploadedImage = page.getByRole('img', {
+        name: `User uploaded image ${i}`,
+      });
+      await expect(uploadedImage).toBeVisible();
     }
   });
   test('shows error when trying to upload too many files', async ({ page }) => {
