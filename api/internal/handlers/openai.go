@@ -9,6 +9,7 @@ import (
 
 	"github.com/kava-labs/kavachat/api/internal/config"
 	"github.com/kava-labs/kavachat/api/internal/middleware"
+	"github.com/kava-labs/kavachat/api/internal/otel"
 	"github.com/rs/zerolog"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
@@ -24,6 +25,9 @@ type TimeToFirstByteResponseWriter struct {
 	started      bool
 	tracer       trace.Tracer
 	ResponseSpan trace.Span
+	model        string
+	backend      string
+	bytesWritten int64
 }
 
 // NewTimeToFirstByteResponseWriter creates a new TimeToFirstByteResponseWriter
@@ -31,6 +35,8 @@ func NewTimeToFirstByteResponseWriter(
 	ctx context.Context,
 	w http.ResponseWriter,
 	tracer trace.Tracer,
+	model string,
+	backend string,
 ) *TimeToFirstByteResponseWriter {
 	return &TimeToFirstByteResponseWriter{
 		ResponseWriter: w,
@@ -39,6 +45,8 @@ func NewTimeToFirstByteResponseWriter(
 		started:        false,
 		tracer:         tracer,
 		ResponseSpan:   nil,
+		model:          model,
+		backend:        backend,
 	}
 }
 
@@ -48,6 +56,16 @@ func (w *TimeToFirstByteResponseWriter) Write(b []byte) (int, error) {
 	if !w.started && len(b) > 0 {
 		ttfb := time.Since(w.startTime)
 		w.started = true
+
+		// Record metrics for TTFB
+		if otel.GlobalMetrics != nil {
+			otel.GlobalMetrics.RecordTTFB(
+				w.ctx,
+				float64(ttfb.Milliseconds()),
+				attribute.String("model", w.model),
+				attribute.String("backend", w.backend),
+			)
+		}
 
 		if w.tracer != nil {
 			// Create a child span for the TTFB
@@ -62,11 +80,10 @@ func (w *TimeToFirstByteResponseWriter) Write(b []byte) (int, error) {
 		w.ResponseSpan.SetStatus(codes.Error, "response write error")
 		w.ResponseSpan.RecordError(err)
 	}
-
 	return i, err
 }
 
-// End ends the response span if it exists
+// End ends the response span if it exists and records response size metric
 func (w *TimeToFirstByteResponseWriter) End() {
 	if w.ResponseSpan != nil {
 		w.ResponseSpan.End()
@@ -129,7 +146,13 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	proxySpan.SetAttributes(attribute.String("model", model))
 
 	// This creates a child span for the TTFB
-	responseWriter := NewTimeToFirstByteResponseWriter(ctx, w, tracer)
+	responseWriter := NewTimeToFirstByteResponseWriter(
+		ctx,
+		w,
+		tracer,
+		model,
+		backend.Name,
+	)
 	defer responseWriter.End()
 
 	// Forward request to OpenAI API

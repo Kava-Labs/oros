@@ -10,10 +10,10 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel/attribute"
 
 	chimiddleware "github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
@@ -21,6 +21,7 @@ import (
 	"github.com/kava-labs/kavachat/api/internal/config"
 	"github.com/kava-labs/kavachat/api/internal/handlers"
 	"github.com/kava-labs/kavachat/api/internal/middleware"
+	"github.com/kava-labs/kavachat/api/internal/otel"
 )
 
 func main() {
@@ -47,36 +48,33 @@ func main() {
 
 	// -------------------------------------------------------------------------
 	// OpenTelemetry tracing setup
-	shutdownOtel, err := setupOTelSDK(context.Background())
+
+	// Includes runtime and host metrics start
+	shutdownOtel, err := otel.SetupOTelSDK(context.Background())
 	if err != nil {
 		logger.Fatal().Err(err).Msg("error setting up OpenTelemetry SDK")
 	}
-
-	// TODO: Migrate to using OpenTelemetry for metrics
-	metricsReg := prometheus.NewRegistry()
-
-	// Go runtime metrics and process collectors
-	metricsReg.MustRegister(
-		collectors.NewGoCollector(),
-		collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}),
-	)
-
-	metricsMiddleware := middleware.NewMetricsMiddleware(metricsReg, nil)
 
 	// -------------------------------------------------------------------------
 	// API Routes
 
 	r := chi.NewRouter()
 
-	r.Use(chimiddleware.Recoverer)                // Recover from panics, 500 response, logs stack trace
-	r.Use(otelhttp.NewMiddleware("kavachat-api")) // OpenTelemetry tracing middleware
-
-	// Metrics re-use middleware for /v1/files routes to not duplicate metrics
-	// autoprom panics if the same handler name is used
-	fileMetrics := metricsMiddleware.WitHandlerName("/v1/files")
+	r.Use(chimiddleware.Recoverer) // Recover from panics, 500 response, logs stack trace
 
 	// /v1/ custom routes
 	r.Route("/v1", func(r chi.Router) {
+		r.Use(otelhttp.NewMiddleware(
+			"kavachat-api",
+			otelhttp.WithMetricAttributesFn(func(r *http.Request) []attribute.KeyValue {
+				attrs := []attribute.KeyValue{
+					attribute.String("path", r.URL.Path),
+				}
+
+				return attrs
+			}),
+		)) // OpenTelemetry tracing and metrics middleware
+
 		r.Get("/healthcheck", func(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintln(w, "available")
 		})
@@ -96,7 +94,6 @@ func main() {
 				MaxRequests: 10,
 				WindowSize:  1 * time.Minute,
 			}),
-			fileMetrics,
 		).Post(
 			"/files",
 			fileUploadHandler.ServeHTTP,
@@ -108,7 +105,7 @@ func main() {
 			cfg.S3PathStyleRequests,
 			logger,
 		)
-		r.With(fileMetrics).Get(
+		r.Get(
 			"/files/{file_id}",
 			downloadHandler.ServeHTTP,
 		)
@@ -119,28 +116,43 @@ func main() {
 		r.Use(middleware.PreflightMiddleware)
 		r.Use(middleware.ExtractModelMiddleware(logger))
 		r.Use(middleware.ModelAllowlistMiddleware(logger, cfg.Backends))
+		// Register after model extract to get model from context
+		r.Use(otelhttp.NewMiddleware(
+			"kavachat-api",
+			otelhttp.WithMetricAttributesFn(func(r *http.Request) []attribute.KeyValue {
+				attrs := []attribute.KeyValue{
+					attribute.String("path", r.URL.Path),
+				}
+
+				// Not all routes have model
+				model, ok := r.Context().Value(middleware.CTX_REQ_MODEL_KEY).(string)
+				if ok {
+					attrs = append(attrs, attribute.String("model", model))
+				}
+
+				return attrs
+			}),
+		))
 
 		chatCompletionsRoute := "/chat/completions"
-		r.With(metricsMiddleware.WitHandlerName(chatCompletionsRoute)).
-			Handle(
+		r.Handle(
+			chatCompletionsRoute,
+			handlers.NewOpenAIProxyHandler(
+				cfg.Backends,
+				logger,
 				chatCompletionsRoute,
-				handlers.NewOpenAIProxyHandler(
-					cfg.Backends,
-					logger,
-					chatCompletionsRoute,
-				),
-			)
+			),
+		)
 
 		imageGenerationsRoute := "/images/generations"
-		r.With(metricsMiddleware.WitHandlerName(imageGenerationsRoute)).
-			Handle(
+		r.Handle(
+			imageGenerationsRoute,
+			handlers.NewOpenAIProxyHandler(
+				cfg.Backends,
+				logger,
 				imageGenerationsRoute,
-				handlers.NewOpenAIProxyHandler(
-					cfg.Backends,
-					logger,
-					imageGenerationsRoute,
-				),
-			)
+			),
+		)
 	})
 
 	// -------------------------------------------------------------------------
@@ -149,9 +161,8 @@ func main() {
 	metricsLogger := logger.With().Str("server", "metrics").Logger()
 
 	metricsR := chi.NewRouter()
-	metricsR.Handle("/metrics", promhttp.HandlerFor(metricsReg, promhttp.HandlerOpts{
-		// register a metric "promhttp_metric_handler_errors_total", partitioned by "cause".
-		Registry: metricsReg,
+	metricsR.Handle("/metrics", promhttp.HandlerFor(prometheus.DefaultGatherer, promhttp.HandlerOpts{
+		Registry: prometheus.DefaultRegisterer,
 		ErrorLog: &metricsLogger,
 	}))
 
