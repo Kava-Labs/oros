@@ -4,12 +4,7 @@ import { MetaMask } from './Metamask';
 import { ethers } from 'ethers';
 import { devices } from '@playwright/test';
 import * as fs from 'fs';
-import * as path from 'path';
-import { fileURLToPath } from 'url';
-
-// @ts-expect-error: module
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { join } from 'path';
 
 describe('chat', () => {
   test('renders intro messages by model', async ({ page }) => {
@@ -711,7 +706,7 @@ describe('chat', () => {
       name: 'Attach file icon',
     });
 
-    const imagePath = path.join(__dirname, './images/orosLogo.png');
+    const imagePath = join(process.cwd(), 'e2e/images/orosLogo.png');
 
     const buffer = fs.readFileSync(imagePath);
 
