@@ -16,6 +16,7 @@ export interface BaseModelConfig {
   name: string;
   icon: ComponentType;
   description: string;
+  supportedFileTypes: Array<SupportedFileType>;
   contextLength: number;
   contextLimitMonitor: (
     messages: ChatMessage[],
@@ -67,3 +68,5 @@ export interface ModelRegistry {
 export interface ContextMetrics {
   tokensRemaining: number;
 }
+
+type SupportedFileType = 'image/jpeg' | 'image/png' | 'image/webp';
