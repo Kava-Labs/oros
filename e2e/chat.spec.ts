@@ -713,13 +713,13 @@ describe('chat', () => {
       'base64',
     );
 
-    const testImage = {
-      name: 'test-image.jpeg',
+    const fileWithinLimit = {
+      name: 'withinLimit-image.jpeg',
       mimeType: 'image/jpeg',
       buffer,
     };
 
-    await fileChooser.setFiles([testImage]);
+    await fileChooser.setFiles([fileWithinLimit]);
 
     const imagePreviewContainer = page.locator('.imagePreviewContainer');
     if (await imagePreviewContainer.isVisible()) {
