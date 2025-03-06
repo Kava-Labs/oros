@@ -1,9 +1,14 @@
 package types
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/httptrace"
+
+	"go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 // OpenAIPassthroughClient is a client for the OpenAI API
@@ -20,7 +25,14 @@ func NewOpenAIClient(baseURL, apiKey string) *OpenAIPassthroughClient {
 	return &OpenAIPassthroughClient{
 		BaseURL: baseURL,
 		APIKey:  apiKey,
-		client:  &http.Client{},
+		client: &http.Client{
+			Transport: otelhttp.NewTransport(
+				http.DefaultTransport,
+				otelhttp.WithClientTrace(func(ctx context.Context) *httptrace.ClientTrace {
+					return otelhttptrace.NewClientTrace(ctx)
+				}),
+			),
+		},
 	}
 }
 
@@ -29,6 +41,7 @@ func NewOpenAIClient(baseURL, apiKey string) *OpenAIPassthroughClient {
 // custom handling, retries, etc and would need manual handling of the response
 // and streaming.
 func (c *OpenAIPassthroughClient) DoRequest(
+	ctx context.Context,
 	method,
 	path string,
 	body io.ReadCloser,
@@ -53,7 +66,7 @@ func (c *OpenAIPassthroughClient) DoRequest(
 
 	reqUrl := c.BaseURL + path
 
-	req, err := http.NewRequest(method, reqUrl, body)
+	req, err := http.NewRequestWithContext(ctx, method, reqUrl, body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}

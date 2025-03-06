@@ -1,14 +1,77 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/kava-labs/kavachat/api/internal/config"
 	"github.com/kava-labs/kavachat/api/internal/middleware"
 	"github.com/rs/zerolog"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 )
+
+// TimeToFirstByteResponseWriter is a wrapper around http.ResponseWriter that
+// records the time to first byte (TTFB) for a response
+type TimeToFirstByteResponseWriter struct {
+	http.ResponseWriter
+	ctx          context.Context
+	startTime    time.Time
+	started      bool
+	tracer       trace.Tracer
+	ResponseSpan trace.Span
+}
+
+// NewTimeToFirstByteResponseWriter creates a new TimeToFirstByteResponseWriter
+func NewTimeToFirstByteResponseWriter(
+	ctx context.Context,
+	w http.ResponseWriter,
+	tracer trace.Tracer,
+) *TimeToFirstByteResponseWriter {
+	return &TimeToFirstByteResponseWriter{
+		ResponseWriter: w,
+		ctx:            ctx,
+		startTime:      time.Now(),
+		started:        false,
+		tracer:         tracer,
+		ResponseSpan:   nil,
+	}
+}
+
+// Write records the time to first byte (TTFB) on the first write
+func (w *TimeToFirstByteResponseWriter) Write(b []byte) (int, error) {
+	// Record TTFB on first write
+	if !w.started && len(b) > 0 {
+		ttfb := time.Since(w.startTime)
+		w.started = true
+
+		if w.tracer != nil {
+			// Create a child span for the TTFB
+			_, w.ResponseSpan = w.tracer.Start(w.ctx, "proxy.response")
+			w.ResponseSpan.SetAttributes(attribute.Float64("ttfb_ms", float64(ttfb.Milliseconds())))
+		}
+	}
+
+	i, err := w.ResponseWriter.Write(b)
+	if err != nil && w.ResponseSpan != nil {
+		// Record error in child span
+		w.ResponseSpan.SetStatus(codes.Error, "response write error")
+		w.ResponseSpan.RecordError(err)
+	}
+
+	return i, err
+}
+
+// End ends the response span if it exists
+func (w *TimeToFirstByteResponseWriter) End() {
+	if w.ResponseSpan != nil {
+		w.ResponseSpan.End()
+	}
+}
 
 type openaiProxyHandler struct {
 	backends config.OpenAIBackends
@@ -36,6 +99,14 @@ func NewOpenAIProxyHandler(
 
 // ServeHTTP forwards the request to the OpenAI API
 func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tracer := trace.SpanFromContext(ctx).
+		TracerProvider().
+		Tracer("openai_proxy")
+
+	ctx, proxySpan := tracer.Start(ctx, "proxy.request")
+	defer proxySpan.End()
+
 	model := r.Context().Value(middleware.CTX_REQ_MODEL_KEY).(string)
 	backend, found := h.backends.GetBackendFromModel(model)
 	if !found {
@@ -55,8 +126,15 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	client := backend.GetClient()
 
+	proxySpan.SetAttributes(attribute.String("model", model))
+
+	// This creates a child span for the TTFB
+	responseWriter := NewTimeToFirstByteResponseWriter(ctx, w, tracer)
+	defer responseWriter.End()
+
 	// Forward request to OpenAI API
 	apiResponse, err := client.DoRequest(
+		ctx,
 		r.Method,
 		h.endpoint,
 		r.Body,
@@ -70,6 +148,8 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(err)
 
+		proxySpan.SetStatus(codes.Error, "request forwarding error")
+		proxySpan.RecordError(err)
 		return
 	}
 	defer apiResponse.Body.Close()
@@ -82,7 +162,7 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(apiResponse.StatusCode)
 
 	// Forward response body, straight copy from response which includes streaming
-	bytesWritten, err := io.Copy(w, apiResponse.Body)
+	bytesWritten, err := io.Copy(responseWriter, apiResponse.Body)
 	if err != nil {
 		h.logger.Error().Msgf(
 			"error forwarding response body to client: %s",
@@ -90,6 +170,7 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		)
 	}
 
+	proxySpan.SetAttributes(attribute.Int64("response_bytes", bytesWritten))
 	h.logger.Debug().
 		Int64("bytes_written", bytesWritten).
 		Msg("request forwarded successfully")

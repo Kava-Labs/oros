@@ -11,6 +11,9 @@ import (
 	"github.com/kava-labs/kavachat/api/internal/types"
 	"github.com/openai/openai-go"
 	"github.com/rs/zerolog"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 )
 
 const CTX_REQ_MODEL_KEY = "model"
@@ -32,6 +35,8 @@ func ExtractModelMiddleware(baseLogger *zerolog.Logger) func(next http.Handler) 
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
+
 			// Decode the request body into Payload struct
 			req := RequestWithModel{}
 
@@ -50,8 +55,18 @@ func ExtractModelMiddleware(baseLogger *zerolog.Logger) func(next http.Handler) 
 			// Replace the body bytes with a new ReadCloser
 			r.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 
+			// Create a span for JSON decoding
+			tracer := trace.SpanFromContext(ctx).
+				TracerProvider().
+				Tracer("extract_model_middleware")
+			ctx, jsonSpan := tracer.Start(ctx, "request.json.decode")
+
 			// Parse body for model field
 			if err := json.Unmarshal(bodyBytes, &req); err != nil {
+				// Add error information to the span
+				jsonSpan.SetStatus(codes.Error, "json decode error")
+				jsonSpan.RecordError(err)
+
 				// Respond with openai error
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusBadRequest)
@@ -63,11 +78,17 @@ func ExtractModelMiddleware(baseLogger *zerolog.Logger) func(next http.Handler) 
 					},
 				})
 
+				jsonSpan.End()
 				return
 			}
 
+			// Add model info to span
+			jsonSpan.SetAttributes(attribute.String("model", req.Model))
+			jsonSpan.SetAttributes(attribute.Int64("request_bytes", int64(len(bodyBytes))))
+			jsonSpan.End()
+
 			// Store the extracted field in the request context
-			ctx := context.WithValue(r.Context(), CTX_REQ_MODEL_KEY, req.Model)
+			ctx = context.WithValue(ctx, CTX_REQ_MODEL_KEY, req.Model)
 			logger.Debug().Str("model", req.Model).Msg("extracted model from request body")
 
 			// Call the next handler with the new context

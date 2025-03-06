@@ -13,6 +13,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+
 	chimiddleware "github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 
@@ -44,7 +46,13 @@ func main() {
 	logger.Info().Stringer("config", cfg).Msg("Load config from env")
 
 	// -------------------------------------------------------------------------
-	// Metrics registry
+	// OpenTelemetry tracing setup
+	shutdownOtel, err := setupOTelSDK(context.Background())
+	if err != nil {
+		logger.Fatal().Err(err).Msg("error setting up OpenTelemetry SDK")
+	}
+
+	// TODO: Migrate to using OpenTelemetry for metrics
 	metricsReg := prometheus.NewRegistry()
 
 	// Go runtime metrics and process collectors
@@ -60,7 +68,8 @@ func main() {
 
 	r := chi.NewRouter()
 
-	r.Use(chimiddleware.Recoverer) // Recover from panics, 500 response, logs stack trace
+	r.Use(chimiddleware.Recoverer)                // Recover from panics, 500 response, logs stack trace
+	r.Use(otelhttp.NewMiddleware("kavachat-api")) // OpenTelemetry tracing middleware
 
 	// Metrics re-use middleware for /v1/files routes to not duplicate metrics
 	// autoprom panics if the same handler name is used
@@ -192,12 +201,16 @@ func main() {
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
+	if err := shutdownOtel(shutdownCtx); err != nil {
+		logger.Error().Err(err).Msg("shutdown OpenTelemetry SDK err")
+	}
+
 	if err := metricsServer.Shutdown(shutdownCtx); err != nil {
-		logger.Fatal().Err(err).Msg("shutdown metrics server err")
+		logger.Error().Err(err).Msg("shutdown metrics server err")
 	}
 
 	if err := server.Shutdown(shutdownCtx); err != nil {
-		logger.Fatal().Err(err).Msg("shutdown API server err")
+		logger.Error().Err(err).Msg("shutdown API server err")
 	}
 
 	logger.Info().Msg("Server shut down")
