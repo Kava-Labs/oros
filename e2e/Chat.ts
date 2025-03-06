@@ -71,6 +71,19 @@ export class Chat {
     await this.page.getByTestId('chat-view-button').click();
   }
 
+  async waitForReasoningToBegin() {
+    await this.page.waitForResponse(async (res) => {
+      if (res.url().includes('completions')) {
+        const request = res.request();
+        const requestBody = JSON.parse(request.postData() || '{}');
+        if (requestBody.model === 'deepseek-r1') {
+          return true;
+        }
+      }
+      return false;
+    });
+  }
+
   async waitForStreamToFinish() {
     await this.page.waitForResponse(async (res) => {
       if (res.url().includes('completions')) {

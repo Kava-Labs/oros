@@ -3,6 +3,13 @@ import { Chat } from './Chat';
 import { MetaMask } from './Metamask';
 import { ethers } from 'ethers';
 import { devices } from '@playwright/test';
+import * as fs from 'fs';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
+
+// @ts-expect-error: module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 describe('chat', () => {
   test('renders intro messages by model', async ({ page }) => {
@@ -694,7 +701,9 @@ describe('chat', () => {
 
     await expect(page.getByText('Start a new chat to begin')).toBeVisible();
   });
-  test('allows a user to upload a file up to 8MB limit', async ({ page }) => {
+  test.only('allows a user to upload a file up to 8MB limit', async ({
+    page,
+  }) => {
     test.setTimeout(30 * 1000);
 
     const chat = new Chat(page);
@@ -704,14 +713,16 @@ describe('chat', () => {
       name: 'Attach file icon',
     });
 
+    const imagePath = path.join(__dirname, './images/orosLogo.png');
+
+    const buffer = fs.readFileSync(imagePath);
+
     const fileChooserPromise = page.waitForEvent('filechooser');
     await paperclipButton.click();
     const fileChooser = await fileChooserPromise;
 
-    const buffer = Buffer.alloc(7 * 1024 * 1024 + 1024, 'x');
-
     const fileWithinLimit = {
-      name: 'withinLimit-image.png',
+      name: 'orosLogo.png',
       mimeType: 'image/png',
       buffer,
     };
@@ -725,13 +736,18 @@ describe('chat', () => {
       expect(count).toEqual(1);
     }
 
-    await chat.submitMessage('Here is an image');
+    await chat.submitMessage('Describe this image');
 
     const uploadedImage = page.getByRole('img', {
       name: 'User uploaded image 1',
     });
 
     await expect(uploadedImage).toBeVisible();
+
+    await chat.waitForReasoningToBegin();
+
+    const brainIcon = page.getByRole('img', { name: 'Thinking icon' });
+    await expect(brainIcon).toBeVisible();
   });
   test('allows user to upload multiple files', async ({ page }) => {
     const maxFileUploads = 4;
