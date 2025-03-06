@@ -708,15 +708,18 @@ describe('chat', () => {
     await paperclipButton.click();
     const fileChooser = await fileChooserPromise;
 
-    const buffer = Buffer.alloc(7 * 1024 * 1024 + 1024, 'x');
+    const buffer = Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+      'base64',
+    );
 
-    const fileWithinLimit = {
-      name: 'withinLimit-image.png',
-      mimeType: 'image/png',
+    const testImage = {
+      name: 'test-image.jpeg',
+      mimeType: 'image/jpeg',
       buffer,
     };
 
-    await fileChooser.setFiles([fileWithinLimit]);
+    await fileChooser.setFiles([testImage]);
 
     const imagePreviewContainer = page.locator('.imagePreviewContainer');
     if (await imagePreviewContainer.isVisible()) {
@@ -724,6 +727,14 @@ describe('chat', () => {
       const count = await imageCards.count();
       expect(count).toEqual(1);
     }
+
+    await chat.submitMessage('Here is an image');
+
+    const uploadedImage = page.getByRole('img', {
+      name: 'User uploaded image 1',
+    });
+
+    await expect(uploadedImage).toBeVisible();
   });
   test('allows user to upload multiple files', async ({ page }) => {
     const maxFileUploads = 4;
@@ -758,6 +769,15 @@ describe('chat', () => {
       const imageCards = page.locator('.imageCard');
       const count = await imageCards.count();
       expect(count).toEqual(4);
+    }
+
+    await chat.submitMessage('Here are multiple images');
+
+    for (let i = 1; i <= maxFileUploads; i++) {
+      const uploadedImage = page.getByRole('img', {
+        name: `User uploaded image ${i}`,
+      });
+      await expect(uploadedImage).toBeVisible();
     }
   });
   test('shows error when trying to upload too many files', async ({ page }) => {
