@@ -23,6 +23,7 @@ jobs:
     env:
       VITE_OPENAI_BASE_URL: https://kavachat-api.production.kava.io/openai/v1
       VITE_FEAT_UPDATED_DESIGN: true
+      VITE_FEAT_SUPPORT_FILE_UPLOAD: false
     outputs:
       changed: ${{ steps.diff.outputs.diff != '' }}
     steps:
