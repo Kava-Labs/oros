@@ -79,6 +79,7 @@ export const ThinkingContent = ({
             style={{
               opacity: isExpanded ? 1 : 0.7,
             }}
+            aria-label="thinking"
           />
         </div>
 
@@ -92,6 +93,9 @@ export const ThinkingContent = ({
           style={{
             transform: isExpanded ? 'rotate(180deg)' : 'none',
           }}
+          aria-label={
+            isExpanded ? 'collapse thinking conent' : 'expand thinking conent'
+          }
         />
       </button>
 

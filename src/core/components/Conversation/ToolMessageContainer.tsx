@@ -17,7 +17,7 @@ import {
   ChatCompletionToolMessageParam,
 } from 'openai/resources/index';
 
-interface ToolMessageContainerProps {
+export interface ToolMessageContainerProps {
   message: ChatCompletionToolMessageParam;
   prevMessage: ChatCompletionAssistantMessageParam;
   onRendered: () => void;
