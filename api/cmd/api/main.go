@@ -64,6 +64,7 @@ func main() {
 
 	// /v1/ custom routes
 	r.Route("/v1", func(r chi.Router) {
+		// OpenTelemetry tracing and metrics middleware without model
 		r.Use(otelhttp.NewMiddleware(
 			"kavachat-api",
 			otelhttp.WithMetricAttributesFn(func(r *http.Request) []attribute.KeyValue {
@@ -73,7 +74,7 @@ func main() {
 
 				return attrs
 			}),
-		)) // OpenTelemetry tracing and metrics middleware
+		))
 
 		r.Get("/healthcheck", func(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintln(w, "available")
@@ -124,7 +125,6 @@ func main() {
 					attribute.String("path", r.URL.Path),
 				}
 
-				// Not all routes have model
 				model, ok := r.Context().Value(middleware.CTX_REQ_MODEL_KEY).(string)
 				if ok {
 					attrs = append(attrs, attribute.String("model", model))
