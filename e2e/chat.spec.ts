@@ -701,9 +701,7 @@ describe('chat', () => {
 
     await expect(page.getByText('Start a new chat to begin')).toBeVisible();
   });
-  test.only('allows a user to upload a file up to 8MB limit', async ({
-    page,
-  }) => {
+  test('allows a user to upload a file up to 8MB limit', async ({ page }) => {
     test.setTimeout(30 * 1000);
 
     const chat = new Chat(page);
