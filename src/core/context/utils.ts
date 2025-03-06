@@ -39,7 +39,7 @@ const analyzeImage = async (
 ) => {
   const data = await client.chat.completions.create({
     model: 'qwen2.5-vl-7b-instruct',
-    messages: [msg], // todo: add system prompt for qwen
+    messages: [msg],
   });
 
   console.log(data);
