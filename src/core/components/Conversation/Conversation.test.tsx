@@ -3,6 +3,7 @@ import { vi } from 'vitest';
 import { Conversation } from './Conversation';
 import { useAppContext } from '../../context/useAppContext';
 import { useMessageHistory } from '../../hooks/useMessageHistory';
+import { ToolMessageContainerProps } from './ToolMessageContainer';
 
 // Mock the required modules and hooks
 // TODO: Consider using AppContext so the data structure remains
@@ -46,9 +47,15 @@ vi.mock('./AssistantMessage', () => ({
 
 // Mock the child components to reduce other component dependencies
 vi.mock('./ToolMessageContainer', () => ({
-  ToolMessageContainer: ({ message, onRendered }: any) => (
+  ToolMessageContainer: ({
+    message,
+    onRendered,
+  }: ToolMessageContainerProps) => (
     <div data-testid="tool-message" onClick={onRendered}>
-      Tool: {message.content}
+      Tool:{' '}
+      {typeof message.content === 'string'
+        ? message.content
+        : JSON.stringify(message.content)}
     </div>
   ),
 }));
@@ -94,7 +101,7 @@ describe('Conversation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    (useAppContext as any).mockReturnValue({
+    (useAppContext as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
       errorStore: {
         subscribe: mockSubscribe,
         getSnapshot: mockGetSnapshot,
@@ -102,7 +109,7 @@ describe('Conversation', () => {
       isRequesting: false,
     });
 
-    (useMessageHistory as any).mockReturnValue({
+    (useMessageHistory as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
       messages: [],
     });
   });
@@ -115,7 +122,7 @@ describe('Conversation', () => {
   });
 
   it('renders user messages correctly', () => {
-    (useMessageHistory as any).mockReturnValue({
+    (useMessageHistory as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
       messages: [
         { role: 'user', content: 'Hello' },
         { role: 'user', content: 'How are you?' },
@@ -131,7 +138,7 @@ describe('Conversation', () => {
   });
 
   it('renders assistant messages correctly', () => {
-    (useMessageHistory as any).mockReturnValue({
+    (useMessageHistory as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
       messages: [
         { role: 'assistant', content: 'I am an AI assistant' },
         {
@@ -154,7 +161,7 @@ describe('Conversation', () => {
   });
 
   it('renders tool messages correctly', () => {
-    (useMessageHistory as any).mockReturnValue({
+    (useMessageHistory as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
       messages: [
         { role: 'assistant', content: 'I will use a tool' },
         { role: 'tool', content: 'Tool response' },
@@ -172,7 +179,7 @@ describe('Conversation', () => {
   });
 
   it('renders streaming message when isRequesting is true', () => {
-    (useAppContext as any).mockReturnValue({
+    (useAppContext as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
       errorStore: {
         subscribe: mockSubscribe,
         getSnapshot: mockGetSnapshot,
@@ -188,7 +195,7 @@ describe('Conversation', () => {
   it('renders error message when error exists', () => {
     const mockErrorText = 'An error occurred';
 
-    (useAppContext as any).mockReturnValue({
+    (useAppContext as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
       errorStore: {
         subscribe: mockSubscribe,
         getSnapshot: vi.fn().mockReturnValue(mockErrorText),
@@ -206,7 +213,7 @@ describe('Conversation', () => {
   it('passes onRendered to error, streaming, and tool call progress components', () => {
     const mockErrorText = 'An error occurred';
 
-    (useAppContext as any).mockReturnValue({
+    (useAppContext as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
       errorStore: {
         subscribe: mockSubscribe,
         getSnapshot: vi.fn().mockReturnValue(mockErrorText),

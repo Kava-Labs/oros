@@ -13,7 +13,6 @@ vi.mock('../../../shared/theme/useTheme', () => ({
 
 describe('ThinkingContent', () => {
   const mockContent = 'This is thinking content\nWith multiple lines\nOf text';
-  const mockOnRendered = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
