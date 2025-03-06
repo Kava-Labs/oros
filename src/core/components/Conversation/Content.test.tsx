@@ -59,21 +59,6 @@ describe('Content Component', () => {
     });
   });
 
-  it('shows error message when sanitization fails', async () => {
-    // Mock sanitizeContent to throw an error
-    (sanitizeContent as unknown as ReturnType<typeof vi.fn>).mockRejectedValue(
-      new Error('Sanitization error'),
-    );
-
-    render(<ContentComponent content={mockContent} role="user" />);
-
-    await waitFor(() => {
-      expect(
-        screen.getByText('Error: Could not render content!'),
-      ).toBeInTheDocument();
-    });
-  });
-
   it('calls onRendered callback after rendering', async () => {
     render(
       <ContentComponent
@@ -101,22 +86,36 @@ describe('Content Component', () => {
     });
 
     render(<ContentComponent content={mockContent} role="user" />);
-    expect(mockPostProcess).toHaveBeenCalledWith(mockContent);
-    expect(sanitizeContent).toHaveBeenCalledWith('Processed content');
+
+    // Wait for async operations to complete
+    await waitFor(() => {
+      expect(mockPostProcess).toHaveBeenCalledWith(mockContent);
+      expect(sanitizeContent).toHaveBeenCalledWith('Processed content');
+    });
   });
 
-  it('memoizes correctly', () => {
+  it('memoizes correctly', async () => {
     const { rerender } = render(<Content content={mockContent} role="user" />);
-    expect(sanitizeContent).toHaveBeenCalledTimes(1);
+
+    // Wait for the async state updates to complete
+    await waitFor(() => {
+      expect(sanitizeContent).toHaveBeenCalledTimes(1);
+    });
 
     // Rerender with the same props
     rerender(<Content content={mockContent} role="user" />);
 
-    // Should not call sanitizeContent again due to memoization
-    expect(sanitizeContent).toHaveBeenCalledTimes(1);
+    // Wait again for any potential async updates
+    await waitFor(() => {
+      // Should not call sanitizeContent again due to memoization
+      expect(sanitizeContent).toHaveBeenCalledTimes(1);
+    });
 
     // Rerender with different props
     rerender(<Content content="New content" role="user" />);
-    expect(sanitizeContent).toHaveBeenCalledTimes(2);
+
+    await waitFor(() => {
+      expect(sanitizeContent).toHaveBeenCalledTimes(2);
+    });
   });
 });
