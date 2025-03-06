@@ -42,8 +42,8 @@ const analyzeImage = async (
     messages: [msg],
   });
 
-  console.log(data);
 
+  
   // todo: needs better error handling
   if (!data.choices) {
     return JSON.stringify(data);
