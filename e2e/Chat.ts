@@ -71,7 +71,7 @@ export class Chat {
     await this.page.getByTestId('chat-view-button').click();
   }
 
-  async waitForReasoningToBegin() {
+  async waitForReasoningResponseToBegin() {
     await this.page.waitForResponse(async (res) => {
       if (res.url().includes('completions')) {
         const request = res.request();

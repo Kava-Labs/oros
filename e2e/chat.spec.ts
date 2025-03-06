@@ -744,7 +744,7 @@ describe('chat', () => {
 
     await expect(uploadedImage).toBeVisible();
 
-    await chat.waitForReasoningToBegin();
+    await chat.waitForReasoningResponseToBegin();
 
     const brainIcon = page.getByRole('img', { name: 'Thinking icon' });
     await expect(brainIcon).toBeVisible();
