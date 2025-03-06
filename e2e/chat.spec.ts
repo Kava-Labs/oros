@@ -3,6 +3,8 @@ import { Chat } from './Chat';
 import { MetaMask } from './Metamask';
 import { ethers } from 'ethers';
 import { devices } from '@playwright/test';
+import * as fs from 'fs';
+import { join } from 'path';
 
 describe('chat', () => {
   test('renders intro messages by model', async ({ page }) => {
@@ -693,5 +695,203 @@ describe('chat', () => {
     await expect(searchButton).toBeDisabled();
 
     await expect(page.getByText('Start a new chat to begin')).toBeVisible();
+  });
+  test('allows a user to upload a file up to 8MB limit', async ({ page }) => {
+    test.setTimeout(30 * 1000);
+
+    const chat = new Chat(page);
+    await chat.goto();
+
+    const paperclipButton = page.getByRole('button', {
+      name: 'Attach file icon',
+    });
+
+    const imagePath = join(process.cwd(), 'e2e/images/orosLogo.png');
+
+    const buffer = fs.readFileSync(imagePath);
+
+    const fileChooserPromise = page.waitForEvent('filechooser');
+    await paperclipButton.click();
+    const fileChooser = await fileChooserPromise;
+
+    const fileWithinLimit = {
+      name: 'orosLogo.png',
+      mimeType: 'image/png',
+      buffer,
+    };
+
+    await fileChooser.setFiles([fileWithinLimit]);
+
+    const imagePreviewContainer = page.locator('.imagePreviewContainer');
+    if (await imagePreviewContainer.isVisible()) {
+      const imageCards = page.locator('.imageCard');
+      const count = await imageCards.count();
+      expect(count).toEqual(1);
+    }
+
+    await chat.submitMessage('Describe this image');
+
+    const uploadedImage = page.getByRole('img', {
+      name: 'User uploaded image 1',
+    });
+
+    await expect(uploadedImage).toBeVisible();
+  });
+  test('allows user to upload multiple files', async ({ page }) => {
+    const maxFileUploads = 4;
+    test.setTimeout(30 * 1000);
+
+    const chat = new Chat(page);
+    await chat.goto();
+
+    const paperclipButton = page.getByRole('button', {
+      name: 'Attach file icon',
+    });
+
+    const fileChooserPromise = page.waitForEvent('filechooser');
+    await paperclipButton.click();
+    const fileChooser = await fileChooserPromise;
+
+    const buffer = Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+      'base64',
+    );
+
+    const withinLimitSupportedFiles = [...Array(maxFileUploads)].map(() => ({
+      name: 'test-image.png',
+      mimeType: 'image/png',
+      buffer,
+    }));
+
+    await fileChooser.setFiles(withinLimitSupportedFiles);
+
+    const imagePreviewContainer = page.locator('.imagePreviewContainer');
+    if (await imagePreviewContainer.isVisible()) {
+      const imageCards = page.locator('.imageCard');
+      const count = await imageCards.count();
+      expect(count).toEqual(4);
+    }
+
+    await chat.submitMessage('Here are multiple images');
+
+    for (let i = 1; i <= maxFileUploads; i++) {
+      const uploadedImage = page.getByRole('img', {
+        name: `User uploaded image ${i}`,
+      });
+      await expect(uploadedImage).toBeVisible();
+    }
+  });
+  test('shows error when trying to upload too many files', async ({ page }) => {
+    const maxFileUploads = 4;
+    test.setTimeout(30 * 1000);
+
+    const chat = new Chat(page);
+    await chat.goto();
+
+    const paperclipButton = page.getByRole('button', {
+      name: 'Attach file icon',
+    });
+
+    const fileChooserPromise = page.waitForEvent('filechooser');
+    await paperclipButton.click();
+    const fileChooser = await fileChooserPromise;
+
+    const buffer = Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+      'base64',
+    );
+
+    const overLimitSupportedFiles = [...Array(maxFileUploads + 1)].map(() => ({
+      name: 'test-image.png',
+      mimeType: 'image/png',
+      buffer,
+    }));
+
+    await fileChooser.setFiles(overLimitSupportedFiles);
+
+    const errorMessage = page.getByText('Maximum 4 files allowed');
+    await expect(errorMessage).toBeVisible();
+
+    //  Verify the error message clears
+    await page.waitForTimeout(2500);
+    await expect(errorMessage).not.toBeVisible();
+  });
+  test('shows error when trying to upload a file larger than 8MB', async ({
+    page,
+  }) => {
+    test.setTimeout(30 * 1000);
+
+    const chat = new Chat(page);
+    await chat.goto();
+
+    const paperclipButton = page.getByRole('button', {
+      name: 'Attach file icon',
+    });
+
+    const fileChooserPromise = page.waitForEvent('filechooser');
+    await paperclipButton.click();
+    const fileChooser = await fileChooserPromise;
+
+    //  9MB
+    const largeBuffer = Buffer.alloc(9 * 1024 * 1024 + 1024, 'x');
+
+    const oversizedFile = {
+      name: 'oversized-image.png',
+      mimeType: 'image/png',
+      buffer: largeBuffer,
+    };
+
+    await fileChooser.setFiles([oversizedFile]);
+
+    const errorMessage = page.getByText(
+      'File too large! Maximum file size is 8MB.',
+    );
+    await expect(errorMessage).toBeVisible();
+
+    await page.waitForTimeout(2500);
+    await expect(errorMessage).not.toBeVisible();
+  });
+
+  test('uploading multiple files handled independently', async ({ page }) => {
+    test.setTimeout(30 * 1000);
+
+    const chat = new Chat(page);
+    await chat.goto();
+
+    const paperclipButton = page.getByRole('button', {
+      name: 'Attach file icon',
+    });
+
+    const fileChooserPromise = page.waitForEvent('filechooser');
+    await paperclipButton.click();
+    const fileChooser = await fileChooserPromise;
+
+    //  9MB
+    const largeBuffer = Buffer.alloc(9 * 1024 * 1024 + 1024, 'x');
+
+    const oversizedFile = {
+      name: 'oversized-image.png',
+      mimeType: 'image/png',
+      buffer: largeBuffer,
+    };
+
+    //  7MB
+    const bufferWithinLimit = Buffer.alloc(7 * 1024 * 1024 + 1024, 'x');
+
+    const fileWithinLimit = {
+      name: 'withinLimit-image.png',
+      mimeType: 'image/png',
+      buffer: bufferWithinLimit,
+    };
+
+    await fileChooser.setFiles([oversizedFile, fileWithinLimit]);
+
+    //  Verify that the 7MB file was uploaded
+    const imagePreviewContainer = page.locator('.imagePreviewContainer');
+    if (await imagePreviewContainer.isVisible()) {
+      const imageCards = page.locator('.imageCard');
+      const count = await imageCards.count();
+      expect(count).toEqual(1);
+    }
   });
 });

@@ -10,27 +10,14 @@ import { createRoot } from 'react-dom/client';
 import './shared/theme/global.css';
 import '@fontsource/inter/300.css';
 import '@fontsource/inter/300-italic.css';
-
 import '@fontsource/inter/400.css';
 import '@fontsource/inter/400-italic.css';
-
 import '@fontsource/inter/500.css';
 import '@fontsource/inter/500-italic.css';
-
 import '@fontsource/inter/600.css';
 import '@fontsource/inter/600-italic.css';
-
 import '@fontsource/inter/700.css';
 import '@fontsource/inter/700-italic.css';
-// import { idbDatabase } from './utils';
-
-// idbDatabase()
-//   .then(() => {
-//     console.debug('indexedDB initialized');
-//   })
-//   .catch((err) => {
-//     console.error('failed to open indexedDB', err);
-//   });
 
 //
 // Components & Context
@@ -47,6 +34,15 @@ import {
   toolCallStreamStore,
   errorStore,
 } from './core/stores/stores.ts';
+import { idbDatabase } from './core/utils/idb/idb.ts';
+
+idbDatabase()
+  .then(() => {
+    console.debug('indexedDB initialized');
+  })
+  .catch((err) => {
+    console.error('failed to open indexedDB', err);
+  });
 
 //
 // Render!

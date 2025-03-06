@@ -12,7 +12,13 @@ import {
   isToolCallChunk,
 } from '../utils/streamUtils';
 import { formatConversationTitle } from '../utils/conversation/helpers';
-import { ChatCompletionChunk } from 'openai/resources/index';
+import {
+  ChatCompletionChunk,
+  ChatCompletionContentPart,
+  ChatCompletionMessageParam,
+} from 'openai/resources/index';
+import { getImage } from '../utils/idb/idb';
+import { visionModelPrompt } from '../../features/reasoning/config/prompts/defaultPrompts';
 
 export const newConversation = () => {
   return {
@@ -25,6 +31,27 @@ export const newConversation = () => {
     toolCallStreamStore: new ToolCallStreamStore(),
     isRequesting: false,
   };
+};
+
+const analyzeImage = async (
+  client: OpenAI,
+  msg: ChatCompletionMessageParam,
+) => {
+  const data = await client.chat.completions.create({
+    model: 'qwen2.5-vl-7b-instruct',
+    messages: [msg],
+  });
+
+  console.log(data);
+
+  // todo: needs better error handling
+  if (!data.choices) {
+    return JSON.stringify(data);
+  }
+
+  const imageDetails = data.choices[0].message.content;
+
+  return imageDetails ? imageDetails : '';
 };
 
 /**
@@ -114,6 +141,71 @@ export async function doChat(
 ) {
   progressStore.setText('Thinking');
   const { id, tools } = modelConfig;
+
+  const lastMsg =
+    messageHistoryStore.getSnapshot()[
+      messageHistoryStore.getSnapshot().length - 1
+    ];
+
+  let isFileUpload = false;
+  const imageIDs: string[] = [];
+  let userPromptForImage = '';
+
+  const visionModelMsg: ChatCompletionMessageParam = {
+    role: 'user',
+    content: [
+      {
+        type: 'text',
+        text: visionModelPrompt,
+      },
+    ],
+  };
+
+  // if the last user message is a file upload
+  // take the id out of the image_url and replace it with the base64 imageURL from idb
+  if (lastMsg && Array.isArray(lastMsg.content)) {
+    for (const content of lastMsg.content) {
+      if (content.type === 'image_url') {
+        isFileUpload = true;
+        imageIDs.push(content.image_url.url);
+        const img = await getImage(content.image_url.url);
+        (visionModelMsg.content as ChatCompletionContentPart[]).push({
+          type: 'image_url',
+          image_url: {
+            url: img ? img.data : 'image not found!',
+          },
+        });
+      }
+      if (content.type === 'text') {
+        userPromptForImage = content.text;
+      }
+    }
+  }
+
+  if (isFileUpload) {
+    const imageDetails = await analyzeImage(client, visionModelMsg);
+
+    messageHistoryStore.setMessages([
+      ...messageHistoryStore.getSnapshot().slice(0, -1),
+      {
+        role: 'system',
+        content: JSON.stringify(
+          {
+            context: 'User Image Uploaded and Analyzed by a vision model',
+            imageIDs,
+            imageDetails,
+          },
+          null,
+          2,
+        ),
+      },
+      {
+        role: 'user',
+        content: userPromptForImage,
+      },
+    ]);
+  }
+
   try {
     // Create a copy of messages without reasoningContent to stream to the model
     // but don't modify the original messages in the store which we will render to the UI
@@ -128,7 +220,6 @@ export async function doChat(
       });
 
     let finalChunk: ChatCompletionChunk | undefined;
-
     const stream = await client.chat.completions.create(
       {
         model: id,
@@ -234,7 +325,6 @@ export async function doChat(
         conversationID,
       );
     }
-
     syncWithLocalStorage(
       conversationID,
       modelConfig,

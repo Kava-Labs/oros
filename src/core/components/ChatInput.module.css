@@ -16,7 +16,6 @@
   flex: 1;
 }
 
-
 .input {
   width: 100%;
   background-color: transparent;
@@ -87,4 +86,100 @@
     border: 1px solid var(--colors-accentTransparent);
     border-radius: 50%;
   }
+}
+
+.uploadInputFieldContainer {
+  margin-left: var(--spacing-xs);
+  margin-right: var(--spacing-xs);
+}
+
+.uploadInputField {
+  display: none;
+}
+
+.imagePreviewContainer {
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--borderRadius-md);
+  background-color: var(--colors-bgTertiary);
+  padding: var(--spacing-sm);
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.imagePreviewWrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.imageCard {
+  position: relative;
+  width: 5.6rem;
+  height: 5.6rem;
+  border-radius: var(--borderRadius-xs);
+  overflow: hidden;
+}
+
+.cardImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.imageCard:hover .cardImage {
+  transform: scale(1.05);
+}
+
+.removeButton {
+  position: absolute;
+  top: -0.1rem;
+  left: -0.2rem;
+  width: var(--spacing-md);
+  height: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--colors-bgQuaternary);
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.removeButton:hover {
+  background-color: var(--colors-bgSecondary);
+}
+
+
+.attachIcon {
+  margin-right: var(--spacing-xs);
+}
+
+.attachIcon:hover {
+  background-color: var(--colors-bgPrimary);
+}
+
+.active {
+  border: 2px dashed var(--colors-accentTwoTransparent);
+  transition: all 0.2s ease;
+}
+
+.dropZone {
+  width: 100%;
+  min-height: 30px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--colors-accentTwoTransparent);
+  font-weight: 500;
+  background-color: transparent;
+  padding-top: var(--spacing-xs);
+  text-align: center;
+}
+
+.dropZoneError {
+  color: var(--colors-accentTransparent);
+  border-color: var(--colors-accentTransparent);
 }

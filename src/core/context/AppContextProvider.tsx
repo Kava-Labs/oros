@@ -19,8 +19,8 @@ import { ActiveConversation, ConversationHistory } from './types';
 import { getToken } from '../../core/utils/token/token';
 import OpenAI from 'openai';
 import { v4 as uuidv4 } from 'uuid';
-import { doChat, syncWithLocalStorage } from './utils';
-import { newConversation } from './utils';
+import { doChat, syncWithLocalStorage, newConversation } from './utils';
+import type { ChatCompletionContentPart } from 'openai/resources/index';
 
 let client: OpenAI | null = null;
 
@@ -215,7 +215,7 @@ export const AppContextProvider = (props: {
   const controllerRef = useRef<AbortController | null>(null);
 
   const handleChatCompletion = useCallback(
-    async (value: string) => {
+    async (value: string | Array<ChatCompletionContentPart>) => {
       if (isRequesting) {
         return;
       }
