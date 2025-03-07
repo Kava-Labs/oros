@@ -9,6 +9,12 @@ import (
 
 	"go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel/attribute"
+)
+
+const (
+	CTX_CLIENT_REQ_MODEL_KEY   = "model"
+	CTX_CLIENT_REQ_BACKEND_KEY = "backend"
 )
 
 // OpenAIPassthroughClient is a client for the OpenAI API
@@ -30,6 +36,21 @@ func NewOpenAIClient(baseURL, apiKey string) *OpenAIPassthroughClient {
 				http.DefaultTransport,
 				otelhttp.WithClientTrace(func(ctx context.Context) *httptrace.ClientTrace {
 					return otelhttptrace.NewClientTrace(ctx)
+				}),
+				otelhttp.WithMetricAttributesFn(func(r *http.Request) []attribute.KeyValue {
+					attrs := []attribute.KeyValue{}
+
+					model, ok := r.Context().Value(CTX_CLIENT_REQ_MODEL_KEY).(string)
+					if ok {
+						attrs = append(attrs, attribute.String("model", model))
+					}
+
+					backend, ok := r.Context().Value(CTX_CLIENT_REQ_BACKEND_KEY).(string)
+					if ok {
+						attrs = append(attrs, attribute.String("backend", backend))
+					}
+
+					return attrs
 				}),
 			),
 		},
@@ -75,4 +96,14 @@ func (c *OpenAIPassthroughClient) DoRequest(
 	req.Header.Add("Content-Type", "application/json")
 
 	return c.client.Do(req)
+}
+
+// AddModelToContext adds the model string to the context
+func AddModelToContext(ctx context.Context, model string) context.Context {
+	return context.WithValue(ctx, CTX_CLIENT_REQ_MODEL_KEY, model)
+}
+
+// AddBackendToContext adds the backend string to the context
+func AddBackendToContext(ctx context.Context, backend string) context.Context {
+	return context.WithValue(ctx, CTX_CLIENT_REQ_BACKEND_KEY, backend)
 }
