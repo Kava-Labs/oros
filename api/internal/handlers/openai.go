@@ -10,6 +10,7 @@ import (
 	"github.com/kava-labs/kavachat/api/internal/config"
 	"github.com/kava-labs/kavachat/api/internal/middleware"
 	"github.com/kava-labs/kavachat/api/internal/otel"
+	"github.com/kava-labs/kavachat/api/internal/types"
 	"github.com/rs/zerolog"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
@@ -142,6 +143,8 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	)
 
 	client := backend.GetClient()
+	ctx = types.AddBackendToContext(ctx, backend.Name)
+	ctx = types.AddModelToContext(ctx, model)
 
 	proxySpan.SetAttributes(attribute.String("model", model))
 
