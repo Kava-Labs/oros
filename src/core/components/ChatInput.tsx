@@ -12,13 +12,21 @@ import { IdbImage } from './IdbImage';
 import ButtonIcon from './ButtonIcon';
 import { useTheme } from '../../shared/theme/useTheme';
 import { ChatCompletionContentPart } from 'openai/resources/index';
+import { PDFiumLibrary } from '@hyzyla/pdfium/browser/base64';
+
+const library = await PDFiumLibrary.init();
 
 const SUPPORT_FILE_UPLOAD =
   import.meta.env.VITE_FEAT_SUPPORT_FILE_UPLOAD === 'true';
 
 const DEFAULT_HEIGHT = '30px';
 
-const SUPPORTED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const SUPPORTED_FILE_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'application/pdf',
+];
 
 const MAX_FILE_UPLOADS = 4;
 
@@ -222,12 +230,31 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
 
       const reader = new FileReader();
       reader.onload = async (e) => {
+        console.log(e.target?.result);
         if (e.target && typeof e.target.result === 'string') {
           const imgID = await saveImage(e.target.result);
           setImageIDs((prevIDs) => [...prevIDs, imgID]);
+        } else if (e.target?.result instanceof ArrayBuffer) {
+          const buf = new Uint8Array(e.target.result);
+          const doc = await library.loadDocument(buf);
+
+          const page = doc.getPage(0);
+          const image = await page.render({ scale: 3, render: 'bitmap' });
+          const base64ImageURL = await bitmapToBase64ImageURL(
+            image.data,
+            image.width,
+            image.height,
+          );
+          const imgID = await saveImage(base64ImageURL);
+          setImageIDs((prevIDs) => [...prevIDs, imgID]);
         }
       };
-      reader.readAsDataURL(file);
+
+      if (file.type === 'application/pdf') {
+        reader.readAsArrayBuffer(file);
+      } else {
+        reader.readAsDataURL(file);
+      }
     },
     [resetUploadState, hasAvailableUploads],
   );
@@ -532,5 +559,28 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     </>
   );
 };
+
+function bitmapToBase64ImageURL(
+  buffer: Uint8Array,
+  width: number,
+  height: number,
+): Promise<string> {
+  return new Promise((resolve) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+
+    const imageData = new ImageData(
+      new Uint8ClampedArray(buffer),
+      width,
+      height,
+    );
+    ctx!.putImageData(imageData, 0, 0);
+
+    const base64Image = canvas.toDataURL('image/png');
+    resolve(base64Image);
+  });
+}
 
 export default ChatInput;
