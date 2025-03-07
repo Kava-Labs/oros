@@ -89,14 +89,6 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
                         id={imageID}
                         aria-label={`User uploaded image ${i + 1}`}
                         onLoad={() => handleImageLoad(imageID)}
-                        style={{
-                          visibility: loadedImages[imageID]
-                            ? 'visible'
-                            : 'hidden',
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                        }}
                       />
                     </div>
                   ))
