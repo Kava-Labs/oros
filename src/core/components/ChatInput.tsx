@@ -564,13 +564,11 @@ function bitmapToBase64ImageURL(
   height: number,
 ): Promise<string> {
   return new Promise((resolve) => {
-    // Create a canvas
     const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
     const ctx = canvas.getContext('2d');
 
-    // Convert buffer to ImageData and put it on the canvas
     const imageData = new ImageData(
       new Uint8ClampedArray(buffer),
       width,
@@ -578,8 +576,7 @@ function bitmapToBase64ImageURL(
     );
     ctx!.putImageData(imageData, 0, 0);
 
-    // Convert canvas to Base64
-    const base64Image = canvas.toDataURL('image/png'); // Change format if needed
+    const base64Image = canvas.toDataURL('image/png');
     resolve(base64Image);
   });
 }
