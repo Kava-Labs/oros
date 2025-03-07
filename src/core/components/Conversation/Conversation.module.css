@@ -34,11 +34,11 @@
   .content {
     color: var(--colors-textTertiary);
     font-size: 1.5rem;
+  }
 
-    p::after {
-      content: '.';
-      animation: dots 1.5s steps(5, end) infinite;
-    }
+  p::after {
+    content: '.';
+    animation: dots 1.5s steps(5, end) infinite;
   }
 }
 

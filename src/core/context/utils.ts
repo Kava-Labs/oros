@@ -42,8 +42,6 @@ const analyzeImage = async (
     messages: [msg],
   });
 
-
-  
   // todo: needs better error handling
   if (!data.choices) {
     return JSON.stringify(data);
@@ -167,6 +165,7 @@ export async function doChat(
     for (const content of lastMsg.content) {
       if (content.type === 'image_url') {
         isFileUpload = true;
+        progressStore.setText('Analyzing image');
         imageIDs.push(content.image_url.url);
         const img = await getImage(content.image_url.url);
         (visionModelMsg.content as ChatCompletionContentPart[]).push({
