@@ -137,7 +137,6 @@ export async function doChat(
   executeOperation: ExecuteOperation,
   conversationID: string,
 ) {
-  progressStore.setText('Thinking');
   const { id, tools } = modelConfig;
 
   const lastMsg =
@@ -179,6 +178,8 @@ export async function doChat(
       }
     }
   }
+
+  progressStore.setText(isFileUpload ? 'Analyzing image' : 'Thinking');
 
   if (isFileUpload) {
     const imageDetails = await analyzeImage(client, visionModelMsg);
