@@ -14,7 +14,6 @@ import { useTheme } from '../../shared/theme/useTheme';
 import { ChatCompletionContentPart } from 'openai/resources/index';
 import { PDFiumLibrary } from '@hyzyla/pdfium/browser/base64';
 
-
 const library = await PDFiumLibrary.init();
 
 const SUPPORT_FILE_UPLOAD =
@@ -240,8 +239,14 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
           const doc = await library.loadDocument(buf);
 
           const page = doc.getPage(0);
-          const image = await page.render();
-          // convert to a base 64 image url and saveImage
+          const image = await page.render({ scale: 3, render: 'bitmap' });
+          const base64ImageURL = await bitmapToBase64ImageURL(
+            image.data,
+            image.width,
+            image.height,
+          );
+          const imgID = await saveImage(base64ImageURL);
+          setImageIDs((prevIDs) => [...prevIDs, imgID]);
         }
       };
 
@@ -552,5 +557,31 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     </>
   );
 };
+
+function bitmapToBase64ImageURL(
+  buffer: Uint8Array<ArrayBufferLike>,
+  width: number,
+  height: number,
+): Promise<string> {
+  return new Promise((resolve) => {
+    // Create a canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+
+    // Convert buffer to ImageData and put it on the canvas
+    const imageData = new ImageData(
+      new Uint8ClampedArray(buffer),
+      width,
+      height,
+    );
+    ctx!.putImageData(imageData, 0, 0);
+
+    // Convert canvas to Base64
+    const base64Image = canvas.toDataURL('image/png'); // Change format if needed
+    resolve(base64Image);
+  });
+}
 
 export default ChatInput;
