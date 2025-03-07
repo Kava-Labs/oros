@@ -65,18 +65,20 @@ func main() {
 	// /v1/ custom routes
 	r.Route("/v1", func(r chi.Router) {
 		// OpenTelemetry tracing and metrics middleware without model
-		r.Use(otelhttp.NewMiddleware(
+		metricsMiddleware := otelhttp.NewMiddleware(
 			"kavachat-api",
 			otelhttp.WithMetricAttributesFn(func(r *http.Request) []attribute.KeyValue {
 				attrs := []attribute.KeyValue{
+					// TODO: Disable for non-matching paths
+					// New metric created for random paths
 					attribute.String("path", r.URL.Path),
 				}
 
 				return attrs
 			}),
-		))
+		)
 
-		r.Get("/healthcheck", func(w http.ResponseWriter, r *http.Request) {
+		r.With(metricsMiddleware).Get("/healthcheck", func(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintln(w, "available")
 		})
 
@@ -88,6 +90,7 @@ func main() {
 			logger,
 		)
 		r.With(
+			metricsMiddleware,
 			// Need to set real IP
 			chimiddleware.RealIP,
 			// Before rate limiter
@@ -106,7 +109,7 @@ func main() {
 			cfg.S3PathStyleRequests,
 			logger,
 		)
-		r.Get(
+		r.With(metricsMiddleware).Get(
 			"/files/{file_id}",
 			downloadHandler.ServeHTTP,
 		)
@@ -117,8 +120,11 @@ func main() {
 		r.Use(middleware.PreflightMiddleware)
 		r.Use(middleware.ExtractModelMiddleware(logger))
 		r.Use(middleware.ModelAllowlistMiddleware(logger, cfg.Backends))
-		// Register after model extract to get model from context
-		r.Use(otelhttp.NewMiddleware(
+
+		// Do not use r.Use as it will match every /openai/v1/* route, only
+		// want to match specific routes.
+		// Needs to run after ExtractModelMiddleware.
+		openaiMetrics := otelhttp.NewMiddleware(
 			"kavachat-api",
 			otelhttp.WithMetricAttributesFn(func(r *http.Request) []attribute.KeyValue {
 				attrs := []attribute.KeyValue{
@@ -132,10 +138,10 @@ func main() {
 
 				return attrs
 			}),
-		))
+		)
 
 		chatCompletionsRoute := "/chat/completions"
-		r.Handle(
+		r.With(openaiMetrics).Handle(
 			chatCompletionsRoute,
 			handlers.NewOpenAIProxyHandler(
 				cfg.Backends,
@@ -145,7 +151,7 @@ func main() {
 		)
 
 		imageGenerationsRoute := "/images/generations"
-		r.Handle(
+		r.With(openaiMetrics).Handle(
 			imageGenerationsRoute,
 			handlers.NewOpenAIProxyHandler(
 				cfg.Backends,
