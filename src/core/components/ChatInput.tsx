@@ -416,7 +416,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       remainingContextWindow,
     ) || shouldDisableChat;
 
-  const disableSubmit = (!isRequesting && noUserInput) || insufficientContext;
+  const disableSubmit = !isRequesting && (noUserInput || insufficientContext);
 
   return (
     <>
