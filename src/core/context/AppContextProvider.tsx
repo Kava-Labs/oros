@@ -300,8 +300,9 @@ export const AppContextProvider = (props: {
       controllerRef.current.abort();
       controllerRef.current = null;
       toolCallStreamStore.clear();
+      thinkingStore.setText('');
     }
-  }, [toolCallStreamStore]);
+  }, [thinkingStore, toolCallStreamStore]);
 
   return (
     <AppContext.Provider
