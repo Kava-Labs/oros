@@ -559,7 +559,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
 };
 
 function bitmapToBase64ImageURL(
-  buffer: Uint8Array<ArrayBufferLike>,
+  buffer: Uint8Array,
   width: number,
   height: number,
 ): Promise<string> {
