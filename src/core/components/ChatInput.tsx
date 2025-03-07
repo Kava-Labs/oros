@@ -12,13 +12,22 @@ import { IdbImage } from './IdbImage';
 import ButtonIcon from './ButtonIcon';
 import { useTheme } from '../../shared/theme/useTheme';
 import { ChatCompletionContentPart } from 'openai/resources/index';
+import { PDFiumLibrary } from '@hyzyla/pdfium/browser/base64';
+
+
+const library = await PDFiumLibrary.init();
 
 const SUPPORT_FILE_UPLOAD =
   import.meta.env.VITE_FEAT_SUPPORT_FILE_UPLOAD === 'true';
 
 const DEFAULT_HEIGHT = '30px';
 
-const SUPPORTED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const SUPPORTED_FILE_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'application/pdf',
+];
 
 const MAX_FILE_UPLOADS = 4;
 
@@ -222,12 +231,25 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
 
       const reader = new FileReader();
       reader.onload = async (e) => {
+        console.log(e.target?.result);
         if (e.target && typeof e.target.result === 'string') {
           const imgID = await saveImage(e.target.result);
           setImageIDs((prevIDs) => [...prevIDs, imgID]);
+        } else if (e.target?.result instanceof ArrayBuffer) {
+          const buf = new Uint8Array(e.target.result);
+          const doc = await library.loadDocument(buf);
+
+          const page = doc.getPage(0);
+          const image = await page.render();
+          // convert to a base 64 image url and saveImage
         }
       };
-      reader.readAsDataURL(file);
+
+      if (file.type === 'application/pdf') {
+        reader.readAsArrayBuffer(file);
+      } else {
+        reader.readAsDataURL(file);
+      }
     },
     [resetUploadState, hasAvailableUploads],
   );
