@@ -2,7 +2,6 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-
   padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-md);
 }
 
@@ -84,4 +83,34 @@ li {
   top: 16px;
   right: 16px;
   z-index: 100;
+}
+
+.chatImage {
+  margin: var(--spacing-xs) 0 var(--spacing-xs) auto;
+  width: 256px;
+  height: 256px;
+  position: relative;
+}
+
+.imageSkeleton {
+  width: 100%;
+  height: 100%;
+  background: var(--colors-bgSecondary);
+  border-radius: var(--borderRadius-md);
+  position: absolute;
+  top: 0;
+  left: 0;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0.6;
+  }
 }
