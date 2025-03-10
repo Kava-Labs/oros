@@ -12,6 +12,7 @@ import { IdbImage } from './IdbImage';
 import ButtonIcon from './ButtonIcon';
 import { useTheme } from '../../shared/theme/useTheme';
 import { ChatCompletionContentPart } from 'openai/resources/index';
+import { useHandleDragAndDrop } from '../hooks/useHandleDragAndDrop';
 
 const DEFAULT_HEIGHT = '30px';
 
@@ -23,6 +24,12 @@ const MAX_FILE_BYTES = 8 * 1024 * 1024;
 
 interface ChatInputProps {
   setShouldAutoScroll: (s: boolean) => void;
+}
+
+export interface UploadingState {
+  isActive: boolean;
+  isSupportedFile: boolean;
+  errorMessage: string;
 }
 
 const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
@@ -38,7 +45,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
 
   const [inputValue, setInputValue] = useState('');
 
-  const [uploadingState, setUploadingState] = useState({
+  const [uploadingState, setUploadingState] = useState<UploadingState>({
     isActive: false,
     isSupportedFile: true,
     errorMessage: '',
@@ -284,121 +291,17 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
 
   const modelSupportsUpload = modelConfig.supportedFileTypes.length > 0;
 
-  useEffect(() => {
-    if (!modelSupportsUpload) {
-      return;
-    }
-    const handleDragEnter = (e: DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      if (!hasAvailableUploads()) {
-        return;
-      }
-
-      //  Check if we can access the file type during drag & validate
-      if (e.dataTransfer?.items && e.dataTransfer.items.length > 0) {
-        const item = e.dataTransfer.items[0];
-
-        if (item.kind === 'file') {
-          const fileType = item.type;
-          const isValid = SUPPORTED_FILE_TYPES.includes(fileType);
-          setUploadingState({
-            isActive: true,
-            isSupportedFile: isValid,
-            errorMessage: isValid
-              ? ''
-              : 'Invalid file type! Please upload a JPEG, PNG, or WebP image.',
-          });
-        }
-      }
-    };
-
-    const handleDragOver = (e: DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      setUploadingState((prev) => ({
-        ...prev,
-        isActive: true,
-      }));
-    };
-
-    const handleDragLeave = (e: DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      //  Reset if leaving the document (going outside the window)
-      if (e.relatedTarget === null) {
-        setUploadingState((prev) => ({
-          ...prev,
-          isActive: false,
-        }));
-      }
-    };
-
-    const handleDrop = (e: DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      setUploadingState((prev) => ({
-        ...prev,
-        isActive: false,
-      }));
-
-      const files = e.dataTransfer?.files;
-      if (files && files.length > 0) {
-        const totalFilesAfterDrop = imageIDs.length + files.length;
-        if (totalFilesAfterDrop > MAX_FILE_UPLOADS) {
-          setUploadingState({
-            isActive: true,
-            isSupportedFile: false,
-            errorMessage: `Maximum ${MAX_FILE_UPLOADS} files allowed.`,
-          });
-
-          setTimeout(() => {
-            resetUploadState();
-          }, 2000);
-        } else if (
-          Array.from(files).some((file) => file.size > MAX_FILE_BYTES)
-        ) {
-          setUploadingState({
-            isActive: true,
-            isSupportedFile: false,
-            errorMessage: 'File too large! Maximum file size is 8MB.',
-          });
-
-          setTimeout(() => {
-            resetUploadState();
-          }, 2000);
-          return;
-        } else {
-          Array.from(files).forEach((file) => {
-            processFile(file);
-          });
-        }
-      }
-    };
-
-    // Add event listeners to the entire app so the user
-    // doesn't have to specifically target the input
-    document.addEventListener('dragenter', handleDragEnter);
-    document.addEventListener('dragover', handleDragOver);
-    document.addEventListener('dragleave', handleDragLeave);
-    document.addEventListener('drop', handleDrop);
-
-    return () => {
-      document.removeEventListener('dragenter', handleDragEnter);
-      document.removeEventListener('dragover', handleDragOver);
-      document.removeEventListener('dragleave', handleDragLeave);
-      document.removeEventListener('drop', handleDrop);
-    };
-  }, [
-    processFile,
-    imageIDs.length,
-    hasAvailableUploads,
-    resetUploadState,
+  useHandleDragAndDrop({
     modelSupportsUpload,
-  ]);
+    hasAvailableUploads,
+    processFile,
+    resetUploadState,
+    imageIDs,
+    SUPPORTED_FILE_TYPES,
+    MAX_FILE_UPLOADS,
+    MAX_FILE_BYTES,
+    setUploadingState,
+  });
 
   const [, setHoverImageId] = useState<string | null>(null);
 
