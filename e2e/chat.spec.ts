@@ -1038,11 +1038,7 @@ describe('chat', () => {
     const chat = new Chat(page);
     await chat.goto();
 
-    const imagePath = join(process.cwd(), 'e2e/images/orosLogo.png');
-    const buffer = fs.readFileSync(imagePath);
-
-    //  Simulate a clipboard paste with a supported file type
-    await page.evaluate(async (imageBase64) => {
+    await page.evaluate(async () => {
       const pasteEvent = new ClipboardEvent('paste', {
         bubbles: true,
         clipboardData: new DataTransfer(),
