@@ -112,7 +112,25 @@ export const useHandleDragAndDrop = ({
       const files = e.dataTransfer?.files;
       if (files && files.length > 0) {
         const totalFilesAfterDrop = imageIDs.length + files.length;
-        if (totalFilesAfterDrop > MAX_FILE_UPLOADS) {
+
+        // First check if any file has an unsupported type
+        const hasUnsupportedType = Array.from(files).some(
+          (file) => !SUPPORTED_FILE_TYPES.includes(file.type),
+        );
+
+        if (hasUnsupportedType) {
+          setUploadingState({
+            isActive: true,
+            isSupportedFile: false,
+            errorMessage:
+              'Invalid file type! Please upload a JPEG, PNG, or WebP image.',
+          });
+
+          setTimeout(() => {
+            resetUploadState();
+          }, 2000);
+          return;
+        } else if (totalFilesAfterDrop > MAX_FILE_UPLOADS) {
           setUploadingState({
             isActive: true,
             isSupportedFile: false,
@@ -122,6 +140,7 @@ export const useHandleDragAndDrop = ({
           setTimeout(() => {
             resetUploadState();
           }, 2000);
+          return;
         } else if (
           Array.from(files).some((file) => file.size > MAX_FILE_BYTES)
         ) {
@@ -146,6 +165,7 @@ export const useHandleDragAndDrop = ({
       imageIDs.length,
       MAX_FILE_BYTES,
       MAX_FILE_UPLOADS,
+      SUPPORTED_FILE_TYPES,
       processFile,
       resetUploadState,
       setUploadingState,
