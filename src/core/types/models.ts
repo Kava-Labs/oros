@@ -17,6 +17,7 @@ export interface BaseModelConfig {
   icon: ComponentType;
   description: string;
   supportedFileTypes: Array<SupportedFileType>;
+  maximumFileUploads: number;
   contextLength: number;
   contextLimitMonitor: (
     messages: ChatMessage[],
