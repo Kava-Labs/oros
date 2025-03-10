@@ -1,5 +1,5 @@
 import styles from './Conversation.module.css';
-import { Fragment, memo } from 'react';
+import { Fragment, memo, useState } from 'react';
 import { useSyncExternalStore } from 'react';
 import { ToolMessageContainer } from './ToolMessageContainer';
 import { StreamingMessage } from './StreamingMessage';
@@ -25,6 +25,14 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
   );
 
   const { messages } = useMessageHistory();
+  const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
+
+  const handleImageLoad = (imageID: string) => {
+    setLoadedImages((prev) => ({
+      ...prev,
+      [imageID]: true,
+    }));
+  };
 
   return (
     <div className={styles.conversationContainer} data-testid="conversation">
@@ -71,19 +79,16 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
             <Fragment key={index}>
               {hasImage
                 ? imageIDs.map((imageID, i) => (
-                    <div
-                      key={imageID}
-                      style={{
-                        marginLeft: 'auto',
-                        marginBottom: '4px',
-                        marginTop: '4px',
-                      }}
-                    >
+                    <div key={imageID} className={styles.chatImage}>
+                      {!loadedImages[imageID] && (
+                        <div className={styles.imageSkeleton}></div>
+                      )}
                       <IdbImage
                         width="256px"
                         height="256px"
                         id={imageID}
                         aria-label={`User uploaded image ${i + 1}`}
+                        onLoad={() => handleImageLoad(imageID)}
                       />
                     </div>
                   ))
