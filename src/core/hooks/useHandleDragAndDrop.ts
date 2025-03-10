@@ -113,7 +113,6 @@ export const useHandleDragAndDrop = ({
       if (files && files.length > 0) {
         const totalFilesAfterDrop = imageIDs.length + files.length;
 
-        // First check if any file has an unsupported type
         const hasUnsupportedType = Array.from(files).some(
           (file) => !SUPPORTED_FILE_TYPES.includes(file.type),
         );
