@@ -359,7 +359,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
             resetUploadState();
           }, 2000);
         } else if (
-          Array.from(files).filter((file) => file.size > MAX_FILE_BYTES)
+          Array.from(files).some((file) => file.size > MAX_FILE_BYTES)
         ) {
           setUploadingState({
             isActive: true,
