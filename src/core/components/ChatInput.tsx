@@ -13,9 +13,6 @@ import ButtonIcon from './ButtonIcon';
 import { useTheme } from '../../shared/theme/useTheme';
 import { ChatCompletionContentPart } from 'openai/resources/index';
 
-const SUPPORT_FILE_UPLOAD =
-  import.meta.env.VITE_FEAT_SUPPORT_FILE_UPLOAD === 'true';
-
 const DEFAULT_HEIGHT = '30px';
 
 const SUPPORTED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -288,7 +285,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
   const modelSupportsUpload = modelConfig.supportedFileTypes.length > 0;
 
   useEffect(() => {
-    if (!SUPPORT_FILE_UPLOAD || !modelSupportsUpload) {
+    if (!modelSupportsUpload) {
       return;
     }
     const handleDragEnter = (e: DragEvent) => {
@@ -483,7 +480,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
         </div>
         <div className={styles.buttonContainer}>
           <div className={styles.buttonWrapper}>
-            {SUPPORT_FILE_UPLOAD && modelSupportsUpload && (
+            {modelSupportsUpload && (
               <>
                 <div className={styles.uploadInputFieldContainer}>
                   <input
