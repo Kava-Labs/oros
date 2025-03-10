@@ -1,12 +1,13 @@
 import { useEffect, useCallback, Dispatch, SetStateAction } from 'react';
 import { UploadingState } from '../components/ChatInput';
+import { isSupportedFileType, SupportedFileType } from '../types/models';
 
 interface UseHandleDragAndDropParams {
   hasAvailableUploads: () => boolean;
   processFile: (file: File) => Promise<void>;
   resetUploadState: () => void;
   imageIDs: string[];
-  supportedFileTypes: string[];
+  supportedFileTypes: Array<SupportedFileType>;
   MAX_FILE_UPLOADS: number;
   MAX_FILE_BYTES: number;
   setUploadingState: Dispatch<SetStateAction<UploadingState>>;
@@ -54,7 +55,7 @@ export const useDragAndDrop = ({
 
         if (item.kind === 'file') {
           const fileType = item.type;
-          const isValid = supportedFileTypes.includes(fileType);
+          const isValid = isSupportedFileType(fileType);
           setUploadingState({
             isActive: true,
             isSupportedFile: isValid,
@@ -111,7 +112,7 @@ export const useDragAndDrop = ({
         const totalFilesAfterDrop = imageIDs.length + files.length;
 
         const hasUnsupportedType = Array.from(files).some(
-          (file) => !supportedFileTypes.includes(file.type),
+          (file) => !isSupportedFileType(file.type),
         );
 
         if (hasUnsupportedType) {
