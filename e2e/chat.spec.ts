@@ -1032,4 +1032,55 @@ describe('chat', () => {
 
     expect(await imagePreviewContainer.isVisible()).toBe(false);
   });
+
+  test('allows a user to upload a supported file via drag & drop', async ({
+    page,
+  }) => {
+    test.setTimeout(30 * 1000);
+
+    const chat = new Chat(page);
+    await chat.goto();
+
+    await page.evaluate(async () => {
+      const dataTransfer = new DataTransfer();
+
+      const file = new File([''], 'testImage.png', { type: 'image/png' });
+      dataTransfer.items.add(file);
+
+      //  A user can drop the document anywhere on the page
+      const dropTarget = document;
+
+      dropTarget.dispatchEvent(
+        new DragEvent('dragover', {
+          bubbles: true,
+          cancelable: true,
+          dataTransfer,
+        }),
+      );
+
+      dropTarget.dispatchEvent(
+        new DragEvent('drop', {
+          bubbles: true,
+          cancelable: true,
+          dataTransfer,
+        }),
+      );
+    });
+
+    const imagePreviewContainer = page.locator('.imagePreviewContainer');
+
+    if (await imagePreviewContainer.isVisible()) {
+      const imageCards = page.locator('.imageCard');
+      const count = await imageCards.count();
+      expect(count).toEqual(1);
+    }
+
+    await chat.submitMessage('Describe this image');
+
+    const uploadedImage = page.getByRole('img', {
+      name: 'User uploaded image 1',
+    });
+
+    await expect(uploadedImage).toBeVisible();
+  });
 });
