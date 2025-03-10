@@ -1079,4 +1079,98 @@ describe('chat', () => {
 
     await expect(uploadedImage).toBeVisible();
   });
+
+  test('can paste image from clipboard', async ({ page }) => {
+    test.setTimeout(30 * 1000);
+
+    const chat = new Chat(page);
+    await chat.goto();
+
+    await page.evaluate(async () => {
+      const pasteEvent = new ClipboardEvent('paste', {
+        bubbles: true,
+        clipboardData: new DataTransfer(),
+      });
+
+      //  7MB
+      const supportedDataArray = new Uint8Array(7 * 1024 * 1024);
+
+      const blob = new Blob([supportedDataArray], { type: 'image/png' });
+      const file = new File([blob], 'large-image.png', { type: 'image/png' });
+
+      //  Add the file to the clipboard data
+      Object.defineProperty(pasteEvent.clipboardData, 'items', {
+        value: [
+          {
+            kind: 'file',
+            type: 'image/png',
+            getAsFile: () => file,
+          },
+        ],
+      });
+
+      document.activeElement.dispatchEvent(pasteEvent);
+    });
+
+    const imagePreviewContainer = page.locator('.imagePreviewContainer');
+
+    if (await imagePreviewContainer.isVisible()) {
+      const imageCards = page.locator('.imageCard');
+      const count = await imageCards.count();
+      expect(count).toEqual(1);
+    }
+
+    await chat.submitMessage('Describe this image');
+
+    const uploadedImage = page.getByRole('img', {
+      name: 'User uploaded image 1',
+    });
+
+    await expect(uploadedImage).toBeVisible();
+  });
+
+  test('shows error when pasting an image larger than 8MB from clipboard', async ({
+    page,
+  }) => {
+    test.setTimeout(30 * 1000);
+
+    const chat = new Chat(page);
+    await chat.goto();
+
+    await page.evaluate(async () => {
+      const pasteEvent = new ClipboardEvent('paste', {
+        bubbles: true,
+        clipboardData: new DataTransfer(),
+      });
+
+      //  9MB
+      const largeDataArray = new Uint8Array(9 * 1024 * 1024);
+
+      const blob = new Blob([largeDataArray], { type: 'image/png' });
+      const file = new File([blob], 'large-image.png', { type: 'image/png' });
+
+      Object.defineProperty(pasteEvent.clipboardData, 'items', {
+        value: [
+          {
+            kind: 'file',
+            type: 'image/png',
+            getAsFile: () => file,
+          },
+        ],
+      });
+
+      document.activeElement.dispatchEvent(pasteEvent);
+    });
+
+    const errorMessage = page.getByText(
+      'File too large! Maximum file size is 8MB.',
+    );
+    await expect(errorMessage).toBeVisible();
+
+    await page.waitForTimeout(2500);
+    await expect(errorMessage).not.toBeVisible();
+
+    const imagePreviewContainer = page.locator('.imagePreviewContainer');
+    await expect(imagePreviewContainer).not.toBeVisible();
+  });
 });
