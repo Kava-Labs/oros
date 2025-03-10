@@ -1052,16 +1052,12 @@ describe('chat', () => {
 
       dropTarget.dispatchEvent(
         new DragEvent('dragover', {
-          bubbles: true,
-          cancelable: true,
           dataTransfer,
         }),
       );
 
       dropTarget.dispatchEvent(
         new DragEvent('drop', {
-          bubbles: true,
-          cancelable: true,
           dataTransfer,
         }),
       );
