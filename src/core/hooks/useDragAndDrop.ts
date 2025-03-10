@@ -2,12 +2,11 @@ import { useEffect, useCallback, Dispatch, SetStateAction } from 'react';
 import { UploadingState } from '../components/ChatInput';
 
 interface UseHandleDragAndDropParams {
-  modelSupportsUpload: boolean;
   hasAvailableUploads: () => boolean;
   processFile: (file: File) => Promise<void>;
   resetUploadState: () => void;
   imageIDs: string[];
-  SUPPORTED_FILE_TYPES: string[];
+  supportedFileTypes: string[];
   MAX_FILE_UPLOADS: number;
   MAX_FILE_BYTES: number;
   setUploadingState: Dispatch<SetStateAction<UploadingState>>;
@@ -19,25 +18,23 @@ interface UseHandleDragAndDropParams {
  * state updates, and file processing.
  *
  * @param params - Configuration parameters for the drag and drop behavior
- * @param params.modelSupportsUpload - Flag indicating if the current model supports file uploads
  * @param params.hasAvailableUploads - Function that checks if more uploads are allowed
  * @param params.processFile - Function that handles processing a valid file
  * @param params.resetUploadState - Function that resets the uploading state
  * @param params.imageIDs - Array of currently uploaded image IDs
- * @param params.SUPPORTED_FILE_TYPES - Array of accepted MIME types
+ * @param params.supportedFileTypes - Array of accepted MIME types
  * @param params.MAX_FILE_UPLOADS - Maximum number of files allowed
  * @param params.MAX_FILE_BYTES - Maximum file size in bytes
  * @param params.setUploadingState - State setter for the uploading state
  *
  * @returns void - This hook doesn't return any values but sets up event listeners
  */
-export const useHandleDragAndDrop = ({
-  modelSupportsUpload,
+export const useDragAndDrop = ({
   hasAvailableUploads,
   processFile,
   resetUploadState,
   imageIDs,
-  SUPPORTED_FILE_TYPES,
+  supportedFileTypes,
   MAX_FILE_UPLOADS,
   MAX_FILE_BYTES,
   setUploadingState,
@@ -57,7 +54,7 @@ export const useHandleDragAndDrop = ({
 
         if (item.kind === 'file') {
           const fileType = item.type;
-          const isValid = SUPPORTED_FILE_TYPES.includes(fileType);
+          const isValid = supportedFileTypes.includes(fileType);
           setUploadingState({
             isActive: true,
             isSupportedFile: isValid,
@@ -68,7 +65,7 @@ export const useHandleDragAndDrop = ({
         }
       }
     },
-    [hasAvailableUploads, SUPPORTED_FILE_TYPES, setUploadingState],
+    [hasAvailableUploads, supportedFileTypes, setUploadingState],
   );
 
   const handleDragOver = useCallback(
@@ -114,7 +111,7 @@ export const useHandleDragAndDrop = ({
         const totalFilesAfterDrop = imageIDs.length + files.length;
 
         const hasUnsupportedType = Array.from(files).some(
-          (file) => !SUPPORTED_FILE_TYPES.includes(file.type),
+          (file) => !supportedFileTypes.includes(file.type),
         );
 
         if (hasUnsupportedType) {
@@ -164,7 +161,7 @@ export const useHandleDragAndDrop = ({
       imageIDs.length,
       MAX_FILE_BYTES,
       MAX_FILE_UPLOADS,
-      SUPPORTED_FILE_TYPES,
+      supportedFileTypes,
       processFile,
       resetUploadState,
       setUploadingState,
@@ -172,7 +169,7 @@ export const useHandleDragAndDrop = ({
   );
 
   useEffect(() => {
-    if (!modelSupportsUpload) {
+    if (!supportedFileTypes.length) {
       return;
     }
 
@@ -190,10 +187,10 @@ export const useHandleDragAndDrop = ({
       document.removeEventListener('drop', handleDrop);
     };
   }, [
-    modelSupportsUpload,
     handleDragEnter,
     handleDragOver,
     handleDragLeave,
     handleDrop,
+    supportedFileTypes.length,
   ]);
 };

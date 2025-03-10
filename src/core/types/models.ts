@@ -69,4 +69,14 @@ export interface ContextMetrics {
   tokensRemaining: number;
 }
 
-type SupportedFileType = 'image/jpeg' | 'image/png' | 'image/webp';
+export const SUPPORTED_FILE_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+] as const;
+
+export type SupportedFileType = (typeof SUPPORTED_FILE_TYPES)[number];
+
+export function isSupportedFileType(type: string): type is SupportedFileType {
+  return SUPPORTED_FILE_TYPES.includes(type as SupportedFileType);
+}
