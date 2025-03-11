@@ -41,15 +41,22 @@ export const AppContextProvider = (props: {
     initializeMessageRegistry(),
   );
 
-  const [conversation, setConversation] = useState<ActiveConversation>({
-    conversationID: uuidv4(),
-    messageHistoryStore: props.messageHistoryStore,
-    toolCallStreamStore: props.toolCallStreamStore,
-    thinkingStore: props.thinkingStore,
-    progressStore: props.progressStore,
-    messageStore: props.messageStore,
-    errorStore: new TextStreamStore(),
-    isRequesting: false,
+  const [modelConfig, setModelConfig] = useState<ModelConfig>(() =>
+    getModelConfig(DEFAULT_MODEL_NAME),
+  );
+
+  const [conversation, setConversation] = useState<ActiveConversation>(() => {
+    const newConv = newConversation();
+
+    const messages = newConv.messageHistoryStore.getSnapshot();
+    if (messages.length === 0) {
+      newConv.messageHistoryStore.addMessage({
+        role: 'system',
+        content: modelConfig.systemPrompt,
+      });
+    }
+
+    return newConv;
   });
 
   const {
@@ -103,10 +110,6 @@ export const AppContextProvider = (props: {
     },
   );
 
-  const [modelConfig, setModelConfig] = useState<ModelConfig>(() =>
-    getModelConfig(DEFAULT_MODEL_NAME),
-  );
-
   // Poll for conversation changes
   useEffect(() => {
     const load = () => {
@@ -150,6 +153,13 @@ export const AppContextProvider = (props: {
     },
     [],
   );
+
+  // // //  When the in
+  // useEffect(() => {
+  //   if (isReady && messageHistoryStore) {
+  //     ensureCorrectSystemPrompt(messageHistoryStore, modelConfig);
+  //   }
+  // }, [isReady, messageHistoryStore, modelConfig, ensureCorrectSystemPrompt]);
 
   const handleModelChange = useCallback(
     (modelName: SupportedModels) => {
@@ -209,7 +219,7 @@ export const AppContextProvider = (props: {
     }
 
     setIsReady(true);
-  }, []);
+  }, [ensureCorrectSystemPrompt, messageHistoryStore, modelConfig]);
 
   // abort controller for cancelling openai request
   const controllerRef = useRef<AbortController | null>(null);
