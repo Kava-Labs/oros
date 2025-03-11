@@ -77,6 +77,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
   const uploadRef = useRef<HTMLInputElement>(null);
 
   const [imageIDs, setImageIDs] = useState<string[]>([]);
+  const [fileType, setFileType] = useState<string>('');
 
   const prevModelIdRef = useRef(modelConfig.id);
   const prevConversationRef = useRef(conversationID);
@@ -135,13 +136,17 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
         });
       });
 
-      handleChatCompletion(messageContent);
+      handleChatCompletion({
+        content: messageContent,
+        isPDFUpload: fileType === 'application/pdf',
+      });
 
       setImageIDs([]);
     } else {
-      handleChatCompletion(processedMessage);
+      handleChatCompletion({ content: processedMessage });
     }
 
+    setFileType('');
     setInputValue('');
     setShouldAutoScroll(true); // Reset scroll state when sending new message
 
@@ -247,8 +252,6 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
             const image = await page.render({
               scale: 3,
               render: 'bitmap',
-              width: 256,
-              height: 256,
             });
             const base64ImageURL = await bitmapToBase64ImageURL(
               image.data,
@@ -263,6 +266,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
         }
       };
 
+      setFileType(file.type);
       if (file.type === 'application/pdf') {
         reader.readAsArrayBuffer(file);
       } else {

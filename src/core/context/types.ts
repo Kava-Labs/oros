@@ -35,6 +35,11 @@ export type ActiveConversation = {
   isRequesting: boolean;
 };
 
+export type HandleChatCompletionOpts = {
+  content: string | Array<ChatCompletionContentPart>;
+  isPDFUpload?: boolean;
+};
+
 export type AppContextType = {
   conversationID: string;
   isReady: boolean;
@@ -45,7 +50,7 @@ export type AppContextType = {
   startNewChat: () => void;
   executeOperation: ExecuteOperation;
   handleChatCompletion: (
-    value: string | Array<ChatCompletionContentPart>,
+    value: HandleChatCompletionOpts,
   ) => void;
   handleCancel: () => void;
   walletStore: WalletStore;

@@ -19,7 +19,10 @@ import {
   ChatCompletionUserMessageParam,
 } from 'openai/resources/index';
 import { getImage } from '../utils/idb/idb';
-import { visionModelPrompt } from '../../features/reasoning/config/prompts/defaultPrompts';
+import {
+  visionModelPrompt,
+  visionModelPDFPrompt,
+} from '../../features/reasoning/config/prompts/defaultPrompts';
 
 export const newConversation = () => {
   return {
@@ -184,6 +187,7 @@ export async function doChat(
   thinkingStore: TextStreamStore,
   executeOperation: ExecuteOperation,
   conversationID: string,
+  isPDFUpload: boolean,
 ) {
   progressStore.setText('Thinking');
   const { id, tools } = modelConfig;
@@ -202,7 +206,7 @@ export async function doChat(
     content: [
       {
         type: 'text',
-        text: visionModelPrompt,
+        text: isPDFUpload ? visionModelPDFPrompt : visionModelPrompt,
       },
     ],
   };
@@ -369,6 +373,7 @@ export async function doChat(
         thinkingStore,
         executeOperation,
         conversationID,
+        isPDFUpload,
       );
     }
     syncWithLocalStorage(
