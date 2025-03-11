@@ -21,9 +21,8 @@ interface UseHandleDragAndDropParams {
  * @param params.processFile - Function that handles processing a valid file
  * @param params.resetUploadState - Function that resets the uploading state
  * @param params.imageIDs - Array of currently uploaded image IDs
- * @param params.modelConfig - Object that contains necessary properties
+ * @param params.modelConfig - Configuration object that defines upload constraints
  * @param params.setUploadingState - State setter for the uploading state
- *
  * @returns void - This hook doesn't return any values but sets up event listeners
  */
 export const useDragAndDrop = ({
@@ -34,8 +33,7 @@ export const useDragAndDrop = ({
   modelConfig,
   setUploadingState,
 }: UseHandleDragAndDropParams) => {
-  const { supportedFileTypes, maximumFileUploads, maximumFileBytes } =
-    modelConfig;
+  const { maximumFileUploads, maximumFileBytes } = modelConfig;
 
   const handleDragEnter = useCallback(
     (e: DragEvent) => {
