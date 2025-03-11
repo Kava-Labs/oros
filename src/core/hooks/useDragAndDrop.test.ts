@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach, Mock } from 'vitest';
-import { useHandleDragAndDrop } from './useHandleDragAndDrop';
+import { useDragAndDrop } from './useDragAndDrop';
 import { renderHook } from '@testing-library/react';
+import { SupportedFileType } from '../types/models';
 
 const createFileList = (files: File[]): FileList => {
   return {
@@ -17,12 +18,15 @@ describe('useHandleDragAndDrop', () => {
   const mockResetUploadState = vi.fn();
 
   const defaultParams = {
-    modelSupportsUpload: true,
     hasAvailableUploads: mockHasAvailableUploads,
     processFile: mockProcessFile,
     resetUploadState: mockResetUploadState,
     imageIDs: [],
-    SUPPORTED_FILE_TYPES: ['image/jpeg', 'image/png', 'image/webp'],
+    supportedFileTypes: [
+      'image/jpeg',
+      'image/png',
+      'image/webp',
+    ] as Array<SupportedFileType>,
     MAX_FILE_UPLOADS: 4,
     MAX_FILE_BYTES: 8 * 1024 * 1024, // 8MB
     setUploadingState: mockSetUploadingState,
@@ -64,7 +68,7 @@ describe('useHandleDragAndDrop', () => {
   });
 
   it('should register event listeners when modelSupportsUpload is true', () => {
-    renderHook(() => useHandleDragAndDrop(defaultParams));
+    renderHook(() => useDragAndDrop(defaultParams));
 
     const registeredEvents = (document.addEventListener as Mock).mock.calls.map(
       (call) => call[0],
@@ -76,11 +80,11 @@ describe('useHandleDragAndDrop', () => {
     expect(registeredEvents).toContain('drop');
   });
 
-  it('should not register event listeners when modelSupportsUpload is false', () => {
+  it('should not register event listeners when model has no supported file types', () => {
     renderHook(() =>
-      useHandleDragAndDrop({
+      useDragAndDrop({
         ...defaultParams,
-        modelSupportsUpload: false,
+        supportedFileTypes: [],
       }),
     );
 
@@ -88,7 +92,7 @@ describe('useHandleDragAndDrop', () => {
   });
 
   it('should unregister event listeners on unmount', () => {
-    const { unmount } = renderHook(() => useHandleDragAndDrop(defaultParams));
+    const { unmount } = renderHook(() => useDragAndDrop(defaultParams));
 
     unmount();
 
@@ -133,7 +137,7 @@ describe('useHandleDragAndDrop', () => {
     };
 
     it('should handle dragenter event with valid file type', () => {
-      renderHook(() => useHandleDragAndDrop(defaultParams));
+      renderHook(() => useDragAndDrop(defaultParams));
 
       const mockDataTransfer = {
         items: [
@@ -159,7 +163,7 @@ describe('useHandleDragAndDrop', () => {
     });
 
     it('should handle dragenter event with invalid file type', () => {
-      renderHook(() => useHandleDragAndDrop(defaultParams));
+      renderHook(() => useDragAndDrop(defaultParams));
 
       const mockDataTransfer = {
         items: [
@@ -187,7 +191,7 @@ describe('useHandleDragAndDrop', () => {
     it('should not proceed with dragenter when hasAvailableUploads returns false', () => {
       mockHasAvailableUploads.mockReturnValueOnce(false);
 
-      renderHook(() => useHandleDragAndDrop(defaultParams));
+      renderHook(() => useDragAndDrop(defaultParams));
 
       const mockDataTransfer = {
         items: [
@@ -209,7 +213,7 @@ describe('useHandleDragAndDrop', () => {
     });
 
     it('should handle dragover event', () => {
-      renderHook(() => useHandleDragAndDrop(defaultParams));
+      renderHook(() => useDragAndDrop(defaultParams));
 
       const mockEvent = triggerEvent('dragover');
 
@@ -219,7 +223,7 @@ describe('useHandleDragAndDrop', () => {
     });
 
     it('should handle dragleave event when leaving document', () => {
-      renderHook(() => useHandleDragAndDrop(defaultParams));
+      renderHook(() => useDragAndDrop(defaultParams));
 
       const mockEvent = triggerEvent('dragleave', { relatedTarget: null });
 
@@ -231,7 +235,7 @@ describe('useHandleDragAndDrop', () => {
 
   describe('drop event handler', () => {
     it('should process valid dropped files', () => {
-      renderHook(() => useHandleDragAndDrop(defaultParams));
+      renderHook(() => useDragAndDrop(defaultParams));
 
       const files = [
         new File(['content'], 'image1.jpg', { type: 'image/jpeg' }),
@@ -272,7 +276,7 @@ describe('useHandleDragAndDrop', () => {
 
     it('should show error when drop exceeds MAX_FILE_UPLOADS', () => {
       renderHook(() =>
-        useHandleDragAndDrop({
+        useDragAndDrop({
           ...defaultParams,
           imageIDs: ['existing1', 'existing2', 'existing3'],
           MAX_FILE_UPLOADS: 4,
@@ -314,7 +318,7 @@ describe('useHandleDragAndDrop', () => {
 
     it('should show error when drop contains files larger than MAX_FILE_BYTES', () => {
       renderHook(() =>
-        useHandleDragAndDrop({
+        useDragAndDrop({
           ...defaultParams,
           MAX_FILE_BYTES: 1000, // Small limit for testing
         }),

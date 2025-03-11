@@ -12,11 +12,10 @@ import { IdbImage } from './IdbImage';
 import ButtonIcon from './ButtonIcon';
 import { useTheme } from '../../shared/theme/useTheme';
 import { ChatCompletionContentPart } from 'openai/resources/index';
-import { useHandleDragAndDrop } from '../hooks/useHandleDragAndDrop';
+import { useDragAndDrop } from '../hooks/useDragAndDrop';
+import { isSupportedFileType } from '../types/models';
 
 const DEFAULT_HEIGHT = '30px';
-
-const SUPPORTED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 const MAX_FILE_UPLOADS = 4;
 
@@ -67,6 +66,8 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     handleCancel,
     conversationID,
   } = useAppContext();
+
+  const { supportedFileTypes } = modelConfig;
 
   const buttonRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -206,7 +207,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
         return;
       }
 
-      if (!SUPPORTED_FILE_TYPES.includes(file.type)) {
+      if (!isSupportedFileType(file.type)) {
         setUploadingState({
           isActive: true,
           isSupportedFile: false,
@@ -289,15 +290,14 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     ? currentConversation.tokensRemaining
     : modelConfig.contextLength;
 
-  const modelSupportsUpload = modelConfig.supportedFileTypes.length > 0;
+  const modelSupportsUpload = supportedFileTypes.length > 0;
 
-  useHandleDragAndDrop({
-    modelSupportsUpload,
+  useDragAndDrop({
     hasAvailableUploads,
     processFile,
     resetUploadState,
     imageIDs,
-    SUPPORTED_FILE_TYPES,
+    supportedFileTypes,
     MAX_FILE_UPLOADS,
     MAX_FILE_BYTES,
     setUploadingState,
@@ -387,7 +387,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
               <>
                 <div className={styles.uploadInputFieldContainer}>
                   <input
-                    accept={SUPPORTED_FILE_TYPES.join(', ')}
+                    accept={supportedFileTypes.join(', ')}
                     ref={uploadRef}
                     type="file"
                     className={styles.uploadInputField}
