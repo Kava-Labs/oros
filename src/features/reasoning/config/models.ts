@@ -10,11 +10,7 @@ import {
 import KavaIcon from '../../../core/assets/KavaIcon';
 import { calculateFinalChunkTokenUsage } from '../helpers';
 
-<<<<<<< HEAD
-const supportedReasoningModels = [
-  'deepseek-r1',
-  'qwen2.5-vl-7b-instruct',
-] as const;
+const supportedReasoningModels = ['deepseek-r1', 'qwq-32b-bnb-4bit'] as const;
 
 export type SupportedReasoningModel = (typeof supportedReasoningModels)[number];
 
@@ -46,14 +42,15 @@ export const reasoningModels: Record<
     introText: defaultIntroText,
     inputPlaceholderText: defaultInputPlaceholderText,
   },
-  'qwen2.5-vl-7b-instruct-1m': {
-    id: 'qwen2.5-vl-7b-instruct-1m',
+  'qwq-32b-bnb-4bit': {
+    id: 'qwq-32b-bnb-4bit',
     name: 'General Reasoning',
     icon: KavaIcon,
     description: 'Logical Analysis',
     tools: [],
     supportedFileTypes: ['image/jpeg', 'image/png', 'image/webp'],
     maximumFileUploads: 4,
+    maximumFileBytes: 8 * 1024 * 1024,
     contextLength: 65536,
     contextLimitMonitor: calculateFinalChunkTokenUsage,
     contextWarningThresholdPercentage: 5,

@@ -61,7 +61,7 @@ const defaultModelFromQueryParams = () => {
 };
 
 const DEFAULT_REASONING_MODEL = import.meta.env.VITE_FEAT_QWEN
-  ? 'qwen2.5-vl-7b-instruct-1m'
+  ? 'qwq-32b-bnb-4bit'
   : 'deepseek-r1';
 
 export const DEFAULT_MODEL_NAME = defaultModelFromQueryParams()
