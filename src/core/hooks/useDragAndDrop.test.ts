@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach, Mock } from 'vitest';
 import { useDragAndDrop } from './useDragAndDrop';
 import { renderHook } from '@testing-library/react';
-import { SupportedFileType } from '../types/models';
+import { BaseModelConfig, SupportedFileType } from '../types/models';
 
 const createFileList = (files: File[]): FileList => {
   return {
@@ -22,13 +22,15 @@ describe('useHandleDragAndDrop', () => {
     processFile: mockProcessFile,
     resetUploadState: mockResetUploadState,
     imageIDs: [],
-    supportedFileTypes: [
-      'image/jpeg',
-      'image/png',
-      'image/webp',
-    ] as Array<SupportedFileType>,
-    maximumFileUploads: 4,
-    maximumFileBytes: 8 * 1024 * 1024, // 8MB
+    modelConfig: {
+      supportedFileTypes: [
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+      ] as Array<SupportedFileType>,
+      maximumFileUploads: 4,
+      maximumFileBytes: 8 * 1024 * 1024, // 8MB
+    } as unknown as BaseModelConfig,
     setUploadingState: mockSetUploadingState,
   };
 
@@ -80,11 +82,14 @@ describe('useHandleDragAndDrop', () => {
     expect(registeredEvents).toContain('drop');
   });
 
-  it('should not register event listeners when model has no supported file types', () => {
+  it('should not register event listeners when model has no maximum uploads', () => {
     renderHook(() =>
       useDragAndDrop({
         ...defaultParams,
-        supportedFileTypes: [],
+        modelConfig: {
+          ...defaultParams.modelConfig,
+          maximumFileUploads: 0,
+        },
       }),
     );
 
@@ -279,7 +284,10 @@ describe('useHandleDragAndDrop', () => {
         useDragAndDrop({
           ...defaultParams,
           imageIDs: ['existing1', 'existing2', 'existing3'],
-          maximumFileUploads: 4,
+          modelConfig: {
+            ...defaultParams.modelConfig,
+            maximumFileUploads: 4,
+          },
         }),
       );
 
@@ -320,7 +328,10 @@ describe('useHandleDragAndDrop', () => {
       renderHook(() =>
         useDragAndDrop({
           ...defaultParams,
-          maximumFileBytes: 1000, // Small limit for testing
+          modelConfig: {
+            ...defaultParams.modelConfig,
+            maximumFileBytes: 1000, //  Small limit for testing
+          },
         }),
       );
 
