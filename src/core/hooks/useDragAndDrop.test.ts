@@ -28,7 +28,7 @@ describe('useHandleDragAndDrop', () => {
       'image/webp',
     ] as Array<SupportedFileType>,
     maximumFileUploads: 4,
-    MAX_FILE_BYTES: 8 * 1024 * 1024, // 8MB
+    maximumFileBytes: 8 * 1024 * 1024, // 8MB
     setUploadingState: mockSetUploadingState,
   };
 
@@ -320,7 +320,7 @@ describe('useHandleDragAndDrop', () => {
       renderHook(() =>
         useDragAndDrop({
           ...defaultParams,
-          MAX_FILE_BYTES: 1000, // Small limit for testing
+          maximumFileBytes: 1000, // Small limit for testing
         }),
       );
 

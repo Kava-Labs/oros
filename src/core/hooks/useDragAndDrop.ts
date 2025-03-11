@@ -9,7 +9,7 @@ interface UseHandleDragAndDropParams {
   imageIDs: string[];
   supportedFileTypes: Array<SupportedFileType>;
   maximumFileUploads: number;
-  MAX_FILE_BYTES: number;
+  maximumFileBytes: number;
   setUploadingState: Dispatch<SetStateAction<UploadingState>>;
 }
 
@@ -38,7 +38,7 @@ export const useDragAndDrop = ({
   imageIDs,
   supportedFileTypes,
   maximumFileUploads,
-  MAX_FILE_BYTES,
+  maximumFileBytes,
   setUploadingState,
 }: UseHandleDragAndDropParams) => {
   const handleDragEnter = useCallback(
@@ -140,7 +140,7 @@ export const useDragAndDrop = ({
           }, 2000);
           return;
         } else if (
-          Array.from(files).some((file) => file.size > MAX_FILE_BYTES)
+          Array.from(files).some((file) => file.size > maximumFileBytes)
         ) {
           setUploadingState({
             isActive: true,
@@ -161,7 +161,7 @@ export const useDragAndDrop = ({
     },
     [
       imageIDs.length,
-      MAX_FILE_BYTES,
+      maximumFileBytes,
       maximumFileUploads,
       processFile,
       resetUploadState,

@@ -26,6 +26,7 @@ export const blockchainModels: Record<
     tools: messageRegistry.getToolDefinitions(),
     supportedFileTypes: [],
     maximumFileUploads: 0,
+    maximumFileBytes: 0,
     //  https://platform.openai.com/docs/models#gpt-4o
     contextLength: 128000,
     contextLimitMonitor: calculateGptContextMetrics,
