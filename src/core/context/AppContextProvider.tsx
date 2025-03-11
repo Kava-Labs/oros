@@ -18,6 +18,7 @@ import { SupportedModels, ModelConfig } from '../types/models';
 import { ActiveConversation, ConversationHistory } from './types';
 import { getToken } from '../../core/utils/token/token';
 import OpenAI from 'openai';
+import { v4 as uuidv4 } from 'uuid';
 import { doChat, syncWithLocalStorage, newConversation } from './utils';
 import type { ChatCompletionContentPart } from 'openai/resources/index';
 
@@ -45,7 +46,16 @@ export const AppContextProvider = (props: {
   );
 
   const [conversation, setConversation] = useState<ActiveConversation>(() => {
-    const newConv = newConversation();
+    const newConv = {
+      conversationID: uuidv4(),
+      messageHistoryStore: props.messageHistoryStore,
+      toolCallStreamStore: props.toolCallStreamStore,
+      thinkingStore: props.thinkingStore,
+      progressStore: props.progressStore,
+      messageStore: props.messageStore,
+      errorStore: new TextStreamStore(),
+      isRequesting: false,
+    };
 
     const messages = newConv.messageHistoryStore.getSnapshot();
     if (messages.length === 0) {
