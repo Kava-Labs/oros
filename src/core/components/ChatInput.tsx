@@ -315,7 +315,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       if (!clipboardItems) return;
 
       Array.from(clipboardItems)
-        .filter((item) => SUPPORTED_FILE_TYPES.includes(item.type))
+        .filter((clipboardItem) => isSupportedFileType(clipboardItem.type))
         .forEach((item) => {
           const file = item.getAsFile();
           if (file) {
