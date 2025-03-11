@@ -8,7 +8,7 @@ import {
   defaultInputPlaceholderText,
 } from './prompts/defaultPrompts';
 import KavaIcon from '../../../core/assets/KavaIcon';
-import { calculateDeepseekTokenUsage } from '../helpers';
+import { calculateFinalChunkTokenUsage } from '../helpers';
 
 <<<<<<< HEAD
 const supportedReasoningModels = [
@@ -39,7 +39,7 @@ export const reasoningModels: Record<
     maximumFileBytes: 8 * 1024 * 1024, //  8MB
     //  not running full 128K token context currently
     contextLength: 8192,
-    contextLimitMonitor: calculateDeepseekTokenUsage,
+    contextLimitMonitor: calculateFinalChunkTokenUsage,
     contextWarningThresholdPercentage: 5,
     conversationResetTokenThreshold: 100,
     systemPrompt: defaultSystemPrompt,
@@ -54,9 +54,8 @@ export const reasoningModels: Record<
     tools: [],
     supportedFileTypes: ['image/jpeg', 'image/png', 'image/webp'],
     maximumFileUploads: 4,
-    //  not running full 128K token context currently
-    contextLength: 8192,
-    contextLimitMonitor: calculateDeepseekTokenUsage,
+    contextLength: 65536,
+    contextLimitMonitor: calculateFinalChunkTokenUsage,
     contextWarningThresholdPercentage: 5,
     conversationResetTokenThreshold: 100,
     systemPrompt: defaultSystemPrompt,
