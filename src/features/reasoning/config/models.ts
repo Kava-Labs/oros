@@ -10,6 +10,7 @@ import {
 import KavaIcon from '../../../core/assets/KavaIcon';
 import { calculateDeepseekTokenUsage } from '../helpers';
 
+<<<<<<< HEAD
 const supportedReasoningModels = [
   'deepseek-r1',
   'qwen2.5-vl-7b-instruct',
@@ -45,8 +46,8 @@ export const reasoningModels: Record<
     introText: defaultIntroText,
     inputPlaceholderText: defaultInputPlaceholderText,
   },
-  'qwen2.5-vl-7b-instruct': {
-    id: 'qwen2.5-vl-7b-instruct',
+  'qwen2.5-vl-7b-instruct-1m': {
+    id: 'qwen2.5-vl-7b-instruct-1m',
     name: 'General Reasoning',
     icon: KavaIcon,
     description: 'Logical Analysis',
