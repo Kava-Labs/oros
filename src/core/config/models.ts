@@ -60,8 +60,12 @@ const defaultModelFromQueryParams = () => {
   return null;
 };
 
+const DEFAULT_REASONING_MODEL = import.meta.env.VITE_FEAT_QWEN
+  ? 'qwen2.5-vl-7b-instruct'
+  : 'deepseek-r1';
+
 export const DEFAULT_MODEL_NAME = defaultModelFromQueryParams()
   ? defaultModelFromQueryParams()!
   : import.meta.env.VITE_FEAT_UPDATED_DESIGN
-    ? 'deepseek-r1'
+    ? DEFAULT_REASONING_MODEL
     : 'gpt-4o';
