@@ -251,7 +251,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
 
   useDragAndDrop({
     hasAvailableUploads,
-    processFile: processUploadedFile,
+    processUploadedFile,
     resetUploadState,
     imageIDs,
     modelConfig,
