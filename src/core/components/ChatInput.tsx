@@ -244,7 +244,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
           const doc = await library.loadDocument(buf);
 
           let len = doc.getPageCount();
-          const max = 8; // limit to 8 pages for now
+          const max = 4; // limit to max 4 pages for now
           len = len >= max ? max : len;
 
           for (let i = 0; i < len; i++) {
@@ -593,7 +593,7 @@ function bitmapToBase64ImageURL(
     );
     ctx!.putImageData(imageData, 0, 0);
 
-    const base64Image = canvas.toDataURL('image/png');
+    const base64Image = canvas.toDataURL('image/webp');
     resolve(base64Image);
   });
 }

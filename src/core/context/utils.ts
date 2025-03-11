@@ -41,7 +41,9 @@ const analyzeImage = async (
   client: OpenAI,
   msg: ChatCompletionUserMessageParam,
 ) => {
-  if (Array.isArray(msg.content) && msg.content.length > 5) {
+  const chunkSize = 1; // each chunk
+
+  if (Array.isArray(msg.content) && msg.content.length > chunkSize+1) {
     // chunk those requests
     const textContent = msg.content.find((msg) => msg.type === 'text');
     if (!textContent) return;
@@ -58,7 +60,7 @@ const analyzeImage = async (
     ];
     for (const content of msg.content) {
       if (content.type === 'image_url') {
-        if (requestMsgs[requestMsgs.length - 1].content.length >= 5) {
+        if (requestMsgs[requestMsgs.length - 1].content.length >= chunkSize+1) {
           requestMsgs.push({
             role: 'user',
             content: [
