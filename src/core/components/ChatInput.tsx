@@ -301,6 +301,49 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     setUploadingState,
   });
 
+  useEffect(() => {
+    if (!modelSupportsUpload) {
+      return;
+    }
+
+    const handlePaste = (e: ClipboardEvent) => {
+      if (!hasAvailableUploads()) {
+        return;
+      }
+
+      const clipboardItems = e.clipboardData?.items;
+      if (!clipboardItems) return;
+
+      Array.from(clipboardItems)
+        .filter((clipboardItem) => isSupportedFileType(clipboardItem.type))
+        .forEach((item) => {
+          const file = item.getAsFile();
+          if (file) {
+            if (file.size > MAX_FILE_BYTES) {
+              setUploadingState({
+                isActive: true,
+                isSupportedFile: false,
+                errorMessage: 'File too large! Maximum file size is 8MB.',
+              });
+
+              setTimeout(() => {
+                resetUploadState();
+              }, 2000);
+
+              return;
+            }
+            processFile(file);
+          }
+        });
+    };
+
+    document.addEventListener('paste', handlePaste);
+
+    return () => {
+      document.removeEventListener('paste', handlePaste);
+    };
+  }, [processFile, hasAvailableUploads, modelSupportsUpload, resetUploadState]);
+
   const [, setHoverImageId] = useState<string | null>(null);
 
   const { colors } = useTheme();
