@@ -238,15 +238,28 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
           const buf = new Uint8Array(e.target.result);
           const doc = await library.loadDocument(buf);
 
-          const page = doc.getPage(0);
-          const image = await page.render({ scale: 3, render: 'bitmap' });
-          const base64ImageURL = await bitmapToBase64ImageURL(
-            image.data,
-            image.width,
-            image.height,
-          );
-          const imgID = await saveImage(base64ImageURL);
-          setImageIDs((prevIDs) => [...prevIDs, imgID]);
+          let len = doc.getPageCount();
+          const max = 8; // limit to 8 pages for now
+          len = len >= max ? max : len;
+
+          for (let i = 0; i < len; i++) {
+            const page = doc.getPage(i);
+            const image = await page.render({
+              scale: 3,
+              render: 'bitmap',
+              width: 256,
+              height: 256,
+            });
+            const base64ImageURL = await bitmapToBase64ImageURL(
+              image.data,
+              image.width,
+              image.height,
+            );
+            const imgID = await saveImage(base64ImageURL);
+            setImageIDs((prevIDs) => [...prevIDs, imgID]);
+          }
+
+          doc.destroy();
         }
       };
 

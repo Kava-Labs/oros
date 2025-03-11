@@ -16,6 +16,7 @@ import {
   ChatCompletionChunk,
   ChatCompletionContentPart,
   ChatCompletionMessageParam,
+  ChatCompletionUserMessageParam,
 } from 'openai/resources/index';
 import { getImage } from '../utils/idb/idb';
 import { visionModelPrompt } from '../../features/reasoning/config/prompts/defaultPrompts';
@@ -35,23 +36,68 @@ export const newConversation = () => {
 
 const analyzeImage = async (
   client: OpenAI,
-  msg: ChatCompletionMessageParam,
+  msg: ChatCompletionUserMessageParam,
 ) => {
-  const data = await client.chat.completions.create({
-    model: 'qwen2.5-vl-7b-instruct',
-    messages: [msg],
-  });
+  if (Array.isArray(msg.content) && msg.content.length > 5) {
+    // chunk those requests
+    const textContent = msg.content.find((msg) => msg.type === 'text');
+    if (!textContent) return;
+    const requestMsgs: ChatCompletionUserMessageParam[] = [
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'text',
+            text: textContent.text,
+          },
+        ],
+      },
+    ];
+    for (const content of msg.content) {
+      if (content.type === 'image_url') {
+        if (requestMsgs[requestMsgs.length - 1].content.length >= 5) {
+          requestMsgs.push({
+            role: 'user',
+            content: [
+              {
+                type: 'text',
+                text: textContent.text,
+              },
+            ],
+          });
+        }
 
+        (
+          requestMsgs[requestMsgs.length - 1]
+            .content as ChatCompletionContentPart[]
+        ).push({ ...content });
+      }
+    }
 
-  
-  // todo: needs better error handling
-  if (!data.choices) {
-    return JSON.stringify(data);
+    console.log(requestMsgs);
+    const promises: Promise<string | undefined>[] = [];
+    for (const request of requestMsgs) {
+      promises.push(analyzeImage(client, request));
+    }
+
+    const results = await Promise.all(promises);
+    console.log(results);
+    return results.join('\n');
+  } else {
+    const data = await client.chat.completions.create({
+      model: 'qwen2.5-vl-7b-instruct',
+      messages: [msg],
+    });
+
+    // todo: needs better error handling
+    if (!data.choices) {
+      return JSON.stringify(data);
+    }
+
+    const imageDetails = data.choices[0].message.content;
+
+    return imageDetails ? imageDetails : '';
   }
-
-  const imageDetails = data.choices[0].message.content;
-
-  return imageDetails ? imageDetails : '';
 };
 
 /**
