@@ -41,15 +41,49 @@ export const AppContextProvider = (props: {
     initializeMessageRegistry(),
   );
 
-  const [conversation, setConversation] = useState<ActiveConversation>({
-    conversationID: uuidv4(),
-    messageHistoryStore: props.messageHistoryStore,
-    toolCallStreamStore: props.toolCallStreamStore,
-    thinkingStore: props.thinkingStore,
-    progressStore: props.progressStore,
-    messageStore: props.messageStore,
-    errorStore: new TextStreamStore(),
-    isRequesting: false,
+  const [modelConfig, setModelConfig] = useState<ModelConfig>(() =>
+    getModelConfig(DEFAULT_MODEL_NAME),
+  );
+
+  const ensureCorrectSystemPrompt = useCallback(
+    (messageStore: MessageHistoryStore, modelConfig: ModelConfig) => {
+      const messages = messageStore.getSnapshot();
+      const systemPrompt = modelConfig.systemPrompt;
+
+      // If no messages, add the system message
+      if (messages.length === 0) {
+        messageStore.addMessage({
+          role: 'system',
+          content: systemPrompt,
+        });
+      } else if (messages[0].role === 'system') {
+        // If first message is system, update it
+        const updatedMessages = [...messages];
+        updatedMessages[0] = {
+          role: 'system',
+          content: systemPrompt,
+        };
+        messageStore.setMessages(updatedMessages);
+      }
+    },
+    [],
+  );
+
+  const [conversation, setConversation] = useState<ActiveConversation>(() => {
+    const newConv = {
+      conversationID: uuidv4(),
+      messageHistoryStore: props.messageHistoryStore,
+      toolCallStreamStore: props.toolCallStreamStore,
+      thinkingStore: props.thinkingStore,
+      progressStore: props.progressStore,
+      messageStore: props.messageStore,
+      errorStore: new TextStreamStore(),
+      isRequesting: false,
+    };
+
+    ensureCorrectSystemPrompt(newConv.messageHistoryStore, modelConfig);
+
+    return newConv;
   });
 
   const {
@@ -103,10 +137,6 @@ export const AppContextProvider = (props: {
     },
   );
 
-  const [modelConfig, setModelConfig] = useState<ModelConfig>(() =>
-    getModelConfig(DEFAULT_MODEL_NAME),
-  );
-
   // Poll for conversation changes
   useEffect(() => {
     const load = () => {
@@ -125,30 +155,6 @@ export const AppContextProvider = (props: {
   const hasConversations = useMemo(
     () => conversations.length > 0,
     [conversations],
-  );
-
-  const ensureCorrectSystemPrompt = useCallback(
-    (messageStore: MessageHistoryStore, modelConfig: ModelConfig) => {
-      const messages = messageStore.getSnapshot();
-      const systemPrompt = modelConfig.systemPrompt;
-
-      // If no messages, add the system message
-      if (messages.length === 0) {
-        messageStore.addMessage({
-          role: 'system',
-          content: systemPrompt,
-        });
-      } else if (messages[0].role === 'system') {
-        // If first message is system, update it
-        const updatedMessages = [...messages];
-        updatedMessages[0] = {
-          role: 'system',
-          content: systemPrompt,
-        };
-        messageStore.setMessages(updatedMessages);
-      }
-    },
-    [],
   );
 
   const handleModelChange = useCallback(
