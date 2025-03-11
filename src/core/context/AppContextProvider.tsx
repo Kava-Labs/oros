@@ -154,13 +154,6 @@ export const AppContextProvider = (props: {
     [],
   );
 
-  // // //  When the in
-  // useEffect(() => {
-  //   if (isReady && messageHistoryStore) {
-  //     ensureCorrectSystemPrompt(messageHistoryStore, modelConfig);
-  //   }
-  // }, [isReady, messageHistoryStore, modelConfig, ensureCorrectSystemPrompt]);
-
   const handleModelChange = useCallback(
     (modelName: SupportedModels) => {
       const newConfig = getModelConfig(modelName);
@@ -219,7 +212,7 @@ export const AppContextProvider = (props: {
     }
 
     setIsReady(true);
-  }, [ensureCorrectSystemPrompt, messageHistoryStore, modelConfig]);
+  }, []);
 
   // abort controller for cancelling openai request
   const controllerRef = useRef<AbortController | null>(null);
