@@ -52,7 +52,7 @@ export const reasoningModels: Record<
     supportedFileTypes: ['image/jpeg', 'image/png', 'image/webp'],
     maximumFileUploads: 4,
     maximumFileBytes: 8 * 1024 * 1024,
-    contextLength: 65536,
+    contextLength: 8192,
     contextLimitMonitor: calculateFinalChunkTokenUsage,
     contextWarningThresholdPercentage: 5,
     conversationResetTokenThreshold: 100,
