@@ -27,7 +27,7 @@ describe('useHandleDragAndDrop', () => {
       'image/png',
       'image/webp',
     ] as Array<SupportedFileType>,
-    MAX_FILE_UPLOADS: 4,
+    maximumFileUploads: 4,
     MAX_FILE_BYTES: 8 * 1024 * 1024, // 8MB
     setUploadingState: mockSetUploadingState,
   };
@@ -274,12 +274,12 @@ describe('useHandleDragAndDrop', () => {
       expect(mockProcessFile).toHaveBeenCalledWith(files[1]);
     });
 
-    it('should show error when drop exceeds MAX_FILE_UPLOADS', () => {
+    it('should show error when drop exceeds maximumFileUploads', () => {
       renderHook(() =>
         useDragAndDrop({
           ...defaultParams,
           imageIDs: ['existing1', 'existing2', 'existing3'],
-          MAX_FILE_UPLOADS: 4,
+          maximumFileUploads: 4,
         }),
       );
 

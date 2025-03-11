@@ -17,8 +17,6 @@ import { isSupportedFileType } from '../types/models';
 
 const DEFAULT_HEIGHT = '30px';
 
-const MAX_FILE_UPLOADS = 4;
-
 const MAX_FILE_BYTES = 8 * 1024 * 1024;
 
 interface ChatInputProps {
@@ -67,7 +65,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     conversationID,
   } = useAppContext();
 
-  const { supportedFileTypes } = modelConfig;
+  const { supportedFileTypes, maximumFileUploads } = modelConfig;
 
   const buttonRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -170,11 +168,11 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
   };
 
   const hasAvailableUploads = useCallback((): boolean => {
-    if (imageIDs.length >= MAX_FILE_UPLOADS) {
+    if (imageIDs.length >= maximumFileUploads) {
       setUploadingState({
         isActive: true,
         isSupportedFile: false,
-        errorMessage: `Maximum ${MAX_FILE_UPLOADS} files allowed!`,
+        errorMessage: `Maximum ${maximumFileUploads} files allowed!`,
       });
 
       setTimeout(() => {
@@ -240,11 +238,11 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
   const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files?.length) {
       const totalFilesAfterUpdate = imageIDs.length + event.target.files.length;
-      if (totalFilesAfterUpdate > MAX_FILE_UPLOADS) {
+      if (totalFilesAfterUpdate > maximumFileUploads) {
         setUploadingState({
           isActive: true,
           isSupportedFile: false,
-          errorMessage: `Maximum ${MAX_FILE_UPLOADS} files allowed.`,
+          errorMessage: `Maximum ${maximumFileUploads} files allowed.`,
         });
 
         setTimeout(() => {
@@ -298,7 +296,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     resetUploadState,
     imageIDs,
     supportedFileTypes,
-    MAX_FILE_UPLOADS,
+    maximumFileUploads,
     MAX_FILE_BYTES,
     setUploadingState,
   });
@@ -393,7 +391,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
                     className={styles.uploadInputField}
                     onChange={handleUpload}
                     multiple // Allow multiple file selection
-                    disabled={imageIDs.length >= MAX_FILE_UPLOADS}
+                    disabled={imageIDs.length >= maximumFileUploads}
                   />
                 </div>
 
@@ -401,9 +399,9 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
                   icon={Paperclip}
                   size={16}
                   aria-label="Attach file icon"
-                  className={`${styles.attachIcon} ${imageIDs.length >= MAX_FILE_UPLOADS ? styles.disabled : ''}`}
+                  className={`${styles.attachIcon} ${imageIDs.length >= maximumFileUploads ? styles.disabled : ''}`}
                   onClick={() =>
-                    imageIDs.length < MAX_FILE_UPLOADS &&
+                    imageIDs.length < maximumFileUploads &&
                     uploadRef.current?.click()
                   }
                   tooltip={{
@@ -411,7 +409,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
                     position: 'bottom',
                     backgroundColor: colors.bgPrimary,
                   }}
-                  disabled={imageIDs.length >= MAX_FILE_UPLOADS}
+                  disabled={imageIDs.length >= maximumFileUploads}
                 />
               </>
             )}

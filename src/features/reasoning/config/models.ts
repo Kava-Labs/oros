@@ -20,6 +20,7 @@ export const reasoningModels: Record<
     description: 'Logical Analysis',
     tools: [],
     supportedFileTypes: ['image/jpeg', 'image/png', 'image/webp'],
+    maximumFileUploads: 4,
     //  not running full 128K token context currently
     contextLength: 8192,
     contextLimitMonitor: calculateDeepseekTokenUsage,

@@ -8,7 +8,7 @@ interface UseHandleDragAndDropParams {
   resetUploadState: () => void;
   imageIDs: string[];
   supportedFileTypes: Array<SupportedFileType>;
-  MAX_FILE_UPLOADS: number;
+  maximumFileUploads: number;
   MAX_FILE_BYTES: number;
   setUploadingState: Dispatch<SetStateAction<UploadingState>>;
 }
@@ -23,8 +23,9 @@ interface UseHandleDragAndDropParams {
  * @param params.processFile - Function that handles processing a valid file
  * @param params.resetUploadState - Function that resets the uploading state
  * @param params.imageIDs - Array of currently uploaded image IDs
+<<<<<<< HEAD:src/core/hooks/useDragAndDrop.ts
  * @param params.supportedFileTypes - Array of accepted MIME types
- * @param params.MAX_FILE_UPLOADS - Maximum number of files allowed
+ * @param params.maximumFileUploads - Maximum number of files allowed
  * @param params.MAX_FILE_BYTES - Maximum file size in bytes
  * @param params.setUploadingState - State setter for the uploading state
  *
@@ -36,7 +37,7 @@ export const useDragAndDrop = ({
   resetUploadState,
   imageIDs,
   supportedFileTypes,
-  MAX_FILE_UPLOADS,
+  maximumFileUploads,
   MAX_FILE_BYTES,
   setUploadingState,
 }: UseHandleDragAndDropParams) => {
@@ -127,11 +128,11 @@ export const useDragAndDrop = ({
             resetUploadState();
           }, 2000);
           return;
-        } else if (totalFilesAfterDrop > MAX_FILE_UPLOADS) {
+        } else if (totalFilesAfterDrop > maximumFileUploads) {
           setUploadingState({
             isActive: true,
             isSupportedFile: false,
-            errorMessage: `Maximum ${MAX_FILE_UPLOADS} files allowed.`,
+            errorMessage: `Maximum ${maximumFileUploads} files allowed.`,
           });
 
           setTimeout(() => {
@@ -161,8 +162,7 @@ export const useDragAndDrop = ({
     [
       imageIDs.length,
       MAX_FILE_BYTES,
-      MAX_FILE_UPLOADS,
-      supportedFileTypes,
+      maximumFileUploads,
       processFile,
       resetUploadState,
       setUploadingState,
