@@ -20,7 +20,6 @@ describe('useProcessUploadedFile', () => {
   const mockSetUploadingState = vi.fn();
   const mockResetUploadState = vi.fn();
   const mockHasAvailableUploads = vi.fn().mockReturnValue(true);
-  const mockIsSupportedFileType = vi.fn().mockReturnValue(true);
   const mockSaveImage = vi.fn().mockResolvedValue('test-image-id');
   const mockSetImageIDs = vi.fn();
 
@@ -35,7 +34,6 @@ describe('useProcessUploadedFile', () => {
     maximumFileBytes: 8 * 1024 * 1024, // 8MB
     setUploadingState: mockSetUploadingState,
     resetUploadState: mockResetUploadState,
-    isSupportedFileType: mockIsSupportedFileType,
     saveImage: mockSaveImage,
     setImageIDs: mockSetImageIDs,
   };
@@ -96,13 +94,7 @@ describe('useProcessUploadedFile', () => {
   });
 
   it('should reject unsupported file types', async () => {
-    mockIsSupportedFileType.mockReturnValueOnce(false);
-
-    const unsupportedFile = createMockFile(
-      'document.mp4',
-      500,
-      'application/mp4',
-    );
+    const unsupportedFile = createMockFile('video.mp4', 500, 'video/mp4');
 
     const { result } = renderHook(() => useProcessUploadedFile(defaultParams));
 
@@ -110,7 +102,6 @@ describe('useProcessUploadedFile', () => {
       await result.current(unsupportedFile);
     });
 
-    expect(mockIsSupportedFileType).toHaveBeenCalledWith('application/mp4');
     expect(mockSetUploadingState).toHaveBeenCalledWith({
       isActive: true,
       isSupportedFile: false,
