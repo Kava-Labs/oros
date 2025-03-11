@@ -23,6 +23,7 @@ import {
   visionModelPrompt,
   visionModelPDFPrompt,
 } from '../../features/reasoning/config/prompts/defaultPrompts';
+import { hasSufficientRemainingTokens } from '../utils/conversation/hasSufficientRemainingTokens';
 
 export const newConversation = () => {
   return {
@@ -39,14 +40,16 @@ export const newConversation = () => {
 
 const analyzeImage = async (
   client: OpenAI,
+  conversationID: string,
+  modelConfig: ModelConfig,
   msg: ChatCompletionUserMessageParam,
-) => {
-  const chunkSize = 1; // each chunk
+): Promise<string> => {
+  const chunkSize = 1; // each chunk contains chunkSize images
 
-  if (Array.isArray(msg.content) && msg.content.length > chunkSize+1) {
+  if (Array.isArray(msg.content) && msg.content.length > chunkSize + 1) {
     // chunk those requests
     const textContent = msg.content.find((msg) => msg.type === 'text');
-    if (!textContent) return;
+    if (!textContent) return '';
     const requestMsgs: ChatCompletionUserMessageParam[] = [
       {
         role: 'user',
@@ -60,7 +63,10 @@ const analyzeImage = async (
     ];
     for (const content of msg.content) {
       if (content.type === 'image_url') {
-        if (requestMsgs[requestMsgs.length - 1].content.length >= chunkSize+1) {
+        if (
+          requestMsgs[requestMsgs.length - 1].content.length >=
+          chunkSize + 1
+        ) {
           requestMsgs.push({
             role: 'user',
             content: [
@@ -80,14 +86,46 @@ const analyzeImage = async (
     }
 
     console.log(requestMsgs);
-    const promises: Promise<string | undefined>[] = [];
-    for (const request of requestMsgs) {
-      promises.push(analyzeImage(client, request));
+
+    const allConversations: Record<string, ConversationHistory> = JSON.parse(
+      localStorage.getItem('conversations') ?? '{}',
+    );
+
+    const currentConversation = allConversations[conversationID];
+
+    const remainingContextWindow = currentConversation
+      ? currentConversation.tokensRemaining
+      : modelConfig.contextLength;
+
+    let details = '';
+    for (let i = 0; i < requestMsgs.length; i++) {
+      const request = requestMsgs[i];
+      const res = await analyzeImage(
+        client,
+        conversationID,
+        modelConfig,
+        request,
+      );
+
+      if (
+        hasSufficientRemainingTokens(
+          modelConfig.id,
+          details,
+          remainingContextWindow,
+        )
+      ) {
+        details = details.concat(
+          `\nPage #${i + 1} ${chunkSize > 1 ? ' to page #' + i + 1 + chunkSize : ''}`,
+          res,
+        );
+      } else {
+        // exceeds context window
+        break;
+      }
     }
 
-    const results = await Promise.all(promises);
-    console.log(results);
-    return results.join('\n');
+    console.log(details);
+    return details;
   } else {
     const data = await client.chat.completions.create({
       model: 'qwen2.5-vl-7b-instruct',
@@ -235,7 +273,12 @@ export async function doChat(
   }
 
   if (isFileUpload) {
-    const imageDetails = await analyzeImage(client, visionModelMsg);
+    const imageDetails = await analyzeImage(
+      client,
+      conversationID,
+      modelConfig,
+      visionModelMsg,
+    );
 
     messageHistoryStore.setMessages([
       ...messageHistoryStore.getSnapshot().slice(0, -1),
