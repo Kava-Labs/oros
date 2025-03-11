@@ -19,6 +19,7 @@ import {
 } from 'openai/resources/index';
 import { getImage } from '../utils/idb/idb';
 import { visionModelPrompt } from '../../features/reasoning/config/prompts/defaultPrompts';
+import { isReasoningModel } from '../config/models';
 
 export const newConversation = () => {
   return {
@@ -247,8 +248,8 @@ export async function doChat(
       if (isContentChunk(chunk)) {
         content += chunk['choices'][0]['delta']['content'];
         // todo: chance to clean up into a helper similar to assembleToolCallFromStream
-        switch (modelConfig.id) {
-          case 'deepseek-r1': {
+        switch (true) {
+          case isReasoningModel(modelConfig.id): {
             const openTag = '<think>';
             const closeTag = '</think>';
 
