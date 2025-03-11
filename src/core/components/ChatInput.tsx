@@ -294,9 +294,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     processFile,
     resetUploadState,
     imageIDs,
-    supportedFileTypes,
-    maximumFileUploads,
-    maximumFileBytes,
+    modelConfig,
     setUploadingState,
   });
 

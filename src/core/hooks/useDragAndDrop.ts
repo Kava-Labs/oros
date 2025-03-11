@@ -1,15 +1,13 @@
 import { useEffect, useCallback, Dispatch, SetStateAction } from 'react';
 import { UploadingState } from '../components/ChatInput';
-import { isSupportedFileType, SupportedFileType } from '../types/models';
+import { isSupportedFileType, ModelConfig } from '../types/models';
 
 interface UseHandleDragAndDropParams {
   hasAvailableUploads: () => boolean;
   processFile: (file: File) => Promise<void>;
   resetUploadState: () => void;
   imageIDs: string[];
-  supportedFileTypes: Array<SupportedFileType>;
-  maximumFileUploads: number;
-  maximumFileBytes: number;
+  modelConfig: ModelConfig;
   setUploadingState: Dispatch<SetStateAction<UploadingState>>;
 }
 
@@ -23,10 +21,7 @@ interface UseHandleDragAndDropParams {
  * @param params.processFile - Function that handles processing a valid file
  * @param params.resetUploadState - Function that resets the uploading state
  * @param params.imageIDs - Array of currently uploaded image IDs
-<<<<<<< HEAD:src/core/hooks/useDragAndDrop.ts
- * @param params.supportedFileTypes - Array of accepted MIME types
- * @param params.maximumFileUploads - Maximum number of files allowed
- * @param params.MAX_FILE_BYTES - Maximum file size in bytes
+ * @param params.modelConfig - Object that contains necessary properties
  * @param params.setUploadingState - State setter for the uploading state
  *
  * @returns void - This hook doesn't return any values but sets up event listeners
@@ -36,11 +31,12 @@ export const useDragAndDrop = ({
   processFile,
   resetUploadState,
   imageIDs,
-  supportedFileTypes,
-  maximumFileUploads,
-  maximumFileBytes,
+  modelConfig,
   setUploadingState,
 }: UseHandleDragAndDropParams) => {
+  const { supportedFileTypes, maximumFileUploads, maximumFileBytes } =
+    modelConfig;
+
   const handleDragEnter = useCallback(
     (e: DragEvent) => {
       e.preventDefault();
@@ -67,7 +63,7 @@ export const useDragAndDrop = ({
         }
       }
     },
-    [hasAvailableUploads, supportedFileTypes, setUploadingState],
+    [hasAvailableUploads, setUploadingState],
   );
 
   const handleDragOver = useCallback(
@@ -170,7 +166,7 @@ export const useDragAndDrop = ({
   );
 
   useEffect(() => {
-    if (!supportedFileTypes.length) {
+    if (maximumFileUploads === 0) {
       return;
     }
 
@@ -192,6 +188,6 @@ export const useDragAndDrop = ({
     handleDragOver,
     handleDragLeave,
     handleDrop,
-    supportedFileTypes.length,
+    maximumFileUploads,
   ]);
 };
