@@ -238,7 +238,7 @@ export async function doChat(
     let openTagFound = false;
 
     for await (const chunk of stream) {
-      // Get the usage info (in the final chunk)
+      //  Get the usage info (in the final chunk)
       if (chunk.usage) {
         finalChunk = chunk;
       }
@@ -247,8 +247,9 @@ export async function doChat(
         progressStore.setText('');
       }
 
+      //  todo: chance to clean up into a helper similar to assembleToolCallFromStream
       if (isContentChunk(chunk)) {
-        // Add content from chunks that have it and not the final usage chunk if it exists
+        //  Add content from chunks that have it and not the final usage chunk if it exists
         if (chunk.choices.length) {
           content += chunk['choices'][0]['delta']['content'];
         }

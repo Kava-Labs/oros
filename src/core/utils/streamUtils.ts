@@ -12,7 +12,7 @@ export const isContentChunk = (result: ChatCompletionChunk): boolean => {
     return true;
   }
   const delta = result.choices[0].delta;
-  // Sometimes content is an empty string, so we check if content is a string property.
+  //  Sometimes content is an empty string, so we check if content is a string property.
   return delta && 'content' in delta && typeof delta.content === 'string';
 };
 
