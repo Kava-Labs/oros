@@ -1,4 +1,7 @@
-import { ReasoningModelConfig } from '../../../core/types/models';
+import {
+  ReasoningModelConfig,
+  SupportedModels,
+} from '../../../core/types/models';
 import {
   defaultIntroText,
   defaultSystemPrompt,
@@ -7,10 +10,18 @@ import {
 import KavaIcon from '../../../core/assets/KavaIcon';
 import { calculateDeepseekTokenUsage } from '../helpers';
 
-export type SupportedReasoningModels = 'deepseek-r1';
+const supportedReasoningModels = ['deepseek-r1'] as const;
+
+export type SupportedReasoningModel = (typeof supportedReasoningModels)[number];
+
+export function isReasoningModel(
+  modelId: SupportedModels,
+): modelId is SupportedReasoningModel {
+  return supportedReasoningModels.includes(modelId as SupportedReasoningModel);
+}
 
 export const reasoningModels: Record<
-  SupportedReasoningModels,
+  SupportedReasoningModel,
   ReasoningModelConfig
 > = {
   'deepseek-r1': {

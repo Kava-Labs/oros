@@ -19,7 +19,7 @@ import {
 } from 'openai/resources/index';
 import { getImage } from '../utils/idb/idb';
 import { visionModelPrompt } from '../../features/reasoning/config/prompts/defaultPrompts';
-import { isReasoningModel } from '../config/models';
+import { isReasoningModel } from '../../features/reasoning/config/models';
 
 export const newConversation = () => {
   return {
