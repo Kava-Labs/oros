@@ -108,11 +108,12 @@ const analyzeImage = async (
       );
 
       if (
-        hasSufficientRemainingTokens(
-          modelConfig.id,
-          details,
-          remainingContextWindow,
-        )
+        details.length < 4096
+        // hasSufficientRemainingTokens(
+        //   modelConfig.id,
+        //   details,
+        //   remainingContextWindow,
+        // ) not being accurate
       ) {
         details = details.concat(
           `\nPage #${i + 1} ${chunkSize > 1 ? ' to page #' + i + 1 + chunkSize : ''}`,
