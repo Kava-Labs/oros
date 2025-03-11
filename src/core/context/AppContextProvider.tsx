@@ -45,6 +45,30 @@ export const AppContextProvider = (props: {
     getModelConfig(DEFAULT_MODEL_NAME),
   );
 
+  const ensureCorrectSystemPrompt = useCallback(
+    (messageStore: MessageHistoryStore, modelConfig: ModelConfig) => {
+      const messages = messageStore.getSnapshot();
+      const systemPrompt = modelConfig.systemPrompt;
+
+      // If no messages, add the system message
+      if (messages.length === 0) {
+        messageStore.addMessage({
+          role: 'system',
+          content: systemPrompt,
+        });
+      } else if (messages[0].role === 'system') {
+        // If first message is system, update it
+        const updatedMessages = [...messages];
+        updatedMessages[0] = {
+          role: 'system',
+          content: systemPrompt,
+        };
+        messageStore.setMessages(updatedMessages);
+      }
+    },
+    [],
+  );
+
   const [conversation, setConversation] = useState<ActiveConversation>(() => {
     const newConv = {
       conversationID: uuidv4(),
@@ -57,13 +81,7 @@ export const AppContextProvider = (props: {
       isRequesting: false,
     };
 
-    const messages = newConv.messageHistoryStore.getSnapshot();
-    if (messages.length === 0) {
-      newConv.messageHistoryStore.addMessage({
-        role: 'system',
-        content: modelConfig.systemPrompt,
-      });
-    }
+    ensureCorrectSystemPrompt(newConv.messageHistoryStore, modelConfig);
 
     return newConv;
   });
@@ -137,30 +155,6 @@ export const AppContextProvider = (props: {
   const hasConversations = useMemo(
     () => conversations.length > 0,
     [conversations],
-  );
-
-  const ensureCorrectSystemPrompt = useCallback(
-    (messageStore: MessageHistoryStore, modelConfig: ModelConfig) => {
-      const messages = messageStore.getSnapshot();
-      const systemPrompt = modelConfig.systemPrompt;
-
-      // If no messages, add the system message
-      if (messages.length === 0) {
-        messageStore.addMessage({
-          role: 'system',
-          content: systemPrompt,
-        });
-      } else if (messages[0].role === 'system') {
-        // If first message is system, update it
-        const updatedMessages = [...messages];
-        updatedMessages[0] = {
-          role: 'system',
-          content: systemPrompt,
-        };
-        messageStore.setMessages(updatedMessages);
-      }
-    },
-    [],
   );
 
   const handleModelChange = useCallback(
