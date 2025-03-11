@@ -7,12 +7,13 @@ import { ToolCallStreamStore } from '../stores/toolCallStreamStore';
  * @returns True if the chunk contains content, false otherwise.
  */
 export const isContentChunk = (result: ChatCompletionChunk): boolean => {
-  const delta = result.choices[0].delta;
-  // Sometimes content is an empty string, so we check if content is a string property.
-  if (delta && 'content' in delta && typeof delta.content === 'string') {
+  //  Treat usage-only chunks as content chunks
+  if (result.usage && (!result.choices || result.choices.length === 0)) {
     return true;
   }
-  return false;
+  const delta = result.choices[0].delta;
+  // Sometimes content is an empty string, so we check if content is a string property.
+  return delta && 'content' in delta && typeof delta.content === 'string';
 };
 
 /**

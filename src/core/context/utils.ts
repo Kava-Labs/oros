@@ -226,6 +226,7 @@ export async function doChat(
         messages: messagesWithoutReasoningContent,
         tools: tools,
         stream: true,
+        stream_options: { include_usage: modelConfig.includeUsageInStream },
       },
       {
         signal: controller.signal,
@@ -246,7 +247,10 @@ export async function doChat(
       }
 
       if (isContentChunk(chunk)) {
-        content += chunk['choices'][0]['delta']['content'];
+        //  add content from chunks that have it and not the final usage chunk if it exists
+        if (chunk.choices.length) {
+          content += chunk['choices'][0]['delta']['content'];
+        }
         // todo: chance to clean up into a helper similar to assembleToolCallFromStream
         switch (true) {
           case isReasoningModel(modelConfig.id): {
