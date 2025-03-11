@@ -4,12 +4,12 @@ import {
 } from 'openai/resources/index';
 import { ComponentType } from 'react';
 import { SupportedBlockchainModels } from '../../features/blockchain/config/models';
-import { SupportedReasoningModels } from '../../features/reasoning/config/models';
+import { SupportedReasoningModel } from '../../features/reasoning/config/models';
 import { ChatMessage } from '../stores/messageHistoryStore';
 
 export type SupportedModels =
   | SupportedBlockchainModels
-  | SupportedReasoningModels;
+  | SupportedReasoningModel;
 
 export interface BaseModelConfig {
   id: SupportedModels;
@@ -64,7 +64,7 @@ export type ModelConfig = BlockchainModelConfig | ReasoningModelConfig;
 
 export interface ModelRegistry {
   blockchain: Record<SupportedBlockchainModels, BlockchainModelConfig>;
-  reasoning: Record<SupportedReasoningModels, ReasoningModelConfig>;
+  reasoning: Record<SupportedReasoningModel, ReasoningModelConfig>;
 }
 
 export interface ContextMetrics {
