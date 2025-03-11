@@ -21,6 +21,7 @@ export const reasoningModels: Record<
     tools: [],
     supportedFileTypes: ['image/jpeg', 'image/png', 'image/webp'],
     maximumFileUploads: 4,
+    maximumFileBytes: 8 * 1024 * 1024, //  8MB
     //  not running full 128K token context currently
     contextLength: 8192,
     contextLimitMonitor: calculateDeepseekTokenUsage,

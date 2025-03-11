@@ -17,8 +17,6 @@ import { isSupportedFileType } from '../types/models';
 
 const DEFAULT_HEIGHT = '30px';
 
-const MAX_FILE_BYTES = 8 * 1024 * 1024;
-
 interface ChatInputProps {
   setShouldAutoScroll: (s: boolean) => void;
 }
@@ -65,7 +63,8 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     conversationID,
   } = useAppContext();
 
-  const { supportedFileTypes, maximumFileUploads } = modelConfig;
+  const { supportedFileTypes, maximumFileUploads, maximumFileBytes } =
+    modelConfig;
 
   const buttonRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -190,7 +189,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
         return;
       }
 
-      if (file.size > MAX_FILE_BYTES) {
+      if (file.size > maximumFileBytes) {
         setUploadingState({
           isActive: true,
           isSupportedFile: false,
@@ -297,7 +296,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     imageIDs,
     supportedFileTypes,
     maximumFileUploads,
-    MAX_FILE_BYTES,
+    maximumFileBytes,
     setUploadingState,
   });
 
@@ -319,7 +318,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
         .forEach((item) => {
           const file = item.getAsFile();
           if (file) {
-            if (file.size > MAX_FILE_BYTES) {
+            if (file.size > maximumFileBytes) {
               setUploadingState({
                 isActive: true,
                 isSupportedFile: false,
