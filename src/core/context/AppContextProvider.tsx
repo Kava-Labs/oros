@@ -18,7 +18,6 @@ import { SupportedModels, ModelConfig } from '../types/models';
 import { ActiveConversation, ConversationHistory } from './types';
 import { getToken } from '../../core/utils/token/token';
 import OpenAI from 'openai';
-import { v4 as uuidv4 } from 'uuid';
 import { doChat, syncWithLocalStorage, newConversation } from './utils';
 import type { ChatCompletionContentPart } from 'openai/resources/index';
 
