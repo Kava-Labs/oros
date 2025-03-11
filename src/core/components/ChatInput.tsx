@@ -181,7 +181,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       return false;
     }
     return true;
-  }, [imageIDs.length, resetUploadState]);
+  }, [imageIDs.length, maximumFileUploads, resetUploadState]);
 
   const processFile = useCallback(
     async (file: File) => {
@@ -231,7 +231,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       };
       reader.readAsDataURL(file);
     },
-    [resetUploadState, hasAvailableUploads],
+    [hasAvailableUploads, maximumFileBytes, resetUploadState],
   );
 
   const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -339,7 +339,13 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     return () => {
       document.removeEventListener('paste', handlePaste);
     };
-  }, [processFile, hasAvailableUploads, modelSupportsUpload, resetUploadState]);
+  }, [
+    processFile,
+    hasAvailableUploads,
+    modelSupportsUpload,
+    resetUploadState,
+    maximumFileBytes,
+  ]);
 
   const [, setHoverImageId] = useState<string | null>(null);
 
