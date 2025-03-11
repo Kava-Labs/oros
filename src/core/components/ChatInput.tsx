@@ -188,7 +188,6 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     hasAvailableUploads,
     maximumFileBytes,
     setUploadingState,
-    isSupportedFileType,
     saveImage,
     setImageIDs,
     resetUploadState,

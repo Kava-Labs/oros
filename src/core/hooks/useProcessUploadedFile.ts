@@ -1,26 +1,22 @@
 import { Dispatch, SetStateAction, useCallback } from 'react';
+import { isSupportedFileType } from '../types/models';
+import { UploadingState } from '../components/ChatInput';
 
 interface UseProcessUploadedFileParams {
   hasAvailableUploads: () => boolean;
   maximumFileBytes: number;
-  setUploadingState: (state: {
-    isActive: boolean;
-    isSupportedFile: boolean;
-    errorMessage: string;
-  }) => void;
+  setUploadingState: (state: UploadingState) => void;
   resetUploadState: () => void;
-  isSupportedFileType: (fileType: string) => boolean;
   saveImage: (dataUrl: string) => Promise<string>;
   setImageIDs: Dispatch<SetStateAction<string[]>>;
 }
 
 const useProcessUploadedFile = ({
-  hasAvailableUploads,
+  hasAvailableUploads, //  todo - remove when extracted to importable function
   maximumFileBytes,
   setUploadingState,
   resetUploadState,
-  isSupportedFileType,
-  saveImage,
+  saveImage, //  todo - remove when extracted to importable function
   setImageIDs,
 }: UseProcessUploadedFileParams) => {
   return useCallback(
@@ -36,7 +32,7 @@ const useProcessUploadedFile = ({
           errorMessage: 'File too large! Maximum file size is 8MB.',
         });
 
-        //  Present the error for a short time, then reset
+        //   the error for a short time, then reset
         setTimeout(() => {
           resetUploadState();
         }, 2000);
@@ -62,7 +58,7 @@ const useProcessUploadedFile = ({
       resetUploadState();
 
       const reader = new FileReader();
-      reader.onload = async (e: ProgressEvent<FileReader>) => {
+      reader.onload = async (e) => {
         if (e.target && typeof e.target.result === 'string') {
           const imgID = await saveImage(e.target.result);
           setImageIDs((prevIDs) => [...prevIDs, imgID]);
@@ -73,11 +69,10 @@ const useProcessUploadedFile = ({
     [
       hasAvailableUploads,
       maximumFileBytes,
-      isSupportedFileType,
       resetUploadState,
-      setUploadingState,
       saveImage,
       setImageIDs,
+      setUploadingState,
     ],
   );
 };
