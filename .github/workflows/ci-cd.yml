@@ -23,6 +23,7 @@ jobs:
     env:
       VITE_OPENAI_BASE_URL: https://kavachat-api.production.kava.io/openai/v1
       VITE_FEAT_UPDATED_DESIGN: true
+      VITE_FEAT_QWEN: false
     outputs:
       changed: ${{ steps.diff.outputs.diff != '' }}
     steps:
@@ -130,6 +131,7 @@ jobs:
       VITE_E2E_WALLET_MNEMONIC: ${{ secrets.VITE_E2E_WALLET_MNEMONIC }}
       VITE_E2E_WALLET_ADDRESS: ${{ secrets.VITE_E2E_WALLET_ADDRESS }}
       VITE_FEAT_UPDATED_DESIGN: true
+      VITE_FEAT_QWEN: false
     outputs:
       changed: ${{ steps.diff.outputs.diff != '' }}
       image-name: ${{ steps.image-name.outputs.image }}
