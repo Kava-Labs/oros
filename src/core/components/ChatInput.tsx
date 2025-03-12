@@ -220,11 +220,11 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     }
   }, [inputValue, setShouldAutoScroll]);
 
-  // useEffect(() => {
-  //   if (inputRef.current) {
-  //     inputRef.current.focus();
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
 
   const allConversations: Record<string, ConversationHistory> = JSON.parse(
     localStorage.getItem('conversations') ?? '{}',

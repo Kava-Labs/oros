@@ -1,5 +1,5 @@
 import { UploadingState } from '../components/ChatInput';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useCallback } from 'react';
 
 interface UseAvailableUploadsParams {
   imageIDs: string[];
@@ -25,19 +25,23 @@ export const useAvailableUploads = ({
   setUploadingState,
   resetUploadState,
 }: UseAvailableUploadsParams): boolean => {
-  console.log('calling useAvailabeUploads');
-  if (imageIDs.length >= maximumFileUploads) {
-    setUploadingState({
-      isActive: true,
-      isSupportedFile: false,
-      errorMessage: `Maximum ${maximumFileUploads} files allowed.`,
-    });
-
-    setTimeout(() => {
-      resetUploadState();
-    }, 2000);
-
-    return false;
-  }
-  return true;
+  return useCallback((): boolean => {
+    if (imageIDs.length >= maximumFileUploads) {
+      setUploadingState({
+        isActive: true,
+        isSupportedFile: false,
+        errorMessage: `Maximum ${maximumFileUploads} files allowed!`,
+      });
+      setTimeout(() => {
+        resetUploadState();
+      }, 2000);
+      return false;
+    }
+    return true;
+  }, [
+    imageIDs.length,
+    maximumFileUploads,
+    setUploadingState,
+    resetUploadState,
+  ])();
 };

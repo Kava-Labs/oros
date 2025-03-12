@@ -23,7 +23,7 @@ describe('ChatInput', () => {
     onSubmit: vi.fn(),
   };
 
-  test.skip('input is focused by default', () => {
+  test('input is focused by default', () => {
     const wrapper = render(
       <ThemeProvider>
         <AppContextProvider
