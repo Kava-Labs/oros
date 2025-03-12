@@ -4,7 +4,7 @@ import { UploadingState } from '../components/ChatInput';
 import { saveImage } from '../utils/idb/idb';
 
 export interface UseProcessUploadedFileParams {
-  hasAvailableUploads: boolean;
+  hasAvailableUploads: () => boolean;
   maximumFileBytes: number;
   setUploadingState: (state: UploadingState) => void;
   resetUploadState: () => void;
@@ -20,7 +20,7 @@ const useProcessUploadedFile = ({
 }: UseProcessUploadedFileParams) => {
   return useCallback(
     async (file: File) => {
-      if (!hasAvailableUploads) {
+      if (!hasAvailableUploads()) {
         return;
       }
 

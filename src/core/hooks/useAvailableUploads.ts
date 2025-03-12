@@ -9,7 +9,7 @@ interface UseAvailableUploadsParams {
 }
 
 /**
- * Checks if additional file uploads are allowed based on the current state
+ * Returns a function that checks if additional file uploads are allowed
  * Sets error state and schedules reset if maximum is reached
  *
  * @param {UseAvailableUploadsParams} params - Function parameters
@@ -17,14 +17,14 @@ interface UseAvailableUploadsParams {
  * @param {number} params.maximumFileUploads - Maximum number of files allowed for upload
  * @param {Dispatch<SetStateAction<UploadingState>>} params.setUploadingState - State setter for the uploading state
  * @param {Function} params.resetUploadState - Function to reset the uploading state
- * @returns {boolean} True if more uploads are allowed, false otherwise
+ * @returns {Function} Function that returns true if more uploads are allowed, false otherwise
  */
 export const useAvailableUploads = ({
   imageIDs,
   maximumFileUploads,
   setUploadingState,
   resetUploadState,
-}: UseAvailableUploadsParams): boolean => {
+}: UseAvailableUploadsParams): (() => boolean) => {
   return useCallback((): boolean => {
     if (imageIDs.length >= maximumFileUploads) {
       setUploadingState({
@@ -32,9 +32,11 @@ export const useAvailableUploads = ({
         isSupportedFile: false,
         errorMessage: `Maximum ${maximumFileUploads} files allowed!`,
       });
+
       setTimeout(() => {
         resetUploadState();
       }, 2000);
+
       return false;
     }
     return true;
@@ -43,5 +45,5 @@ export const useAvailableUploads = ({
     maximumFileUploads,
     setUploadingState,
     resetUploadState,
-  ])();
+  ]);
 };

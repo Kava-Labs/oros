@@ -17,7 +17,7 @@ describe('useHandleDragAndDrop', () => {
   const mockResetUploadState = vi.fn();
 
   const defaultParams: UseHandleDragAndDropParams = {
-    hasAvailableUploads: true,
+    hasAvailableUploads: () => true,
     processUploadedFile: mockProcessUploadedFile,
     resetUploadState: mockResetUploadState,
     imageIDs: [],
@@ -195,7 +195,7 @@ describe('useHandleDragAndDrop', () => {
       renderHook(() =>
         useDragAndDrop({
           ...defaultParams,
-          hasAvailableUploads: false,
+          hasAvailableUploads: () => false,
         }),
       );
 

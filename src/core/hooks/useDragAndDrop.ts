@@ -3,7 +3,7 @@ import { isSupportedFileType, ModelConfig } from '../types/models';
 import { UploadingState } from '../components/ChatInput';
 
 export interface UseHandleDragAndDropParams {
-  hasAvailableUploads: boolean;
+  hasAvailableUploads: () => boolean;
   processUploadedFile: (file: File) => Promise<void>;
   resetUploadState: () => void;
   imageIDs: string[];
@@ -40,7 +40,7 @@ export const useDragAndDrop = ({
       e.preventDefault();
       e.stopPropagation();
 
-      if (!hasAvailableUploads) {
+      if (!hasAvailableUploads()) {
         return;
       }
 

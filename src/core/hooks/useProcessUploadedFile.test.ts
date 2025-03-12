@@ -35,7 +35,7 @@ describe('useProcessUploadedFile', () => {
   };
 
   const defaultParams: UseProcessUploadedFileParams = {
-    hasAvailableUploads: true,
+    hasAvailableUploads: () => true,
     maximumFileBytes: 8 * 1024 * 1024, // 8MB
     setUploadingState: mockSetUploadingState,
     resetUploadState: mockResetUploadState,
@@ -60,7 +60,7 @@ describe('useProcessUploadedFile', () => {
     const { result } = renderHook(() =>
       useProcessUploadedFile({
         ...defaultParams,
-        hasAvailableUploads: false,
+        hasAvailableUploads: () => false,
       }),
     );
 
@@ -157,7 +157,7 @@ describe('useProcessUploadedFile', () => {
     const { result } = renderHook(() =>
       useProcessUploadedFile({
         ...defaultParams,
-        hasAvailableUploads: false,
+        hasAvailableUploads: () => false,
       }),
     );
 
