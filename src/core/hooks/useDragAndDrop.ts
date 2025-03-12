@@ -3,7 +3,7 @@ import { isSupportedFileType, ModelConfig } from '../types/models';
 import { UploadingState } from '../components/ChatInput';
 
 interface UseHandleDragAndDropParams {
-  hasAvailableUploads: () => boolean;
+  hasAvailableUploads: boolean;
   processUploadedFile: (file: File) => Promise<void>;
   resetUploadState: () => void;
   imageIDs: string[];
@@ -17,8 +17,9 @@ interface UseHandleDragAndDropParams {
  * state updates, and file processing.
  *
  * @param params - Configuration parameters for the drag and drop behavior
- * @param params.hasAvailableUploads - Function that checks if more uploads are allowed
- * @param params.processUploadedFile - Function that handles processing a valid file
+ * @param params.hasAvailableUploads - Boolean for if more uploads are allowed
+ * @param params.@param params.imageIDs - Array of currently uploaded image IDs - Function that handles processing a valid file
+>>>>>>> 64a35e3 (refactor: hasAvailableUploads as boolean)
  * @param params.resetUploadState - Function that resets the uploading state
  * @param params.imageIDs - Array of currently uploaded image IDs
  * @param params.modelConfig - Configuration object that defines upload constraints
@@ -40,7 +41,7 @@ export const useDragAndDrop = ({
       e.preventDefault();
       e.stopPropagation();
 
-      if (!hasAvailableUploads()) {
+      if (!hasAvailableUploads) {
         return;
       }
 

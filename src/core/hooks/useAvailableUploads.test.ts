@@ -1,8 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { useAvailableUploads } from './useAvailableUploads';
-import { renderHook } from '@testing-library/react';
 
-describe('useAvailableUploads', () => {
+describe('checkAvailableUploads', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -13,37 +12,16 @@ describe('useAvailableUploads', () => {
     vi.useRealTimers();
   });
 
-  it('should return "hasAvailableUploads" function', () => {
-    const setUploadingState = vi.fn();
-    const resetUploadState = vi.fn();
-
-    const { result } = renderHook(() =>
-      useAvailableUploads({
-        imageIDs: [],
-        maximumFileUploads: 4,
-        setUploadingState,
-        resetUploadState,
-      }),
-    );
-
-    expect(result.current).toHaveProperty('hasAvailableUploads');
-    expect(typeof result.current.hasAvailableUploads).toBe('function');
-  });
-
   it('should return true when imageIDs length is less than maximumFileUploads', () => {
     const setUploadingState = vi.fn();
     const resetUploadState = vi.fn();
 
-    const { result } = renderHook(() =>
-      useAvailableUploads({
-        imageIDs: ['image1', 'image2'],
-        maximumFileUploads: 4,
-        setUploadingState,
-        resetUploadState,
-      }),
-    );
-
-    const hasAvailable = result.current.hasAvailableUploads();
+    const hasAvailable = useAvailableUploads({
+      imageIDs: ['image1', 'image2'],
+      maximumFileUploads: 4,
+      setUploadingState,
+      resetUploadState,
+    });
 
     expect(hasAvailable).toBe(true);
     expect(setUploadingState).not.toHaveBeenCalled();
@@ -54,16 +32,12 @@ describe('useAvailableUploads', () => {
     const setUploadingState = vi.fn();
     const resetUploadState = vi.fn();
 
-    const { result } = renderHook(() =>
-      useAvailableUploads({
-        imageIDs: ['image1', 'image2', 'image3', 'image4'],
-        maximumFileUploads: 4,
-        setUploadingState,
-        resetUploadState,
-      }),
-    );
-
-    const hasAvailable = result.current.hasAvailableUploads();
+    const hasAvailable = useAvailableUploads({
+      imageIDs: ['image1', 'image2', 'image3', 'image4'],
+      maximumFileUploads: 4,
+      setUploadingState,
+      resetUploadState,
+    });
 
     expect(hasAvailable).toBe(false);
     expect(setUploadingState).toHaveBeenCalledWith({
@@ -77,16 +51,12 @@ describe('useAvailableUploads', () => {
     const setUploadingState = vi.fn();
     const resetUploadState = vi.fn();
 
-    const { result } = renderHook(() =>
-      useAvailableUploads({
-        imageIDs: ['image1', 'image2', 'image3', 'image4', 'image5'],
-        maximumFileUploads: 4,
-        setUploadingState,
-        resetUploadState,
-      }),
-    );
-
-    const hasAvailable = result.current.hasAvailableUploads();
+    const hasAvailable = useAvailableUploads({
+      imageIDs: ['image1', 'image2', 'image3', 'image4', 'image5'],
+      maximumFileUploads: 4,
+      setUploadingState,
+      resetUploadState,
+    });
 
     expect(hasAvailable).toBe(false);
     expect(setUploadingState).toHaveBeenCalledWith({
@@ -100,16 +70,12 @@ describe('useAvailableUploads', () => {
     const setUploadingState = vi.fn();
     const resetUploadState = vi.fn();
 
-    const { result } = renderHook(() =>
-      useAvailableUploads({
-        imageIDs: ['image1', 'image2', 'image3', 'image4', 'image5'],
-        maximumFileUploads: 4,
-        setUploadingState,
-        resetUploadState,
-      }),
-    );
-
-    result.current.hasAvailableUploads();
+    useAvailableUploads({
+      imageIDs: ['image1', 'image2', 'image3', 'image4', 'image5'],
+      maximumFileUploads: 4,
+      setUploadingState,
+      resetUploadState,
+    });
 
     expect(resetUploadState).not.toHaveBeenCalled();
 
@@ -123,16 +89,12 @@ describe('useAvailableUploads', () => {
     const resetUploadState = vi.fn();
     const customMaxUploads = 2;
 
-    const { result } = renderHook(() =>
-      useAvailableUploads({
-        imageIDs: ['image1', 'image2'],
-        maximumFileUploads: customMaxUploads,
-        setUploadingState,
-        resetUploadState,
-      }),
-    );
-
-    result.current.hasAvailableUploads();
+    useAvailableUploads({
+      imageIDs: ['image1', 'image2'],
+      maximumFileUploads: customMaxUploads,
+      setUploadingState,
+      resetUploadState,
+    });
 
     expect(setUploadingState).toHaveBeenCalledWith({
       isActive: true,
@@ -141,39 +103,40 @@ describe('useAvailableUploads', () => {
     });
   });
 
-  it('should re-evaluate current state when dependencies change', () => {
+  it('should handle different input scenarios correctly', () => {
     const setUploadingState = vi.fn();
     const resetUploadState = vi.fn();
 
-    //  Start with 3 images and max of 4
-    const { result, rerender } = renderHook(
-      (props) => useAvailableUploads(props),
-      {
-        initialProps: {
-          imageIDs: ['image1', 'image2', 'image3'],
-          maximumFileUploads: 4,
-          setUploadingState,
-          resetUploadState,
-        },
-      },
-    );
+    let result = useAvailableUploads({
+      imageIDs: [],
+      maximumFileUploads: 4,
+      setUploadingState,
+      resetUploadState,
+    });
+    expect(result).toBe(true);
 
-    let hasAvailable = result.current.hasAvailableUploads();
-    expect(hasAvailable).toBe(true);
+    setUploadingState.mockClear();
+    resetUploadState.mockClear();
 
-    //  Update to 4 images (should now return false)
-    rerender({
+    result = useAvailableUploads({
       imageIDs: ['image1', 'image2', 'image3', 'image4'],
       maximumFileUploads: 4,
       setUploadingState,
       resetUploadState,
     });
+    expect(result).toBe(false);
+    expect(setUploadingState).toHaveBeenCalled();
 
     setUploadingState.mockClear();
     resetUploadState.mockClear();
 
-    hasAvailable = result.current.hasAvailableUploads();
-    expect(hasAvailable).toBe(false);
+    result = useAvailableUploads({
+      imageIDs: [],
+      maximumFileUploads: 0,
+      setUploadingState,
+      resetUploadState,
+    });
+    expect(result).toBe(false);
     expect(setUploadingState).toHaveBeenCalled();
   });
 });

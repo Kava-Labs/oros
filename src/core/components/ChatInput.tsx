@@ -69,7 +69,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
   const { supportedFileTypes, maximumFileUploads, maximumFileBytes } =
     modelConfig;
 
-  const { hasAvailableUploads } = useAvailableUploads({
+  const hasAvailableUploads = useAvailableUploads({
     imageIDs,
     maximumFileUploads,
     setUploadingState,
@@ -253,7 +253,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     }
 
     const handlePaste = (e: ClipboardEvent) => {
-      if (!hasAvailableUploads()) {
+      if (!hasAvailableUploads) {
         return;
       }
 
