@@ -39,13 +39,13 @@ export async function pdfDocToBase64ImageUrls(
   let pageNumber = 1;
   const imageUrls: string[] = [];
 
+  // Create a canvas element
+  const canvas = document.createElement('canvas');
+  const canvasContext = canvas.getContext('2d');
+  if (!canvasContext) throw new Error('failed to get canvas 2d context');
+
   while (pageNumber <= nPages) {
     const page = await pdf.getPage(pageNumber);
-
-    // Create a canvas element
-    const canvas = document.createElement('canvas');
-    const canvasContext = canvas.getContext('2d');
-    if (!canvasContext) throw new Error('failed to get canvas 2d context');
 
     // Set canvas dimensions to match PDF page
     const viewport = page.getViewport({ scale: 2.0 });
@@ -59,6 +59,7 @@ export async function pdfDocToBase64ImageUrls(
 
     // Convert canvas to an image URL
     imageUrls.push(canvas.toDataURL('image/webp'));
+    canvasContext.reset();
     pageNumber++;
   }
 
