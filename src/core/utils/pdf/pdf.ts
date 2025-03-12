@@ -1,12 +1,13 @@
-import 'pdfjs-dist/build/pdf.worker.min.mjs';
 import * as pdfjsLib from 'pdfjs-dist';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = `pdf.worker.min.mjs`;
 
 export async function pdfDocExtractText(
   doc: ArrayBuffer,
   nPages: number,
 ): Promise<string[]> {
   if (nPages <= 0) throw new Error(`nPages must be greater than 0`);
-  const loadingTask = pdfjsLib.getDocument(doc.slice());
+  const loadingTask = pdfjsLib.getDocument(doc.slice(0));
   const pdf = await loadingTask.promise;
 
   const pdfDocPerPageText: string[] = [];
@@ -33,7 +34,7 @@ export async function pdfDocToBase64ImageUrls(
   doc: ArrayBuffer,
   nPages: number,
 ): Promise<string[]> {
-  const loadingTask = pdfjsLib.getDocument(doc.slice());
+  const loadingTask = pdfjsLib.getDocument(doc.slice(0));
   const pdf = await loadingTask.promise;
 
   let pageNumber = 1;
