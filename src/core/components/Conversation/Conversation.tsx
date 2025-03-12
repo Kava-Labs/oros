@@ -85,7 +85,7 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
                       width="256px"
                       height="256px"
                       id={imageIDs[0]}
-                      aria-label="User uploaded image"
+                      aria-label="File upload preview"
                     />
                   )}
                 </div>
