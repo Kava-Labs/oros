@@ -26,7 +26,6 @@ const createMockFile = (
 describe('useProcessUploadedFile', () => {
   const mockSetUploadingState = vi.fn();
   const mockResetUploadState = vi.fn();
-  const mockHasAvailableUploads = vi.fn().mockReturnValue(true);
   const mockSetImageIDs = vi.fn();
 
   const originalFileReader = global.FileReader;
