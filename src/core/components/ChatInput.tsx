@@ -14,17 +14,18 @@ import { ChatCompletionContentPart } from 'openai/resources/index';
 import { useDragAndDrop } from '../hooks/useDragAndDrop';
 import { isSupportedFileType } from '../types/models';
 import useProcessUploadedFile from '../hooks/useProcessUploadedFile';
+import { useAvailableUploads } from '../hooks/useAvailableUploads';
 
 const DEFAULT_HEIGHT = '30px';
-
-interface ChatInputProps {
-  setShouldAutoScroll: (s: boolean) => void;
-}
 
 export interface UploadingState {
   isActive: boolean;
   isSupportedFile: boolean;
   errorMessage: string;
+}
+
+interface ChatInputProps {
+  setShouldAutoScroll: (s: boolean) => void;
 }
 
 const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
@@ -39,12 +40,14 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
   );
 
   const [inputValue, setInputValue] = useState('');
+  const [imageIDs, setImageIDs] = useState<string[]>([]);
 
   const [uploadingState, setUploadingState] = useState<UploadingState>({
     isActive: false,
     isSupportedFile: true,
     errorMessage: '',
   });
+
   const { isActive, isSupportedFile, errorMessage } = uploadingState;
 
   const resetUploadState = useCallback(() => {
@@ -66,11 +69,16 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
   const { supportedFileTypes, maximumFileUploads, maximumFileBytes } =
     modelConfig;
 
+  const { hasAvailableUploads } = useAvailableUploads({
+    imageIDs,
+    maximumFileUploads,
+    setUploadingState,
+    resetUploadState,
+  });
+
   const buttonRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const uploadRef = useRef<HTMLInputElement>(null);
-
-  const [imageIDs, setImageIDs] = useState<string[]>([]);
 
   const prevModelIdRef = useRef(modelConfig.id);
   const prevConversationRef = useRef(conversationID);
@@ -85,6 +93,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       prevConversationRef.current = conversationID;
     }
   }, [conversationID, modelConfig.id]);
+
   const handleInputChange = useCallback(
     (event: ChangeEvent<HTMLTextAreaElement>) => {
       /**
@@ -165,23 +174,6 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       }
     }
   };
-
-  const hasAvailableUploads = useCallback((): boolean => {
-    if (imageIDs.length >= maximumFileUploads) {
-      setUploadingState({
-        isActive: true,
-        isSupportedFile: false,
-        errorMessage: `Maximum ${maximumFileUploads} files allowed!`,
-      });
-
-      setTimeout(() => {
-        resetUploadState();
-      }, 2000);
-
-      return false;
-    }
-    return true;
-  }, [imageIDs.length, maximumFileUploads, resetUploadState]);
 
   const processUploadedFile = useProcessUploadedFile({
     hasAvailableUploads,

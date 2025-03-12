@@ -1,6 +1,6 @@
 import { useEffect, useCallback, Dispatch, SetStateAction } from 'react';
-import { UploadingState } from '../components/ChatInput';
 import { isSupportedFileType, ModelConfig } from '../types/models';
+import { UploadingState } from '../components/ChatInput';
 
 interface UseHandleDragAndDropParams {
   hasAvailableUploads: () => boolean;
