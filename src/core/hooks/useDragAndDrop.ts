@@ -16,14 +16,14 @@ export interface UseHandleDragAndDropParams {
  * It manages the entire lifecycle of drag and drop operations including validation,
  * state updates, and file processing.
  *
- * @param params - Configuration parameters for the drag and drop behavior
- * @param params.hasAvailableUploads - Boolean for if more uploads are allowed
- * @param params.imageIDs - Array of currently uploaded image IDs - Function that handles processing a valid file
- * @param params.resetUploadState - Function that resets the uploading state
- * @param params.imageIDs - Array of currently uploaded image IDs
- * @param params.modelConfig - Configuration object that defines upload constraints
- * @param params.setUploadingState - State setter for the uploading state
- * @returns void - This hook doesn't return any values but sets up event listeners
+ * @param {UseHandleDragAndDropParams} params - Configuration parameters for the drag and drop behavior
+ *  @param {boolean} params.hasAvailableUploads - Boolean indicating if more uploads are allowed
+ *  @param {Function} params.processUploadedFile - Function that handles processing a valid file
+ *  @param {Function} params.resetUploadState - Function that resets the uploading state
+ *  @param {string[]} params.imageIDs - Array of currently uploaded image IDs
+ *  @param {ModelConfig} params.modelConfig - Configuration object that defines upload constraints
+ *  @param {Dispatch<SetStateAction<UploadingState>>} params.setUploadingState - State setter for the uploading state
+ *  @returns {void} This hook doesn't return any values but sets up event listeners
  */
 export const useDragAndDrop = ({
   hasAvailableUploads,
@@ -32,7 +32,7 @@ export const useDragAndDrop = ({
   imageIDs,
   modelConfig,
   setUploadingState,
-}: UseHandleDragAndDropParams) => {
+}: UseHandleDragAndDropParams): void => {
   const { maximumFileUploads, maximumFileBytes } = modelConfig;
 
   const handleDragEnter = useCallback(
