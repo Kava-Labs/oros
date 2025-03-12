@@ -56,7 +56,7 @@ func TestCors(t *testing.T) {
 			wantResponseHeaders: map[string]string{
 				"Access-Control-Allow-Origin":  "*",
 				"Access-Control-Allow-Methods": "POST, OPTIONS",
-				"Access-Control-Allow-Headers": "Authorization, Content-Type, x-stainless-os, x-stainless-runtime-version, x-stainless-package-version, x-stainless-runtime, x-stainless-arch, x-stainless-retry-count, x-stainless-lang, user-agent",
+				"Access-Control-Allow-Headers": "*",
 				"Access-Control-Max-Age":       "3600",
 			},
 		},
@@ -88,7 +88,7 @@ func TestCors(t *testing.T) {
 			wantResponseHeaders: map[string]string{
 				"Access-Control-Allow-Origin":  "*",
 				"Access-Control-Allow-Methods": "POST, OPTIONS",
-				"Access-Control-Allow-Headers": "Authorization, Content-Type, x-stainless-os, x-stainless-runtime-version, x-stainless-package-version, x-stainless-runtime, x-stainless-arch, x-stainless-retry-count, x-stainless-lang, user-agent",
+				"Access-Control-Allow-Headers": "*",
 				"Access-Control-Max-Age":       "3600",
 			},
 		},
