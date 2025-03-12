@@ -25,6 +25,7 @@ export const useAvailableUploads = ({
   setUploadingState,
   resetUploadState,
 }: UseAvailableUploadsParams): boolean => {
+  console.log('calling useAvailabeUploads');
   if (imageIDs.length >= maximumFileUploads) {
     setUploadingState({
       isActive: true,
