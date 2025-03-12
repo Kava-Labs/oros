@@ -159,6 +159,7 @@ describe('useHandleDragAndDrop', () => {
 
       expect(mockEvent.preventDefault).toHaveBeenCalled();
       expect(mockEvent.stopPropagation).toHaveBeenCalled();
+      expect(mockHasAvailableUploads).toHaveBeenCalled();
       expect(mockSetUploadingState).toHaveBeenCalledWith({
         isActive: true,
         isSupportedFile: true,
@@ -194,6 +195,7 @@ describe('useHandleDragAndDrop', () => {
 
     it('should not proceed with dragenter when hasAvailableUploads returns false', () => {
       mockHasAvailableUploads.mockReturnValueOnce(false);
+
       renderHook(() => useDragAndDrop(defaultParams));
 
       const mockDataTransfer = {
@@ -211,6 +213,7 @@ describe('useHandleDragAndDrop', () => {
 
       expect(mockEvent.preventDefault).toHaveBeenCalled();
       expect(mockEvent.stopPropagation).toHaveBeenCalled();
+      expect(mockHasAvailableUploads).toHaveBeenCalled();
       expect(mockSetUploadingState).not.toHaveBeenCalled();
     });
 
