@@ -732,7 +732,7 @@ describe('chat', () => {
     await chat.submitMessage('Describe this image');
 
     const uploadedImage = page.getByRole('img', {
-      name: 'User uploaded image 1',
+      name: 'File upload preview',
     });
 
     await expect(uploadedImage).toBeVisible();
@@ -774,12 +774,13 @@ describe('chat', () => {
 
     await chat.submitMessage('Here are multiple images');
 
-    for (let i = 1; i <= maxFileUploads; i++) {
-      const uploadedImage = page.getByRole('img', {
-        name: `User uploaded image ${i}`,
-      });
-      await expect(uploadedImage).toBeVisible();
-    }
+    const uploadedImage = page.getByRole('img', {
+      name: 'File upload preview',
+    });
+    const paginationDisplay = page.getByText('1 / 4');
+
+    await expect(uploadedImage).toBeVisible();
+    await expect(paginationDisplay).toBeVisible();
   });
   test('shows error when trying to upload too many files', async ({ page }) => {
     const maxFileUploads = 4;
