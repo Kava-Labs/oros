@@ -1,7 +1,7 @@
 import { UploadingState } from '../components/ChatInput';
 import { Dispatch, SetStateAction } from 'react';
 
-interface UseAvailableUploadsProps {
+interface UseAvailableUploadsParams {
   imageIDs: string[];
   maximumFileUploads: number;
   setUploadingState: Dispatch<SetStateAction<UploadingState>>;
@@ -9,20 +9,22 @@ interface UseAvailableUploadsProps {
 }
 
 /**
- * Hook to check if additional file uploads are allowed based on the current state
+ * Checks if additional file uploads are allowed based on the current state
+ * Sets error state and schedules reset if maximum is reached
  *
- * @param {string[]} imageIDs - Array of image IDs currently uploaded
- * @param {number} maximumFileUploads - Maximum number of files allowed for upload
- * @param {Dispatch<SetStateAction<UploadingState>>} setUploadingState - State setter for the uploading state
- * @param {Function} resetUploadState - Function to reset the uploading state
- * @returns {{ hasAvailableUploads: () => boolean }} Object containing the hasAvailableUploads function
+ * @param {UseAvailableUploadsParams} params - Function parameters
+ * @param {string[]} params.imageIDs - Array of image IDs currently uploaded
+ * @param {number} params.maximumFileUploads - Maximum number of files allowed for upload
+ * @param {Dispatch<SetStateAction<UploadingState>>} params.setUploadingState - State setter for the uploading state
+ * @param {Function} params.resetUploadState - Function to reset the uploading state
+ * @returns {boolean} True if more uploads are allowed, false otherwise
  */
 export const useAvailableUploads = ({
   imageIDs,
   maximumFileUploads,
   setUploadingState,
   resetUploadState,
-}: UseAvailableUploadsProps): boolean => {
+}: UseAvailableUploadsParams): boolean => {
   if (imageIDs.length >= maximumFileUploads) {
     setUploadingState({
       isActive: true,
