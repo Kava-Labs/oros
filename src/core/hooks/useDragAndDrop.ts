@@ -17,7 +17,7 @@ export interface UseHandleDragAndDropParams {
  * state updates, and file processing.
  *
  * @param {UseHandleDragAndDropParams} params - Configuration parameters for the drag and drop behavior
- *  @param {boolean} params.hasAvailableUploads - Boolean indicating if more uploads are allowed
+ *  @param {Function} params.hasAvailableUploads - Function that checks if more uploads are allowed
  *  @param {Function} params.processUploadedFile - Function that handles processing a valid file
  *  @param {Function} params.resetUploadState - Function that resets the uploading state
  *  @param {string[]} params.imageIDs - Array of currently uploaded image IDs

@@ -47,7 +47,6 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     isSupportedFile: true,
     errorMessage: '',
   });
-
   const { isActive, isSupportedFile, errorMessage } = uploadingState;
 
   const resetUploadState = useCallback(() => {
