@@ -226,16 +226,14 @@ export async function doChat(
         messages: messagesWithoutReasoningContent,
         tools: tools,
         stream: true,
-        stream_options: { include_usage: modelConfig.includeUsageInStream },
       },
       {
         signal: controller.signal,
       },
     );
+
     let content = '';
     let thinkingEnd = -1;
-    let hasCloseTag = false;
-    let openTagFound = false;
 
     for await (const chunk of stream) {
       //  Get the usage info (in the final chunk)
@@ -247,38 +245,32 @@ export async function doChat(
         progressStore.setText('');
       }
 
-      //  todo: chance to clean up into a helper similar to assembleToolCallFromStream
       if (isContentChunk(chunk)) {
-        //  Add content from chunks that have it and not the final usage chunk if it exists
-        if (chunk.choices.length) {
-          content += chunk['choices'][0]['delta']['content'];
-        }
-
+        content += chunk['choices'][0]['delta']['content'];
+        // todo: chance to clean up into a helper similar to assembleToolCallFromStream
         switch (true) {
           case isReasoningModel(modelConfig.id): {
             const openTag = '<think>';
             const closeTag = '</think>';
 
-            if (!openTagFound && content.includes(openTag)) {
-              openTagFound = true;
-              //  Remove the initial opening tag if present
-              content = content.replace(openTag, '');
-            }
-
-            if (!hasCloseTag && content.includes(closeTag)) {
-              hasCloseTag = true;
+            if (thinkingEnd === -1) {
               thinkingEnd = content.indexOf(closeTag);
+              // stream the thoughts part to the thinking store
+              if (content.length >= openTag.length) {
+                thinkingStore.setText(
+                  content.slice(
+                    openTag.length,
+                    thinkingEnd === -1 ? content.length : thinkingEnd,
+                  ),
+                );
+              }
             }
 
-            //  Split the content when the closing tag is found
-            if (hasCloseTag) {
-              thinkingStore.setText(content.slice(0, thinkingEnd));
-
+            if (thinkingEnd !== -1) {
+              // stream the response part to the message store
               messageStore.setText(
                 content.slice(thinkingEnd + closeTag.length),
               );
-            } else {
-              thinkingStore.setText(content);
             }
             break;
           }
@@ -395,11 +387,10 @@ export async function syncWithLocalStorage(
   // Initialize tokensRemaining from existing conversation or default to full context length
   let tokensRemaining = existingConversation?.tokensRemaining ?? contextLength;
 
-  //  Deepseek & Qwen compare the current message to the remaining context
+  //  Deepseek compares the current message to the remaining context
   //  GPT compares the entire conversation thread to the max context
-  const contextToProcess = isReasoningModel(modelConfig.id)
-    ? tokensRemaining
-    : contextLength;
+  const contextToProcess =
+    modelConfig.id === 'deepseek-r1' ? tokensRemaining : contextLength;
 
   const metrics = await modelConfig.contextLimitMonitor(
     messages,
