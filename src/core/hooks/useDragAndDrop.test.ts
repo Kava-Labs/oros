@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach, Mock } from 'vitest';
-import { useDragAndDrop } from './useDragAndDrop';
+import { useDragAndDrop, UseHandleDragAndDropParams } from './useDragAndDrop';
 import { renderHook } from '@testing-library/react';
 import { BaseModelConfig, SupportedFileType } from '../types/models';
 
@@ -17,7 +17,7 @@ describe('useHandleDragAndDrop', () => {
   const mockProcessUploadedFile = vi.fn().mockResolvedValue({});
   const mockResetUploadState = vi.fn();
 
-  const defaultParams = {
+  const defaultParams: UseHandleDragAndDropParams = {
     hasAvailableUploads: mockHasAvailableUploads,
     processUploadedFile: mockProcessUploadedFile,
     resetUploadState: mockResetUploadState,
