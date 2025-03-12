@@ -12,9 +12,10 @@ import { IdbImage } from './IdbImage';
 import ButtonIcon from './ButtonIcon';
 import { useTheme } from '../../shared/theme/useTheme';
 import { ChatCompletionContentPart } from 'openai/resources/index';
-import { PDFiumLibrary } from '@hyzyla/pdfium/browser/base64';
 
-const library = await PDFiumLibrary.init();
+import 'pdfjs-dist/build/pdf.worker.min.mjs';
+import * as pdfjsLib from 'pdfjs-dist';
+import { pdfDocToBase64ImageUrls } from '../utils/pdf/pdf';
 
 const SUPPORT_FILE_UPLOAD =
   import.meta.env.VITE_FEAT_SUPPORT_FILE_UPLOAD === 'true';
@@ -235,34 +236,15 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
 
       const reader = new FileReader();
       reader.onload = async (e) => {
-        console.log(e.target?.result);
         if (e.target && typeof e.target.result === 'string') {
           const imgID = await saveImage(e.target.result);
           setImageIDs((prevIDs) => [...prevIDs, imgID]);
         } else if (e.target?.result instanceof ArrayBuffer) {
-          const buf = new Uint8Array(e.target.result);
-          const doc = await library.loadDocument(buf);
-
-          let len = doc.getPageCount();
-          const max = 4; // limit to max 4 pages for now
-          len = len >= max ? max : len;
-
-          for (let i = 0; i < len; i++) {
-            const page = doc.getPage(i);
-            const image = await page.render({
-              scale: 3,
-              render: 'bitmap',
-            });
-            const base64ImageURL = await bitmapToBase64ImageURL(
-              image.data,
-              image.width,
-              image.height,
-            );
-            const imgID = await saveImage(base64ImageURL);
-            setImageIDs((prevIDs) => [...prevIDs, imgID]);
+          const images = await pdfDocToBase64ImageUrls(e.target.result, 4);
+          for (const img of images) {
+            const id = await saveImage(img);
+            setImageIDs((prev) => [...prev, id]);
           }
-
-          doc.destroy();
         }
       };
 
@@ -574,28 +556,5 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     </>
   );
 };
-
-function bitmapToBase64ImageURL(
-  buffer: Uint8Array,
-  width: number,
-  height: number,
-): Promise<string> {
-  return new Promise((resolve) => {
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext('2d');
-
-    const imageData = new ImageData(
-      new Uint8ClampedArray(buffer),
-      width,
-      height,
-    );
-    ctx!.putImageData(imageData, 0, 0);
-
-    const base64Image = canvas.toDataURL('image/webp');
-    resolve(base64Image);
-  });
-}
 
 export default ChatInput;
