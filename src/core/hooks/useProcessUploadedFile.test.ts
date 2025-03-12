@@ -1,6 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach, Mock } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import useProcessUploadedFile from './useProcessUploadedFile';
+import useProcessUploadedFile, {
+  UseProcessUploadedFileParams,
+} from './useProcessUploadedFile';
+import { saveImage } from '../utils/idb/idb';
+
+vi.mock('../utils/idb/idb', () => ({
+  saveImage: vi.fn().mockResolvedValue('mocked-image-id'),
+}));
 
 const createMockFile = (
   name: string = 'test.jpg',
@@ -20,7 +27,6 @@ describe('useProcessUploadedFile', () => {
   const mockSetUploadingState = vi.fn();
   const mockResetUploadState = vi.fn();
   const mockHasAvailableUploads = vi.fn().mockReturnValue(true);
-  const mockSaveImage = vi.fn().mockResolvedValue('test-image-id');
   const mockSetImageIDs = vi.fn();
 
   const originalFileReader = global.FileReader;
@@ -29,12 +35,11 @@ describe('useProcessUploadedFile', () => {
     onload: vi.fn(),
   };
 
-  const defaultParams = {
+  const defaultParams: UseProcessUploadedFileParams = {
     hasAvailableUploads: mockHasAvailableUploads,
     maximumFileBytes: 8 * 1024 * 1024, // 8MB
     setUploadingState: mockSetUploadingState,
     resetUploadState: mockResetUploadState,
-    saveImage: mockSaveImage,
     setImageIDs: mockSetImageIDs,
   };
 
@@ -119,6 +124,8 @@ describe('useProcessUploadedFile', () => {
 
   it('should process valid files correctly', async () => {
     const validFile = createMockFile();
+    const mockSaveImage = vi.mocked(saveImage);
+    mockSaveImage.mockResolvedValueOnce('mocked-image-id');
 
     const { result } = renderHook(() => useProcessUploadedFile(defaultParams));
 
@@ -139,10 +146,10 @@ describe('useProcessUploadedFile', () => {
       }
     });
 
+    expect(mockSetImageIDs).toHaveBeenCalledTimes(1);
     expect(mockSaveImage).toHaveBeenCalledWith(
       'data:image/jpeg;base64,testdata',
     );
-    expect(mockSetImageIDs).toHaveBeenCalled();
   });
 
   it('should not call readAsDataURL if file validation fails', async () => {

@@ -7,7 +7,6 @@ import { ConversationHistory } from '../context/types';
 import { hasSufficientRemainingTokens } from '../utils/conversation/hasSufficientRemainingTokens';
 import { useManageContextWarning } from '../hooks/useManageContextWarning';
 import { Paperclip, X } from 'lucide-react';
-import { saveImage } from '../utils/idb/idb';
 import { IdbImage } from './IdbImage';
 import ButtonIcon from './ButtonIcon';
 import { useTheme } from '../../shared/theme/useTheme';
@@ -188,7 +187,6 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     hasAvailableUploads,
     maximumFileBytes,
     setUploadingState,
-    saveImage,
     setImageIDs,
     resetUploadState,
   });

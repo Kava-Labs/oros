@@ -1,13 +1,13 @@
 import { Dispatch, SetStateAction, useCallback } from 'react';
 import { isSupportedFileType } from '../types/models';
 import { UploadingState } from '../components/ChatInput';
+import { saveImage } from '../utils/idb/idb';
 
-interface UseProcessUploadedFileParams {
+export interface UseProcessUploadedFileParams {
   hasAvailableUploads: () => boolean;
   maximumFileBytes: number;
   setUploadingState: (state: UploadingState) => void;
   resetUploadState: () => void;
-  saveImage: (dataUrl: string) => Promise<string>;
   setImageIDs: Dispatch<SetStateAction<string[]>>;
 }
 
@@ -16,7 +16,6 @@ const useProcessUploadedFile = ({
   maximumFileBytes,
   setUploadingState,
   resetUploadState,
-  saveImage, //  todo - remove when extracted to importable function
   setImageIDs,
 }: UseProcessUploadedFileParams) => {
   return useCallback(
@@ -70,7 +69,6 @@ const useProcessUploadedFile = ({
       hasAvailableUploads,
       maximumFileBytes,
       resetUploadState,
-      saveImage,
       setImageIDs,
       setUploadingState,
     ],
