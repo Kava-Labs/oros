@@ -265,10 +265,10 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
           const imgID = await saveImage(e.target.result);
           setImageIDs((prevIDs) => [...prevIDs, imgID]);
         } else if (e.target?.result instanceof ArrayBuffer) {
-          // todo: remove hardcoded 4 page limit
+          // todo: remove hardcoded 2 page limit
           // todo: limit the pdfText to fit within the context window
-          const images = await pdfDocToBase64ImageUrls(e.target.result, 4);
-          const pdfText = await pdfDocExtractText(e.target.result, 4);
+          const images = await pdfDocToBase64ImageUrls(e.target.result, 2);
+          const pdfText = await pdfDocExtractText(e.target.result, 2);
           setPdfDocumentText(pdfText);
 
           for (const img of images) {
