@@ -777,7 +777,10 @@ describe('chat', () => {
     const uploadedImage = page.getByRole('img', {
       name: 'File upload preview',
     });
+    const paginationDisplay = page.getByText('1 / 4');
+
     await expect(uploadedImage).toBeVisible();
+    await expect(paginationDisplay).toBeVisible();
   });
   test('shows error when trying to upload too many files', async ({ page }) => {
     const maxFileUploads = 4;

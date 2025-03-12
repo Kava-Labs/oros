@@ -46,6 +46,7 @@ export const ImageCarousel = ({ imageIDs }: ImageCarouselProps) => {
               id={imageID}
               alt={`Slide ${index + 1}`}
               className={styles.image}
+              aria-label="File upload preview"
             />
           </div>
         ))}
