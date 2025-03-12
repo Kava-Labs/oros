@@ -122,7 +122,6 @@ describe('useAvailableUploads', () => {
     const setUploadingState = vi.fn();
     const resetUploadState = vi.fn();
 
-    // Test empty array case
     let { result } = renderHook(() =>
       useAvailableUploads({
         imageIDs: [],

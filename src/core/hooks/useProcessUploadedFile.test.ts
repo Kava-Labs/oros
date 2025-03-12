@@ -26,6 +26,7 @@ const createMockFile = (
 describe('useProcessUploadedFile', () => {
   const mockSetUploadingState = vi.fn();
   const mockResetUploadState = vi.fn();
+  const mockHasAvailableUploads = vi.fn().mockReturnValue(true);
   const mockSetImageIDs = vi.fn();
 
   const originalFileReader = global.FileReader;
@@ -35,7 +36,7 @@ describe('useProcessUploadedFile', () => {
   };
 
   const defaultParams: UseProcessUploadedFileParams = {
-    hasAvailableUploads: () => true,
+    hasAvailableUploads: mockHasAvailableUploads,
     maximumFileBytes: 8 * 1024 * 1024, // 8MB
     setUploadingState: mockSetUploadingState,
     resetUploadState: mockResetUploadState,
@@ -57,12 +58,8 @@ describe('useProcessUploadedFile', () => {
   });
 
   it('should not process file if no uploads are available', async () => {
-    const { result } = renderHook(() =>
-      useProcessUploadedFile({
-        ...defaultParams,
-        hasAvailableUploads: () => false,
-      }),
-    );
+    mockHasAvailableUploads.mockReturnValueOnce(false);
+    const { result } = renderHook(() => useProcessUploadedFile(defaultParams));
 
     const file = createMockFile();
     await act(async () => {
@@ -154,12 +151,8 @@ describe('useProcessUploadedFile', () => {
   });
 
   it('should not call readAsDataURL if file validation fails', async () => {
-    const { result } = renderHook(() =>
-      useProcessUploadedFile({
-        ...defaultParams,
-        hasAvailableUploads: () => false,
-      }),
-    );
+    mockHasAvailableUploads.mockReturnValueOnce(false);
+    const { result } = renderHook(() => useProcessUploadedFile(defaultParams));
 
     const file = createMockFile();
     await act(async () => {
