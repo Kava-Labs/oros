@@ -5,6 +5,8 @@ import {
 import { reasoningModels } from '../../features/reasoning/config/models';
 import { ModelConfig, ModelRegistry, SupportedModels } from '../types/models';
 
+const isQwenSupported = import.meta.env.VITE_FEAT_QWEN === 'true';
+
 export const MODEL_REGISTRY: ModelRegistry = {
   blockchain: blockchainModels,
   reasoning: reasoningModels,
@@ -34,10 +36,20 @@ export const getModelConfig = (name: SupportedModels): ModelConfig => {
 };
 
 export const getAllModels = (): ModelConfig[] => {
-  return [
-    ...Object.values(MODEL_REGISTRY.blockchain),
-    ...Object.values(MODEL_REGISTRY.reasoning),
-  ];
+  //  todo - consolidate when qwen is released
+  const baseReasoningModels = Object.values(MODEL_REGISTRY.reasoning);
+  const reasoningModelsWithFeature = baseReasoningModels.filter(
+    (modelConfig) => modelConfig.id !== 'deepseek-r1',
+  );
+  const reasoningModelsWithoutFeature = baseReasoningModels.filter(
+    (modelConfig) => modelConfig.id !== 'qwq-32b-bnb-4bit',
+  );
+
+  const reasoningModels = isQwenSupported
+    ? reasoningModelsWithFeature
+    : reasoningModelsWithoutFeature;
+
+  return [...Object.values(MODEL_REGISTRY.blockchain), ...reasoningModels];
 };
 
 const defaultModelFromQueryParams = () => {
@@ -60,8 +72,12 @@ const defaultModelFromQueryParams = () => {
   return null;
 };
 
+const DEFAULT_REASONING_MODEL = isQwenSupported
+  ? 'qwq-32b-bnb-4bit'
+  : 'deepseek-r1';
+
 export const DEFAULT_MODEL_NAME = defaultModelFromQueryParams()
   ? defaultModelFromQueryParams()!
   : import.meta.env.VITE_FEAT_UPDATED_DESIGN
-    ? 'deepseek-r1'
+    ? DEFAULT_REASONING_MODEL
     : 'gpt-4o';

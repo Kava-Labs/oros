@@ -16,6 +16,7 @@ export interface BaseModelConfig {
   name: string;
   icon: ComponentType;
   description: string;
+  includeUsageInStream: boolean;
   supportedFileTypes: Array<SupportedFileType>;
   maximumFileUploads: number;
   maximumFileBytes: number;

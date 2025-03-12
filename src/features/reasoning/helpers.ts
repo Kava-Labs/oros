@@ -40,7 +40,7 @@ export const estimateTokenUsage = (
   };
 };
 
-export async function calculateDeepseekTokenUsage(
+export async function calculateFinalChunkTokenUsage(
   messages: ChatMessage[],
   contextLength: number,
   finalChunk?: ChatCompletionChunk,
