@@ -26,7 +26,7 @@ export const reasoningModels: Record<
 > = {
   'qwq-32b-bnb-4bit': {
     id: 'qwq-32b-bnb-4bit',
-    name: 'Qwen',
+    name: 'General Reasoning',
     icon: KavaIcon,
     description: 'Logical Analysis',
     includeUsageInStream: true,
