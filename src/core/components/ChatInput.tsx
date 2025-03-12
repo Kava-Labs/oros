@@ -181,6 +181,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     }
   }, [
     imageIDs,
+    fileType,
     isRequesting,
     inputValue,
     modelConfig.messageProcessors,
