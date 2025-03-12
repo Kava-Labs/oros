@@ -13,11 +13,12 @@ const createFileList = (files: File[]): FileList => {
 
 describe('useHandleDragAndDrop', () => {
   const mockSetUploadingState = vi.fn();
+  const mockHasAvailableUploads = vi.fn().mockReturnValue(true);
   const mockProcessUploadedFile = vi.fn().mockResolvedValue({});
   const mockResetUploadState = vi.fn();
 
   const defaultParams: UseHandleDragAndDropParams = {
-    hasAvailableUploads: () => true,
+    hasAvailableUploads: mockHasAvailableUploads,
     processUploadedFile: mockProcessUploadedFile,
     resetUploadState: mockResetUploadState,
     imageIDs: [],
@@ -192,12 +193,8 @@ describe('useHandleDragAndDrop', () => {
     });
 
     it('should not proceed with dragenter when hasAvailableUploads returns false', () => {
-      renderHook(() =>
-        useDragAndDrop({
-          ...defaultParams,
-          hasAvailableUploads: () => false,
-        }),
-      );
+      mockHasAvailableUploads.mockReturnValueOnce(false);
+      renderHook(() => useDragAndDrop(defaultParams));
 
       const mockDataTransfer = {
         items: [
