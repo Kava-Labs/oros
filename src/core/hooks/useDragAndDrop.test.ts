@@ -14,12 +14,12 @@ const createFileList = (files: File[]): FileList => {
 describe('useHandleDragAndDrop', () => {
   const mockSetUploadingState = vi.fn();
   const mockHasAvailableUploads = vi.fn().mockReturnValue(true);
-  const mockProcessFile = vi.fn().mockResolvedValue({});
+  const mockProcessUploadedFile = vi.fn().mockResolvedValue({});
   const mockResetUploadState = vi.fn();
 
   const defaultParams = {
     hasAvailableUploads: mockHasAvailableUploads,
-    processFile: mockProcessFile,
+    processUploadedFile: mockProcessUploadedFile,
     resetUploadState: mockResetUploadState,
     imageIDs: [],
     modelConfig: {
@@ -274,9 +274,9 @@ describe('useHandleDragAndDrop', () => {
         errorMessage: '',
       });
       expect(result.isActive).toBe(false);
-      expect(mockProcessFile).toHaveBeenCalledTimes(2);
-      expect(mockProcessFile).toHaveBeenCalledWith(files[0]);
-      expect(mockProcessFile).toHaveBeenCalledWith(files[1]);
+      expect(mockProcessUploadedFile).toHaveBeenCalledTimes(2);
+      expect(mockProcessUploadedFile).toHaveBeenCalledWith(files[0]);
+      expect(mockProcessUploadedFile).toHaveBeenCalledWith(files[1]);
     });
 
     it('should show error when drop exceeds maximumFileUploads', () => {
@@ -317,7 +317,7 @@ describe('useHandleDragAndDrop', () => {
         errorMessage: 'Maximum 4 files allowed.',
       });
 
-      expect(mockProcessFile).not.toHaveBeenCalled();
+      expect(mockProcessUploadedFile).not.toHaveBeenCalled();
 
       // Test that reset is called after timeout
       vi.advanceTimersByTime(2000);
@@ -360,7 +360,7 @@ describe('useHandleDragAndDrop', () => {
         errorMessage: 'File too large! Maximum file size is 8MB.',
       });
 
-      expect(mockProcessFile).not.toHaveBeenCalled();
+      expect(mockProcessUploadedFile).not.toHaveBeenCalled();
 
       // Test that reset is called after timeout
       vi.advanceTimersByTime(2000);

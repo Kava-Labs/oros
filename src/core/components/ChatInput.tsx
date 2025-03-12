@@ -7,13 +7,13 @@ import { ConversationHistory } from '../context/types';
 import { hasSufficientRemainingTokens } from '../utils/conversation/hasSufficientRemainingTokens';
 import { useManageContextWarning } from '../hooks/useManageContextWarning';
 import { Paperclip, X } from 'lucide-react';
-import { saveImage } from '../utils/idb/idb';
 import { IdbImage } from './IdbImage';
 import ButtonIcon from './ButtonIcon';
 import { useTheme } from '../../shared/theme/useTheme';
 import { ChatCompletionContentPart } from 'openai/resources/index';
 import { useDragAndDrop } from '../hooks/useDragAndDrop';
 import { isSupportedFileType } from '../types/models';
+import useProcessUploadedFile from '../hooks/useProcessUploadedFile';
 
 const DEFAULT_HEIGHT = '30px';
 
@@ -183,56 +183,13 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     return true;
   }, [imageIDs.length, maximumFileUploads, resetUploadState]);
 
-  const processFile = useCallback(
-    async (file: File) => {
-      if (!hasAvailableUploads()) {
-        return;
-      }
-
-      if (file.size > maximumFileBytes) {
-        setUploadingState({
-          isActive: true,
-          isSupportedFile: false,
-          errorMessage: 'File too large! Maximum file size is 8MB.',
-        });
-
-        // Present the error for a short time, then reset
-        setTimeout(() => {
-          resetUploadState();
-        }, 2000);
-
-        return;
-      }
-
-      if (!isSupportedFileType(file.type)) {
-        setUploadingState({
-          isActive: true,
-          isSupportedFile: false,
-          errorMessage:
-            'Invalid file type! Please upload a JPEG, PNG, or WebP image.',
-        });
-
-        //  Present the error for a short time, then reset
-        setTimeout(() => {
-          resetUploadState();
-        }, 1000);
-
-        return;
-      }
-
-      resetUploadState();
-
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        if (e.target && typeof e.target.result === 'string') {
-          const imgID = await saveImage(e.target.result);
-          setImageIDs((prevIDs) => [...prevIDs, imgID]);
-        }
-      };
-      reader.readAsDataURL(file);
-    },
-    [hasAvailableUploads, maximumFileBytes, resetUploadState],
-  );
+  const processUploadedFile = useProcessUploadedFile({
+    hasAvailableUploads,
+    maximumFileBytes,
+    setUploadingState,
+    setImageIDs,
+    resetUploadState,
+  });
 
   const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files?.length) {
@@ -249,7 +206,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
         }, 2000);
       } else {
         Array.from(event.target.files).forEach((file) => {
-          processFile(file);
+          processUploadedFile(file);
         });
       }
 
@@ -291,7 +248,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
 
   useDragAndDrop({
     hasAvailableUploads,
-    processFile,
+    processUploadedFile,
     resetUploadState,
     imageIDs,
     modelConfig,
@@ -329,7 +286,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
 
               return;
             }
-            processFile(file);
+            processUploadedFile(file);
           }
         });
     };
@@ -340,7 +297,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       document.removeEventListener('paste', handlePaste);
     };
   }, [
-    processFile,
+    processUploadedFile,
     hasAvailableUploads,
     modelSupportsUpload,
     resetUploadState,

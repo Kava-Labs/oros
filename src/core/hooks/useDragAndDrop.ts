@@ -4,7 +4,7 @@ import { isSupportedFileType, ModelConfig } from '../types/models';
 
 interface UseHandleDragAndDropParams {
   hasAvailableUploads: () => boolean;
-  processFile: (file: File) => Promise<void>;
+  processUploadedFile: (file: File) => Promise<void>;
   resetUploadState: () => void;
   imageIDs: string[];
   modelConfig: ModelConfig;
@@ -18,7 +18,7 @@ interface UseHandleDragAndDropParams {
  *
  * @param params - Configuration parameters for the drag and drop behavior
  * @param params.hasAvailableUploads - Function that checks if more uploads are allowed
- * @param params.processFile - Function that handles processing a valid file
+ * @param params.processUploadedFile - Function that handles processing a valid file
  * @param params.resetUploadState - Function that resets the uploading state
  * @param params.imageIDs - Array of currently uploaded image IDs
  * @param params.modelConfig - Configuration object that defines upload constraints
@@ -27,7 +27,7 @@ interface UseHandleDragAndDropParams {
  */
 export const useDragAndDrop = ({
   hasAvailableUploads,
-  processFile,
+  processUploadedFile,
   resetUploadState,
   imageIDs,
   modelConfig,
@@ -148,7 +148,7 @@ export const useDragAndDrop = ({
           return;
         } else {
           Array.from(files).forEach((file) => {
-            processFile(file);
+            processUploadedFile(file);
           });
         }
       }
@@ -157,7 +157,7 @@ export const useDragAndDrop = ({
       imageIDs.length,
       maximumFileBytes,
       maximumFileUploads,
-      processFile,
+      processUploadedFile,
       resetUploadState,
       setUploadingState,
     ],
