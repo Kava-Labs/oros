@@ -29,4 +29,3 @@ For **documents**, focus on:
 - Single, dense paragraph for concise summaries.
 - If required, use structured listing for clarity in complex scenes (e.g., inventories).
 - No markdown or unnecessary formatting unless explicitly requested.`;
-
