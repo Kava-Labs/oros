@@ -9,7 +9,7 @@ type ImageCarouselProps = {
 export const ImageCarousel = ({ imageIDs }: ImageCarouselProps) => {
   const [slideIndex, setSlideIndex] = useState(1);
 
-  // Function to show current slide
+  //  Function to show current slide
   const showSlides = (n: number) => {
     let index = n;
     if (n > imageIDs.length) {
@@ -21,7 +21,7 @@ export const ImageCarousel = ({ imageIDs }: ImageCarouselProps) => {
     setSlideIndex(index);
   };
 
-  // Function for next/previous controls
+  //  Function for next/previous controls
   const plusSlides = (n: number) => {
     showSlides(slideIndex + n);
   };
@@ -39,7 +39,7 @@ export const ImageCarousel = ({ imageIDs }: ImageCarouselProps) => {
             key={index}
             className={`${styles.mySlides} ${index + 1 === slideIndex ? styles.activeSlide : ''} ${styles.fade}`}
           >
-            <div className={styles.numbertext}>
+            <div className={styles.paginationNumber}>
               {index + 1} / {imageIDs.length}
             </div>
             <IdbImage
@@ -47,9 +47,6 @@ export const ImageCarousel = ({ imageIDs }: ImageCarouselProps) => {
               alt={`Slide ${index + 1}`}
               className={styles.image}
             />
-            {/* {image.caption && (
-              <div className={styles.text}>{image.caption}</div>
-            )} */}
           </div>
         ))}
 
