@@ -36,13 +36,17 @@ export const getModelConfig = (name: SupportedModels): ModelConfig => {
 };
 
 export const getAllModels = (): ModelConfig[] => {
+  //  todo - consolidate when qwen is released
   const baseReasoningModels = Object.values(MODEL_REGISTRY.reasoning);
+  const reasoningModelsWithFeature = baseReasoningModels.filter(
+    (modelConfig) => modelConfig.id !== 'deepseek-r1',
+  );
   const reasoningModelsWithoutFeature = baseReasoningModels.filter(
     (modelConfig) => modelConfig.id !== 'qwq-32b-bnb-4bit',
   );
 
   const reasoningModels = isQwenSupported
-    ? baseReasoningModels
+    ? reasoningModelsWithFeature
     : reasoningModelsWithoutFeature;
 
   return [...Object.values(MODEL_REGISTRY.blockchain), ...reasoningModels];
