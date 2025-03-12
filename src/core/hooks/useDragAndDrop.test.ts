@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach, Mock } from 'vitest';
-import { useDragAndDrop } from './useDragAndDrop';
+import { useDragAndDrop, UseHandleDragAndDropParams } from './useDragAndDrop';
 import { renderHook } from '@testing-library/react';
 import { BaseModelConfig, SupportedFileType } from '../types/models';
 
@@ -13,12 +13,11 @@ const createFileList = (files: File[]): FileList => {
 
 describe('useHandleDragAndDrop', () => {
   const mockSetUploadingState = vi.fn();
-  const mockHasAvailableUploads = vi.fn().mockReturnValue(true);
   const mockProcessUploadedFile = vi.fn().mockResolvedValue({});
   const mockResetUploadState = vi.fn();
 
-  const defaultParams = {
-    hasAvailableUploads: mockHasAvailableUploads,
+  const defaultParams: UseHandleDragAndDropParams = {
+    hasAvailableUploads: true,
     processUploadedFile: mockProcessUploadedFile,
     resetUploadState: mockResetUploadState,
     imageIDs: [],
@@ -159,7 +158,6 @@ describe('useHandleDragAndDrop', () => {
 
       expect(mockEvent.preventDefault).toHaveBeenCalled();
       expect(mockEvent.stopPropagation).toHaveBeenCalled();
-      expect(mockHasAvailableUploads).toHaveBeenCalled();
       expect(mockSetUploadingState).toHaveBeenCalledWith({
         isActive: true,
         isSupportedFile: true,
@@ -194,9 +192,12 @@ describe('useHandleDragAndDrop', () => {
     });
 
     it('should not proceed with dragenter when hasAvailableUploads returns false', () => {
-      mockHasAvailableUploads.mockReturnValueOnce(false);
-
-      renderHook(() => useDragAndDrop(defaultParams));
+      renderHook(() =>
+        useDragAndDrop({
+          ...defaultParams,
+          hasAvailableUploads: false,
+        }),
+      );
 
       const mockDataTransfer = {
         items: [
@@ -213,7 +214,6 @@ describe('useHandleDragAndDrop', () => {
 
       expect(mockEvent.preventDefault).toHaveBeenCalled();
       expect(mockEvent.stopPropagation).toHaveBeenCalled();
-      expect(mockHasAvailableUploads).toHaveBeenCalled();
       expect(mockSetUploadingState).not.toHaveBeenCalled();
     });
 

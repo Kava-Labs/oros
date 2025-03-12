@@ -18,14 +18,14 @@ import { useAvailableUploads } from '../hooks/useAvailableUploads';
 
 const DEFAULT_HEIGHT = '30px';
 
+interface ChatInputProps {
+  setShouldAutoScroll: (s: boolean) => void;
+}
+
 export interface UploadingState {
   isActive: boolean;
   isSupportedFile: boolean;
   errorMessage: string;
-}
-
-interface ChatInputProps {
-  setShouldAutoScroll: (s: boolean) => void;
 }
 
 const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {

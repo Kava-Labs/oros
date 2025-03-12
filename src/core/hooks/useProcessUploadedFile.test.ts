@@ -36,7 +36,7 @@ describe('useProcessUploadedFile', () => {
   };
 
   const defaultParams: UseProcessUploadedFileParams = {
-    hasAvailableUploads: mockHasAvailableUploads,
+    hasAvailableUploads: true,
     maximumFileBytes: 8 * 1024 * 1024, // 8MB
     setUploadingState: mockSetUploadingState,
     resetUploadState: mockResetUploadState,
@@ -58,16 +58,18 @@ describe('useProcessUploadedFile', () => {
   });
 
   it('should not process file if no uploads are available', async () => {
-    mockHasAvailableUploads.mockReturnValueOnce(false);
-
-    const { result } = renderHook(() => useProcessUploadedFile(defaultParams));
+    const { result } = renderHook(() =>
+      useProcessUploadedFile({
+        ...defaultParams,
+        hasAvailableUploads: false,
+      }),
+    );
 
     const file = createMockFile();
     await act(async () => {
       await result.current(file);
     });
 
-    expect(mockHasAvailableUploads).toHaveBeenCalled();
     expect(mockSetUploadingState).not.toHaveBeenCalled();
     expect(mockResetUploadState).not.toHaveBeenCalled();
   });
@@ -153,9 +155,12 @@ describe('useProcessUploadedFile', () => {
   });
 
   it('should not call readAsDataURL if file validation fails', async () => {
-    mockHasAvailableUploads.mockReturnValueOnce(false);
-
-    const { result } = renderHook(() => useProcessUploadedFile(defaultParams));
+    const { result } = renderHook(() =>
+      useProcessUploadedFile({
+        ...defaultParams,
+        hasAvailableUploads: false,
+      }),
+    );
 
     const file = createMockFile();
     await act(async () => {
