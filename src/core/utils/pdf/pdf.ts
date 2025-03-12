@@ -11,7 +11,7 @@ export async function pdfDocExtractText(
 
   const pdfDocPerPageText: string[] = [];
 
-  const len = nPages < pdf.numPages ? pdf.numPages : nPages;
+  const len = nPages < pdf.numPages ? nPages : pdf.numPages;
   // first page is 1
   for (let pageNum = 1; pageNum <= len; pageNum++) {
     const page = await pdf.getPage(pageNum);

@@ -15,15 +15,12 @@ import { initializeMessageRegistry } from '../../features/blockchain/config/init
 import { useExecuteOperation } from './useExecuteOperation';
 import { DEFAULT_MODEL_NAME, getModelConfig } from '../config/models';
 import { SupportedModels, ModelConfig } from '../types/models';
-import {
-  ActiveConversation,
-  ConversationHistory,
-  HandleChatCompletionOpts,
-} from './types';
+import { ActiveConversation, ConversationHistory } from './types';
 import { getToken } from '../../core/utils/token/token';
 import OpenAI from 'openai';
 import { v4 as uuidv4 } from 'uuid';
 import { doChat, syncWithLocalStorage, newConversation } from './utils';
+import type { ChatCompletionMessageParam } from 'openai/resources/index';
 
 let client: OpenAI | null = null;
 
@@ -218,8 +215,7 @@ export const AppContextProvider = (props: {
   const controllerRef = useRef<AbortController | null>(null);
 
   const handleChatCompletion = useCallback(
-    async (opts: HandleChatCompletionOpts) => {
-      const { content } = opts;
+    async (value: ChatCompletionMessageParam[]) => {
       if (isRequesting) {
         return;
       }
@@ -239,7 +235,11 @@ export const AppContextProvider = (props: {
       setIsRequesting(true, id);
 
       // Add the user message to the UI
-      messageHistoryStore.addMessage({ role: 'user' as const, content });
+      messageHistoryStore.setMessages([
+        ...messageHistoryStore.getSnapshot(),
+        ...value,
+      ]);
+
       // save to local storage (pre-request with user's prompt)
       syncWithLocalStorage(
         conversationID,
@@ -266,7 +266,6 @@ export const AppContextProvider = (props: {
           thinkingStore,
           executeOperation,
           conversationID,
-          opts.isPDFUpload !== undefined ? opts.isPDFUpload : false,
         );
       } catch (error) {
         let errorMessage =

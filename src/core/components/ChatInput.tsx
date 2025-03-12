@@ -12,7 +12,7 @@ import { IdbImage } from './IdbImage';
 import ButtonIcon from './ButtonIcon';
 import { useTheme } from '../../shared/theme/useTheme';
 import { ChatCompletionContentPart } from 'openai/resources/index';
-import { pdfDocToBase64ImageUrls } from '../utils/pdf/pdf';
+import { pdfDocExtractText, pdfDocToBase64ImageUrls } from '../utils/pdf/pdf';
 
 const SUPPORT_FILE_UPLOAD =
   import.meta.env.VITE_FEAT_SUPPORT_FILE_UPLOAD === 'true';
@@ -76,6 +76,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
 
   const [imageIDs, setImageIDs] = useState<string[]>([]);
   const [fileType, setFileType] = useState<string>('');
+  const [pdfDocumentText, setPdfDocumentText] = useState<string[]>([]);
 
   const prevModelIdRef = useRef(modelConfig.id);
   const prevConversationRef = useRef(conversationID);
@@ -118,30 +119,56 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     }
 
     if (imageIDs.length > 0) {
-      const messageContent: ChatCompletionContentPart[] = [
-        {
-          type: 'text',
-          text: processedMessage,
-        },
-      ];
-
-      imageIDs.forEach((id) => {
-        messageContent.push({
-          type: 'image_url',
-          image_url: {
-            url: id,
+      if (fileType === 'application/pdf') {
+        handleChatCompletion([
+          {
+            role: 'system',
+            content: JSON.stringify({
+              context: 'User PDF Uploaded and text has been extracted',
+              imageIDs,
+              imageDetails: pdfDocumentText,
+            }),
           },
-        });
-      });
+          {
+            role: 'user',
+            content: processedMessage,
+          },
+        ]);
 
-      handleChatCompletion({
-        content: messageContent,
-        isPDFUpload: fileType === 'application/pdf',
-      });
+        setPdfDocumentText([]);
+      } else {
+        const messageContent: ChatCompletionContentPart[] = [
+          {
+            type: 'text',
+            text: processedMessage,
+          },
+        ];
+
+        imageIDs.forEach((id) => {
+          messageContent.push({
+            type: 'image_url',
+            image_url: {
+              url: id,
+            },
+          });
+        });
+
+        handleChatCompletion([
+          {
+            role: 'user',
+            content: messageContent,
+          },
+        ]);
+      }
 
       setImageIDs([]);
     } else {
-      handleChatCompletion({ content: processedMessage });
+      handleChatCompletion([
+        {
+          role: 'user',
+          content: processedMessage,
+        },
+      ]);
     }
 
     setFileType('');
@@ -237,7 +264,12 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
           const imgID = await saveImage(e.target.result);
           setImageIDs((prevIDs) => [...prevIDs, imgID]);
         } else if (e.target?.result instanceof ArrayBuffer) {
+          // todo: remove hardcoded 4 page limit
+          // todo: limit the pdfText to fit within the context window
           const images = await pdfDocToBase64ImageUrls(e.target.result, 4);
+          const pdfText = await pdfDocExtractText(e.target.result, 4);
+          setPdfDocumentText(pdfText);
+
           for (const img of images) {
             const id = await saveImage(img);
             setImageIDs((prev) => [...prev, id]);

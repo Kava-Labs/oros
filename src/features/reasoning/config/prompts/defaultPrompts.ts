@@ -30,4 +30,3 @@ For **documents**, focus on:
 - If required, use structured listing for clarity in complex scenes (e.g., inventories).
 - No markdown or unnecessary formatting unless explicitly requested.`;
 
-export const visionModelPDFPrompt = `You are an AI specialized in recognizing and extracting text from images while maintaining user privacy and data integrity.`;

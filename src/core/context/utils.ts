@@ -19,11 +19,7 @@ import {
   ChatCompletionUserMessageParam,
 } from 'openai/resources/index';
 import { getImage } from '../utils/idb/idb';
-import {
-  visionModelPrompt,
-  visionModelPDFPrompt,
-} from '../../features/reasoning/config/prompts/defaultPrompts';
-import { hasSufficientRemainingTokens } from '../utils/conversation/hasSufficientRemainingTokens';
+import { visionModelPrompt } from '../../features/reasoning/config/prompts/defaultPrompts';
 
 export const newConversation = () => {
   return {
@@ -40,108 +36,21 @@ export const newConversation = () => {
 
 const analyzeImage = async (
   client: OpenAI,
-  conversationID: string,
-  modelConfig: ModelConfig,
   msg: ChatCompletionUserMessageParam,
 ): Promise<string> => {
-  const chunkSize = 1; // each chunk contains chunkSize images
+  const data = await client.chat.completions.create({
+    model: 'qwen2.5-vl-7b-instruct',
+    messages: [msg],
+  });
 
-  if (Array.isArray(msg.content) && msg.content.length > chunkSize + 1) {
-    // chunk those requests
-    const textContent = msg.content.find((msg) => msg.type === 'text');
-    if (!textContent) return '';
-    const requestMsgs: ChatCompletionUserMessageParam[] = [
-      {
-        role: 'user',
-        content: [
-          {
-            type: 'text',
-            text: textContent.text,
-          },
-        ],
-      },
-    ];
-    for (const content of msg.content) {
-      if (content.type === 'image_url') {
-        if (
-          requestMsgs[requestMsgs.length - 1].content.length >=
-          chunkSize + 1
-        ) {
-          requestMsgs.push({
-            role: 'user',
-            content: [
-              {
-                type: 'text',
-                text: textContent.text,
-              },
-            ],
-          });
-        }
-
-        (
-          requestMsgs[requestMsgs.length - 1]
-            .content as ChatCompletionContentPart[]
-        ).push({ ...content });
-      }
-    }
-
-    console.log(requestMsgs);
-
-    const allConversations: Record<string, ConversationHistory> = JSON.parse(
-      localStorage.getItem('conversations') ?? '{}',
-    );
-
-    const currentConversation = allConversations[conversationID];
-
-    const remainingContextWindow = currentConversation
-      ? currentConversation.tokensRemaining
-      : modelConfig.contextLength;
-
-    let details = '';
-    for (let i = 0; i < requestMsgs.length; i++) {
-      const request = requestMsgs[i];
-      const res = await analyzeImage(
-        client,
-        conversationID,
-        modelConfig,
-        request,
-      );
-
-      if (
-        details.length < 4096
-        // hasSufficientRemainingTokens(
-        //   modelConfig.id,
-        //   details,
-        //   remainingContextWindow,
-        // ) not being accurate
-      ) {
-        details = details.concat(
-          `\nPage #${i + 1} ${chunkSize > 1 ? ' to page #' + i + 1 + chunkSize : ''}`,
-          res,
-        );
-      } else {
-        // exceeds context window
-        break;
-      }
-    }
-
-    console.log(details);
-    return details;
-  } else {
-    const data = await client.chat.completions.create({
-      model: 'qwen2.5-vl-7b-instruct',
-      messages: [msg],
-    });
-
-    // todo: needs better error handling
-    if (!data.choices) {
-      return JSON.stringify(data);
-    }
-
-    const imageDetails = data.choices[0].message.content;
-
-    return imageDetails ? imageDetails : '';
+  // todo: needs better error handling
+  if (!data.choices) {
+    return JSON.stringify(data);
   }
+
+  const imageDetails = data.choices[0].message.content;
+
+  return imageDetails ? imageDetails : '';
 };
 
 /**
@@ -228,7 +137,6 @@ export async function doChat(
   thinkingStore: TextStreamStore,
   executeOperation: ExecuteOperation,
   conversationID: string,
-  isPDFUpload: boolean,
 ) {
   progressStore.setText('Thinking');
   const { id, tools } = modelConfig;
@@ -247,7 +155,7 @@ export async function doChat(
     content: [
       {
         type: 'text',
-        text: isPDFUpload ? visionModelPDFPrompt : visionModelPrompt,
+        text: visionModelPrompt,
       },
     ],
   };
@@ -274,12 +182,7 @@ export async function doChat(
   }
 
   if (isFileUpload) {
-    const imageDetails = await analyzeImage(
-      client,
-      conversationID,
-      modelConfig,
-      visionModelMsg,
-    );
+    const imageDetails = await analyzeImage(client, visionModelMsg);
 
     messageHistoryStore.setMessages([
       ...messageHistoryStore.getSnapshot().slice(0, -1),
@@ -419,7 +322,6 @@ export async function doChat(
         thinkingStore,
         executeOperation,
         conversationID,
-        isPDFUpload,
       );
     }
     syncWithLocalStorage(

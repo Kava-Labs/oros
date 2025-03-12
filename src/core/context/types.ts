@@ -4,10 +4,7 @@ import { TextStreamStore } from '../../core/stores/textStreamStore';
 import { ToolCallStreamStore } from '../../core/stores/toolCallStreamStore';
 import { MessageHistoryStore } from '../../core/stores/messageHistoryStore';
 import { ModelConfig, SupportedModels } from '../types/models';
-import type {
-  ChatCompletionMessageParam,
-  ChatCompletionContentPart,
-} from 'openai/resources/index';
+import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import OpenAI from 'openai';
 
 export type ExecuteOperation = (
@@ -35,11 +32,6 @@ export type ActiveConversation = {
   isRequesting: boolean;
 };
 
-export type HandleChatCompletionOpts = {
-  content: string | Array<ChatCompletionContentPart>;
-  isPDFUpload?: boolean;
-};
-
 export type AppContextType = {
   conversationID: string;
   isReady: boolean;
@@ -49,9 +41,7 @@ export type AppContextType = {
   handleModelChange: (modelName: SupportedModels) => void;
   startNewChat: () => void;
   executeOperation: ExecuteOperation;
-  handleChatCompletion: (
-    value: HandleChatCompletionOpts,
-  ) => void;
+  handleChatCompletion: (value: ChatCompletionMessageParam[]) => void;
   handleCancel: () => void;
   walletStore: WalletStore;
   client: OpenAI | null;
