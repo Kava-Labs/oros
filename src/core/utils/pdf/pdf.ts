@@ -44,7 +44,8 @@ export async function pdfDocToBase64ImageUrls(
   const canvasContext = canvas.getContext('2d');
   if (!canvasContext) throw new Error('failed to get canvas 2d context');
 
-  while (pageNumber <= nPages) {
+  const len = nPages < pdf.numPages ? nPages : pdf.numPages;
+  while (pageNumber <= len) {
     const page = await pdf.getPage(pageNumber);
 
     // Set canvas dimensions to match PDF page
