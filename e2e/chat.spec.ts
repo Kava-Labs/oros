@@ -982,7 +982,7 @@ describe('chat', () => {
         JSON.stringify({
           'test-id': {
             id: 'test-id',
-            model: 'gpt-4o',
+            model: 'deepseek-r1',
             title: 'Test Conversation Title',
             conversation: [
               {

@@ -23,7 +23,6 @@ export const blockchainModels: Record<
     name: 'Blockchain Instruct',
     icon: OrosIcon,
     description: 'Blockchain Execution',
-    includeUsageInStream: false,
     tools: messageRegistry.getToolDefinitions(),
     supportedFileTypes: [],
     maximumFileUploads: 0,
