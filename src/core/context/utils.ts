@@ -23,7 +23,6 @@ import {
   visionModelPrompt,
   visionModelPDFPrompt,
 } from '../../features/reasoning/config/prompts/defaultPrompts';
-import { hasSufficientRemainingTokens } from '../utils/conversation/hasSufficientRemainingTokens';
 
 export const newConversation = () => {
   return {
@@ -86,16 +85,6 @@ const analyzeImage = async (
     }
 
     console.log(requestMsgs);
-
-    const allConversations: Record<string, ConversationHistory> = JSON.parse(
-      localStorage.getItem('conversations') ?? '{}',
-    );
-
-    const currentConversation = allConversations[conversationID];
-
-    const remainingContextWindow = currentConversation
-      ? currentConversation.tokensRemaining
-      : modelConfig.contextLength;
 
     let details = '';
     for (let i = 0; i < requestMsgs.length; i++) {

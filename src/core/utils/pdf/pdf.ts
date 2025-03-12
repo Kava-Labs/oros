@@ -1,39 +1,10 @@
 import 'pdfjs-dist/build/pdf.worker.min.mjs';
 import * as pdfjsLib from 'pdfjs-dist';
-
-export async function pdfDocExtractText(
-  doc: ArrayBuffer,
-  nPages: number,
-): Promise<string[]> {
-  if (nPages <= 0) throw new Error(`nPages must be greater than 0`);
-  const loadingTask = pdfjsLib.getDocument(doc.slice());
-  const pdf = await loadingTask.promise;
-
-  const pdfDocPerPageText: string[] = [];
-
-  const len = nPages < pdf.numPages ? pdf.numPages : nPages;
-  // first page is 1
-  for (let pageNum = 1; pageNum <= len; pageNum++) {
-    const page = await pdf.getPage(pageNum);
-    const text = await page.getTextContent();
-
-    let pageTextContent = '';
-    for (const item of text.items) {
-      if ('str' in item) {
-        pageTextContent += item.str + ' ';
-      }
-    }
-    pdfDocPerPageText.push(pageTextContent);
-  }
-
-  return pdfDocPerPageText;
-}
-
 export async function pdfDocToBase64ImageUrls(
   doc: ArrayBuffer,
   nPages: number,
 ): Promise<string[]> {
-  const loadingTask = pdfjsLib.getDocument(doc.slice());
+  const loadingTask = pdfjsLib.getDocument(doc);
   const pdf = await loadingTask.promise;
 
   let pageNumber = 1;
