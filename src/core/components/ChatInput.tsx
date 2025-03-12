@@ -253,7 +253,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     }
 
     const handlePaste = (e: ClipboardEvent) => {
-      if (!hasAvailableUploads) {
+      if (!hasAvailableUploads()) {
         return;
       }
 
