@@ -12,9 +12,6 @@ import { IdbImage } from './IdbImage';
 import ButtonIcon from './ButtonIcon';
 import { useTheme } from '../../shared/theme/useTheme';
 import { ChatCompletionContentPart } from 'openai/resources/index';
-
-import 'pdfjs-dist/build/pdf.worker.min.mjs';
-import * as pdfjsLib from 'pdfjs-dist';
 import { pdfDocToBase64ImageUrls } from '../utils/pdf/pdf';
 
 const SUPPORT_FILE_UPLOAD =
