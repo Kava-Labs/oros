@@ -87,9 +87,6 @@ li {
 
 .chatImage {
   margin: var(--spacing-xs) 0 var(--spacing-xs) auto;
-  width: 256px;
-  height: 256px;
-  position: relative;
 }
 
 .imageSkeleton {

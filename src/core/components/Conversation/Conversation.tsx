@@ -1,5 +1,5 @@
 import styles from './Conversation.module.css';
-import { Fragment, memo, useState } from 'react';
+import { Fragment, memo } from 'react';
 import { useSyncExternalStore } from 'react';
 import { ToolMessageContainer } from './ToolMessageContainer';
 import { StreamingMessage } from './StreamingMessage';
@@ -11,6 +11,7 @@ import { useAppContext } from '../../context/useAppContext';
 import { useMessageHistory } from '../../hooks/useMessageHistory';
 import { Content } from './Content';
 import { IdbImage } from '../IdbImage';
+import { ImageCarousel } from './ImageCarousel';
 
 export interface ConversationProps {
   onRendered(): void;
@@ -25,14 +26,15 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
   );
 
   const { messages } = useMessageHistory();
-  const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
+  // todo: re-implement this to make it work with the ImageCarousel
+  // const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
 
-  const handleImageLoad = (imageID: string) => {
-    setLoadedImages((prev) => ({
-      ...prev,
-      [imageID]: true,
-    }));
-  };
+  // const handleImageLoad = (imageID: string) => {
+  //   setLoadedImages((prev) => ({
+  //     ...prev,
+  //     [imageID]: true,
+  //   }));
+  // };
 
   return (
     <div className={styles.conversationContainer} data-testid="conversation">
@@ -77,22 +79,20 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
 
           return (
             <Fragment key={index}>
-              {hasImage
-                ? imageIDs.map((imageID, i) => (
-                    <div key={imageID} className={styles.chatImage}>
-                      {!loadedImages[imageID] && (
-                        <div className={styles.imageSkeleton}></div>
-                      )}
-                      <IdbImage
-                        width="256px"
-                        height="256px"
-                        id={imageID}
-                        aria-label={`User uploaded image ${i + 1}`}
-                        onLoad={() => handleImageLoad(imageID)}
-                      />
-                    </div>
-                  ))
-                : null}
+              {hasImage ? (
+                <div className={styles.chatImage}>
+                  {imageIDs.length > 1 ? (
+                    <ImageCarousel imageIDs={imageIDs} />
+                  ) : (
+                    <IdbImage
+                      width="256px"
+                      height="256px"
+                      id={imageIDs[0]}
+                      aria-label="File upload preview"
+                    />
+                  )}
+                </div>
+              ) : null}
 
               <div className={styles.userInputContainer}>
                 <Content
