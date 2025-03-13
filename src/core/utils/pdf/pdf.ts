@@ -1,6 +1,7 @@
 import * as pdfjsLib from 'pdfjs-dist';
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = `pdf.worker.min.mjs`;
+pdfjsLib.GlobalWorkerOptions.workerSrc = `pdf.worker.min-${pdfjsLib.version}-4603be13.mjs`;
+
 
 export async function pdfDocExtractText(
   doc: ArrayBuffer,
