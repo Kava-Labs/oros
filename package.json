@@ -38,6 +38,7 @@
     "marked": "^15.0.2",
     "marked-highlight": "^2.2.1",
     "openai": "^4.73.1",
+    "pdfjs-dist": "4.10.38",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "uuid": "^11.0.3"
