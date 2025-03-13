@@ -4,9 +4,7 @@ import { TextStreamStore } from '../../core/stores/textStreamStore';
 import { ToolCallStreamStore } from '../../core/stores/toolCallStreamStore';
 import { MessageHistoryStore } from '../../core/stores/messageHistoryStore';
 import { ModelConfig, SupportedModels } from '../types/models';
-import type {
-  ChatCompletionMessageParam,
-} from 'openai/resources/index';
+import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import OpenAI from 'openai';
 
 export type ExecuteOperation = (
