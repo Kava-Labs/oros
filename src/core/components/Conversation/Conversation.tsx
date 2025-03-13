@@ -58,14 +58,24 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
                 break;
               }
             }
-          } else if (index > 0 && messages[index - 1].role === 'system') {
-            const prevMsg = messages[index - 1];
-            if (
-              typeof prevMsg.content === 'string' &&
-              prevMsg.content.includes('"imageIDs":')
-            ) {
-              hasImage = true;
-              imageIDs = JSON.parse(prevMsg.content).imageIDs;
+          }
+          if (index > 0 && messages[index - 1].role === 'system') {
+            let i = index - 1;
+            while (i > 0) {
+              const prevMsg = messages[i];
+              if (prevMsg.role !== 'system') break;
+              if (
+                typeof prevMsg.content === 'string' &&
+                prevMsg.content.includes('"imageIDs":')
+              ) {
+                hasImage = true;
+                imageIDs = [
+                  ...imageIDs,
+                  ...JSON.parse(prevMsg.content).imageIDs,
+                ];
+              }
+
+              i--;
             }
           }
 

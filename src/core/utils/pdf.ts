@@ -2,43 +2,22 @@ import * as pdfjsLib from 'pdfjs-dist';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `pdf.worker.min-${pdfjsLib.version}-4603be13.mjs`;
 
-export async function pdfDocExtractText(
+export type PDFData = {
+  base64ImageURL: string;
+  text: string;
+  pageNumber: number;
+};
+
+export async function pdfDocExtractTextAndImage(
   doc: ArrayBuffer,
   nPages: number,
-): Promise<string[]> {
-  if (nPages <= 0) throw new Error(`nPages must be greater than 0`);
-  const loadingTask = pdfjsLib.getDocument(doc.slice(0));
-  const pdf = await loadingTask.promise;
+): Promise<PDFData[]> {
+  const pdfData: PDFData[] = [];
 
-  const pdfDocPerPageText: string[] = [];
-
-  const len = nPages < pdf.numPages ? nPages : pdf.numPages;
-  // first page is 1
-  for (let pageNum = 1; pageNum <= len; pageNum++) {
-    const page = await pdf.getPage(pageNum);
-    const text = await page.getTextContent();
-
-    let pageTextContent = '';
-    for (const item of text.items) {
-      if ('str' in item) {
-        pageTextContent += item.str + ' ';
-      }
-    }
-    pdfDocPerPageText.push(pageTextContent);
-  }
-
-  return pdfDocPerPageText;
-}
-
-export async function pdfDocToBase64ImageUrls(
-  doc: ArrayBuffer,
-  nPages: number,
-): Promise<string[]> {
   const loadingTask = pdfjsLib.getDocument(doc.slice(0));
   const pdf = await loadingTask.promise;
 
   let pageNumber = 1;
-  const imageUrls: string[] = [];
 
   // Create a canvas element
   const canvas = document.createElement('canvas');
@@ -59,11 +38,24 @@ export async function pdfDocToBase64ImageUrls(
       viewport,
     }).promise;
 
-    // Convert canvas to an image URL
-    imageUrls.push(canvas.toDataURL('image/webp'));
+    const text = await page.getTextContent();
+
+    let pageTextContent = '';
+    for (const item of text.items) {
+      if ('str' in item) {
+        pageTextContent += item.str + ' ';
+      }
+    }
+
+    pdfData.push({
+      pageNumber,
+      base64ImageURL: canvas.toDataURL('image/webp'),
+      text: pageTextContent,
+    });
+
     canvasContext.reset();
     pageNumber++;
   }
 
-  return imageUrls;
+  return pdfData;
 }

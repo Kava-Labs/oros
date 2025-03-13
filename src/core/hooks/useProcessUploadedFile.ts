@@ -1,22 +1,25 @@
 import { Dispatch, SetStateAction, useCallback } from 'react';
 import { isSupportedFileType } from '../types/models';
-import { UploadingState } from '../components/ChatInput';
+import type { FileUpload, UploadingState } from '../components/ChatInput';
 import { saveImage } from '../utils/idb/idb';
+import { pdfDocExtractTextAndImage } from '../utils/pdf';
 
 export interface UseProcessUploadedFileParams {
   hasAvailableUploads: () => boolean;
   maximumFileBytes: number;
+  maximumFileUploads: number;
   setUploadingState: (state: UploadingState) => void;
   resetUploadState: () => void;
-  setImageIDs: Dispatch<SetStateAction<string[]>>;
+  setUploadedFiles: Dispatch<SetStateAction<FileUpload[]>>;
 }
 
 const useProcessUploadedFile = ({
   hasAvailableUploads, //  todo - remove when extracted to importable function
   maximumFileBytes,
+  maximumFileUploads,
   setUploadingState,
   resetUploadState,
-  setImageIDs,
+  setUploadedFiles,
 }: UseProcessUploadedFileParams) => {
   return useCallback(
     async (file: File) => {
@@ -44,7 +47,7 @@ const useProcessUploadedFile = ({
           isActive: true,
           isSupportedFile: false,
           errorMessage:
-            'Invalid file type! Please upload a JPEG, PNG, or WebP image.',
+            'Invalid file type! Please upload a JPEG, PNG, WebP, or PDF file',
         });
 
         setTimeout(() => {
@@ -60,16 +63,71 @@ const useProcessUploadedFile = ({
       reader.onload = async (e) => {
         if (e.target && typeof e.target.result === 'string') {
           const imgID = await saveImage(e.target.result);
-          setImageIDs((prevIDs) => [...prevIDs, imgID]);
+          setUploadedFiles((prev) => [
+            ...prev,
+            { fileType: file.type, id: imgID, fileName: file.name },
+          ]);
+        } else if (
+          e.target?.result instanceof ArrayBuffer &&
+          file.type === 'application/pdf'
+        ) {
+          const pdfDocData = await pdfDocExtractTextAndImage(
+            e.target.result,
+            maximumFileUploads,
+          );
+
+          for (const pdfPage of pdfDocData) {
+            const id = await saveImage(pdfPage.base64ImageURL);
+
+            setUploadedFiles((prev) => [
+              ...prev,
+              {
+                id,
+                fileName: file.name,
+                fileType: file.type,
+                fileText: pdfPage.text,
+                page: pdfPage.pageNumber,
+              },
+            ]);
+          }
+
+          // const images = await pdfDocToBase64ImageUrls(
+          //   e.target.result,
+          //   maximumFileUploads,
+          // );
+          // const pdfText = await pdfDocExtractText(
+          //   e.target.result,
+          //   maximumFileUploads,
+          // );
+
+          // for (let i = 0; i < images.length; i++) {
+          //   const img = images[i];
+          //   const id = await saveImage(img);
+          //   setUploadedFiles((prev) => [
+          //     ...prev,
+          //     {
+          //       id,
+          //       fileName: file.name,
+          //       fileType: file.type,
+          //       fileText: pdfText[i] ? pdfText[i] : '',
+          //     },
+          //   ]);
+          // }
         }
       };
-      reader.readAsDataURL(file);
+
+      if (file.type === 'application/pdf') {
+        reader.readAsArrayBuffer(file);
+      } else {
+        reader.readAsDataURL(file);
+      }
     },
     [
       hasAvailableUploads,
       maximumFileBytes,
       resetUploadState,
-      setImageIDs,
+      maximumFileUploads,
+      setUploadedFiles,
       setUploadingState,
     ],
   );
