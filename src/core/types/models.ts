@@ -76,6 +76,7 @@ export const SUPPORTED_FILE_TYPES = [
   'image/jpeg',
   'image/png',
   'image/webp',
+  'application/pdf',
 ] as const;
 
 export type SupportedFileType = (typeof SUPPORTED_FILE_TYPES)[number];
