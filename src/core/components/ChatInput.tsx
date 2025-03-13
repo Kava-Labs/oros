@@ -137,11 +137,21 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
         });
       });
 
-      handleChatCompletion(messageContent);
+      handleChatCompletion([
+        {
+          role: 'user',
+          content: messageContent,
+        },
+      ]);
 
       setImageIDs([]);
     } else {
-      handleChatCompletion(processedMessage);
+      handleChatCompletion([
+        {
+          role: 'user',
+          content: processedMessage,
+        },
+      ]);
     }
 
     setInputValue('');
