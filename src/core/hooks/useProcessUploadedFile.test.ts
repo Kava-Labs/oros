@@ -27,7 +27,7 @@ describe('useProcessUploadedFile', () => {
   const mockSetUploadingState = vi.fn();
   const mockResetUploadState = vi.fn();
   const mockHasAvailableUploads = vi.fn().mockReturnValue(true);
-  const mockSetImageIDs = vi.fn();
+  const mockSetUploadedFiles = vi.fn();
 
   const originalFileReader = global.FileReader;
   const mockFileReaderInstance = {
@@ -38,9 +38,10 @@ describe('useProcessUploadedFile', () => {
   const defaultParams: UseProcessUploadedFileParams = {
     hasAvailableUploads: mockHasAvailableUploads,
     maximumFileBytes: 8 * 1024 * 1024, // 8MB
+    maximumFileUploads: 4,
     setUploadingState: mockSetUploadingState,
     resetUploadState: mockResetUploadState,
-    setImageIDs: mockSetImageIDs,
+    setUploadedFiles: mockSetUploadedFiles,
   };
 
   beforeEach(() => {
@@ -111,7 +112,7 @@ describe('useProcessUploadedFile', () => {
       isActive: true,
       isSupportedFile: false,
       errorMessage:
-        'Invalid file type! Please upload a JPEG, PNG, or WebP image.',
+        'Invalid file type! Please upload a JPEG, PNG, WebP, or PDF file',
     });
 
     //  Trigger the timeout
@@ -146,7 +147,7 @@ describe('useProcessUploadedFile', () => {
       }
     });
 
-    expect(mockSetImageIDs).toHaveBeenCalledTimes(1);
+    expect(mockSetUploadedFiles).toHaveBeenCalledTimes(1);
     expect(mockSaveImage).toHaveBeenCalledWith(
       'data:image/jpeg;base64,testdata',
     );
