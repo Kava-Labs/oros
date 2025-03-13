@@ -90,29 +90,6 @@ const useProcessUploadedFile = ({
               },
             ]);
           }
-
-          // const images = await pdfDocToBase64ImageUrls(
-          //   e.target.result,
-          //   maximumFileUploads,
-          // );
-          // const pdfText = await pdfDocExtractText(
-          //   e.target.result,
-          //   maximumFileUploads,
-          // );
-
-          // for (let i = 0; i < images.length; i++) {
-          //   const img = images[i];
-          //   const id = await saveImage(img);
-          //   setUploadedFiles((prev) => [
-          //     ...prev,
-          //     {
-          //       id,
-          //       fileName: file.name,
-          //       fileType: file.type,
-          //       fileText: pdfText[i] ? pdfText[i] : '',
-          //     },
-          //   ]);
-          // }
         }
       };
 

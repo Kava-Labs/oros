@@ -53,7 +53,6 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
 
   const [inputValue, setInputValue] = useState('');
   const [uploadedFiles, setUploadedFiles] = useState<FileUpload[]>([]);
-  // console.log(uploadedFiles);
 
   const [uploadingState, setUploadingState] = useState<UploadingState>({
     isActive: false,
@@ -100,7 +99,6 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       prevModelIdRef.current !== modelConfig.id ||
       prevConversationRef.current !== conversationID
     ) {
-      // setImageIDs([]);
       setUploadedFiles([]);
       prevModelIdRef.current = modelConfig.id;
       prevConversationRef.current = conversationID;
