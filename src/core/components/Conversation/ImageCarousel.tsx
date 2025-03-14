@@ -38,7 +38,7 @@ export const ImageCarousel = ({
   };
 
   return (
-    <div style={{ visibility: isLoaded ? 'visible' : 'hidden' }}>
+    <div className={isLoaded ? styles.visible : styles.hidden}>
       <div className={styles.slideshowContainer}>
         {imageIDs.map((imageID, index) => (
           <div
