@@ -1,5 +1,5 @@
 import styles from './Conversation.module.css';
-import { Fragment, memo } from 'react';
+import { Fragment, memo, useState } from 'react';
 import { useSyncExternalStore } from 'react';
 import { ToolMessageContainer } from './ToolMessageContainer';
 import { StreamingMessage } from './StreamingMessage';
@@ -26,15 +26,11 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
   );
 
   const { messages } = useMessageHistory();
-  // todo: re-implement this to make it work with the ImageCarousel
-  // const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  // const handleImageLoad = (imageID: string) => {
-  //   setLoadedImages((prev) => ({
-  //     ...prev,
-  //     [imageID]: true,
-  //   }));
-  // };
+  const handleFileLoad = () => {
+    setIsLoaded(true);
+  };
 
   return (
     <div className={styles.conversationContainer} data-testid="conversation">
@@ -92,14 +88,24 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
               {hasImage ? (
                 <div className={styles.chatImage}>
                   {imageIDs.length > 1 ? (
-                    <ImageCarousel imageIDs={imageIDs} />
-                  ) : (
-                    <IdbImage
-                      width="256px"
-                      height="256px"
-                      id={imageIDs[0]}
-                      aria-label="File upload chat message"
+                    <ImageCarousel
+                      imageIDs={imageIDs}
+                      isLoaded={isLoaded}
+                      handleLoaded={handleFileLoad}
                     />
+                  ) : (
+                    <>
+                      {!isLoaded && (
+                        <div className={styles.imageSkeleton}></div>
+                      )}
+                      <IdbImage
+                        width="256px"
+                        height="256px"
+                        id={imageIDs[0]}
+                        aria-label="File upload chat message"
+                        onLoad={handleFileLoad}
+                      />
+                    </>
                   )}
                 </div>
               ) : null}
