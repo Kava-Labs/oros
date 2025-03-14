@@ -86,6 +86,14 @@
   animation-duration: 1s;
 }
 
+.visible {
+  visibility: visible;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
 @keyframes fade {
   from {
     opacity: 0.4;

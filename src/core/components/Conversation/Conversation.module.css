@@ -92,12 +92,9 @@ li {
 .imageSkeleton {
   width: 100%;
   height: 100%;
-  background: var(--colors-bgSecondary);
-  border-radius: var(--borderRadius-md);
   position: absolute;
   top: 0;
   left: 0;
-  animation: pulse 1.5s infinite ease-in-out;
 }
 
 @keyframes pulse {
