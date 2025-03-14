@@ -11,6 +11,7 @@ import { useAppContext } from '../../context/useAppContext';
 import { useMessageHistory } from '../../hooks/useMessageHistory';
 import { Content } from './Content';
 import { IdbImage } from '../IdbImage';
+import { ImageCarousel } from './ImageCarousel';
 
 export interface ConversationProps {
   onRendered(): void;
@@ -25,13 +26,10 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
   );
 
   const { messages } = useMessageHistory();
-  const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  const handleImageLoad = (imageID: string) => {
-    setLoadedImages((prev) => ({
-      ...prev,
-      [imageID]: true,
-    }));
+  const handleFileLoad = () => {
+    setIsLoaded(true);
   };
 
   return (
@@ -56,14 +54,24 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
                 break;
               }
             }
-          } else if (index > 0 && messages[index - 1].role === 'system') {
-            const prevMsg = messages[index - 1];
-            if (
-              typeof prevMsg.content === 'string' &&
-              prevMsg.content.includes('"imageIDs":')
-            ) {
-              hasImage = true;
-              imageIDs = JSON.parse(prevMsg.content).imageIDs;
+          }
+          if (index > 0 && messages[index - 1].role === 'system') {
+            let i = index - 1;
+            while (i > 0) {
+              const prevMsg = messages[i];
+              if (prevMsg.role !== 'system') break;
+              if (
+                typeof prevMsg.content === 'string' &&
+                prevMsg.content.includes('"imageIDs":')
+              ) {
+                hasImage = true;
+                imageIDs = [
+                  ...imageIDs,
+                  ...JSON.parse(prevMsg.content).imageIDs,
+                ];
+              }
+
+              i--;
             }
           }
 
@@ -77,22 +85,30 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
 
           return (
             <Fragment key={index}>
-              {hasImage
-                ? imageIDs.map((imageID, i) => (
-                    <div key={imageID} className={styles.chatImage}>
-                      {!loadedImages[imageID] && (
+              {hasImage ? (
+                <div className={styles.chatImage}>
+                  {imageIDs.length > 1 ? (
+                    <ImageCarousel
+                      imageIDs={imageIDs}
+                      isLoaded={isLoaded}
+                      handleLoaded={handleFileLoad}
+                    />
+                  ) : (
+                    <>
+                      {!isLoaded && (
                         <div className={styles.imageSkeleton}></div>
                       )}
                       <IdbImage
                         width="256px"
                         height="256px"
-                        id={imageID}
-                        aria-label={`User uploaded image ${i + 1}`}
-                        onLoad={() => handleImageLoad(imageID)}
+                        id={imageIDs[0]}
+                        aria-label="File upload chat message"
+                        onLoad={handleFileLoad}
                       />
-                    </div>
-                  ))
-                : null}
+                    </>
+                  )}
+                </div>
+              ) : null}
 
               <div className={styles.userInputContainer}>
                 <Content

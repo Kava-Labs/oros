@@ -21,7 +21,7 @@ describe('useHandleDragAndDrop', () => {
     hasAvailableUploads: mockHasAvailableUploads,
     processUploadedFile: mockProcessUploadedFile,
     resetUploadState: mockResetUploadState,
-    imageIDs: [],
+    uploadedFiles: [],
     modelConfig: {
       supportedFileTypes: [
         'image/jpeg',
@@ -283,7 +283,11 @@ describe('useHandleDragAndDrop', () => {
       renderHook(() =>
         useDragAndDrop({
           ...defaultParams,
-          imageIDs: ['existing1', 'existing2', 'existing3'],
+          uploadedFiles: [
+            { id: 'existing1', fileName: 'mock1', fileType: 'image/png' },
+            { id: 'existing2', fileName: 'mock2', fileType: 'image/png' },
+            { id: 'existing3', fileName: 'mock3', fileType: 'image/png' },
+          ],
           modelConfig: {
             ...defaultParams.modelConfig,
             maximumFileUploads: 4,

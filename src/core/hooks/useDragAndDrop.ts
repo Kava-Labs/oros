@@ -1,12 +1,12 @@
 import { useEffect, useCallback, Dispatch, SetStateAction } from 'react';
 import { isSupportedFileType, ModelConfig } from '../types/models';
-import { UploadingState } from '../components/ChatInput';
+import type { FileUpload, UploadingState } from '../components/ChatInput';
 
 export interface UseHandleDragAndDropParams {
   hasAvailableUploads: () => boolean;
   processUploadedFile: (file: File) => Promise<void>;
   resetUploadState: () => void;
-  imageIDs: string[];
+  uploadedFiles: FileUpload[];
   modelConfig: ModelConfig;
   setUploadingState: Dispatch<SetStateAction<UploadingState>>;
 }
@@ -20,7 +20,7 @@ export interface UseHandleDragAndDropParams {
  *  @param {Function} params.hasAvailableUploads - Function that checks if more uploads are allowed
  *  @param {Function} params.processUploadedFile - Function that handles processing a valid file
  *  @param {Function} params.resetUploadState - Function that resets the uploading state
- *  @param {string[]} params.imageIDs - Array of currently uploaded image IDs
+ *  @param {FileUpload[]} params.imageIDs - Array of currently uploaded files
  *  @param {ModelConfig} params.modelConfig - Configuration object that defines upload constraints
  *  @param {Dispatch<SetStateAction<UploadingState>>} params.setUploadingState - State setter for the uploading state
  *  @returns {void} This hook doesn't return any values but sets up event listeners
@@ -29,7 +29,7 @@ export const useDragAndDrop = ({
   hasAvailableUploads,
   processUploadedFile,
   resetUploadState,
-  imageIDs,
+  uploadedFiles,
   modelConfig,
   setUploadingState,
 }: UseHandleDragAndDropParams): void => {
@@ -104,7 +104,7 @@ export const useDragAndDrop = ({
 
       const files = e.dataTransfer?.files;
       if (files && files.length > 0) {
-        const totalFilesAfterDrop = imageIDs.length + files.length;
+        const totalFilesAfterDrop = uploadedFiles.length + files.length;
 
         const hasUnsupportedType = Array.from(files).some(
           (file) => !isSupportedFileType(file.type),
@@ -154,7 +154,7 @@ export const useDragAndDrop = ({
       }
     },
     [
-      imageIDs.length,
+      uploadedFiles.length,
       maximumFileBytes,
       maximumFileUploads,
       processUploadedFile,

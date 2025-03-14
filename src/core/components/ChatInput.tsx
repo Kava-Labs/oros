@@ -10,7 +10,11 @@ import { Paperclip, X } from 'lucide-react';
 import { IdbImage } from './IdbImage';
 import ButtonIcon from './ButtonIcon';
 import { useTheme } from '../../shared/theme/useTheme';
-import { ChatCompletionContentPart } from 'openai/resources/index';
+import type {
+  ChatCompletionContentPart,
+  ChatCompletionMessageParam,
+  ChatCompletionUserMessageParam,
+} from 'openai/resources/index';
 import { useDragAndDrop } from '../hooks/useDragAndDrop';
 import { isSupportedFileType } from '../types/models';
 import useProcessUploadedFile from '../hooks/useProcessUploadedFile';
@@ -28,6 +32,14 @@ export interface UploadingState {
   errorMessage: string;
 }
 
+export type FileUpload = {
+  id: string;
+  fileName: string;
+  fileType: string;
+  fileText?: string;
+  page?: number;
+};
+
 const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
   const [showInputAdornmentMessage, setShowInputAdornmentMessage] =
     useState(false);
@@ -40,7 +52,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
   );
 
   const [inputValue, setInputValue] = useState('');
-  const [imageIDs, setImageIDs] = useState<string[]>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<FileUpload[]>([]);
 
   const [uploadingState, setUploadingState] = useState<UploadingState>({
     isActive: false,
@@ -69,7 +81,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     modelConfig;
 
   const hasAvailableUploads = useAvailableUploads({
-    imageIDs,
+    uploadedFiles,
     maximumFileUploads,
     setUploadingState,
     resetUploadState,
@@ -87,7 +99,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       prevModelIdRef.current !== modelConfig.id ||
       prevConversationRef.current !== conversationID
     ) {
-      setImageIDs([]);
+      setUploadedFiles([]);
       prevModelIdRef.current = modelConfig.id;
       prevConversationRef.current = conversationID;
     }
@@ -115,33 +127,82 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       return;
     }
 
+    const newMessages: ChatCompletionMessageParam[] = [];
     let processedMessage = inputValue;
     if (modelConfig.messageProcessors?.preProcess) {
       processedMessage = modelConfig.messageProcessors.preProcess(inputValue);
     }
 
-    if (imageIDs.length > 0) {
-      const messageContent: ChatCompletionContentPart[] = [
-        {
-          type: 'text',
-          text: processedMessage,
-        },
-      ];
+    if (uploadedFiles.length > 0) {
+      // group all pdf uploads together into a system message
+      // this is because a single pdf upload creates multiple images
+      const groupedPDFFiles: Record<string, FileUpload[]> = {};
 
-      imageIDs.forEach((id) => {
-        messageContent.push({
-          type: 'image_url',
-          image_url: {
-            url: id,
-          },
+      for (const uploadedFile of uploadedFiles) {
+        if (uploadedFile.fileType === 'application/pdf') {
+          if (!groupedPDFFiles[uploadedFile.fileName]) {
+            groupedPDFFiles[uploadedFile.fileName] = [];
+          }
+          // groups all image pages to the same pdf file
+          groupedPDFFiles[uploadedFile.fileName].push(uploadedFile);
+        }
+      }
+
+      for (const [, groupedPdfPages] of Object.entries(groupedPDFFiles)) {
+        // make sure we are sorted in ascending order
+        groupedPdfPages.sort((a, b) => a.page! - b.page!);
+        // push a system message for each pdf document
+        newMessages.push({
+          role: 'system',
+          content: JSON.stringify({
+            context: 'user uploaded pdf document and text has been extracted',
+            imageIDs: groupedPdfPages.map((p) => p.id), // required for conversation component to show the images
+            document: groupedPdfPages.map((p) => ({
+              page: p.page,
+              content: p.fileText,
+            })),
+          }),
         });
-      });
+      }
 
-      handleChatCompletion(messageContent);
+      const userMessage: ChatCompletionUserMessageParam = {
+        role: 'user',
+        content: [
+          {
+            type: 'text',
+            text: processedMessage,
+          },
+        ],
+      };
 
-      setImageIDs([]);
+      const nonPdfUploads = uploadedFiles.filter(
+        (f) => f.fileType !== 'application/pdf',
+      );
+
+      // if we have regular image uploads
+      // push all the images into the content of the user message
+      if (nonPdfUploads.length) {
+        nonPdfUploads.forEach((file) => {
+          (userMessage.content as ChatCompletionContentPart[]).push({
+            type: 'image_url',
+            image_url: { url: file.id },
+          });
+        });
+      }
+
+      // add the user message
+      // it should always be the last thing added
+      newMessages.push(userMessage);
+
+      handleChatCompletion(newMessages);
+      setUploadedFiles([]);
     } else {
-      handleChatCompletion(processedMessage);
+      handleChatCompletion([
+        {
+          role: 'user',
+          content: processedMessage,
+        },
+      ]);
     }
 
     setInputValue('');
@@ -152,7 +213,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       inputRef.current.style.height = DEFAULT_HEIGHT;
     }
   }, [
-    imageIDs,
+    uploadedFiles,
     isRequesting,
     inputValue,
     modelConfig.messageProcessors,
@@ -177,14 +238,16 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
   const processUploadedFile = useProcessUploadedFile({
     hasAvailableUploads,
     maximumFileBytes,
+    maximumFileUploads,
     setUploadingState,
-    setImageIDs,
+    setUploadedFiles,
     resetUploadState,
   });
 
   const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files?.length) {
-      const totalFilesAfterUpdate = imageIDs.length + event.target.files.length;
+      const totalFilesAfterUpdate =
+        uploadedFiles.length + event.target.files.length;
       if (totalFilesAfterUpdate > maximumFileUploads) {
         setUploadingState({
           isActive: true,
@@ -208,7 +271,9 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
   };
 
   const removeImage = (imageIdToRemove: string) => {
-    setImageIDs((prevIDs) => prevIDs.filter((id) => id !== imageIdToRemove));
+    setUploadedFiles((prevFiles) =>
+      prevFiles.filter((f) => f.id !== imageIdToRemove),
+    );
   };
 
   // Reset textarea height when input is cleared
@@ -241,7 +306,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     hasAvailableUploads,
     processUploadedFile,
     resetUploadState,
-    imageIDs,
+    uploadedFiles,
     modelConfig,
     setUploadingState,
   });
@@ -299,7 +364,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
 
   const { colors } = useTheme();
 
-  const noUserInput = inputValue.length === 0 && imageIDs.length === 0;
+  const noUserInput = inputValue.length === 0 && uploadedFiles.length === 0;
 
   const insufficientContext =
     !hasSufficientRemainingTokens(
@@ -321,10 +386,10 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
           }}
         />
       )}
-      {imageIDs.length > 0 && (
+      {uploadedFiles.length > 0 && (
         <div className={styles.imagePreviewContainer}>
           <div className={styles.imagePreviewWrapper}>
-            {imageIDs.map((id) => (
+            {uploadedFiles.map(({ id }) => (
               <div
                 key={id}
                 className={styles.imageCard}
@@ -385,7 +450,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
                     className={styles.uploadInputField}
                     onChange={handleUpload}
                     multiple // Allow multiple file selection
-                    disabled={imageIDs.length >= maximumFileUploads}
+                    disabled={uploadedFiles.length >= maximumFileUploads}
                   />
                 </div>
 
@@ -393,9 +458,9 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
                   icon={Paperclip}
                   size={16}
                   aria-label="Attach file icon"
-                  className={`${styles.attachIcon} ${imageIDs.length >= maximumFileUploads ? styles.disabled : ''}`}
+                  className={`${styles.attachIcon} ${uploadedFiles.length >= maximumFileUploads ? styles.disabled : ''}`}
                   onClick={() =>
-                    imageIDs.length < maximumFileUploads &&
+                    uploadedFiles.length < maximumFileUploads &&
                     uploadRef.current?.click()
                   }
                   tooltip={{
@@ -403,7 +468,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
                     position: 'bottom',
                     backgroundColor: colors.bgPrimary,
                   }}
-                  disabled={imageIDs.length >= maximumFileUploads}
+                  disabled={uploadedFiles.length >= maximumFileUploads}
                 />
               </>
             )}

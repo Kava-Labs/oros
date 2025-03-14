@@ -1,0 +1,104 @@
+.slideshowContainer {
+  max-width: 256px;
+  position: relative;
+  margin: auto;
+  height: 256px;
+  overflow: hidden;
+}
+
+.mySlides {
+  display: none;
+  position: relative;
+  height: 256px;
+}
+
+.activeSlide {
+  display: block;
+}
+
+.prev,
+.next {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  margin-top: -22px;
+  padding: var(--spacing-sm);
+  color: var(--colors-textPrimary);
+  transition: 0.6s ease;
+  border-radius: 0 var(--spacing-xs) var(--spacing-xs) 0;
+  user-select: none;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.next {
+  right: 0;
+  border-radius: var(--spacing-xs) 0 0 var(--spacing-xs);
+}
+
+.prev:hover,
+.next:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+  text-decoration: none;
+}
+
+.paginationNumber {
+  color: var(--colors-textPrimary);
+  font-size: 1.2rem;
+  border-radius: 0 0 var(--spacing-xs) 0;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  position: absolute;
+  top: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.dotsContainer {
+  text-align: center;
+  padding-top: 10px;
+}
+
+.dot {
+  cursor: pointer;
+  height: 8px;
+  width: 8px;
+  margin: 0 2px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+  transition: background-color 0.6s ease;
+}
+
+.activeDot {
+  background-color: #717171;
+}
+
+.dot:hover {
+  background-color: #717171;
+}
+
+.image {
+  width: 256px;
+  height: 256px;
+  object-fit: cover;
+}
+
+.fade {
+  animation-name: fade;
+  animation-duration: 1s;
+}
+
+.visible {
+  visibility: visible;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0.4;
+  }
+  to {
+    opacity: 1;
+  }
+}
