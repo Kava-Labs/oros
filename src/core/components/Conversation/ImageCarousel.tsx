@@ -53,7 +53,8 @@ export const ImageCarousel = ({
               alt={`Slide ${index + 1}`}
               className={styles.image}
               aria-label="File upload chat message"
-              onLoad={handleLoaded}
+              //  we only need to update the loading state for the first file
+              onLoad={index === 0 ? handleLoaded : undefined}
             />
           </div>
         ))}
