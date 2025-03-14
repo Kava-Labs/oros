@@ -43,7 +43,8 @@ export async function pdfDocExtractTextAndImage(
     let pageTextContent = '';
     for (const item of text.items) {
       if ('str' in item) {
-        pageTextContent += item.str + ' ';
+        pageTextContent += item.str;
+        if (item.hasEOL) pageTextContent += '\n';
       }
     }
 
