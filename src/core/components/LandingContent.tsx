@@ -12,7 +12,7 @@ export const LandingContent = () => {
     <div className={styles.startContent}>
       <div className={styles.startLogoContainer}>
         {Logo && (
-          <Logo width="100%" height="auto" className={styles.startLogo} />
+          <Logo width="100%" height="100%" className={styles.startLogo} />
         )}
       </div>
       <h1 className={styles.introText}>{introText}</h1>
