@@ -344,6 +344,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     modelSupportsUpload,
     resetUploadState,
     maximumFileBytes,
+    setUploadError,
   ]);
 
   const [, setHoverImageId] = useState<string | null>(null);
