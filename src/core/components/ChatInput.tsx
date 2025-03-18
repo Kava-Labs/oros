@@ -86,8 +86,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
   const hasAvailableUploads = useAvailableUploads({
     uploadedFiles,
     maximumFileUploads,
-    setUploadingState,
-    resetUploadState,
+    setUploadError,
   });
 
   const buttonRef = useRef<HTMLButtonElement>(null);

@@ -1,11 +1,10 @@
-import type { FileUpload, UploadingState } from '../components/ChatInput';
-import { Dispatch, SetStateAction, useCallback } from 'react';
+import type { FileUpload } from '../components/ChatInput';
+import { useCallback } from 'react';
 
 interface UseAvailableUploadsParams {
   uploadedFiles: FileUpload[];
   maximumFileUploads: number;
-  setUploadingState: Dispatch<SetStateAction<UploadingState>>;
-  resetUploadState: () => void;
+  setUploadError: (errorMessage: string) => void;
 }
 
 /**
@@ -22,28 +21,14 @@ interface UseAvailableUploadsParams {
 export const useAvailableUploads = ({
   uploadedFiles,
   maximumFileUploads,
-  setUploadingState,
-  resetUploadState,
+  setUploadError,
 }: UseAvailableUploadsParams): (() => boolean) => {
   return useCallback((): boolean => {
     if (uploadedFiles.length >= maximumFileUploads) {
-      setUploadingState({
-        isActive: true,
-        isSupportedFile: false,
-        errorMessage: `Maximum ${maximumFileUploads} files allowed!`,
-      });
-
-      setTimeout(() => {
-        resetUploadState();
-      }, 2000);
+      setUploadError(`Maximum ${maximumFileUploads} files allowed!`);
 
       return false;
     }
     return true;
-  }, [
-    uploadedFiles.length,
-    maximumFileUploads,
-    setUploadingState,
-    resetUploadState,
-  ]);
+  }, [uploadedFiles.length, maximumFileUploads, setUploadError]);
 };
