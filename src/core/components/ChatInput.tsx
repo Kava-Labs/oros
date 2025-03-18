@@ -325,16 +325,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
           const file = item.getAsFile();
           if (file) {
             if (file.size > maximumFileBytes) {
-              setUploadingState({
-                isActive: true,
-                isSupportedFile: false,
-                errorMessage: 'File too large! Maximum file size is 8MB.',
-              });
-
-              setTimeout(() => {
-                resetUploadState();
-              }, 2000);
-
+              setUploadError('File too large! Maximum file size is 8MB.');
               return;
             }
             processUploadedFile(file);
