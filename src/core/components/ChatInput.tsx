@@ -19,6 +19,7 @@ import { useDragAndDrop } from '../hooks/useDragAndDrop';
 import { isSupportedFileType } from '../types/models';
 import useProcessUploadedFile from '../hooks/useProcessUploadedFile';
 import { useAvailableUploads } from '../hooks/useAvailableUploads';
+import { useUploadingError } from '../hooks/useUploadingError';
 
 const DEFAULT_HEIGHT = '30px';
 
@@ -59,8 +60,10 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     isSupportedFile: true,
     errorMessage: '',
   });
+  const { setUploadError } = useUploadingError(setUploadingState);
   const { isActive, isSupportedFile, errorMessage } = uploadingState;
 
+  //  todo - fully deprecate
   const resetUploadState = useCallback(() => {
     setUploadingState({
       isActive: false,
@@ -249,15 +252,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       const totalFilesAfterUpdate =
         uploadedFiles.length + event.target.files.length;
       if (totalFilesAfterUpdate > maximumFileUploads) {
-        setUploadingState({
-          isActive: true,
-          isSupportedFile: false,
-          errorMessage: `Maximum ${maximumFileUploads} files allowed.`,
-        });
-
-        setTimeout(() => {
-          resetUploadState();
-        }, 2000);
+        setUploadError(`Maximum ${maximumFileUploads} files allowed.`);
       } else {
         Array.from(event.target.files).forEach((file) => {
           processUploadedFile(file);
@@ -330,16 +325,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
           const file = item.getAsFile();
           if (file) {
             if (file.size > maximumFileBytes) {
-              setUploadingState({
-                isActive: true,
-                isSupportedFile: false,
-                errorMessage: 'File too large! Maximum file size is 8MB.',
-              });
-
-              setTimeout(() => {
-                resetUploadState();
-              }, 2000);
-
+              setUploadError('File too large! Maximum file size is 8MB.');
               return;
             }
             processUploadedFile(file);
@@ -358,6 +344,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     modelSupportsUpload,
     resetUploadState,
     maximumFileBytes,
+    setUploadError,
   ]);
 
   const [, setHoverImageId] = useState<string | null>(null);
