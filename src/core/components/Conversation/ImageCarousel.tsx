@@ -67,15 +67,17 @@ export const ImageCarousel = ({
         </a>
       </div>
 
-      <div className={styles.dotsContainer}>
-        {imageIDs.map((_, index) => (
-          <span
-            key={index}
-            className={`${styles.dot} ${index + 1 === slideIndex ? styles.activeDot : ''}`}
-            onClick={() => currentSlide(index + 1)}
-          />
-        ))}
-      </div>
+      {imageIDs.length <= 12 ? (
+        <div className={styles.dotsContainer}>
+          {imageIDs.map((_, index) => (
+            <span
+              key={index}
+              className={`${styles.dot} ${index + 1 === slideIndex ? styles.activeDot : ''}`}
+              onClick={() => currentSlide(index + 1)}
+            />
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 };
