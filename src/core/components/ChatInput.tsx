@@ -19,6 +19,7 @@ import { useDragAndDrop } from '../hooks/useDragAndDrop';
 import { isSupportedFileType } from '../types/models';
 import useProcessUploadedFile from '../hooks/useProcessUploadedFile';
 import { useAvailableUploads } from '../hooks/useAvailableUploads';
+import { useUploadingError } from '../hooks/useUploadingError';
 
 const DEFAULT_HEIGHT = '30px';
 
@@ -59,8 +60,10 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     isSupportedFile: true,
     errorMessage: '',
   });
+  const { setUploadError } = useUploadingError(setUploadingState);
   const { isActive, isSupportedFile, errorMessage } = uploadingState;
 
+  //  todo - fully deprecate
   const resetUploadState = useCallback(() => {
     setUploadingState({
       isActive: false,
@@ -249,15 +252,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
       const totalFilesAfterUpdate =
         uploadedFiles.length + event.target.files.length;
       if (totalFilesAfterUpdate > maximumFileUploads) {
-        setUploadingState({
-          isActive: true,
-          isSupportedFile: false,
-          errorMessage: `Maximum ${maximumFileUploads} files allowed.`,
-        });
-
-        setTimeout(() => {
-          resetUploadState();
-        }, 2000);
+        setUploadError(`Maximum ${maximumFileUploads} files allowed.`);
       } else {
         Array.from(event.target.files).forEach((file) => {
           processUploadedFile(file);
