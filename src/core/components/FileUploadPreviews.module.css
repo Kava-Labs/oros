@@ -43,7 +43,7 @@
   justify-content: center;
   background-color: var(--colors-bgQuaternary);
   border-radius: 50%;
-  color: white;
+  color: var(--colors-textPrimary);
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
