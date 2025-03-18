@@ -6,8 +6,7 @@ import { InputAdornmentMessage } from './InputAdornmentMessage';
 import { ConversationHistory } from '../context/types';
 import { hasSufficientRemainingTokens } from '../utils/conversation/hasSufficientRemainingTokens';
 import { useManageContextWarning } from '../hooks/useManageContextWarning';
-import { Paperclip, X } from 'lucide-react';
-import { IdbImage } from './IdbImage';
+import { Paperclip } from 'lucide-react';
 import ButtonIcon from './ButtonIcon';
 import { useTheme } from '../../shared/theme/useTheme';
 import type {
@@ -19,6 +18,7 @@ import { useDragAndDrop } from '../hooks/useDragAndDrop';
 import { isSupportedFileType } from '../types/models';
 import useProcessUploadedFile from '../hooks/useProcessUploadedFile';
 import { useAvailableUploads } from '../hooks/useAvailableUploads';
+import { FileUploadPreviews } from './FileUploadPreviews';
 
 const DEFAULT_HEIGHT = '30px';
 
@@ -387,32 +387,11 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
         />
       )}
       {uploadedFiles.length > 0 && (
-        <div className={styles.imagePreviewContainer}>
-          <div className={styles.imagePreviewWrapper}>
-            {uploadedFiles.map(({ id }) => (
-              <div
-                key={id}
-                className={styles.imageCard}
-                onMouseEnter={() => setHoverImageId(id)}
-                onMouseLeave={() => setHoverImageId(null)}
-              >
-                <IdbImage
-                  id={id}
-                  width="56px"
-                  height="56px"
-                  className={styles.cardImage}
-                />
-                <ButtonIcon
-                  icon={X}
-                  className={styles.removeButton}
-                  onClick={() => removeImage(id)}
-                  aria-label="Remove image"
-                  size={14}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
+        <FileUploadPreviews
+          uploadedFiles={uploadedFiles}
+          setHoverImageId={setHoverImageId}
+          removeImage={removeImage}
+        />
       )}
 
       <div
