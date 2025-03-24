@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { ClipboardCheck, Copy } from 'lucide-react';
 import { useIsMobile } from '../../../shared/theme/useIsMobile';
 import styles from './Conversation.module.css';
-import KavaIcon from '../../assets/KavaIcon';
 import { Content } from './Content';
 import { ThinkingContent } from './ThinkingContent';
 import ButtonIcon from '.././ButtonIcon';
@@ -66,7 +65,6 @@ const AssistantMessage = ({
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-      <KavaIcon className={styles.conversationChatIcon} />
       <div className={styles.assistantContainer}>
         {reasoningContent ? (
           <ThinkingContent content={reasoningContent} />

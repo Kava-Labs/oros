@@ -58,15 +58,6 @@
   }
 }
 
-.conversationChatIcon {
-  height: 40px;
-  width: 40px;
-  margin-right: var(--spacing-md);
-  object-fit: contain;
-  aspect-ratio: 1 / 1;
-  transform-origin: center;
-}
-
 /** Basic list wrapping **/
 li {
   overflow-wrap: break-word;
