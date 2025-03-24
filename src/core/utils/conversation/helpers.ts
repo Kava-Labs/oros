@@ -76,12 +76,25 @@ export const groupConversationsByTime = (
 };
 
 /**
- * Groups and filters conversations based on a search term
- * @param conversations - Array of conversation histories
- * @param searchTerm - Optional search term to filter conversations
- * @param snippetLength - Optional number of words to include in the snippet (default: 6)
- * @returns An object with time period keys and filtered, sorted conversations as values
+ * Extracts text content from a message, handling various content structures
+ * @param msg The message to extract text from
+ * @returns A string of text content from the message
  */
+export const extractTextContent = (msg: ChatMessage): string => {
+  if (typeof msg.content === 'string') {
+    return msg.content;
+  }
+
+  if (Array.isArray(msg.content)) {
+    return msg.content
+      .filter((item) => item.type === 'text')
+      .map((item) => item.text)
+      .join(' ');
+  }
+
+  return '';
+};
+
 /**
  * Groups and filters conversations based on search term
  * @param conversations Array of conversations to process
@@ -98,15 +111,14 @@ export const groupAndFilterConversations = (
 
   const lowerSearchTerm = searchTerm.toLowerCase();
   const filteredConversations = conversations.filter((conv) => {
-    const messages = removeInitialSystemMessage(conv);
+    const messages = removeSystemMessages(conv);
 
     return (
       conv.title.toLowerCase().includes(lowerSearchTerm) ||
-      messages.some(
-        (msg) =>
-          typeof msg.content === 'string' &&
-          msg.content.toLowerCase().includes(lowerSearchTerm),
-      )
+      messages.some((msg) => {
+        const textContent = extractTextContent(msg);
+        return textContent.toLowerCase().includes(lowerSearchTerm);
+      })
     );
   });
 
@@ -126,25 +138,21 @@ export const formatContentSnippet = (
   conversation: ConversationHistory,
   searchTerm: string = '',
 ): string => {
-  const messages = removeInitialSystemMessage(conversation);
+  const messages = removeSystemMessages(conversation);
 
   if (searchTerm) {
-    const matchingMessage = messages.find(
-      (msg) =>
-        typeof msg.content === 'string' &&
-        msg.content.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
+    const matchingMessage = messages.find((msg) => {
+      const textContent = extractTextContent(msg);
+      return textContent.toLowerCase().includes(searchTerm.toLowerCase());
+    });
 
-    if (matchingMessage && matchingMessage.content) {
-      const content = Array.isArray(matchingMessage.content)
-        ? matchingMessage.content.map((part) => part).join('')
-        : matchingMessage.content;
-
+    if (matchingMessage) {
+      const content = extractTextContent(matchingMessage);
       const searchIndex = content
         .toLowerCase()
         .indexOf(searchTerm.toLowerCase());
 
-      // Find start of snippet considering up to 3 words before match
+      //  Find start of snippet considering up to 3 words before match
       let snippetStart = searchIndex;
       if (searchIndex > 0) {
         const beforeMatch = content.slice(0, searchIndex).trim();
@@ -158,10 +166,8 @@ export const formatContentSnippet = (
   }
 
   const firstUserMessage = messages.find((msg) => msg.role === 'user');
-  if (firstUserMessage && firstUserMessage.content) {
-    const content = Array.isArray(firstUserMessage.content)
-      ? firstUserMessage.content.map((part) => part).join('')
-      : firstUserMessage.content;
+  if (firstUserMessage) {
+    const content = extractTextContent(firstUserMessage);
     return content.slice(0, 100);
   }
 
@@ -188,10 +194,10 @@ export const highlightMatch = (
 /**
  * Removes the system prompt from the conversation array since we don't include that when searching
  */
-const removeInitialSystemMessage = (conversation: ConversationHistory) => {
-  return conversation.conversation[0]?.role === 'system'
-    ? conversation.conversation.slice(1)
-    : conversation.conversation;
+const removeSystemMessages = (conversationHistory: ConversationHistory) => {
+  return conversationHistory.conversation.filter(
+    (msg) => msg.role !== 'system',
+  );
 };
 
 /**
