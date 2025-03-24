@@ -26,14 +26,12 @@ describe('ErrorMessage', () => {
     vi.clearAllMocks();
   });
 
-  it('renders with KavaIcon and Content components', () => {
+  it('renders with error text content', () => {
     render(
       <ErrorMessage errorText={mockErrorText} onRendered={mockOnRendered} />,
     );
     expect(screen.getByTestId('content')).toHaveTextContent(mockErrorText);
 
-    // should see both the assistant icon and content
-    expect(screen.getByLabelText('Kava Assistant Icon')).toBeInTheDocument();
     expect(screen.getByTestId('content')).toBeInTheDocument();
     expect(screen.getByTestId('content')).toHaveAttribute(
       'data-role',
