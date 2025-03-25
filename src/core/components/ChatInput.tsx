@@ -464,7 +464,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
               className={styles.sendChatButton}
               type="submit"
               onClick={handleButtonClick}
-              aria-label="Send Chat"
+              aria-label={isRequesting ? 'Cancel Chat' : 'Send Chat'}
               disabled={disableSubmit}
             >
               {isRequesting ? <CancelChatIcon /> : <SendChatIcon />}
