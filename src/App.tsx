@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChatView } from './core/components/ChatView';
 import { useAppContext } from './core/context/useAppContext';
 import styles from './App.module.css';
@@ -8,6 +8,7 @@ import KavaAILogo from './core/assets/KavaAILogo';
 import { DesktopSideBar } from './core/components/DesktopSideBar';
 import { MobileSideBar } from './core/components/MobileSideBar';
 import { MobileBackdrop } from './core/components/MobileBackdrop';
+import { useSession } from './useSession';
 
 export const App = () => {
   const { isReady } = useAppContext();
@@ -20,6 +21,9 @@ export const App = () => {
   const [isMobileSideBarOpen, setIsMobileSideBarOpen] = useState(false);
   // TODO: Support a collapse sidebar button
   const [isDesktopSideBarHidden, setIsDesktopSideBarHidden] = useState(false);
+
+  const { sessionData, loading, error } = useSession();
+  console.log(sessionData, loading, error);
 
   return (
     <>
