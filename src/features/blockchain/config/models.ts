@@ -14,13 +14,15 @@ const messageRegistry = initializeMessageRegistry();
 
 export type SupportedBlockchainModels = 'gpt-4o';
 
+export const BLOCKCHAIN_MODEL_NAME = 'Blockchain Instruct';
+
 export const blockchainModels: Record<
   SupportedBlockchainModels,
   BlockchainModelConfig
 > = {
   'gpt-4o': {
     id: 'gpt-4o',
-    name: 'Blockchain Instruct',
+    name: BLOCKCHAIN_MODEL_NAME,
     icon: OrosIcon,
     description: 'Blockchain Execution',
     includeUsageInStream: false,
