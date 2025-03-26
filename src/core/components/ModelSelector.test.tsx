@@ -96,21 +96,23 @@ describe('ModelSelector', () => {
 
     // Check blockchain model content
     expect(
-      within(dropdownMenu).getByText('Blockchain Instruct'),
-    ).toBeInTheDocument();
+      within(dropdownMenu).queryByText('Blockchain Instruct'),
+    ).not.toBeInTheDocument();
     expect(
-      within(dropdownMenu).getByText('Blockchain Execution'),
-    ).toBeInTheDocument();
-    expect(within(dropdownMenu).getByTestId('oros-icon')).toBeInTheDocument();
+      within(dropdownMenu).queryByText('Blockchain Execution'),
+    ).not.toBeInTheDocument();
+    expect(
+      within(dropdownMenu).queryByTestId('oros-icon'),
+    ).not.toBeInTheDocument();
   });
 
   it('selects a model when clicked', () => {
     render(<ModelSelector />);
 
     fireEvent.click(screen.getByRole('combobox', { name: 'Select Model' }));
-    fireEvent.click(screen.getByText('Blockchain Instruct'));
+    fireEvent.click(screen.getAllByText('General Reasoning')[1]);
 
-    expect(mockHandleModelChange).toHaveBeenCalledWith('gpt-4o');
+    expect(mockHandleModelChange).toHaveBeenCalledWith('deepseek-r1');
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
   });
 
@@ -165,18 +167,17 @@ describe('ModelSelector', () => {
 
     // Get all options
     const options = await screen.findAllByRole('option');
-    expect(options).toHaveLength(2);
+    expect(options).toHaveLength(1);
 
     // Move selection to first option
     fireEvent.keyDown(combobox, { key: 'ArrowDown' });
 
     // Wait for React state update
-    const blockchainOption = await screen.findByRole('option', {
+    const blockchainOption = screen.queryByRole('option', {
       name: 'Blockchain Instruct',
     });
 
-    expect(blockchainOption).toHaveAttribute('aria-selected', 'true');
-    expect(document.activeElement).toBe(blockchainOption);
+    expect(blockchainOption).not.toBeInTheDocument();
 
     // Move selection to second option
     fireEvent.keyDown(options[0], { key: 'ArrowDown' });
@@ -189,11 +190,11 @@ describe('ModelSelector', () => {
     expect(generalReasoningOption).toHaveAttribute('aria-selected', 'true');
     expect(document.activeElement).toBe(generalReasoningOption);
 
-    // Press Enter to select the model
-    fireEvent.keyDown(blockchainOption, { key: 'Enter' });
+    // // Press Enter to select the model
+    fireEvent.keyDown(generalReasoningOption, { key: 'Enter' });
 
     // Ensure correct model was selected
-    expect(mockHandleModelChange).toHaveBeenCalledWith('gpt-4o');
+    expect(mockHandleModelChange).toHaveBeenCalledWith('deepseek-r1');
   });
 
   it('displays correct icon for selected model', () => {
