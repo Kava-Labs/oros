@@ -53,7 +53,11 @@ describe('chat', () => {
     expect(responseText).toMatch(/THIS IS A TEST/i);
   });
 
-  test.skip('check balances', async ({ page, context, metaMaskExtensionId }) => {
+  test.skip('check balances', async ({
+    page,
+    context,
+    metaMaskExtensionId,
+  }) => {
     test.setTimeout(90 * 1000);
 
     const chat = new Chat(page);
@@ -895,7 +899,9 @@ describe('chat', () => {
       expect(count).toEqual(1);
     }
   });
-  test('image previews are cleared on model switch', async ({ page }) => {
+
+  //  todo - reintroduce when multiple models become supported
+  test.skip('image previews are cleared on model switch', async ({ page }) => {
     test.setTimeout(30 * 1000);
 
     const chat = new Chat(page);
