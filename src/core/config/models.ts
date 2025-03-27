@@ -52,32 +52,8 @@ export const getAllModels = (): ModelConfig[] => {
   return [...Object.values(MODEL_REGISTRY.blockchain), ...reasoningModels];
 };
 
-const defaultModelFromQueryParams = () => {
-  const params = new URLSearchParams(new URL(window.location.href).search);
-  let wantedModel = params.get('defaultModel');
-
-  if (wantedModel) {
-    if (wantedModel.includes("'")) wantedModel = wantedModel.replace(/'/g, '');
-    if (wantedModel.includes('"')) wantedModel = wantedModel.replace(/"/g, '');
-    for (const model of Object.values(blockchainModels)) {
-      if (model.name === wantedModel) return model.id;
-      if (model.id === wantedModel) return model.id;
-    }
-    for (const model of Object.values(reasoningModels)) {
-      if (model.name === wantedModel) return model.id;
-      if (model.id === wantedModel) return model.id;
-    }
-  }
-
-  return null;
-};
-
 const DEFAULT_REASONING_MODEL = isQwenSupported
   ? 'qwq-32b-bnb-4bit'
   : 'deepseek-r1';
 
-export const DEFAULT_MODEL_NAME = defaultModelFromQueryParams()
-  ? defaultModelFromQueryParams()!
-  : import.meta.env.VITE_FEAT_UPDATED_DESIGN
-    ? DEFAULT_REASONING_MODEL
-    : 'gpt-4o';
+export const DEFAULT_MODEL_NAME = DEFAULT_REASONING_MODEL;
