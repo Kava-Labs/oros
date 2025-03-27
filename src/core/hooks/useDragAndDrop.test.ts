@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach, Mock } from 'vitest';
 import { useDragAndDrop, UseHandleDragAndDropParams } from './useDragAndDrop';
 import { renderHook } from '@testing-library/react';
-import { BaseModelConfig, SupportedFileType } from '../types/models';
+import { ModelConfig, SupportedFileType } from '../types/models';
 
 const createFileList = (files: File[]): FileList => {
   return {
@@ -30,7 +30,7 @@ describe('useHandleDragAndDrop', () => {
       ] as Array<SupportedFileType>,
       maximumFileUploads: 4,
       maximumFileBytes: 8 * 1024 * 1024, // 8MB
-    } as unknown as BaseModelConfig,
+    } as unknown as ModelConfig,
     setUploadingState: mockSetUploadingState,
   };
 

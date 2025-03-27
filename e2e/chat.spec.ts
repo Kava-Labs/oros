@@ -53,7 +53,11 @@ describe('chat', () => {
     expect(responseText).toMatch(/THIS IS A TEST/i);
   });
 
-  test.skip('check balances', async ({ page, context, metaMaskExtensionId }) => {
+  test.skip('check balances', async ({
+    page,
+    context,
+    metaMaskExtensionId,
+  }) => {
     test.setTimeout(90 * 1000);
 
     const chat = new Chat(page);

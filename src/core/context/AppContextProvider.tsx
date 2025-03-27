@@ -6,14 +6,9 @@ import React, {
   useMemo,
 } from 'react';
 import { AppContext } from './AppContext';
-import { OperationRegistry } from '../../features/blockchain/services/registry';
-import { WalletStore } from '../../features/blockchain/stores/walletStore';
 import { TextStreamStore } from '../../core/stores/textStreamStore';
-import { ToolCallStreamStore } from '../../core/stores/toolCallStreamStore';
 import { MessageHistoryStore } from '../../core/stores/messageHistoryStore';
-import { initializeMessageRegistry } from '../../features/blockchain/config/initializeMessageRegistry';
-import { useExecuteOperation } from './useExecuteOperation';
-import { DEFAULT_MODEL_NAME, getModelConfig } from '../config/models';
+import { DEFAULT_MODEL_NAME, getModelConfig } from '../config';
 import { SupportedModels, ModelConfig } from '../types/models';
 import { ActiveConversation, ConversationHistory } from './types';
 import { getToken } from '../../core/utils/token/token';
@@ -26,20 +21,15 @@ let client: OpenAI | null = null;
 
 export const AppContextProvider = (props: {
   children: React.ReactNode;
-  walletStore: WalletStore;
   thinkingStore: TextStreamStore;
   errorStore: TextStreamStore;
   messageStore: TextStreamStore;
-  toolCallStreamStore: ToolCallStreamStore;
   progressStore: TextStreamStore;
   messageHistoryStore: MessageHistoryStore;
 }) => {
-  const { children, walletStore } = props;
+  const { children } = props;
 
   const [isReady, setIsReady] = useState(false);
-  const [registry] = useState<OperationRegistry<unknown>>(() =>
-    initializeMessageRegistry(),
-  );
 
   const [modelConfig, setModelConfig] = useState<ModelConfig>(() =>
     getModelConfig(DEFAULT_MODEL_NAME),
@@ -73,7 +63,6 @@ export const AppContextProvider = (props: {
     const newConv = {
       conversationID: uuidv4(),
       messageHistoryStore: props.messageHistoryStore,
-      toolCallStreamStore: props.toolCallStreamStore,
       thinkingStore: props.thinkingStore,
       progressStore: props.progressStore,
       messageStore: props.messageStore,
@@ -90,7 +79,6 @@ export const AppContextProvider = (props: {
     conversationID,
     isRequesting,
     messageHistoryStore,
-    toolCallStreamStore,
     messageStore,
     progressStore,
     thinkingStore,
@@ -173,11 +161,6 @@ export const AppContextProvider = (props: {
     [messageHistoryStore, ensureCorrectSystemPrompt],
   );
 
-  const { executeOperation, isOperationValidated } = useExecuteOperation(
-    registry,
-    walletStore,
-  );
-
   const loadConversation = useCallback(
     (convoHistory: ConversationHistory) => {
       handleModelChange(convoHistory.model as SupportedModels);
@@ -234,7 +217,6 @@ export const AppContextProvider = (props: {
         return;
       }
 
-      toolCallStreamStore.clear();
       // Abort controller integrated with UI
       const controller = new AbortController();
       controllerRef.current = controller;
@@ -267,9 +249,7 @@ export const AppContextProvider = (props: {
           modelConfig,
           progressStore,
           messageStore,
-          toolCallStreamStore,
           thinkingStore,
-          executeOperation,
           conversationID,
         );
       } catch (error) {
@@ -292,7 +272,6 @@ export const AppContextProvider = (props: {
     [
       isRequesting,
       conversationID,
-      toolCallStreamStore,
       setIsRequesting,
       messageHistoryStore,
       modelConfig,
@@ -300,7 +279,6 @@ export const AppContextProvider = (props: {
       progressStore,
       messageStore,
       thinkingStore,
-      executeOperation,
     ],
   );
 
@@ -308,10 +286,9 @@ export const AppContextProvider = (props: {
     if (controllerRef.current) {
       controllerRef.current.abort();
       controllerRef.current = null;
-      toolCallStreamStore.clear();
       thinkingStore.setText('');
     }
-  }, [thinkingStore, toolCallStreamStore]);
+  }, [thinkingStore]);
 
   return (
     <AppContext.Provider
@@ -321,8 +298,6 @@ export const AppContextProvider = (props: {
         messageHistoryStore,
         messageStore,
         progressStore,
-        walletStore,
-        toolCallStreamStore,
         modelConfig,
         handleModelChange,
         startNewChat,
@@ -331,11 +306,8 @@ export const AppContextProvider = (props: {
         thinkingStore,
         errorStore,
         loadConversation,
-        executeOperation,
-        registry,
         isReady,
         isRequesting,
-        isOperationValidated,
         conversations,
         hasConversations,
       }}

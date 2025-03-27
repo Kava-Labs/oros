@@ -1,30 +1,14 @@
-import {
-  blockchainModels,
-  SupportedBlockchainModels,
-} from '../../features/blockchain/config/models';
-import { reasoningModels } from '../../features/reasoning/config/models';
+import { models } from './models';
 import { ModelConfig, ModelRegistry, SupportedModels } from '../types/models';
 
 const isQwenSupported = import.meta.env.VITE_FEAT_QWEN === 'true';
 
-export const MODEL_REGISTRY: ModelRegistry = {
-  blockchain: blockchainModels,
-  reasoning: reasoningModels,
-};
-
-export const isBlockchainModelName = (
-  name: SupportedModels,
-): name is SupportedBlockchainModels => {
-  return Object.keys(MODEL_REGISTRY.blockchain).includes(name);
-};
+export const MODEL_REGISTRY: ModelRegistry = models;
 
 export const getModelByName = (
   name: SupportedModels,
 ): ModelConfig | undefined => {
-  if (isBlockchainModelName(name)) {
-    return MODEL_REGISTRY.blockchain[name];
-  }
-  return MODEL_REGISTRY.reasoning[name];
+  return MODEL_REGISTRY[name];
 };
 
 export const getModelConfig = (name: SupportedModels): ModelConfig => {
@@ -37,7 +21,9 @@ export const getModelConfig = (name: SupportedModels): ModelConfig => {
 
 export const getAllModels = (): ModelConfig[] => {
   //  todo - consolidate when qwen is released
-  const baseReasoningModels = Object.values(MODEL_REGISTRY.reasoning);
+  const baseReasoningModels = Object.values(MODEL_REGISTRY).filter(
+    (model) => model.reasoningModel,
+  );
   const reasoningModelsWithFeature = baseReasoningModels.filter(
     (modelConfig) => modelConfig.id !== 'deepseek-r1',
   );
@@ -49,7 +35,7 @@ export const getAllModels = (): ModelConfig[] => {
     ? reasoningModelsWithFeature
     : reasoningModelsWithoutFeature;
 
-  return [...Object.values(MODEL_REGISTRY.blockchain), ...reasoningModels];
+  return [...reasoningModels];
 };
 
 const DEFAULT_REASONING_MODEL = isQwenSupported

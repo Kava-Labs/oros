@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { isWithinTokenLimit } from 'gpt-tokenizer';
-import { estimateTokenUsage } from '../../../features/reasoning/helpers';
+import { estimateTokenUsage } from '../../config/models/helpers';
 import { hasSufficientRemainingTokens } from './hasSufficientRemainingTokens';
 
 describe('hasSufficientRemainingTokens', () => {

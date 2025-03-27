@@ -1,6 +1,6 @@
 import { SupportedModels } from '../../types/models';
 import { isWithinTokenLimit } from 'gpt-tokenizer';
-import { estimateTokenUsage } from '../../../features/reasoning/helpers';
+import { estimateTokenUsage } from '../../config/models/helpers';
 
 /**
  * Checks if the input string is within the token limit for a given model.

@@ -1,11 +1,8 @@
 import styles from './Conversation.module.css';
 import { Fragment, memo, useState } from 'react';
 import { useSyncExternalStore } from 'react';
-import { ToolMessageContainer } from './ToolMessageContainer';
 import { StreamingMessage } from './StreamingMessage';
 import { ErrorMessage } from './ErrorMessage';
-import { ToolCallProgressCards } from './ToolCallProgressCards';
-import { ChatCompletionAssistantMessageParam } from 'openai/resources/index';
 import AssistantMessage from './AssistantMessage';
 import { useAppContext } from '../../context/useAppContext';
 import { useMessageHistory } from '../../hooks/useMessageHistory';
@@ -135,18 +132,6 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
           );
         }
 
-        if (message.role === 'tool') {
-          return (
-            <ToolMessageContainer
-              key={index}
-              message={message}
-              prevMessage={
-                messages[index - 1] as ChatCompletionAssistantMessageParam
-              }
-              onRendered={onRendered}
-            />
-          );
-        }
         return null;
       })}
 
@@ -155,8 +140,6 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
       {errorText.length > 0 && (
         <ErrorMessage errorText={errorText} onRendered={onRendered} />
       )}
-
-      <ToolCallProgressCards onRendered={onRendered} />
     </div>
   );
 };

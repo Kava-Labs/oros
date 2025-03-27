@@ -3,7 +3,6 @@ import { vi } from 'vitest';
 import { Conversation } from './Conversation';
 import { useAppContext } from '../../context/useAppContext';
 import { useMessageHistory } from '../../hooks/useMessageHistory';
-import { ToolMessageContainerProps } from './ToolMessageContainer';
 
 // Mock the required modules and hooks
 // TODO: Consider using AppContext so the data structure remains
@@ -46,21 +45,6 @@ vi.mock('./AssistantMessage', () => ({
 }));
 
 // Mock the child components to reduce other component dependencies
-vi.mock('./ToolMessageContainer', () => ({
-  ToolMessageContainer: ({
-    message,
-    onRendered,
-  }: ToolMessageContainerProps) => (
-    <div data-testid="tool-message" onClick={onRendered}>
-      Tool:{' '}
-      {typeof message.content === 'string'
-        ? message.content
-        : JSON.stringify(message.content)}
-    </div>
-  ),
-}));
-
-// Mock the child components to reduce other component dependencies
 vi.mock('./StreamingMessage', () => ({
   StreamingMessage: ({ onRendered }: { onRendered: () => void }) => (
     <div data-testid="streaming-message" onClick={onRendered}>
@@ -80,15 +64,6 @@ vi.mock('./ErrorMessage', () => ({
   }) => (
     <div data-testid="error-message" onClick={onRendered}>
       {errorText}
-    </div>
-  ),
-}));
-
-// Mock the child components to reduce other component dependencies
-vi.mock('./ToolCallProgressCards', () => ({
-  ToolCallProgressCards: ({ onRendered }: { onRendered: () => void }) => (
-    <div data-testid="tool-call-progress" onClick={onRendered}>
-      Tool Call Progress
     </div>
   ),
 }));
@@ -160,24 +135,6 @@ describe('Conversation', () => {
     expect(reasoningContent).toHaveTextContent('Thinking about response');
   });
 
-  it('renders tool messages correctly', () => {
-    (useMessageHistory as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-      messages: [
-        { role: 'assistant', content: 'I will use a tool' },
-        { role: 'tool', content: 'Tool response' },
-      ],
-    });
-
-    render(<Conversation onRendered={mockOnRendered} />);
-
-    expect(screen.getByTestId('assistant-message')).toBeInTheDocument();
-    expect(screen.getByTestId('tool-message')).toBeInTheDocument();
-
-    // Check that onRendered is passed correctly
-    screen.getByTestId('tool-message').click();
-    expect(mockOnRendered).toHaveBeenCalled();
-  });
-
   it('renders streaming message when isRequesting is true', () => {
     (useAppContext as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
       errorStore: {
@@ -208,25 +165,5 @@ describe('Conversation', () => {
     const errorMessage = screen.getByTestId('error-message');
     expect(errorMessage).toBeInTheDocument();
     expect(errorMessage).toHaveTextContent(mockErrorText);
-  });
-
-  it('passes onRendered to error, streaming, and tool call progress components', () => {
-    const mockErrorText = 'An error occurred';
-
-    (useAppContext as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-      errorStore: {
-        subscribe: mockSubscribe,
-        getSnapshot: vi.fn().mockReturnValue(mockErrorText),
-      },
-      isRequesting: true,
-    });
-
-    render(<Conversation onRendered={mockOnRendered} />);
-
-    // Click on all components that should receive onRendered
-    screen.getByTestId('error-message').click();
-    screen.getByTestId('streaming-message').click();
-    screen.getByTestId('tool-call-progress').click();
-    expect(mockOnRendered).toHaveBeenCalledTimes(3);
   });
 });

@@ -2,7 +2,7 @@ import { render, screen, fireEvent, within } from '@testing-library/react';
 import { ModelSelector } from './ModelSelector';
 import { useAppContext } from '../context/useAppContext';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
-import { getAllModels } from '../config/models';
+import { getAllModels } from '../config';
 import { vi } from 'vitest';
 
 // Mock the required modules and hooks

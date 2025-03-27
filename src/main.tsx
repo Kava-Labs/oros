@@ -29,9 +29,7 @@ import {
   progressStore,
   messageHistoryStore,
   messageStore,
-  walletStore,
   thinkingStore,
-  toolCallStreamStore,
   errorStore,
 } from './core/stores/stores.ts';
 import { idbDatabase } from './core/utils/idb/idb.ts';
@@ -57,8 +55,6 @@ root.render(
         progressStore={progressStore}
         messageStore={messageStore}
         thinkingStore={thinkingStore}
-        toolCallStreamStore={toolCallStreamStore}
-        walletStore={walletStore}
         messageHistoryStore={messageHistoryStore}
       >
         <App />

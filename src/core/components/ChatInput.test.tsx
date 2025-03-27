@@ -2,18 +2,14 @@ import { fireEvent, render } from '@testing-library/react';
 import { ThemeProvider } from '../../shared/theme/themeProvider';
 import { AppContextProvider } from '../context/AppContextProvider';
 import { TextStreamStore } from '../stores/textStreamStore';
-import { ToolCallStreamStore } from '../stores/toolCallStreamStore';
 import { MessageHistoryStore } from '../stores/messageHistoryStore';
-import { WalletStore } from '../../features/blockchain/stores/walletStore';
 import ChatInput from './ChatInput';
 import { vi } from 'vitest';
 
 describe('ChatInput', () => {
   const messageStore = new TextStreamStore();
   const progressStore = new TextStreamStore();
-  const toolCallStreamStore = new ToolCallStreamStore();
   const messageHistoryStore = new MessageHistoryStore();
-  const walletStore = new WalletStore();
   const thinkingStore = new TextStreamStore();
   const errorStore = new TextStreamStore();
 
@@ -31,8 +27,6 @@ describe('ChatInput', () => {
           thinkingStore={thinkingStore}
           progressStore={progressStore}
           messageStore={messageStore}
-          toolCallStreamStore={toolCallStreamStore}
-          walletStore={walletStore}
           messageHistoryStore={messageHistoryStore}
         >
           <ChatInput {...props} />
@@ -50,8 +44,6 @@ describe('ChatInput', () => {
           thinkingStore={thinkingStore}
           progressStore={progressStore}
           messageStore={messageStore}
-          toolCallStreamStore={toolCallStreamStore}
-          walletStore={walletStore}
           messageHistoryStore={messageHistoryStore}
         >
           <ChatInput {...props} />
@@ -75,8 +67,6 @@ describe('ChatInput', () => {
           thinkingStore={thinkingStore}
           progressStore={progressStore}
           messageStore={messageStore}
-          toolCallStreamStore={toolCallStreamStore}
-          walletStore={walletStore}
           messageHistoryStore={messageHistoryStore}
         >
           <ChatInput {...props} />

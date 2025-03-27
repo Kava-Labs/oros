@@ -6,18 +6,14 @@ import type { Decorator } from '@storybook/react';
 import { ThemeProvider } from '../shared/theme/themeProvider';
 import { AppContextProvider } from '../core/context/AppContextProvider';
 import { TextStreamStore } from '../core/stores/textStreamStore';
-import { ToolCallStreamStore } from '../core/stores/toolCallStreamStore';
 import {
   ChatMessage,
   MessageHistoryStore,
 } from '../core/stores/messageHistoryStore';
-import { WalletStore } from '../features/blockchain/stores/walletStore';
 
 const messageStore = new TextStreamStore();
 const progressStore = new TextStreamStore();
-const toolCallStreamStore = new ToolCallStreamStore();
 const messageHistoryStore = new MessageHistoryStore();
-const walletStore = new WalletStore();
 const thinkingStore = new TextStreamStore();
 const errorStore = new TextStreamStore();
 
@@ -43,8 +39,6 @@ const withProviders =
           thinkingStore={thinkingStore}
           progressStore={progressStore}
           messageStore={messageStore}
-          toolCallStreamStore={toolCallStreamStore}
-          walletStore={walletStore}
           messageHistoryStore={messageHistoryStore}
         >
           <Story />
