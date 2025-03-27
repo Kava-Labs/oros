@@ -33,11 +33,6 @@
   display: flex;
   align-content: center;
 
-  .content {
-    color: var(--colors-textTertiary);
-    font-size: 1.5rem;
-  }
-
   p {
     color: var(--colors-textTertiary);
     font-size: 1.5rem;
