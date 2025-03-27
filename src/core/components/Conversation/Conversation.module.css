@@ -30,6 +30,9 @@
 }
 
 .progressStream {
+  display: flex;
+  align-content: center;
+
   .content {
     color: var(--colors-textTertiary);
     font-size: 1.5rem;
@@ -88,14 +91,61 @@ li {
   left: 0;
 }
 
-@keyframes pulse {
+.brainIconContainer {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-xs);
+  border-radius: 50%;
+  background: var(--colors-accentTwoBorder);
+  transition: background 0.3s ease;
+  width: fit-content;
+  margin-right: 2rem;
+  height: fit-content;
+}
+
+.brainIcon {
+  color: var(--colors-accentTwo);
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+  display: block;
+}
+
+.brainIconContainer.pulsing {
+  animation: iconContainerPulse 2s ease-in-out infinite;
+  /* Outer glow */
+  box-shadow: 0 0 8px 2px var(--colors-accentTwo);
+}
+
+.brainIcon.pulsing {
+  animation: iconPulse 2s ease-in-out infinite;
+  /* Make sure the icon remains visible */
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes iconContainerPulse {
   0% {
-    opacity: 0.6;
+    background: rgba(var(--colors-accentTwo), 0.2);
+    box-shadow: 0 0 5px 1px var(--colors-accentTwo);
   }
   50% {
-    opacity: 0.8;
+    background: rgba(var(--colors-accentTwo), 0.6);
+    box-shadow: 0 0 12px 3px var(--colors-accentTwo);
   }
   100% {
-    opacity: 0.6;
+    background: rgba(var(--colors-accentTwo), 0.2);
+    box-shadow: 0 0 5px 1px var(--colors-accentTwo);
+  }
+}
+
+@keyframes iconPulse {
+  0% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.7;
   }
 }
