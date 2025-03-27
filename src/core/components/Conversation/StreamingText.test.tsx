@@ -1,6 +1,10 @@
 import { render, screen, act } from '@testing-library/react';
 import { StreamingText } from './StreamingText';
 import { TextStreamStore } from '../../stores/textStreamStore';
+import React from 'react';
+import { AppContext } from '../../context/AppContext';
+import { AppContextType } from '../../context/types';
+import { ProgressStream } from './ProgressStream';
 
 describe('StreamingText', () => {
   it('renders with the initial snapshot of the store', () => {
@@ -189,5 +193,46 @@ describe('StreamingText', () => {
     expect(screen.getByTestId('child')).toHaveTextContent('Updated');
     // Check the parent's render count
     expect(parentRenderCount).toBe(1);
+  });
+
+  it('shows brain icon when progress store has text and hides when empty', () => {
+    const progressStore = new TextStreamStore();
+
+    const mockContext = {
+      progressStore,
+    } as unknown as AppContextType;
+
+    //  Render with empty progress store initially
+    const { rerender } = render(
+      <AppContext.Provider value={mockContext}>
+        <ProgressStream onRendered={() => {}} />
+      </AppContext.Provider>,
+    );
+
+    expect(screen.queryByTestId('brain-icon')).not.toBeInTheDocument();
+
+    act(() => {
+      progressStore.setText('Thinking...');
+    });
+
+    rerender(
+      <AppContext.Provider value={mockContext}>
+        <ProgressStream onRendered={() => {}} />
+      </AppContext.Provider>,
+    );
+
+    expect(screen.getByLabelText('Progress Icon')).toBeInTheDocument();
+
+    act(() => {
+      progressStore.setText('');
+    });
+
+    rerender(
+      <AppContext.Provider value={mockContext}>
+        <ProgressStream onRendered={() => {}} />
+      </AppContext.Provider>,
+    );
+
+    expect(screen.queryByLabelText('Progress Icon')).not.toBeInTheDocument();
   });
 });
