@@ -1,7 +1,6 @@
 import { render, screen, act } from '@testing-library/react';
 import { StreamingText } from './StreamingText';
 import { TextStreamStore } from '../../stores/textStreamStore';
-import React from 'react';
 import { AppContext } from '../../context/AppContext';
 import { AppContextType } from '../../context/types';
 import { ProgressStream } from './ProgressStream';
