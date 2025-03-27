@@ -71,8 +71,8 @@ export const MODEL_REGISTRY: Record<SupportedModels, ModelConfig> = {
       'application/pdf',
     ],
     tools: [],
-    maximumFileUploads: 0,
-    maximumFileBytes: 0,
+    maximumFileUploads: 4,
+    maximumFileBytes: 8 * 1024 * 1024,
     //  https://platform.openai.com/docs/models#gpt-4o
     contextLength: 128000,
     contextLimitMonitor: calculateGptContextMetrics,
