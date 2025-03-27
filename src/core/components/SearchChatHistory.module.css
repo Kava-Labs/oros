@@ -97,7 +97,7 @@
 }
 
 .conversationItem:hover {
-  background-color: var(--colors-bgTertiary);
+  background-color: var(--colors-bgQuaternary);
 }
 
 .conversationTitle {
