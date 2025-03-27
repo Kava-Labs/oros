@@ -2,6 +2,7 @@ import { ConversationHistory, TextChatMessage } from '../../context/types';
 import { encodeChat } from 'gpt-tokenizer';
 import { ContextMetrics } from '../../types/models';
 import { ChatMessage } from '../../stores/messageHistoryStore';
+import { MODEL_REGISTRY } from '../../config';
 
 /**
  * Formats a conversation title by removing surrounding quotes and truncating if necessary
@@ -209,7 +210,7 @@ export async function calculateGptContextMetrics(
   chatMessages: ChatMessage[],
 ): Promise<ContextMetrics> {
   const messages = chatMessages as TextChatMessage[];
-  const maxTokens = 128000; // todo: pull from config
+  const maxTokens = MODEL_REGISTRY['gpt-4o'].contextLength;
   const tokensUsed = encodeChat(messages, 'gpt-4o').length;
   const tokensRemaining = Math.max(0, maxTokens - tokensUsed);
 
