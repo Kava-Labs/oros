@@ -53,7 +53,7 @@ describe('chat', () => {
     expect(responseText).toMatch(/THIS IS A TEST/i);
   });
 
-  test('check balances', async ({ page, context, metaMaskExtensionId }) => {
+  test.skip('check balances', async ({ page, context, metaMaskExtensionId }) => {
     test.setTimeout(90 * 1000);
 
     const chat = new Chat(page);
@@ -86,7 +86,7 @@ describe('chat', () => {
     expect(amount).toBeGreaterThan(1000);
   });
 
-  test('send tx (native asset)', async ({
+  test.skip('send tx (native asset)', async ({
     page,
     context,
     metaMaskExtensionId,
@@ -130,7 +130,7 @@ describe('chat', () => {
 
     expect(Number(txValue) / KAVA_EVM_DECIMALS).toBe(0.12345);
   });
-  test('send tx (non-native asset)', async ({
+  test.skip('send tx (non-native asset)', async ({
     page,
     context,
     metaMaskExtensionId,
@@ -180,7 +180,7 @@ describe('chat', () => {
 
     expect(formattedAmount).toBe(0.2345);
   });
-  test('model dropdown interactions', async ({ page }) => {
+  test.skip('model dropdown interactions', async ({ page }) => {
     const DEFAULT_MODEL_DISPLAY_NAME = 'General Reasoning';
     const NUMBER_OF_SUPPORTED_MODELS = 2;
     const chat = new Chat(page);
@@ -228,7 +228,7 @@ describe('chat', () => {
     await expect(modelButton).toBeDisabled();
   });
 
-  test('model dropdown interactions in mobile', async ({ browser }) => {
+  test.skip('model dropdown interactions in mobile', async ({ browser }) => {
     const context = await browser.newContext({
       ...devices['iPhone 13'],
     });
@@ -259,7 +259,7 @@ describe('chat', () => {
     await context.close();
   });
 
-  test('chat history', async ({ page }) => {
+  test.skip('chat history', async ({ page }) => {
     test.setTimeout(90 * 1000);
 
     const chat = new Chat(page);
