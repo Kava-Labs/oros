@@ -100,9 +100,7 @@ const isQwenSupported = import.meta.env.VITE_FEAT_QWEN === 'true';
 
 export const getAllModels = (): ModelConfig[] => {
   //  todo - consolidate when qwen is released
-  const baseReasoningModels = Object.values(MODEL_REGISTRY).filter(
-    (model) => model.reasoningModel,
-  );
+  const baseReasoningModels = Object.values(MODEL_REGISTRY);
   const reasoningModelsWithFeature = baseReasoningModels.filter(
     (modelConfig) => modelConfig.id !== 'deepseek-r1',
   );
