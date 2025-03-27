@@ -13,7 +13,7 @@ describe('hasSufficientRemainingTokens', () => {
     };
   });
 
-  vi.mock('../../../features/reasoning/helpers', () => ({
+  vi.mock('../../config/models/helpers', () => ({
     estimateTokenUsage: vi.fn(),
   }));
 

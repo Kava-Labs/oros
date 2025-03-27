@@ -2,13 +2,14 @@ import { render, screen, fireEvent, within } from '@testing-library/react';
 import { ModelSelector } from './ModelSelector';
 import { useAppContext } from '../context/useAppContext';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
-import { getAllModels } from '../config';
+import { getAllModels } from '../config/models/index';
 import { vi } from 'vitest';
 
 // Mock the required modules and hooks
 vi.mock('../context/useAppContext');
 vi.mock('../../shared/theme/useIsMobile');
 vi.mock('../config/models');
+
 
 // Mock icons
 const KavaIcon = () => <div data-testid="kava-icon">KavaIcon</div>;
@@ -97,13 +98,13 @@ describe('ModelSelector', () => {
     // Check blockchain model content
     expect(
       within(dropdownMenu).queryByText('Blockchain Instruct'),
-    ).not.toBeInTheDocument();
+    ).toBeInTheDocument();
     expect(
       within(dropdownMenu).queryByText('Blockchain Execution'),
-    ).not.toBeInTheDocument();
+    ).toBeInTheDocument();
     expect(
       within(dropdownMenu).queryByTestId('oros-icon'),
-    ).not.toBeInTheDocument();
+    ).toBeInTheDocument();
   });
 
   it('selects a model when clicked', () => {
@@ -167,7 +168,7 @@ describe('ModelSelector', () => {
 
     // Get all options
     const options = await screen.findAllByRole('option');
-    expect(options).toHaveLength(1);
+    expect(options).toHaveLength(2);
 
     // Move selection to first option
     fireEvent.keyDown(combobox, { key: 'ArrowDown' });
@@ -177,7 +178,7 @@ describe('ModelSelector', () => {
       name: 'Blockchain Instruct',
     });
 
-    expect(blockchainOption).not.toBeInTheDocument();
+    expect(blockchainOption).toBeInTheDocument();
 
     // Move selection to second option
     fireEvent.keyDown(options[0], { key: 'ArrowDown' });

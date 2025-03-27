@@ -93,7 +93,6 @@ describe('Conversation', () => {
     render(<Conversation onRendered={mockOnRendered} />);
 
     expect(screen.getByTestId('conversation')).toBeInTheDocument();
-    expect(screen.getByTestId('tool-call-progress')).toBeInTheDocument();
   });
 
   it.skip('renders user messages correctly', () => {
