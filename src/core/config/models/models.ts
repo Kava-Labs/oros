@@ -64,8 +64,13 @@ export const MODEL_REGISTRY: Record<SupportedModels, ModelConfig> = {
     description: 'Logical Analysis',
     includeUsageInStream: false,
     reasoningModel: false,
+    supportedFileTypes: [
+      'image/jpeg',
+      'image/png',
+      'image/webp',
+      'application/pdf',
+    ],
     tools: [],
-    supportedFileTypes: [],
     maximumFileUploads: 0,
     maximumFileBytes: 0,
     //  https://platform.openai.com/docs/models#gpt-4o
