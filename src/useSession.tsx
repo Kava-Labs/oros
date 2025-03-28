@@ -1,42 +1,64 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type SessionResponse = {
-  message: string;
-  // visitor_id: string;
-  // session_id: string;
+  session_id: string;
+  visitor_id: string;
+  expires_at: string;
+  expired: boolean;
 };
 
 export const useSession = () => {
   const [sessionData, setSessionData] = useState<SessionResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const fetchSession = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/session', {
+        method: 'GET',
+        credentials: 'include', // needed to handle cookies
+      });
+
+      if (!response.ok) throw new Error(`Status ${response.status}`);
+
+      const data: SessionResponse = await response.json();
+      console.log('[Session] Fetched:', data);
+      setSessionData(data);
+    } catch (err) {
+      console.error('[Session] Fetch failed:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchSession = async () => {
-      try {
-        const response = await fetch('http://localhost:3001/session', {
-          method: 'GET',
-          credentials: 'omit',
-          // credentials: 'include', // important for cookies
-        });
+    // Initial call
+    fetchSession();
 
-        if (!response.ok) {
-          throw new Error(`Status ${response.status}`);
-        }
-
-        const data: SessionResponse = await response.json();
-        console.log(data);
-        setSessionData(data);
-      } catch (err: any) {
-        console.error('Failed to fetch session:', err);
-        setError(err.message || 'Unknown error');
-      } finally {
-        setLoading(false);
+    // Tab visibility tracking
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchSession();
       }
     };
+    document.addEventListener('visibilitychange', onVisibilityChange);
 
-    fetchSession();
+    // 5-minute interval polling only if tab is visible
+    intervalRef.current = setInterval(
+      () => {
+        if (document.visibilityState === 'visible') {
+          fetchSession();
+        }
+      },
+      5 * 60 * 1000,
+    ); // 5 minutes
+
+    // cleanup
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, []);
 
-  return { sessionData, loading, error };
+  return { sessionData, loading };
 };

@@ -22,8 +22,8 @@ export const App = () => {
   // TODO: Support a collapse sidebar button
   const [isDesktopSideBarHidden, setIsDesktopSideBarHidden] = useState(false);
 
-  const { sessionData, loading, error } = useSession();
-  console.log(sessionData, loading, error);
+  // setup annonymous sessions
+  useSession();
 
   return (
     <>
