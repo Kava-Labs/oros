@@ -8,8 +8,9 @@ import { ChatMessage } from '../stores/messageHistoryStore';
 
 export const supportedModels = [
   'qwq-32b-bnb-4bit',
-  'deepseek-r1',
-  'gpt-4o',
+  // 'deepseek-r1',
+  // 'gpt-4o',
+  'o3-mini',
 ] as const;
 
 export type SupportedModels = (typeof supportedModels)[number];
