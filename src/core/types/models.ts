@@ -3,20 +3,24 @@ import {
   ChatCompletionTool,
 } from 'openai/resources/index';
 import { ComponentType } from 'react';
-import { SupportedBlockchainModels } from '../../features/blockchain/config/models';
-import { SupportedReasoningModel } from '../../features/reasoning/config/models';
+
 import { ChatMessage } from '../stores/messageHistoryStore';
 
-export type SupportedModels =
-  | SupportedBlockchainModels
-  | SupportedReasoningModel;
+export const supportedModels = [
+  'qwq-32b-bnb-4bit',
+  'deepseek-r1',
+  'gpt-4o',
+] as const;
 
-export interface BaseModelConfig {
+export type SupportedModels = (typeof supportedModels)[number];
+
+export interface ModelConfig {
   id: SupportedModels;
   name: string;
   icon: ComponentType;
   description: string;
   includeUsageInStream: boolean;
+  reasoningModel: boolean;
   supportedFileTypes: Array<SupportedFileType>;
   maximumFileUploads: number;
   maximumFileBytes: number;
@@ -51,22 +55,8 @@ export interface BaseModelConfig {
     postProcess?: (message: string) => string;
   };
 }
-export interface BlockchainModelConfig extends BaseModelConfig {
-  tools: ChatCompletionTool[];
-  messageProcessors: {
-    preProcess: (message: string) => string;
-    postProcess: (message: string) => string;
-  };
-}
 
-export type ReasoningModelConfig = BaseModelConfig;
-
-export type ModelConfig = BlockchainModelConfig | ReasoningModelConfig;
-
-export interface ModelRegistry {
-  blockchain: Record<SupportedBlockchainModels, BlockchainModelConfig>;
-  reasoning: Record<SupportedReasoningModel, ReasoningModelConfig>;
-}
+export type ModelRegistry = Record<SupportedModels, ModelConfig>;
 
 export interface ContextMetrics {
   tokensRemaining: number;

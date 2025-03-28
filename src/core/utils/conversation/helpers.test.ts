@@ -9,7 +9,7 @@ import {
 import { ConversationHistory } from '../../context/types';
 import { ChatCompletionMessageParam } from 'openai/resources/index';
 import { ChatMessage } from '../../stores/messageHistoryStore';
-import { blockchainModels } from '../../../features/blockchain/config/models';
+import { MODEL_REGISTRY } from '../../config';
 
 describe('formatConversationTitle', () => {
   it('should remove double quotes from beginning and end', () => {
@@ -356,7 +356,7 @@ describe('formatContentSnippet', () => {
 });
 
 describe('calculateGptContextMetrics', () => {
-  const maxTokens = blockchainModels['gpt-4o'].contextLength;
+  const maxTokens = MODEL_REGISTRY['gpt-4o'].contextLength;
 
   it('initializing with system prompt', async () => {
     const mockMessages: ChatMessage[] = [

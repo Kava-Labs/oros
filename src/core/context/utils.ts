@@ -1,16 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
 import { TextStreamStore } from '../stores/textStreamStore';
 import { MessageHistoryStore } from '../stores/messageHistoryStore';
-import { ToolCallStreamStore } from '../stores/toolCallStreamStore';
-import { ConversationHistory, ExecuteOperation } from './types';
-import { OperationResult } from '../../features/blockchain/types/chain';
+import { ConversationHistory } from './types';
 import OpenAI from 'openai';
 import { ModelConfig } from '../types/models';
-import {
-  assembleToolCallsFromStream,
-  isContentChunk,
-  isToolCallChunk,
-} from '../utils/streamUtils';
+import { isContentChunk } from '../utils/streamUtils';
 import { formatConversationTitle } from '../utils/conversation/helpers';
 import {
   ChatCompletionChunk,
@@ -18,8 +12,8 @@ import {
   ChatCompletionMessageParam,
 } from 'openai/resources/index';
 import { getImage } from '../utils/idb/idb';
-import { visionModelPrompt } from '../../features/reasoning/config/prompts/defaultPrompts';
-import { isReasoningModel } from '../../features/reasoning/config/models';
+import { visionModelPrompt } from '../config/models/defaultPrompts';
+import { isReasoningModel } from '../config/models';
 
 export const newConversation = () => {
   return {
@@ -29,7 +23,6 @@ export const newConversation = () => {
     progressStore: new TextStreamStore(),
     errorStore: new TextStreamStore(),
     messageHistoryStore: new MessageHistoryStore(),
-    toolCallStreamStore: new ToolCallStreamStore(),
     isRequesting: false,
   };
 };
@@ -52,59 +45,6 @@ const analyzeImage = async (
 
   return imageDetails ? imageDetails : '';
 };
-
-/**
- * Processes pending tool calls from the tool call stream, executes the corresponding operations,
- * and updates the message history with both the tool calls and their results.
- *
- * @param toolCallStreamStore - Store containing pending tool calls to be processed
- * @param messageHistoryStore - Store for maintaining the conversation message history
- * @param executeOperation - Function that executes the named operation with the provided arguments
- */
-export async function callTools(
-  toolCallStreamStore: ToolCallStreamStore,
-  messageHistoryStore: MessageHistoryStore,
-  executeOperation: ExecuteOperation,
-): Promise<void> {
-  for (const toolCall of toolCallStreamStore.getSnapShot()) {
-    const name = toolCall.function?.name;
-
-    if (name) {
-      let content = '';
-      try {
-        const result = await executeOperation(
-          name,
-          toolCall.function.arguments,
-        );
-        content = JSON.stringify({
-          status: 'ok',
-          info: result,
-        } as OperationResult);
-      } catch (err) {
-        console.error(err);
-        content = JSON.stringify({
-          status: 'failed',
-          info: err instanceof Error ? err.message : err,
-        } as OperationResult);
-      }
-
-      messageHistoryStore.addMessage({
-        role: 'assistant' as const,
-        function_call: null,
-        content: null,
-        tool_calls: [
-          toolCallStreamStore.toChatCompletionMessageToolCall(toolCall),
-        ],
-      });
-      toolCallStreamStore.deleteToolCallById(toolCall.id);
-      messageHistoryStore.addMessage({
-        role: 'tool' as const,
-        tool_call_id: toolCall.id,
-        content,
-      });
-    }
-  }
-}
 
 /**
  * Manages a chat interaction with an AI model, handling streaming responses, tool calls,
@@ -133,9 +73,7 @@ export async function doChat(
   modelConfig: ModelConfig,
   progressStore: TextStreamStore,
   messageStore: TextStreamStore,
-  toolCallStreamStore: ToolCallStreamStore,
   thinkingStore: TextStreamStore,
-  executeOperation: ExecuteOperation,
   conversationID: string,
 ) {
   progressStore.setText('Thinking');
@@ -288,8 +226,6 @@ export async function doChat(
             break;
           }
         }
-      } else if (isToolCallChunk(chunk)) {
-        assembleToolCallsFromStream(chunk, toolCallStreamStore);
       }
     }
 
@@ -311,28 +247,6 @@ export async function doChat(
       messageStore.setText('');
     }
 
-    if (toolCallStreamStore.getSnapShot().length > 0) {
-      // do the tool calls
-      await callTools(
-        toolCallStreamStore,
-        messageHistoryStore,
-        executeOperation,
-      );
-
-      // inform the model of the tool call responses
-      await doChat(
-        controller,
-        client,
-        messageHistoryStore,
-        modelConfig,
-        progressStore,
-        messageStore,
-        toolCallStreamStore,
-        thinkingStore,
-        executeOperation,
-        conversationID,
-      );
-    }
     syncWithLocalStorage(
       conversationID,
       modelConfig,

@@ -1,7 +1,6 @@
 import { describe, expect, test, retryButtonClick } from './fixtures';
 import { Chat } from './Chat';
 import { MetaMask } from './Metamask';
-import { ethers } from 'ethers';
 import { devices } from '@playwright/test';
 import * as fs from 'fs';
 import { join } from 'path';
@@ -90,100 +89,100 @@ describe('chat', () => {
     expect(amount).toBeGreaterThan(1000);
   });
 
-  test.skip('send tx (native asset)', async ({
-    page,
-    context,
-    metaMaskExtensionId,
-  }) => {
-    const KAVA_EVM_DECIMALS = 10 ** 18;
-    test.setTimeout(90 * 1000);
+  // test.skip('send tx (native asset)', async ({
+  //   page,
+  //   context,
+  //   metaMaskExtensionId,
+  // }) => {
+  //   const KAVA_EVM_DECIMALS = 10 ** 18;
+  //   test.setTimeout(90 * 1000);
 
-    const chat = new Chat(page);
-    await chat.goto();
+  //   const chat = new Chat(page);
+  //   await chat.goto();
 
-    await chat.switchToBlockchainModel();
+  //   await chat.switchToBlockchainModel();
 
-    const metaMask = await MetaMask.prepareWallet(context, metaMaskExtensionId);
+  //   const metaMask = await MetaMask.prepareWallet(context, metaMaskExtensionId);
 
-    await metaMask.switchNetwork();
+  //   await metaMask.switchNetwork();
 
-    //  be ready to find the upcoming popup
-    const metamaskPopupPromise = context.waitForEvent('page');
+  //   //  be ready to find the upcoming popup
+  //   const metamaskPopupPromise = context.waitForEvent('page');
 
-    await chat.submitMessage(
-      'Send 0.12345 TKAVA to 0xC07918E451Ab77023a16Fa7515Dd60433A3c771D on Kava EVM Internal Testnet',
-    );
+  //   await chat.submitMessage(
+  //     'Send 0.12345 TKAVA to 0xC07918E451Ab77023a16Fa7515Dd60433A3c771D on Kava EVM Internal Testnet',
+  //   );
 
-    await chat.waitForStreamToFinish();
+  //   await chat.waitForStreamToFinish();
 
-    const metamaskPopup = await metamaskPopupPromise;
-    await retryButtonClick(metamaskPopup, { name: 'Connect' });
-    await retryButtonClick(metamaskPopup, { name: 'Confirm' });
+  //   const metamaskPopup = await metamaskPopupPromise;
+  //   await retryButtonClick(metamaskPopup, { name: 'Connect' });
+  //   await retryButtonClick(metamaskPopup, { name: 'Confirm' });
 
-    //  In progress
-    await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
+  //   //  In progress
+  //   await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
 
-    const provider = new ethers.JsonRpcProvider(
-      'https://evm.data.internal.testnet.us-east.production.kava.io',
-    );
-    const txHash = await page.getByTestId('tx-hash').innerText();
-    const txInfo = await provider.getTransaction(txHash);
+  //   const provider = new ethers.JsonRpcProvider(
+  //     'https://evm.data.internal.testnet.us-east.production.kava.io',
+  //   );
+  //   const txHash = await page.getByTestId('tx-hash').innerText();
+  //   const txInfo = await provider.getTransaction(txHash);
 
-    //  Verify that the tx value is the amount from the user input
-    const txValue: bigint = txInfo.value;
+  //   //  Verify that the tx value is the amount from the user input
+  //   const txValue: bigint = txInfo.value;
 
-    expect(Number(txValue) / KAVA_EVM_DECIMALS).toBe(0.12345);
-  });
-  test.skip('send tx (non-native asset)', async ({
-    page,
-    context,
-    metaMaskExtensionId,
-  }) => {
-    const USDT_DECIMALS = 10 ** 6;
-    test.setTimeout(90 * 1000);
+  //   expect(Number(txValue) / KAVA_EVM_DECIMALS).toBe(0.12345);
+  // });
+  // test.skip('send tx (non-native asset)', async ({
+  //   page,
+  //   context,
+  //   metaMaskExtensionId,
+  // }) => {
+  //   const USDT_DECIMALS = 10 ** 6;
+  //   test.setTimeout(90 * 1000);
 
-    const chat = new Chat(page);
-    await chat.goto();
+  //   const chat = new Chat(page);
+  //   await chat.goto();
 
-    await chat.switchToBlockchainModel();
+  //   await chat.switchToBlockchainModel();
 
-    const metaMask = await MetaMask.prepareWallet(context, metaMaskExtensionId);
+  //   const metaMask = await MetaMask.prepareWallet(context, metaMaskExtensionId);
 
-    await metaMask.switchNetwork();
+  //   await metaMask.switchNetwork();
 
-    //  be ready to find the upcoming popup
-    const metamaskPopupPromise = context.waitForEvent('page');
+  //   //  be ready to find the upcoming popup
+  //   const metamaskPopupPromise = context.waitForEvent('page');
 
-    await chat.submitMessage(
-      'Send 0.2345 USDT to 0xC07918E451Ab77023a16Fa7515Dd60433A3c771D on Kava EVM Internal Testnet',
-    );
+  //   await chat.submitMessage(
+  //     'Send 0.2345 USDT to 0xC07918E451Ab77023a16Fa7515Dd60433A3c771D on Kava EVM Internal Testnet',
+  //   );
 
-    await chat.waitForStreamToFinish();
+  //   await chat.waitForStreamToFinish();
 
-    const metamaskPopup = await metamaskPopupPromise;
-    await retryButtonClick(metamaskPopup, { name: 'Connect' });
-    await retryButtonClick(metamaskPopup, { name: 'Confirm' });
+  //   const metamaskPopup = await metamaskPopupPromise;
+  //   await retryButtonClick(metamaskPopup, { name: 'Connect' });
+  //   await retryButtonClick(metamaskPopup, { name: 'Confirm' });
 
-    //  In progress
-    await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
+  //   //  In progress
+  //   await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
 
-    const provider = new ethers.JsonRpcProvider(
-      'https://evm.data.internal.testnet.us-east.production.kava.io',
-    );
-    const txHash = await page.getByTestId('tx-hash').innerText();
-    const txInfo = await provider.getTransaction(txHash);
+  //   const provider = new ethers.JsonRpcProvider(
+  //     'https://evm.data.internal.testnet.us-east.production.kava.io',
+  //   );
+  //   const txHash = await page.getByTestId('tx-hash').innerText();
+  //   const txInfo = await provider.getTransaction(txHash);
 
-    // Get the parsed transaction data using ethers interface
-    const ethersInterface = new ethers.Interface([
-      'function transfer(address to, uint256 amount)',
-    ]);
-    const decodedData = ethersInterface.parseTransaction({ data: txInfo.data });
+  //   // Get the parsed transaction data using ethers interface
+  //   const ethersInterface = new ethers.Interface([
+  //     'function transfer(address to, uint256 amount)',
+  //   ]);
+  //   const decodedData = ethersInterface.parseTransaction({ data: txInfo.data });
 
-    const amount = decodedData.args[1]; // Second argument is the amount
-    const formattedAmount = Number(amount) / USDT_DECIMALS;
+  //   const amount = decodedData.args[1]; // Second argument is the amount
+  //   const formattedAmount = Number(amount) / USDT_DECIMALS;
 
-    expect(formattedAmount).toBe(0.2345);
-  });
+  //   expect(formattedAmount).toBe(0.2345);
+  // });
   test.skip('model dropdown interactions', async ({ page }) => {
     const DEFAULT_MODEL_DISPLAY_NAME = 'General Reasoning';
     const NUMBER_OF_SUPPORTED_MODELS = 2;

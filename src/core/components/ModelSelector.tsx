@@ -1,9 +1,8 @@
 import styles from './ModelSelector.module.css';
 import { useEffect, useState } from 'react';
 import { useAppContext } from '../context/useAppContext';
-import { getAllModels } from '../config/models';
+import { getAllModels } from '../config';
 import { SupportedModels } from '../types/models';
-import { BLOCKCHAIN_MODEL_NAME } from '../../features/blockchain/config/models';
 
 export const ModelSelector = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -122,12 +121,6 @@ export const ModelSelector = () => {
           onKeyDown={handleKeyDown}
         >
           {models.map((model, index) => {
-            if (model.name === BLOCKCHAIN_MODEL_NAME) {
-              // skip blockchain instruct model
-              // moving over to hard.ai
-              return null;
-            }
-
             const ModelIcon = model.icon;
             return (
               <div

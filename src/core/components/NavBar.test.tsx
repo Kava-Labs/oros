@@ -4,15 +4,11 @@ import { NavBar } from './NavBar';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
 import { AppContextProvider } from '../context/AppContextProvider';
 import { TextStreamStore } from '../stores/textStreamStore';
-import { ToolCallStreamStore } from '../stores/toolCallStreamStore';
 import { MessageHistoryStore } from '../stores/messageHistoryStore';
-import { WalletStore } from '../../features/blockchain/stores/walletStore';
 
 const messageStore = new TextStreamStore();
 const progressStore = new TextStreamStore();
-const toolCallStreamStore = new ToolCallStreamStore();
 const messageHistoryStore = new MessageHistoryStore();
-const walletStore = new WalletStore();
 const thinkingStore = new TextStreamStore();
 const errorStore = new TextStreamStore();
 
@@ -58,8 +54,6 @@ describe('NavBar', () => {
           thinkingStore={thinkingStore}
           progressStore={progressStore}
           messageStore={messageStore}
-          toolCallStreamStore={toolCallStreamStore}
-          walletStore={walletStore}
           messageHistoryStore={messageHistoryStore}
         >
           <NavBar {...mockProps} />
@@ -80,8 +74,6 @@ describe('NavBar', () => {
           thinkingStore={thinkingStore}
           progressStore={progressStore}
           messageStore={messageStore}
-          toolCallStreamStore={toolCallStreamStore}
-          walletStore={walletStore}
           messageHistoryStore={messageHistoryStore}
         >
           <NavBar {...mockProps} isPanelOpen={true} />
@@ -100,8 +92,6 @@ describe('NavBar', () => {
           thinkingStore={thinkingStore}
           progressStore={progressStore}
           messageStore={messageStore}
-          toolCallStreamStore={toolCallStreamStore}
-          walletStore={walletStore}
           messageHistoryStore={messageHistoryStore}
         >
           <NavBar {...mockProps} />
@@ -119,8 +109,6 @@ describe('NavBar', () => {
           thinkingStore={thinkingStore}
           progressStore={progressStore}
           messageStore={messageStore}
-          toolCallStreamStore={toolCallStreamStore}
-          walletStore={walletStore}
           messageHistoryStore={messageHistoryStore}
         >
           <NavBar {...mockProps} />
@@ -145,8 +133,6 @@ describe('NavBar', () => {
           thinkingStore={thinkingStore}
           progressStore={progressStore}
           messageStore={messageStore}
-          toolCallStreamStore={toolCallStreamStore}
-          walletStore={walletStore}
           messageHistoryStore={messageHistoryStore}
         >
           <NavBar {...mockProps} />
@@ -167,8 +153,6 @@ describe('NavBar', () => {
           thinkingStore={thinkingStore}
           progressStore={progressStore}
           messageStore={messageStore}
-          toolCallStreamStore={toolCallStreamStore}
-          walletStore={walletStore}
           messageHistoryStore={messageHistoryStore}
         >
           <NavBar {...mockProps} />

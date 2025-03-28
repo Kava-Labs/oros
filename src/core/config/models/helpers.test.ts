@@ -1,5 +1,5 @@
+import { ChatMessage } from '../../stores/messageHistoryStore';
 import { estimateTokenUsage } from './helpers';
-import { ChatMessage } from '../../core/stores/messageHistoryStore';
 
 describe('estimateTokenUsage', () => {
   it('should calculate tokens based on message length', () => {

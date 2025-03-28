@@ -5,7 +5,7 @@ import { NavBar } from './NavBar';
 import { useMessageHistory } from '../hooks/useMessageHistory';
 import ChatInput from './ChatInput';
 import { LandingContent } from './LandingContent';
-import { defaultCautionText } from '../../features/blockchain/config';
+import { defaultCautionText } from '../config/models/defaultPrompts';
 
 export interface ChatViewProps {
   onMenu(): void;

@@ -1,6 +1,6 @@
-import { ChatMessage } from '../../core/stores/messageHistoryStore';
+import { ChatMessage } from '../../stores/messageHistoryStore';
 import { ChatCompletionChunk } from 'openai/resources/index';
-import { ContextMetrics } from '../../core/types/models';
+import { ContextMetrics } from '../../types/models';
 
 /**
  * Estimates token usage based on message lengths
