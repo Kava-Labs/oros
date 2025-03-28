@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ChatView } from './core/components/ChatView';
 import { useAppContext } from './core/context/useAppContext';
 import styles from './App.module.css';
