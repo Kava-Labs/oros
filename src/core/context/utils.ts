@@ -193,7 +193,8 @@ export async function doChat(
         }
 
         switch (true) {
-          case isReasoningModel(modelConfig.id): {
+          case isReasoningModel(modelConfig.id) &&
+            modelConfig.id !== 'o3-mini': {
             const openTag = '<think>';
             const closeTag = '</think>';
 

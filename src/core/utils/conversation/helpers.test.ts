@@ -1,5 +1,5 @@
 import {
-  calculateGptContextMetrics,
+  // calculateGptContextMetrics,
   formatContentSnippet,
   formatConversationTitle,
   getTimeGroup,
@@ -8,8 +8,8 @@ import {
 } from './helpers';
 import { ConversationHistory } from '../../context/types';
 import { ChatCompletionMessageParam } from 'openai/resources/index';
-import { ChatMessage } from '../../stores/messageHistoryStore';
-import { MODEL_REGISTRY } from '../../config';
+// import { ChatMessage } from '../../stores/messageHistoryStore';
+// import { MODEL_REGISTRY } from '../../config';
 
 describe('formatConversationTitle', () => {
   it('should remove double quotes from beginning and end', () => {
@@ -355,54 +355,54 @@ describe('formatContentSnippet', () => {
   });
 });
 
-describe('calculateGptContextMetrics', () => {
-  const maxTokens = MODEL_REGISTRY['gpt-4o'].contextLength;
+// describe('calculateGptContextMetrics', () => {
+//   const maxTokens = MODEL_REGISTRY['gpt-4o'].contextLength;
 
-  it('initializing with system prompt', async () => {
-    const mockMessages: ChatMessage[] = [
-      { role: 'system', content: 'I am helpful' },
-    ];
-    const result = await calculateGptContextMetrics(mockMessages);
+//   it('initializing with system prompt', async () => {
+//     const mockMessages: ChatMessage[] = [
+//       { role: 'system', content: 'I am helpful' },
+//     ];
+//     const result = await calculateGptContextMetrics(mockMessages);
 
-    expect(result).toEqual({
-      tokensRemaining: maxTokens - 10,
-    });
-  });
+//     expect(result).toEqual({
+//       tokensRemaining: maxTokens - 10,
+//     });
+//   });
 
-  it('calculates tokens as conversation proceeds', async () => {
-    const mockMessages: ChatMessage[] = [
-      { role: 'system', content: 'I am helpful' },
-      {
-        role: 'user',
-        content: 'Lorem ipsum odor amet, consectetuer adipiscing elit.',
-      },
-    ];
-    const result = await calculateGptContextMetrics(mockMessages);
+//   it('calculates tokens as conversation proceeds', async () => {
+//     const mockMessages: ChatMessage[] = [
+//       { role: 'system', content: 'I am helpful' },
+//       {
+//         role: 'user',
+//         content: 'Lorem ipsum odor amet, consectetuer adipiscing elit.',
+//       },
+//     ];
+//     const result = await calculateGptContextMetrics(mockMessages);
 
-    expect(result).toEqual({
-      tokensRemaining: maxTokens - 25,
-    });
+//     expect(result).toEqual({
+//       tokensRemaining: maxTokens - 25,
+//     });
 
-    const updatedMessages: ChatMessage[] = [
-      ...mockMessages,
-      { role: 'assistant', content: 'Do you speak Latin?' },
-    ];
+//     const updatedMessages: ChatMessage[] = [
+//       ...mockMessages,
+//       { role: 'assistant', content: 'Do you speak Latin?' },
+//     ];
 
-    const updatedResult = await calculateGptContextMetrics(updatedMessages);
+//     const updatedResult = await calculateGptContextMetrics(updatedMessages);
 
-    expect(updatedResult).toEqual({
-      tokensRemaining: maxTokens - 34,
-    });
-  });
+//     expect(updatedResult).toEqual({
+//       tokensRemaining: maxTokens - 34,
+//     });
+//   });
 
-  it('handles large input', async () => {
-    const mockMessages: ChatMessage[] = [
-      { role: 'system', content: 'Make a giant string'.repeat(30000) },
-    ];
-    const result = await calculateGptContextMetrics(mockMessages);
+//   it('handles large input', async () => {
+//     const mockMessages: ChatMessage[] = [
+//       { role: 'system', content: 'Make a giant string'.repeat(30000) },
+//     ];
+//     const result = await calculateGptContextMetrics(mockMessages);
 
-    expect(result).toEqual({
-      tokensRemaining: maxTokens - 120007,
-    });
-  });
-});
+//     expect(result).toEqual({
+//       tokensRemaining: maxTokens - 120007,
+//     });
+//   });
+// });

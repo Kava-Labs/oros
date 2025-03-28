@@ -1,8 +1,8 @@
-import { ConversationHistory, TextChatMessage } from '../../context/types';
-import { encodeChat } from 'gpt-tokenizer';
-import { ContextMetrics } from '../../types/models';
+import { ConversationHistory } from '../../context/types';
+// import { encodeChat } from 'gpt-tokenizer';
+// import { ContextMetrics } from '../../types/models';
 import { ChatMessage } from '../../stores/messageHistoryStore';
-import { MODEL_REGISTRY } from '../../config';
+// import { MODEL_REGISTRY } from '../../config';
 
 /**
  * Formats a conversation title by removing surrounding quotes and truncating if necessary
@@ -200,21 +200,21 @@ const removeSystemMessages = (conversationHistory: ConversationHistory) => {
   );
 };
 
-/**
- *
- * Function to calculate context metrics based on messages and model's context length
- * @param chatMessages  Array of chat messages
- * @returns ContextMetrics object (promise)
- */
-export async function calculateGptContextMetrics(
-  chatMessages: ChatMessage[],
-): Promise<ContextMetrics> {
-  const messages = chatMessages as TextChatMessage[];
-  const maxTokens = MODEL_REGISTRY['gpt-4o'].contextLength;
-  const tokensUsed = encodeChat(messages, 'gpt-4o').length;
-  const tokensRemaining = Math.max(0, maxTokens - tokensUsed);
+// /**
+//  *
+//  * Function to calculate context metrics based on messages and model's context length
+//  * @param chatMessages  Array of chat messages
+//  * @returns ContextMetrics object (promise)
+//  */
+// export async function calculateGptContextMetrics(
+//   chatMessages: ChatMessage[],
+// ): Promise<ContextMetrics> {
+//   const messages = chatMessages as TextChatMessage[];
+//   const maxTokens = MODEL_REGISTRY['gpt-4o'].contextLength;
+//   const tokensUsed = encodeChat(messages, 'gpt-4o').length;
+//   const tokensRemaining = Math.max(0, maxTokens - tokensUsed);
 
-  return {
-    tokensRemaining,
-  };
-}
+//   return {
+//     tokensRemaining,
+//   };
+// }
