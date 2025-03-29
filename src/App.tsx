@@ -8,6 +8,7 @@ import KavaAILogo from './core/assets/KavaAILogo';
 import { DesktopSideBar } from './core/components/DesktopSideBar';
 import { MobileSideBar } from './core/components/MobileSideBar';
 import { MobileBackdrop } from './core/components/MobileBackdrop';
+import { useSession } from './useSession';
 
 export const App = () => {
   const { isReady } = useAppContext();
@@ -20,6 +21,9 @@ export const App = () => {
   const [isMobileSideBarOpen, setIsMobileSideBarOpen] = useState(false);
   // TODO: Support a collapse sidebar button
   const [isDesktopSideBarHidden, setIsDesktopSideBarHidden] = useState(false);
+
+  // setup annonymous sessions
+  useSession();
 
   return (
     <>
