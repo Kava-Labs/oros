@@ -9,7 +9,11 @@ import { AppContext } from './AppContext';
 import { TextStreamStore } from '../../core/stores/textStreamStore';
 import { MessageHistoryStore } from '../../core/stores/messageHistoryStore';
 import { DEFAULT_MODEL_NAME, getModelConfig } from '../config';
-import { SupportedModels, ModelConfig } from '../types/models';
+import {
+  SupportedModels,
+  ModelConfig,
+  isSupportedModel,
+} from '../types/models';
 import { ActiveConversation, ConversationHistory } from './types';
 import { getToken } from '../../core/utils/token/token';
 import OpenAI from 'openai';
@@ -128,9 +132,12 @@ export const AppContextProvider = (props: {
   // Poll for conversation changes
   useEffect(() => {
     const load = () => {
-      const storedConversations = Object.values(
-        JSON.parse(localStorage.getItem('conversations') ?? '{}'),
-      ) as ConversationHistory[];
+      // drop conversations with unsupported models
+      const storedConversations = (
+        Object.values(
+          JSON.parse(localStorage.getItem('conversations') ?? '{}'),
+        ) as ConversationHistory[]
+      ).filter((convo) => isSupportedModel(convo.model));
       setConversations(storedConversations);
     };
 

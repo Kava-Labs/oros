@@ -75,3 +75,7 @@ export type SupportedFileType = (typeof SUPPORTED_FILE_TYPES)[number];
 export function isSupportedFileType(type: string): type is SupportedFileType {
   return SUPPORTED_FILE_TYPES.includes(type as SupportedFileType);
 }
+
+export const isSupportedModel = (model: string): boolean => {
+  return supportedModels.includes(model as SupportedModels);
+};
