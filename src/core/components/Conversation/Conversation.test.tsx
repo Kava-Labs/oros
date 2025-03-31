@@ -9,7 +9,6 @@ import { useMessageHistory } from '../../hooks/useMessageHistory';
 //       the same instead of potentially producing false positives
 vi.mock('../../context/useAppContext');
 vi.mock('../../hooks/useMessageHistory');
-vi.mock('../../hooks/useMessages');
 vi.mock('react', async () => {
   const actual = await vi.importActual('react');
   return {

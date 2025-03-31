@@ -1,6 +1,7 @@
 import styles from './Conversation.module.css';
 import { Fragment, memo, useState } from 'react';
 import { useSyncExternalStore } from 'react';
+import { StreamingMessage } from './StreamingMessage';
 import { ErrorMessage } from './ErrorMessage';
 import AssistantMessage from './AssistantMessage';
 import { useAppContext } from '../../context/useAppContext';
@@ -9,7 +10,6 @@ import { Content } from './Content';
 import { IdbImage } from '../IdbImage';
 import { ImageCarousel } from './ImageCarousel';
 import { ProgressIcon } from './ProgressIcon';
-import { StreamingMessage } from './StreamingMessage';
 
 export interface ConversationProps {
   onRendered(): void;
