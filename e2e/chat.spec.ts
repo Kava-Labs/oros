@@ -1,7 +1,5 @@
-import { describe, expect, test, retryButtonClick } from './fixtures';
+import { describe, expect, test } from './fixtures';
 import { Chat } from './Chat';
-import { MetaMask } from './Metamask';
-import { devices } from '@playwright/test';
 import * as fs from 'fs';
 import { join } from 'path';
 
