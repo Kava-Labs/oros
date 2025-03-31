@@ -10,8 +10,10 @@ export const MessageStream = ({ onRendered }: MessageStreamProps) => {
   const { messageStore } = useAppContext();
 
   return (
-    <StreamingText store={messageStore} onRendered={onRendered}>
-      {StreamingTextContent}
-    </StreamingText>
+    <>
+      <StreamingText store={messageStore} onRendered={onRendered}>
+        {StreamingTextContent}
+      </StreamingText>
+    </>
   );
 };

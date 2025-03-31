@@ -1,7 +1,6 @@
 import styles from './Conversation.module.css';
 import { Fragment, memo, useState } from 'react';
 import { useSyncExternalStore } from 'react';
-import { StreamingMessage } from './StreamingMessage';
 import { ErrorMessage } from './ErrorMessage';
 import AssistantMessage from './AssistantMessage';
 import { useAppContext } from '../../context/useAppContext';
@@ -9,17 +8,24 @@ import { useMessageHistory } from '../../hooks/useMessageHistory';
 import { Content } from './Content';
 import { IdbImage } from '../IdbImage';
 import { ImageCarousel } from './ImageCarousel';
+import { ProgressIcon } from './ProgressIcon';
+import { StreamingMessage } from './StreamingMessage';
 
 export interface ConversationProps {
   onRendered(): void;
 }
 
 const ConversationComponent = ({ onRendered }: ConversationProps) => {
-  const { errorStore, isRequesting } = useAppContext();
+  const { errorStore, isRequesting, messageStore } = useAppContext();
 
   const errorText: string = useSyncExternalStore(
     errorStore.subscribe,
     errorStore.getSnapshot,
+  );
+
+  const assistantStream = useSyncExternalStore(
+    messageStore.subscribe,
+    messageStore.getSnapshot,
   );
 
   const { messages } = useMessageHistory();
@@ -135,7 +141,11 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
         return null;
       })}
 
-      {isRequesting && <StreamingMessage onRendered={onRendered} />}
+      {isRequesting && assistantStream.length === 0 ? (
+        <ProgressIcon />
+      ) : (
+        <StreamingMessage onRendered={onRendered} />
+      )}
 
       {errorText.length > 0 && (
         <ErrorMessage errorText={errorText} onRendered={onRendered} />
