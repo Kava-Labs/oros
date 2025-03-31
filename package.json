@@ -25,6 +25,7 @@
     "dotenv": "^16.4.7",
     "gpt-tokenizer": "^2.8.1",
     "highlight.js": "^11.11.1",
+    "lib-kava-ai": "github:Kava-Labs/lib-kava-ai",
     "lucide-react": "^0.469.0",
     "marked": "^15.0.2",
     "marked-highlight": "^2.2.1",

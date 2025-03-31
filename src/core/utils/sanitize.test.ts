@@ -1,4 +1,4 @@
-import { sanitizeContent } from './sanitize';
+import { sanitizeContent } from 'lib-kava-ai';
 
 describe('sanitizeContent', () => {
   it('should convert simple Markdown to safe HTML', async () => {
