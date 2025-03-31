@@ -13,13 +13,6 @@ describe('chat', () => {
 
     expect(chat.messageContainer).not.toBeNull();
     await expect(page.getByText(initialIntroMessage)).toBeVisible();
-
-    await chat.switchToBlockchainModel();
-
-    const updatedIntroMessage = 'How can I help you with Web3?';
-
-    await expect(page.getByText(initialIntroMessage)).not.toBeVisible();
-    await expect(page.getByText(updatedIntroMessage)).toBeVisible();
   });
 
   test('receiving a response from the model', async ({ page }) => {
@@ -27,9 +20,6 @@ describe('chat', () => {
 
     const chat = new Chat(page);
     await chat.goto();
-
-    //  todo - remove when the default (reasoning) model is quicker
-    await chat.switchToBlockchainModel();
 
     await chat.submitMessage(
       'This is an automated test suite, please respond with the exact text: THIS IS A TEST',
@@ -52,224 +42,11 @@ describe('chat', () => {
     expect(responseText).toMatch(/THIS IS A TEST/i);
   });
 
-  test.skip('check balances', async ({
-    page,
-    context,
-    metaMaskExtensionId,
-  }) => {
+  test('chat history', async ({ page }) => {
     test.setTimeout(90 * 1000);
 
     const chat = new Chat(page);
     await chat.goto();
-
-    await chat.switchToBlockchainModel();
-
-    const metaMask = await MetaMask.prepareWallet(context, metaMaskExtensionId);
-
-    await metaMask.switchNetwork();
-
-    //  be ready to find the upcoming popup
-    const metamaskPopupPromise = context.waitForEvent('page');
-
-    await chat.submitMessage('What are my balances on Kava Internal Testnet?');
-
-    await chat.waitForStreamToFinish();
-
-    const metamaskPopup = await metamaskPopupPromise;
-
-    await retryButtonClick(metamaskPopup, { name: 'Connect' });
-
-    await chat.waitForStreamToFinish();
-    await chat.waitForAssistantResponse();
-
-    const amountElement = await page.getByTestId('TKAVA-query-amount');
-    const amountText = (await amountElement.textContent()) || '';
-
-    const amount = parseFloat(amountText.replace(/,/g, ''));
-    expect(amount).toBeGreaterThan(1000);
-  });
-
-  // test.skip('send tx (native asset)', async ({
-  //   page,
-  //   context,
-  //   metaMaskExtensionId,
-  // }) => {
-  //   const KAVA_EVM_DECIMALS = 10 ** 18;
-  //   test.setTimeout(90 * 1000);
-
-  //   const chat = new Chat(page);
-  //   await chat.goto();
-
-  //   await chat.switchToBlockchainModel();
-
-  //   const metaMask = await MetaMask.prepareWallet(context, metaMaskExtensionId);
-
-  //   await metaMask.switchNetwork();
-
-  //   //  be ready to find the upcoming popup
-  //   const metamaskPopupPromise = context.waitForEvent('page');
-
-  //   await chat.submitMessage(
-  //     'Send 0.12345 TKAVA to 0xC07918E451Ab77023a16Fa7515Dd60433A3c771D on Kava EVM Internal Testnet',
-  //   );
-
-  //   await chat.waitForStreamToFinish();
-
-  //   const metamaskPopup = await metamaskPopupPromise;
-  //   await retryButtonClick(metamaskPopup, { name: 'Connect' });
-  //   await retryButtonClick(metamaskPopup, { name: 'Confirm' });
-
-  //   //  In progress
-  //   await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
-
-  //   const provider = new ethers.JsonRpcProvider(
-  //     'https://evm.data.internal.testnet.us-east.production.kava.io',
-  //   );
-  //   const txHash = await page.getByTestId('tx-hash').innerText();
-  //   const txInfo = await provider.getTransaction(txHash);
-
-  //   //  Verify that the tx value is the amount from the user input
-  //   const txValue: bigint = txInfo.value;
-
-  //   expect(Number(txValue) / KAVA_EVM_DECIMALS).toBe(0.12345);
-  // });
-  // test.skip('send tx (non-native asset)', async ({
-  //   page,
-  //   context,
-  //   metaMaskExtensionId,
-  // }) => {
-  //   const USDT_DECIMALS = 10 ** 6;
-  //   test.setTimeout(90 * 1000);
-
-  //   const chat = new Chat(page);
-  //   await chat.goto();
-
-  //   await chat.switchToBlockchainModel();
-
-  //   const metaMask = await MetaMask.prepareWallet(context, metaMaskExtensionId);
-
-  //   await metaMask.switchNetwork();
-
-  //   //  be ready to find the upcoming popup
-  //   const metamaskPopupPromise = context.waitForEvent('page');
-
-  //   await chat.submitMessage(
-  //     'Send 0.2345 USDT to 0xC07918E451Ab77023a16Fa7515Dd60433A3c771D on Kava EVM Internal Testnet',
-  //   );
-
-  //   await chat.waitForStreamToFinish();
-
-  //   const metamaskPopup = await metamaskPopupPromise;
-  //   await retryButtonClick(metamaskPopup, { name: 'Connect' });
-  //   await retryButtonClick(metamaskPopup, { name: 'Confirm' });
-
-  //   //  In progress
-  //   await expect(page.getByTestId('in-progress-tx-display')).toBeVisible();
-
-  //   const provider = new ethers.JsonRpcProvider(
-  //     'https://evm.data.internal.testnet.us-east.production.kava.io',
-  //   );
-  //   const txHash = await page.getByTestId('tx-hash').innerText();
-  //   const txInfo = await provider.getTransaction(txHash);
-
-  //   // Get the parsed transaction data using ethers interface
-  //   const ethersInterface = new ethers.Interface([
-  //     'function transfer(address to, uint256 amount)',
-  //   ]);
-  //   const decodedData = ethersInterface.parseTransaction({ data: txInfo.data });
-
-  //   const amount = decodedData.args[1]; // Second argument is the amount
-  //   const formattedAmount = Number(amount) / USDT_DECIMALS;
-
-  //   expect(formattedAmount).toBe(0.2345);
-  // });
-  test.skip('model dropdown interactions', async ({ page }) => {
-    const DEFAULT_MODEL_DISPLAY_NAME = 'General Reasoning';
-    const NUMBER_OF_SUPPORTED_MODELS = 2;
-    const chat = new Chat(page);
-    await chat.goto();
-
-    // Select model button
-    const modelButton = page.getByRole('combobox', { name: 'Select Model' });
-    await expect(modelButton).toContainText(DEFAULT_MODEL_DISPLAY_NAME);
-    await expect(modelButton).toHaveAttribute('aria-expanded', 'false');
-
-    // Open dropdown and verify options
-    await modelButton.click();
-    const dropdown = page.getByRole('listbox');
-    const dropdownOptions = await page.getByRole('option').all();
-
-    await expect(dropdown).toBeVisible();
-    expect(dropdownOptions).toHaveLength(NUMBER_OF_SUPPORTED_MODELS);
-    await expect(modelButton).toHaveAttribute('aria-expanded', 'true');
-
-    // Select a different model
-    const alternativeModel = page
-      .getByRole('option')
-      .filter({ hasText: 'Blockchain Instruct' });
-    const alternativeModelName =
-      (await alternativeModel.locator('span').first().textContent()) || '';
-
-    expect(alternativeModelName).not.toBe(DEFAULT_MODEL_DISPLAY_NAME);
-    await alternativeModel.click();
-
-    // Verify dropdown closed and new model selected
-    await expect(dropdown).not.toBeVisible();
-    await expect(modelButton).toContainText(alternativeModelName);
-    await expect(modelButton).toHaveAttribute('aria-expanded', 'false');
-
-    // Change back to original model
-    await modelButton.click();
-    const originalModel = page.getByRole('option', {
-      name: DEFAULT_MODEL_DISPLAY_NAME,
-    });
-    await originalModel.click();
-    await expect(modelButton).toContainText(DEFAULT_MODEL_DISPLAY_NAME);
-
-    // Type message to disable dropdown
-    await chat.submitMessage('test message');
-    await expect(modelButton).toBeDisabled();
-  });
-
-  test.skip('model dropdown interactions in mobile', async ({ browser }) => {
-    const context = await browser.newContext({
-      ...devices['iPhone 13'],
-    });
-
-    const page = await context.newPage();
-    const chat = new Chat(page);
-    await chat.goto();
-
-    const modelButton = page.getByRole('combobox', { name: 'Select Model' });
-    await modelButton.click();
-
-    const dropdown = page.getByRole('listbox');
-    await expect(dropdown).toBeVisible();
-
-    const blockchainModel = page
-      .getByRole('option')
-      .filter({ hasText: 'Blockchain Instruct' });
-    const reasoningModel = page
-      .getByRole('option')
-      .filter({ hasText: 'General Reasoning' });
-
-    await expect(blockchainModel).toBeEnabled();
-    await expect(reasoningModel).toBeEnabled();
-
-    await blockchainModel.click();
-    await expect(modelButton).toContainText('Blockchain Instruct');
-
-    await context.close();
-  });
-
-  test.skip('chat history', async ({ page }) => {
-    test.setTimeout(90 * 1000);
-
-    const chat = new Chat(page);
-    await chat.goto();
-
-    //  this test runs very slowly on the reasoning model
-    await chat.switchToBlockchainModel();
 
     await chat.submitMessage(
       'This is an automated test suite, please respond with the exact text: THIS IS A TEST',
@@ -368,49 +145,11 @@ describe('chat', () => {
     expect(historyEntryTexts).toHaveLength(0);
     await expect(page.getByText('Start a new chat to begin')).toBeVisible();
   });
-  test('conversation history from local storage populates the UI', async ({
-    page,
-  }) => {
-    const chat = new Chat(page);
-
-    await page.addInitScript(() => {
-      localStorage.setItem(
-        'conversations',
-        JSON.stringify({
-          'test-id': {
-            id: 'test-id',
-            model: 'test-model',
-            title: 'Test Conversation Title',
-            conversation: [
-              {
-                role: 'user',
-                content: 'test message',
-              },
-            ],
-            lastSaved: Date.now(),
-          },
-        }),
-      );
-    });
-
-    await chat.goto();
-
-    const historyEntry = page.getByTestId('chat-history-entry').first();
-    await expect(historyEntry).toHaveText('Test Conversation Title');
-
-    //  still there after a refresh/reload
-    await page.reload();
-
-    await expect(historyEntry).toHaveText('Test Conversation Title');
-  });
-
   test('conversation history title editing', async ({ page }) => {
     const chat = new Chat(page);
     await chat.goto();
 
     const updatedTitle = 'Updated Title';
-
-    await chat.switchToBlockchainModel();
 
     await chat.submitMessage(
       'This is an automated test suite, please respond with the exact text: THIS IS A TEST',
@@ -934,8 +673,6 @@ describe('chat', () => {
       expect(count).toEqual(1);
     }
 
-    await chat.switchToBlockchainModel();
-
     expect(await imagePreviewContainer.isVisible()).toBe(false);
   });
   test('image previews are cleared on new chat click', async ({ page }) => {
@@ -977,6 +714,7 @@ describe('chat', () => {
 
     expect(await imagePreviewContainer.isVisible()).toBe(false);
   });
+
   test('image previews are cleared when visiting old chat (even if model supports it)', async ({
     page,
   }) => {
