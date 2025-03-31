@@ -67,7 +67,7 @@ export const test = base.extend<{
   },
 });
 
-export { screenshotOnFailure, getWalletId } from './utils';
+export { screenshotOnFailure } from './utils';
 export const describe = test.describe;
 export const only = test.only;
 export const expect = test.expect;

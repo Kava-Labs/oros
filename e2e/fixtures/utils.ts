@@ -16,11 +16,3 @@ export async function screenshotOnFailure(
     await page.screenshot({ path, timeout: 5000 });
   }
 }
-
-export function getWalletId(accountPool: number[], retry: number) {
-  if (retry) {
-    return accountPool[retry];
-  }
-
-  return accountPool[0];
-}

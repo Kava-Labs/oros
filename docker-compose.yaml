@@ -26,7 +26,7 @@ services:
       # Pass through existing environment variables
       KAVACHAT_API_BACKEND_0_BASE_URL: ${OPENAI_BASE_URL}
       KAVACHAT_API_BACKEND_0_API_KEY: ${OPENAI_API_KEY}
-      KAVACHAT_API_BACKEND_0_ALLOWED_MODELS: 'gpt-4o,gpt-4o-mini'
+      KAVACHAT_API_BACKEND_0_ALLOWED_MODELS: 'gpt-4o,gpt-4o-mini,o3-mini'
 
   localstack:
     image: localstack/localstack:4.1.1

@@ -76,7 +76,7 @@ export class Chat {
       if (res.url().includes('completions')) {
         const request = res.request();
         const requestBody = JSON.parse(request.postData() || '{}');
-        if (requestBody.model === 'gpt-4o') {
+        if (requestBody.model === 'o3-mini') {
           await res.finished();
           return true;
         }
@@ -119,12 +119,5 @@ export class Chat {
         polling: 100,
       },
     );
-  }
-
-  async switchToBlockchainModel() {
-    await this.page.getByRole('combobox', { name: 'Select Model' }).click();
-    await this.page
-      .getByRole('option', { name: 'Blockchain Instruct' })
-      .click();
   }
 }
