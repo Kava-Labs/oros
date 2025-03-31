@@ -10,7 +10,6 @@ vi.mock('../context/useAppContext');
 vi.mock('../../shared/theme/useIsMobile');
 vi.mock('../config/models');
 
-
 // Mock icons
 const KavaIcon = () => <div data-testid="kava-icon">KavaIcon</div>;
 const OrosIcon = () => <div data-testid="oros-icon">OrosIcon</div>;
@@ -102,9 +101,7 @@ describe('ModelSelector', () => {
     expect(
       within(dropdownMenu).queryByText('Blockchain Execution'),
     ).toBeInTheDocument();
-    expect(
-      within(dropdownMenu).queryByTestId('oros-icon'),
-    ).toBeInTheDocument();
+    expect(within(dropdownMenu).queryByTestId('oros-icon')).toBeInTheDocument();
   });
 
   it('selects a model when clicked', () => {
