@@ -15,9 +15,8 @@ interface NavBarProps {
 export const NavBar = ({ onMenu, onPanelOpen, isPanelOpen }: NavBarProps) => {
   const isMobile = useIsMobile();
 
-  const { startNewChat, modelConfig } = useAppContext();
+  const { startNewChat } = useAppContext();
 
-  console.log('model name', modelConfig.id);
   return (
     <div className={styles.nav}>
       <div className={styles.leftSection}>
