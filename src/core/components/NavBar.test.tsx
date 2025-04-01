@@ -3,7 +3,7 @@ import { vi } from 'vitest';
 import { NavBar } from './NavBar';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
 import { AppContextProvider } from '../context/AppContextProvider';
-import { TextStreamStore } from '../stores/textStreamStore';
+import { TextStreamStore } from 'lib-kava-ai';
 import { MessageHistoryStore } from '../stores/messageHistoryStore';
 
 const messageStore = new TextStreamStore();

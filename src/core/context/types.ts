@@ -1,4 +1,4 @@
-import { TextStreamStore } from '../../core/stores/textStreamStore';
+import { TextStreamStore } from 'lib-kava-ai';
 import { MessageHistoryStore } from '../../core/stores/messageHistoryStore';
 import { ModelConfig, SupportedModels } from '../types/models';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';

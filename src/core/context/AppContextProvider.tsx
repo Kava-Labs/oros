@@ -6,7 +6,7 @@ import React, {
   useMemo,
 } from 'react';
 import { AppContext } from './AppContext';
-import { TextStreamStore } from '../../core/stores/textStreamStore';
+import { TextStreamStore } from 'lib-kava-ai';
 import { MessageHistoryStore } from '../../core/stores/messageHistoryStore';
 import { DEFAULT_MODEL_NAME, getModelConfig } from '../config';
 import {

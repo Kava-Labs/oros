@@ -1,5 +1,5 @@
-import { memo, useSyncExternalStore } from 'react';
-import { TextStreamStore } from '../../stores/textStreamStore';
+import { memo } from 'react';
+import { TextStreamStore, useTextStreamStore } from 'lib-kava-ai';
 
 interface StreamingTextProps {
   children: (text: string, onRendered: () => void) => React.ReactNode;
@@ -12,7 +12,7 @@ export const StreamingText = memo(function StreamingText({
   onRendered,
   store,
 }: StreamingTextProps) {
-  const text = useSyncExternalStore(store.subscribe, store.getSnapshot);
+  const text = useTextStreamStore(store);
 
   return <div>{children(text, onRendered)}</div>;
 });

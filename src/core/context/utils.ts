@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { TextStreamStore } from '../stores/textStreamStore';
+import { TextStreamStore } from 'lib-kava-ai';
 import { MessageHistoryStore } from '../stores/messageHistoryStore';
 import { ConversationHistory } from './types';
 import OpenAI from 'openai';

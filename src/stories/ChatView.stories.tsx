@@ -5,7 +5,7 @@ import { mockChatMessages, markDownSpecChatMessages } from './mockdata';
 import type { Decorator } from '@storybook/react';
 import { ThemeProvider } from '../shared/theme/themeProvider';
 import { AppContextProvider } from '../core/context/AppContextProvider';
-import { TextStreamStore } from '../core/stores/textStreamStore';
+import { TextStreamStore } from 'lib-kava-ai';
 import {
   ChatMessage,
   MessageHistoryStore,
