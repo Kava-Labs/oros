@@ -92,58 +92,41 @@ describe('useSession', () => {
   });
 
   // Core interaction events
+  /**
+   * wheel is used for tracking mouse wheel scrolls
+   * touchstart is used to track mobile scrolling
+   */
+  describe.each([
+    ['click'],
+    ['scroll'],
+    ['keydown'],
+    ['mousemove'],
+    ['wheel'],
+    ['touchstart'],
+  ])('useSession - throttle behavior on %s', (eventType) => {
+    it(`calls GET /session on ${eventType} after 5 minutes`, () => {
+      const fetchSpy = vi.spyOn(globalThis, 'fetch');
+      renderHook(() => useSession());
 
-  describe.each([['click'], ['scroll'], ['keydown']])(
-    'useSession - throttle behavior on %s',
-    (eventType) => {
-      it(`calls GET /session on ${eventType} after 5 minutes`, () => {
-        const fetchSpy = vi.spyOn(globalThis, 'fetch');
-        renderHook(() => useSession());
+      // Initial call on mount
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
 
-        // Initial call on mount
-        expect(fetchSpy).toHaveBeenCalledTimes(1);
+      // Advance time to just under 5 minutes
+      vi.advanceTimersByTime(4 * 60 * 1000);
+      window.dispatchEvent(new Event(eventType));
 
-        // Advance time to just under 5 minutes
-        vi.advanceTimersByTime(4 * 60 * 1000);
-        window.dispatchEvent(new Event(eventType));
+      // Should still be just the initial call
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
 
-        // Should still be just the initial call
-        expect(fetchSpy).toHaveBeenCalledTimes(1);
+      // Advance to just past 5 minutes total
+      vi.advanceTimersByTime(1 * 60 * 1000 + 1);
+      window.dispatchEvent(new Event(eventType));
 
-        // Advance to just past 5 minutes total
-        vi.advanceTimersByTime(1 * 60 * 1000 + 1);
-        window.dispatchEvent(new Event(eventType));
+      // Now the second call should happen
+      expect(fetchSpy).toHaveBeenCalledTimes(2);
 
-        // Now the second call should happen
-        expect(fetchSpy).toHaveBeenCalledTimes(2);
-
-        fetchSpy.mockRestore();
-      });
-    },
-  );
-
-  it.skip('calls GET /session on keydown after 5 minutes', () => {
-    renderHook(() => useSession());
-    // simulate keydown + timer
-  });
-
-  // Additional recommended interactions
-  it.skip('calls GET /session on mousemove after 5 minutes', () => {
-    renderHook(() => useSession());
-    // simulate mousemove + timer
-  });
-
-  it.skip('calls GET /session on wheel after 5 minutes', () => {
-    // Note: wheel events may occur without triggering scroll,
-    // so it's important to track them independently.
-    renderHook(() => useSession());
-    // simulate wheel + timer
-  });
-
-  it.skip('calls GET /session on touchstart after 5 minutes', () => {
-    // Note: touchstart is critical for mobile activity tracking.
-    renderHook(() => useSession());
-    // simulate touchstart + timer
+      fetchSpy.mockRestore();
+    });
   });
 
   it.skip('only calls GET /session once when multiple user events occur within 5 minutes', () => {

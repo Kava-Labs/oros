@@ -29,15 +29,24 @@ export function useSession() {
     const handleClick = () => handleUserActivity();
     const handleScroll = () => handleUserActivity();
     const handleKeydown = () => handleUserActivity();
+    const handleMousemove = () => handleUserActivity();
+    const handleWheel = () => handleUserActivity();
+    const handleTouchStart = () => handleUserActivity();
 
     window.addEventListener('click', handleClick);
     window.addEventListener('scroll', handleScroll);
     window.addEventListener('keydown', handleKeydown);
+    window.addEventListener('mousemove', handleMousemove);
+    window.addEventListener('wheel', handleWheel);
+    window.addEventListener('touchstart', handleTouchStart);
 
     return () => {
       window.removeEventListener('click', handleClick);
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('keydown', handleKeydown);
+      window.removeEventListener('mousemove', handleMousemove);
+      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('touchstart', handleTouchStart);
     };
   }, []);
 }
