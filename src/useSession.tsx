@@ -27,13 +27,6 @@ export function useSession() {
   useEffect(() => {
     pingSession(); // Initial ping
 
-    const handleClick = () => handleUserActivity();
-    const handleScroll = () => handleUserActivity();
-    const handleKeydown = () => handleUserActivity();
-    const handleMousemove = () => handleUserActivity();
-    const handleWheel = () => handleUserActivity();
-    const handleTouchStart = () => handleUserActivity();
-
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         handleUserActivity();
@@ -50,22 +43,25 @@ export function useSession() {
       navigator.sendBeacon('/session');
     };
 
-    window.addEventListener('click', handleClick);
-    window.addEventListener('scroll', handleScroll);
-    window.addEventListener('keydown', handleKeydown);
-    window.addEventListener('mousemove', handleMousemove);
-    window.addEventListener('wheel', handleWheel);
-    window.addEventListener('touchstart', handleTouchStart);
+    const userActivityEvents = [
+      'click',
+      'scroll',
+      'keydown',
+      'mousemove',
+      'wheel',
+      'touchstart',
+    ];
+
+    userActivityEvents.forEach((event) => {
+      window.addEventListener(event, handleUserActivity);
+    });
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('pagehide', handlePagehide);
 
     return () => {
-      window.removeEventListener('click', handleClick);
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('keydown', handleKeydown);
-      window.removeEventListener('mousemove', handleMousemove);
-      window.removeEventListener('wheel', handleWheel);
-      window.removeEventListener('touchstart', handleTouchStart);
+      userActivityEvents.forEach((event) => {
+        window.removeEventListener(event, handleUserActivity);
+      });
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('pagehide', handlePagehide);
     };
