@@ -1,5 +1,5 @@
 import styles from './Conversation.module.css';
-import { Fragment, memo, useState } from 'react';
+import { Fragment, memo } from 'react';
 import { useSyncExternalStore } from 'react';
 import { StreamingMessage } from './StreamingMessage';
 import { ErrorMessage } from './ErrorMessage';
@@ -29,11 +29,6 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
   );
 
   const { messages } = useMessageHistory();
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  const handleFileLoad = () => {
-    setIsLoaded(true);
-  };
 
   return (
     <div className={styles.conversationContainer} data-testid="conversation">
@@ -91,24 +86,14 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
               {hasImage ? (
                 <div className={styles.chatImage}>
                   {imageIDs.length > 1 ? (
-                    <ImageCarousel
-                      imageIDs={imageIDs}
-                      isLoaded={isLoaded}
-                      handleLoaded={handleFileLoad}
-                    />
+                    <ImageCarousel imageIDs={imageIDs} />
                   ) : (
-                    <>
-                      {!isLoaded && (
-                        <div className={styles.imageSkeleton}></div>
-                      )}
-                      <IdbImage
-                        width="256px"
-                        height="256px"
-                        id={imageIDs[0]}
-                        aria-label="File upload chat message"
-                        onLoad={handleFileLoad}
-                      />
-                    </>
+                    <IdbImage
+                      width="256px"
+                      height="256px"
+                      id={imageIDs[0]}
+                      aria-label="File upload chat message"
+                    />
                   )}
                 </div>
               ) : null}
