@@ -151,30 +151,78 @@ describe('useSession', () => {
   });
 
   // Visibility triggers
-  it.skip('calls GET /session on visibilitychange to visible after 5 minutes', () => {
+  it('calls GET /session on visibilitychange to visible after 5 minutes', () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
     renderHook(() => useSession());
-    // simulate visibilitychange + timer
+
+    // Initial mount
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+    // Advance time < 5 minutes
+    vi.advanceTimersByTime(4 * 60 * 1000);
+    Object.defineProperty(document, 'visibilityState', {
+      value: 'visible',
+      configurable: true,
+    });
+    document.dispatchEvent(new Event('visibilitychange'));
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+    // Advance to pass 5 minutes
+    vi.advanceTimersByTime(60 * 1000 + 1); // total = 5:00.001 since initial
+    document.dispatchEvent(new Event('visibilitychange'));
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+
+    fetchSpy.mockRestore();
   });
 
-  it.skip('does NOT call GET /session on visibilitychange to visible within debounce', () => {
+  it('throttles GET /session on visibilitychange to visible within 5 minutes of last call', () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
     renderHook(() => useSession());
-    // simulate event within 5-minute window
-  });
 
-  // Debounce logic
-  it.skip('does not call GET /session multiple times within 5 minutes of repeated events', () => {
-    renderHook(() => useSession());
-    // simulate repeated triggers within 5-minute debounce
+    // Initial call on mount
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+    // Simulate visibilitychange before 5 minutes
+    vi.advanceTimersByTime(2 * 60 * 1000);
+    Object.defineProperty(document, 'visibilityState', {
+      value: 'visible',
+      configurable: true,
+    });
+    document.dispatchEvent(new Event('visibilitychange'));
+
+    // Still within throttle window
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+    fetchSpy.mockRestore();
   });
 
   // Beacon-based session end
-  it.skip('calls navigator.sendBeacon on visibilitychange to hidden', () => {
+  it('calls navigator.sendBeacon on visibilitychange to hidden', () => {
+    const beaconSpy = vi.spyOn(navigator, 'sendBeacon');
+
     renderHook(() => useSession());
-    // simulate document becoming hidden
+
+    Object.defineProperty(document, 'visibilityState', {
+      value: 'hidden',
+      configurable: true,
+    });
+
+    document.dispatchEvent(new Event('visibilitychange'));
+
+    expect(beaconSpy).toHaveBeenCalledWith('/session');
+
+    beaconSpy.mockRestore();
   });
 
-  it.skip('calls navigator.sendBeacon on pagehide', () => {
+  it('calls navigator.sendBeacon on pagehide', () => {
+    const beaconSpy = vi.spyOn(navigator, 'sendBeacon');
+
     renderHook(() => useSession());
-    // simulate pagehide event
+
+    window.dispatchEvent(new Event('pagehide'));
+
+    expect(beaconSpy).toHaveBeenCalledWith('/session');
+
+    beaconSpy.mockRestore();
   });
 });
