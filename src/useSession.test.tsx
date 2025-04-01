@@ -93,57 +93,34 @@ describe('useSession', () => {
 
   // Core interaction events
 
-  /**
-   * These core events have potential to be table style tests
-   * since the output assertions should really be the same
-   */
-  it('calls GET /session on click after 5 minutes', () => {
-    const fetchSpy = vi.spyOn(globalThis, 'fetch');
-    renderHook(() => useSession());
+  describe.each([['click'], ['scroll']])(
+    'useSession - throttle behavior on %s',
+    (eventType) => {
+      it(`calls GET /session on ${eventType} after 5 minutes`, () => {
+        const fetchSpy = vi.spyOn(globalThis, 'fetch');
+        renderHook(() => useSession());
 
-    // Initial mount
-    expect(fetchSpy).toHaveBeenCalledTimes(1);
+        // Initial call on mount
+        expect(fetchSpy).toHaveBeenCalledTimes(1);
 
-    // Advance 4 minutes — not enough
-    vi.advanceTimersByTime(4 * 60 * 1000);
+        // Advance time to just under 5 minutes
+        vi.advanceTimersByTime(4 * 60 * 1000);
+        window.dispatchEvent(new Event(eventType));
 
-    // First click — should NOT trigger a call yet
-    window.dispatchEvent(new Event('click'));
-    expect(fetchSpy).toHaveBeenCalledTimes(1);
+        // Should still be just the initial call
+        expect(fetchSpy).toHaveBeenCalledTimes(1);
 
-    // Advance 1 more minute
-    vi.advanceTimersByTime(1 * 60 * 1000 + 1); // now total = 5:00.001
+        // Advance to just past 5 minutes total
+        vi.advanceTimersByTime(1 * 60 * 1000 + 1);
+        window.dispatchEvent(new Event(eventType));
 
-    // Second click — NOW should trigger another call
-    window.dispatchEvent(new Event('click'));
-    expect(fetchSpy).toHaveBeenCalledTimes(2);
+        // Now the second call should happen
+        expect(fetchSpy).toHaveBeenCalledTimes(2);
 
-    fetchSpy.mockRestore();
-  });
-
-  it('calls GET /session on scroll after 5 minutes', () => {
-    const fetchSpy = vi.spyOn(globalThis, 'fetch');
-    renderHook(() => useSession());
-
-    // Initial ping on mount
-    expect(fetchSpy).toHaveBeenCalledTimes(1);
-
-    // Advance 4 minutes — not enough
-    vi.advanceTimersByTime(4 * 60 * 1000);
-    window.dispatchEvent(new Event('scroll'));
-
-    // Still only 1 call
-    expect(fetchSpy).toHaveBeenCalledTimes(1);
-
-    // Advance just over 1 minute more
-    vi.advanceTimersByTime(60 * 1000 + 1); // now total = 5:00.001
-    window.dispatchEvent(new Event('scroll'));
-
-    // Should now trigger second ping
-    expect(fetchSpy).toHaveBeenCalledTimes(2);
-
-    fetchSpy.mockRestore();
-  });
+        fetchSpy.mockRestore();
+      });
+    },
+  );
 
   it.skip('calls GET /session on keydown after 5 minutes', () => {
     renderHook(() => useSession());
