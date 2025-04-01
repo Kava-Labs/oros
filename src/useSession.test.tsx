@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react';
-import { vi } from 'vitest';
+import { vi, MockInstance } from 'vitest';
 import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
 import { useSession } from './useSession';
@@ -8,6 +8,10 @@ import { useSession } from './useSession';
 const sessionHandler = vi.fn((_req) => {
   return new HttpResponse(null, { status: 204 });
 });
+
+const setupSessionHook = () => {
+  return renderHook(() => useSession());
+};
 
 const server = setupServer(http.get('/session', sessionHandler));
 
@@ -18,18 +22,36 @@ afterEach(() => {
 });
 afterAll(() => server.close());
 
+const advanceMinutesAndMs = (minutes: number, ms: number = 0) => {
+  vi.advanceTimersByTime(minutes * 60 * 1000 + ms);
+};
+
 describe('useSession', () => {
+  let fetchSpy: MockInstance;
+  let beaconSpy: MockInstance;
+
   beforeEach(() => {
     vi.useFakeTimers();
 
-    Object.defineProperty(navigator, 'sendBeacon', {
-      writable: true,
-      value: vi.fn(() => true),
-    });
+    fetchSpy = vi.spyOn(globalThis, 'fetch');
+
+    // Define navigator.sendBeacon if not present
+    if (typeof navigator.sendBeacon !== 'function') {
+      Object.defineProperty(navigator, 'sendBeacon', {
+        writable: true,
+        configurable: true,
+        value: vi.fn(() => true),
+      });
+    }
+
+    // Now that it's defined, spy on it
+    beaconSpy = vi.spyOn(navigator, 'sendBeacon');
   });
 
   afterEach(() => {
     vi.useRealTimers();
+    fetchSpy.mockRestore();
+    beaconSpy.mockRestore();
   });
 
   it('does not perform session tracking when GET /session fails on mount', () => {
@@ -40,29 +62,21 @@ describe('useSession', () => {
       }),
     );
 
-    const fetchSpy = vi.spyOn(globalThis, 'fetch');
-    const beaconSpy = vi.spyOn(navigator, 'sendBeacon');
-
     // Mount the hook – this will try the initial GET /session
-    renderHook(() => useSession());
+    setupSessionHook();
     expect(fetchSpy).toHaveBeenCalledWith('/session', expect.any(Object));
     expect(beaconSpy).not.toHaveBeenCalled();
 
     // Simulate interaction to verify no side effects occur
-    vi.advanceTimersByTime(5 * 60 * 1000);
+    advanceMinutesAndMs(5);
     window.dispatchEvent(new Event('click'));
 
     // Still no beacon activity — session tracking failed gracefully
     expect(beaconSpy).not.toHaveBeenCalled();
-
-    fetchSpy.mockRestore();
-    beaconSpy.mockRestore();
   });
 
   it('calls GET /session once on mount', () => {
-    const fetchSpy = vi.spyOn(globalThis, 'fetch');
-
-    renderHook(() => useSession());
+    setupSessionHook();
 
     expect(fetchSpy).toHaveBeenCalledTimes(1);
     expect(fetchSpy).toHaveBeenCalledWith(
@@ -72,23 +86,17 @@ describe('useSession', () => {
         credentials: 'include',
       }),
     );
-
-    fetchSpy.mockRestore();
   });
 
   it('does not call GET /session again if no user interaction occurs after 5 minutes', () => {
-    const fetchSpy = vi.spyOn(globalThis, 'fetch');
-
-    renderHook(() => useSession());
+    setupSessionHook();
     expect(fetchSpy).toHaveBeenCalledTimes(1);
 
     // Advance 6 minutes — no interaction
-    vi.advanceTimersByTime(6 * 60 * 1000);
+    advanceMinutesAndMs(6);
 
     // Still only 1 call should have happened
     expect(fetchSpy).toHaveBeenCalledTimes(1);
-
-    fetchSpy.mockRestore();
   });
 
   // Core interaction events
@@ -105,37 +113,33 @@ describe('useSession', () => {
     ['touchstart'],
   ])('useSession - throttle behavior on %s', (eventType) => {
     it(`calls GET /session on ${eventType} after 5 minutes`, () => {
-      const fetchSpy = vi.spyOn(globalThis, 'fetch');
-      renderHook(() => useSession());
+      setupSessionHook();
 
       // Initial call on mount
       expect(fetchSpy).toHaveBeenCalledTimes(1);
 
       // Advance time to just under 5 minutes
-      vi.advanceTimersByTime(4 * 60 * 1000);
+      advanceMinutesAndMs(4);
       window.dispatchEvent(new Event(eventType));
 
       // Should still be just the initial call
       expect(fetchSpy).toHaveBeenCalledTimes(1);
 
       // Advance to just past 5 minutes total
-      vi.advanceTimersByTime(1 * 60 * 1000 + 1);
+      advanceMinutesAndMs(1, 1);
       window.dispatchEvent(new Event(eventType));
 
       // Now the second call should happen
       expect(fetchSpy).toHaveBeenCalledTimes(2);
-
-      fetchSpy.mockRestore();
     });
   });
 
   it('only calls GET /session once when multiple user events occur within 5 minutes', () => {
-    const fetchSpy = vi.spyOn(globalThis, 'fetch');
-    renderHook(() => useSession());
+    setupSessionHook();
     // Initial call on mount
     expect(fetchSpy).toHaveBeenCalledTimes(1);
     // Advance a safe amount — 1 minute
-    vi.advanceTimersByTime(60 * 1000);
+    advanceMinutesAndMs(1);
     // Trigger multiple different events
     window.dispatchEvent(new Event('click'));
     window.dispatchEvent(new Event('scroll'));
@@ -144,22 +148,20 @@ describe('useSession', () => {
     window.dispatchEvent(new Event('wheel'));
     // Still within 5-minute window — no additional call should happen
     expect(fetchSpy).toHaveBeenCalledTimes(1);
-    vi.advanceTimersByTime(4 * 60 * 1000 + 1); // total = 5:00.001 since initial
+    advanceMinutesAndMs(4, 1); // total = 5:00.001 since initial
     window.dispatchEvent(new Event('keydown'));
     expect(fetchSpy).toHaveBeenCalledTimes(2);
-    fetchSpy.mockRestore();
   });
 
   // Visibility triggers
   it('calls GET /session on visibilitychange to visible after 5 minutes', () => {
-    const fetchSpy = vi.spyOn(globalThis, 'fetch');
-    renderHook(() => useSession());
+    setupSessionHook();
 
     // Initial mount
     expect(fetchSpy).toHaveBeenCalledTimes(1);
 
     // Advance time < 5 minutes
-    vi.advanceTimersByTime(4 * 60 * 1000);
+    advanceMinutesAndMs(4);
     Object.defineProperty(document, 'visibilityState', {
       value: 'visible',
       configurable: true,
@@ -168,22 +170,19 @@ describe('useSession', () => {
     expect(fetchSpy).toHaveBeenCalledTimes(1);
 
     // Advance to pass 5 minutes
-    vi.advanceTimersByTime(60 * 1000 + 1); // total = 5:00.001 since initial
+    advanceMinutesAndMs(1, 1); // total = 5:00.001 since initial
     document.dispatchEvent(new Event('visibilitychange'));
     expect(fetchSpy).toHaveBeenCalledTimes(2);
-
-    fetchSpy.mockRestore();
   });
 
   it('throttles GET /session on visibilitychange to visible within 5 minutes of last call', () => {
-    const fetchSpy = vi.spyOn(globalThis, 'fetch');
-    renderHook(() => useSession());
+    setupSessionHook();
 
     // Initial call on mount
     expect(fetchSpy).toHaveBeenCalledTimes(1);
 
     // Simulate visibilitychange before 5 minutes
-    vi.advanceTimersByTime(2 * 60 * 1000);
+    advanceMinutesAndMs(2);
     Object.defineProperty(document, 'visibilityState', {
       value: 'visible',
       configurable: true,
@@ -192,15 +191,11 @@ describe('useSession', () => {
 
     // Still within throttle window
     expect(fetchSpy).toHaveBeenCalledTimes(1);
-
-    fetchSpy.mockRestore();
   });
 
   // Beacon-based session end
   it('calls navigator.sendBeacon on visibilitychange to hidden', () => {
-    const beaconSpy = vi.spyOn(navigator, 'sendBeacon');
-
-    renderHook(() => useSession());
+    setupSessionHook();
 
     Object.defineProperty(document, 'visibilityState', {
       value: 'hidden',
@@ -208,21 +203,13 @@ describe('useSession', () => {
     });
 
     document.dispatchEvent(new Event('visibilitychange'));
-
     expect(beaconSpy).toHaveBeenCalledWith('/session');
-
-    beaconSpy.mockRestore();
   });
 
   it('calls navigator.sendBeacon on pagehide', () => {
-    const beaconSpy = vi.spyOn(navigator, 'sendBeacon');
-
-    renderHook(() => useSession());
+    setupSessionHook();
 
     window.dispatchEvent(new Event('pagehide'));
-
     expect(beaconSpy).toHaveBeenCalledWith('/session');
-
-    beaconSpy.mockRestore();
   });
 });
