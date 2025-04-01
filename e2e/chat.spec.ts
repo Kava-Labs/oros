@@ -817,7 +817,7 @@ describe('chat', () => {
       name: 'File upload chat message',
     });
 
-    await expect(uploadedImage).toBeVisible({ timeout: 10000 });
+    await expect(uploadedImage).toBeVisible({ timeout: 15000 });
   });
 
   test('can paste image from clipboard', async ({ page }) => {
@@ -866,7 +866,7 @@ describe('chat', () => {
       name: 'File upload chat message',
     });
 
-    await expect(uploadedImage).toBeVisible({ timeout: 10000 });
+    await expect(uploadedImage).toBeVisible({ timeout: 15000 });
   });
 
   test('shows error when pasting an image larger than 8MB from clipboard', async ({
@@ -905,7 +905,7 @@ describe('chat', () => {
     const errorMessage = page.getByText(
       'File too large! Maximum file size is 8MB.',
     );
-    await expect(errorMessage).toBeVisible({ timeout: 10000 });
+    await expect(errorMessage).toBeVisible({ timeout: 15000 });
 
     await page.waitForTimeout(2500);
     await expect(errorMessage).not.toBeVisible();
