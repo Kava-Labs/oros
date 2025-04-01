@@ -1,15 +1,44 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
-export const useSession = () => {
-  useEffect(() => {
+const FIVE_MINUTES = 5 * 60 * 1000;
+
+export function useSession() {
+  const lastPingTimeRef = useRef<number>(Date.now());
+
+  const pingSession = () => {
+    // update current time to track against last ping
+    lastPingTimeRef.current = Date.now();
     fetch('/session', {
       method: 'GET',
       credentials: 'include',
     }).catch(() => {
-      // Silently fail — don't block app if session ping fails
+      // Silently ignore errors
     });
+  };
+
+  const handleUserActivity = () => {
+    const now = Date.now();
+    const timeSinceLastPing = now - lastPingTimeRef.current;
+
+    if (timeSinceLastPing >= FIVE_MINUTES) {
+      pingSession();
+    }
+  };
+
+  useEffect(() => {
+    // Initial session ping on mount
+    pingSession();
+
+    // Event listeners — can add more later
+    const handleClick = () => handleUserActivity();
+
+    window.addEventListener('click', handleClick);
+
+    return () => {
+      window.removeEventListener('click', handleClick);
+    };
   }, []);
-};
+}
 
 // type SessionResponse = {
 //   session_id: string;

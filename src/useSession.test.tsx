@@ -76,10 +76,49 @@ describe('useSession', () => {
     fetchSpy.mockRestore();
   });
 
-  // Core interaction events
-  it.skip('calls GET /session on click after 5 minutes', () => {
+  it('does not call GET /session again if no user interaction occurs after 5 minutes', () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+
     renderHook(() => useSession());
-    // simulate click + timer
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+    // Advance 6 minutes — no interaction
+    vi.advanceTimersByTime(6 * 60 * 1000);
+
+    // Still only 1 call should have happened
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+    fetchSpy.mockRestore();
+  });
+
+  // Core interaction events
+
+  /**
+   * These core events have potential to be table style tests
+   * since the output assertions should really be the same
+   */
+  it('calls GET /session on click after 5 minutes', () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+    renderHook(() => useSession());
+
+    // Initial mount
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+    // Advance 4 minutes — not enough
+    vi.advanceTimersByTime(4 * 60 * 1000);
+
+    // First click — should NOT trigger a call yet
+    window.dispatchEvent(new Event('click'));
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+    // Advance 1 more minute
+    vi.advanceTimersByTime(1 * 60 * 1000 + 1); // now total = 5:00.001
+
+    // Second click — NOW should trigger another call
+    window.dispatchEvent(new Event('click'));
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+
+    fetchSpy.mockRestore();
   });
 
   it.skip('calls GET /session on scroll after 5 minutes', () => {
@@ -109,6 +148,26 @@ describe('useSession', () => {
     // Note: touchstart is critical for mobile activity tracking.
     renderHook(() => useSession());
     // simulate touchstart + timer
+  });
+
+  it.skip('only calls GET /session once when multiple user events occur within 5 minutes', () => {
+    // const fetchSpy = vi.spyOn(globalThis, 'fetch');
+    // renderHook(() => useSession());
+    // // Initial call on mount
+    // expect(fetchSpy).toHaveBeenCalledTimes(1);
+    // // Advance a safe amount — 1 minute
+    // vi.advanceTimersByTime(60 * 1000);
+    // // Trigger multiple different events
+    // window.dispatchEvent(new Event('click'));
+    // window.dispatchEvent(new Event('scroll'));
+    // window.dispatchEvent(new Event('keydown'));
+    // window.dispatchEvent(new Event('mousemove'));
+    // window.dispatchEvent(new Event('wheel'));
+    // // Still within 5-minute window — no additional call should happen
+    // expect(fetchSpy).toHaveBeenCalledTimes(1);
+    // vi.advanceTimersByTime(60 * 5 * 1000);
+    // expect(fetchSpy).toHaveBeenCalledTimes(2);
+    // fetchSpy.mockRestore();
   });
 
   // Visibility triggers
