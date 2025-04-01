@@ -81,6 +81,10 @@ describe('Conversation', () => {
         subscribe: mockSubscribe,
         getSnapshot: mockGetSnapshot,
       },
+      messageStore: {
+        subscribe: mockSubscribe,
+        getSnapshot: mockGetSnapshot,
+      },
       isRequesting: false,
     });
 
@@ -134,18 +138,40 @@ describe('Conversation', () => {
     expect(reasoningContent).toHaveTextContent('Thinking about response');
   });
 
-  it('renders streaming message when isRequesting is true', () => {
+  it('renders progress icon when isRequesting is true before assistant stream starts', () => {
     (useAppContext as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
       errorStore: {
         subscribe: mockSubscribe,
         getSnapshot: mockGetSnapshot,
+      },
+      messageStore: {
+        subscribe: mockSubscribe,
+        getSnapshot: () => '',
       },
       isRequesting: true,
     });
 
     render(<Conversation onRendered={mockOnRendered} />);
 
-    expect(screen.getByTestId('streaming-message')).toBeInTheDocument();
+    expect(screen.getByLabelText('Progress Icon')).toBeInTheDocument();
+  });
+
+  it('hides progress icon when isRequesting is true and assistant stream starts', () => {
+    (useAppContext as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+      errorStore: {
+        subscribe: mockSubscribe,
+        getSnapshot: mockGetSnapshot,
+      },
+      messageStore: {
+        subscribe: mockSubscribe,
+        getSnapshot: () => 'Hi',
+      },
+      isRequesting: true,
+    });
+
+    render(<Conversation onRendered={mockOnRendered} />);
+
+    expect(screen.queryByLabelText('Progress Icon')).not.toBeInTheDocument();
   });
 
   it('renders error message when error exists', () => {
@@ -155,6 +181,10 @@ describe('Conversation', () => {
       errorStore: {
         subscribe: mockSubscribe,
         getSnapshot: vi.fn().mockReturnValue(mockErrorText),
+      },
+      messageStore: {
+        subscribe: mockSubscribe,
+        getSnapshot: () => '',
       },
       isRequesting: false,
     });
