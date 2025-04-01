@@ -18,9 +18,7 @@ export function useSession() {
 
   const handleUserActivity = () => {
     const now = Date.now();
-    const timeSinceLastPing = now - lastPingTimeRef.current;
-
-    if (timeSinceLastPing >= FIVE_MINUTES) {
+    if (now - lastPingTimeRef.current >= FIVE_MINUTES) {
       pingSession();
     }
   };
@@ -29,13 +27,16 @@ export function useSession() {
     // Initial session ping on mount
     pingSession();
 
-    // Event listeners — can add more later
+    // Event listeners
     const handleClick = () => handleUserActivity();
+    const handleScroll = () => handleUserActivity();
 
     window.addEventListener('click', handleClick);
+    window.addEventListener('scroll', handleScroll);
 
     return () => {
       window.removeEventListener('click', handleClick);
+      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 }

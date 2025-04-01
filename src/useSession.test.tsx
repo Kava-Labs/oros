@@ -121,9 +121,28 @@ describe('useSession', () => {
     fetchSpy.mockRestore();
   });
 
-  it.skip('calls GET /session on scroll after 5 minutes', () => {
+  it('calls GET /session on scroll after 5 minutes', () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
     renderHook(() => useSession());
-    // simulate scroll + timer
+
+    // Initial ping on mount
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+    // Advance 4 minutes — not enough
+    vi.advanceTimersByTime(4 * 60 * 1000);
+    window.dispatchEvent(new Event('scroll'));
+
+    // Still only 1 call
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+    // Advance just over 1 minute more
+    vi.advanceTimersByTime(60 * 1000 + 1); // now total = 5:00.001
+    window.dispatchEvent(new Event('scroll'));
+
+    // Should now trigger second ping
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+
+    fetchSpy.mockRestore();
   });
 
   it.skip('calls GET /session on keydown after 5 minutes', () => {
