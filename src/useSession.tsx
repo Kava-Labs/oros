@@ -2,8 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 
 export const useSession = () => {
   useEffect(() => {
-    fetch('/session', { method: 'GET', credentials: 'include' }).catch(() => {
-      // Intentionally ignore failure — session tracking silently fails
+    fetch('/session', {
+      method: 'GET',
+      credentials: 'include',
+    }).catch(() => {
+      // Silently fail — don't block app if session ping fails
     });
   }, []);
 };

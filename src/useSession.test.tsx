@@ -32,7 +32,7 @@ describe('useSession', () => {
     vi.useRealTimers();
   });
 
-  it.only('does not perform session tracking when GET /session fails on mount', () => {
+  it('does not perform session tracking when GET /session fails on mount', () => {
     // Override the MSW handler to simulate API failure
     server.use(
       http.get('/session', () => {
@@ -60,69 +60,81 @@ describe('useSession', () => {
   });
 
   it('calls GET /session once on mount', () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+
     renderHook(() => useSession());
-    // expect(sessionHandler).toHaveBeenCalledTimes(1);
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(fetchSpy).toHaveBeenCalledWith(
+      '/session',
+      expect.objectContaining({
+        method: 'GET',
+        credentials: 'include',
+      }),
+    );
+
+    fetchSpy.mockRestore();
   });
 
   // Core interaction events
-  it('calls GET /session on click after 5 minutes', () => {
+  it.skip('calls GET /session on click after 5 minutes', () => {
     renderHook(() => useSession());
     // simulate click + timer
   });
 
-  it('calls GET /session on scroll after 5 minutes', () => {
+  it.skip('calls GET /session on scroll after 5 minutes', () => {
     renderHook(() => useSession());
     // simulate scroll + timer
   });
 
-  it('calls GET /session on keydown after 5 minutes', () => {
+  it.skip('calls GET /session on keydown after 5 minutes', () => {
     renderHook(() => useSession());
     // simulate keydown + timer
   });
 
   // Additional recommended interactions
-  it('calls GET /session on mousemove after 5 minutes', () => {
+  it.skip('calls GET /session on mousemove after 5 minutes', () => {
     renderHook(() => useSession());
     // simulate mousemove + timer
   });
 
-  it('calls GET /session on wheel after 5 minutes', () => {
+  it.skip('calls GET /session on wheel after 5 minutes', () => {
     // Note: wheel events may occur without triggering scroll,
     // so it's important to track them independently.
     renderHook(() => useSession());
     // simulate wheel + timer
   });
 
-  it('calls GET /session on touchstart after 5 minutes', () => {
+  it.skip('calls GET /session on touchstart after 5 minutes', () => {
     // Note: touchstart is critical for mobile activity tracking.
     renderHook(() => useSession());
     // simulate touchstart + timer
   });
 
   // Visibility triggers
-  it('calls GET /session on visibilitychange to visible after 5 minutes', () => {
+  it.skip('calls GET /session on visibilitychange to visible after 5 minutes', () => {
     renderHook(() => useSession());
     // simulate visibilitychange + timer
   });
 
-  it('does NOT call GET /session on visibilitychange to visible within debounce', () => {
+  it.skip('does NOT call GET /session on visibilitychange to visible within debounce', () => {
     renderHook(() => useSession());
     // simulate event within 5-minute window
   });
 
   // Debounce logic
-  it('does not call GET /session multiple times within 5 minutes of repeated events', () => {
+  it.skip('does not call GET /session multiple times within 5 minutes of repeated events', () => {
     renderHook(() => useSession());
     // simulate repeated triggers within 5-minute debounce
   });
 
   // Beacon-based session end
-  it('calls navigator.sendBeacon on visibilitychange to hidden', () => {
+  it.skip('calls navigator.sendBeacon on visibilitychange to hidden', () => {
     renderHook(() => useSession());
     // simulate document becoming hidden
   });
 
-  it('calls navigator.sendBeacon on pagehide', () => {
+  it.skip('calls navigator.sendBeacon on pagehide', () => {
     renderHook(() => useSession());
     // simulate pagehide event
   });
