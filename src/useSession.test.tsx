@@ -93,7 +93,7 @@ describe('useSession', () => {
 
   // Core interaction events
 
-  describe.each([['click'], ['scroll']])(
+  describe.each([['click'], ['scroll'], ['keydown']])(
     'useSession - throttle behavior on %s',
     (eventType) => {
       it(`calls GET /session on ${eventType} after 5 minutes`, () => {

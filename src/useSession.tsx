@@ -24,19 +24,20 @@ export function useSession() {
   };
 
   useEffect(() => {
-    // Initial session ping on mount
-    pingSession();
+    pingSession(); // Initial ping
 
-    // Event listeners
     const handleClick = () => handleUserActivity();
     const handleScroll = () => handleUserActivity();
+    const handleKeydown = () => handleUserActivity();
 
     window.addEventListener('click', handleClick);
     window.addEventListener('scroll', handleScroll);
+    window.addEventListener('keydown', handleKeydown);
 
     return () => {
       window.removeEventListener('click', handleClick);
       window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('keydown', handleKeydown);
     };
   }, []);
 }
