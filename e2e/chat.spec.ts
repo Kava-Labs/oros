@@ -1,7 +1,9 @@
-import { describe, expect, test } from './fixtures';
+import { expect, test } from '@playwright/test';
 import { Chat } from './Chat';
 import * as fs from 'fs';
 import { join } from 'path';
+
+const { describe } = test;
 
 describe('chat', () => {
   test('renders intro messages by model', async ({ page }) => {
