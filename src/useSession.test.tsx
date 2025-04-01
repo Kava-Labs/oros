@@ -129,24 +129,25 @@ describe('useSession', () => {
     });
   });
 
-  it.skip('only calls GET /session once when multiple user events occur within 5 minutes', () => {
-    // const fetchSpy = vi.spyOn(globalThis, 'fetch');
-    // renderHook(() => useSession());
-    // // Initial call on mount
-    // expect(fetchSpy).toHaveBeenCalledTimes(1);
-    // // Advance a safe amount — 1 minute
-    // vi.advanceTimersByTime(60 * 1000);
-    // // Trigger multiple different events
-    // window.dispatchEvent(new Event('click'));
-    // window.dispatchEvent(new Event('scroll'));
-    // window.dispatchEvent(new Event('keydown'));
-    // window.dispatchEvent(new Event('mousemove'));
-    // window.dispatchEvent(new Event('wheel'));
-    // // Still within 5-minute window — no additional call should happen
-    // expect(fetchSpy).toHaveBeenCalledTimes(1);
-    // vi.advanceTimersByTime(60 * 5 * 1000);
-    // expect(fetchSpy).toHaveBeenCalledTimes(2);
-    // fetchSpy.mockRestore();
+  it('only calls GET /session once when multiple user events occur within 5 minutes', () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+    renderHook(() => useSession());
+    // Initial call on mount
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    // Advance a safe amount — 1 minute
+    vi.advanceTimersByTime(60 * 1000);
+    // Trigger multiple different events
+    window.dispatchEvent(new Event('click'));
+    window.dispatchEvent(new Event('scroll'));
+    window.dispatchEvent(new Event('keydown'));
+    window.dispatchEvent(new Event('mousemove'));
+    window.dispatchEvent(new Event('wheel'));
+    // Still within 5-minute window — no additional call should happen
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    vi.advanceTimersByTime(4 * 60 * 1000 + 1); // total = 5:00.001 since initial
+    window.dispatchEvent(new Event('keydown'));
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    fetchSpy.mockRestore();
   });
 
   // Visibility triggers
