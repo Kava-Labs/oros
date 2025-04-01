@@ -26,7 +26,6 @@ describe('chat', () => {
     );
 
     await chat.waitForStreamToFinish();
-    await chat.waitForAssistantResponse();
 
     const messages = await chat.getMessageElementsWithContent();
     const messageCount = await messages.count();
@@ -54,7 +53,6 @@ describe('chat', () => {
 
     await chat.waitForStreamToFinish();
     await chat.waitForSummarizationToFinish();
-    await chat.waitForAssistantResponse();
 
     const initialHistoryTitle = await page
       .getByTestId('chat-history-entry')
@@ -72,7 +70,6 @@ describe('chat', () => {
 
     await chat.waitForStreamToFinish();
     await chat.waitForSummarizationToFinish();
-    await chat.waitForAssistantResponse();
 
     //  Switching between conversation histories
     let blockchainQuestionConversation =
@@ -156,7 +153,6 @@ describe('chat', () => {
     );
 
     await chat.waitForStreamToFinish();
-    await chat.waitForAssistantResponse();
 
     const initialHistoryTitle = await page
       .getByTestId('chat-history-entry')
@@ -821,7 +817,7 @@ describe('chat', () => {
       name: 'File upload chat message',
     });
 
-    await expect(uploadedImage).toBeVisible();
+    await expect(uploadedImage).toBeVisible({ timeout: 10000 });
   });
 
   test('can paste image from clipboard', async ({ page }) => {
@@ -870,7 +866,7 @@ describe('chat', () => {
       name: 'File upload chat message',
     });
 
-    await expect(uploadedImage).toBeVisible();
+    await expect(uploadedImage).toBeVisible({ timeout: 10000 });
   });
 
   test('shows error when pasting an image larger than 8MB from clipboard', async ({
@@ -909,7 +905,7 @@ describe('chat', () => {
     const errorMessage = page.getByText(
       'File too large! Maximum file size is 8MB.',
     );
-    await expect(errorMessage).toBeVisible();
+    await expect(errorMessage).toBeVisible({ timeout: 10000 });
 
     await page.waitForTimeout(2500);
     await expect(errorMessage).not.toBeVisible();

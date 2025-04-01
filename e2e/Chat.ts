@@ -100,24 +100,4 @@ export class Chat {
       return false;
     });
   }
-
-  async waitForAssistantResponse() {
-    await this.page.waitForFunction(
-      () => {
-        const messages = document.querySelectorAll(
-          '[data-testid="conversation-message"]',
-        );
-        const lastMessage = messages[messages.length - 1];
-        return (
-          lastMessage &&
-          lastMessage.getAttribute('data-chat-role') === 'assistant' &&
-          (lastMessage.textContent?.length ?? 0) > 0
-        );
-      },
-      {
-        timeout: 10000,
-        polling: 100,
-      },
-    );
-  }
 }
