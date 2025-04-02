@@ -12,6 +12,7 @@ export interface ChatViewProps {
   onPanelOpen(): void;
   isPanelOpen: boolean;
   supportsUpload: boolean;
+  showModelSelector: boolean;
 }
 
 export const ChatView = ({
@@ -19,6 +20,7 @@ export const ChatView = ({
   onPanelOpen,
   isPanelOpen,
   supportsUpload,
+  showModelSelector,
 }: ChatViewProps) => {
   const { hasMessages } = useMessageHistory();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -73,6 +75,7 @@ export const ChatView = ({
             onPanelOpen={onPanelOpen}
             isPanelOpen={isPanelOpen}
             onMenu={onMenu}
+            showModelSelector={showModelSelector}
           />
         </div>
 

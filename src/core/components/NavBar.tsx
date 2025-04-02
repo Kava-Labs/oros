@@ -6,13 +6,19 @@ import { NewChatButton } from '../assets/NewChatButton';
 import { ModelSelector } from './ModelSelector';
 import { useAppContext } from '../context/useAppContext';
 
-interface NavBarProps {
+export interface NavBarProps {
   onMenu(): void;
   onPanelOpen(): void;
   isPanelOpen: boolean;
+  showModelSelector: boolean;
 }
 
-export const NavBar = ({ onMenu, onPanelOpen, isPanelOpen }: NavBarProps) => {
+export const NavBar = ({
+  onMenu,
+  onPanelOpen,
+  isPanelOpen,
+  showModelSelector,
+}: NavBarProps) => {
   const isMobile = useIsMobile();
 
   const { startNewChat } = useAppContext();
@@ -37,7 +43,7 @@ export const NavBar = ({ onMenu, onPanelOpen, isPanelOpen }: NavBarProps) => {
               onClick={startNewChat}
               className={styles.newChatDesktop}
             />
-            <ModelSelector />
+            {showModelSelector && <ModelSelector />}
           </div>
         ) : (
           <div className={styles.menu}>
@@ -55,7 +61,7 @@ export const NavBar = ({ onMenu, onPanelOpen, isPanelOpen }: NavBarProps) => {
       </div>
 
       <div className={styles.centerSection}>
-        {isMobile && <ModelSelector />}
+        {isMobile && showModelSelector && <ModelSelector />}
       </div>
 
       <div className={styles.rightSection}>

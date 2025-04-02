@@ -74,6 +74,7 @@ const args: ChatViewProps = {
   onPanelOpen: fn(),
   isPanelOpen: false,
   supportsUpload: true,
+  showModelSelector: true,
 };
 
 // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args

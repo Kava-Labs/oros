@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi } from 'vitest';
-import { NavBar } from './NavBar';
+import { NavBar, NavBarProps } from './NavBar';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
 import { AppContextProvider } from '../context/AppContextProvider';
 import { TextStreamStore } from 'lib-kava-ai';
@@ -30,10 +30,11 @@ vi.mock('../assets/NewChatButton', () => ({
 }));
 
 describe('NavBar', () => {
-  const mockProps = {
+  const mockProps: NavBarProps = {
     onMenu: vi.fn(),
     onPanelOpen: vi.fn(),
     isPanelOpen: false,
+    showModelSelector: true,
   };
 
   beforeEach(() => {
