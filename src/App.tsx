@@ -10,7 +10,8 @@ import { MobileSideBar } from './core/components/MobileSideBar';
 import { MobileBackdrop } from './core/components/MobileBackdrop';
 
 export const App = () => {
-  const { isReady } = useAppContext();
+  const { isReady, modelConfig } = useAppContext();
+  const { supportedFileTypes } = modelConfig;
   const isMobile = useIsMobile();
 
   /*
@@ -64,6 +65,7 @@ export const App = () => {
               onMenu={() => setIsMobileSideBarOpen(true)}
               onPanelOpen={() => setIsDesktopSideBarHidden(false)}
               isPanelOpen={!isDesktopSideBarHidden}
+              supportsUpload={supportedFileTypes.length > 0}
             />
           </div>
         </div>
