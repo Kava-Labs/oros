@@ -1,5 +1,8 @@
 import { useEffect, useRef } from 'react';
 
+const RAILS_API_BASE_URL = import.meta.env.VITE_RAILS_API_BASE_URL ?? '';
+export const sessionUrl = `${RAILS_API_BASE_URL}/session`;
+export const heartbeatUrl = `${sessionUrl}/heartbeat`;
 const FIVE_MINUTES = 5 * 60 * 1000;
 
 export function useSession() {
@@ -8,8 +11,7 @@ export function useSession() {
   const getSession = () => {
     // update current time to track against last ping
     lastPingTimeRef.current = Date.now();
-    // http://localhost:3001/session
-    fetch('/session', {
+    fetch(sessionUrl, {
       method: 'GET',
       credentials: 'include',
     }).catch(() => {
@@ -19,7 +21,7 @@ export function useSession() {
 
   const postHeartbeat = () => {
     lastPingTimeRef.current = Date.now();
-    fetch('/session/heartbeat', {
+    fetch(heartbeatUrl, {
       method: 'POST',
       credentials: 'include',
     }).catch(() => {
@@ -28,7 +30,7 @@ export function useSession() {
   };
 
   const sendBeacon = () => {
-    navigator.sendBeacon('/session/heartbeat');
+    navigator.sendBeacon(heartbeatUrl);
   };
 
   const handleUserActivity = () => {

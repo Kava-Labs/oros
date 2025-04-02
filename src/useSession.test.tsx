@@ -2,15 +2,15 @@ import { renderHook } from '@testing-library/react';
 import { vi, MockInstance } from 'vitest';
 import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
-import { useSession } from './useSession';
+import { useSession, sessionUrl, heartbeatUrl } from './useSession';
 
 // MSW handler for GET /session
 const getSessionHandler = http.get(
-  '/session',
+  sessionUrl,
   () => new HttpResponse(null, { status: 204 }),
 );
 const postHeartbeatHandler = http.post(
-  '/session/heartbeat',
+  heartbeatUrl,
   () => new HttpResponse(null, { status: 204 }),
 );
 
@@ -61,21 +61,18 @@ describe('useSession', () => {
   it('does not perform session tracking when GET /session fails on mount', () => {
     // Override the MSW handler to simulate API failure
     server.use(
-      http.get('/session', () => new HttpResponse(null, { status: 500 })),
-      http.post(
-        '/session/heartbeat',
-        () => new HttpResponse(null, { status: 500 }),
-      ),
+      http.get(sessionUrl, () => new HttpResponse(null, { status: 500 })),
+      http.post(heartbeatUrl, () => new HttpResponse(null, { status: 500 })),
     );
 
     setupSessionHook();
 
     // GET /session should have been attempted
-    expect(fetchSpy).toHaveBeenCalledWith('/session', expect.any(Object));
+    expect(fetchSpy).toHaveBeenCalledWith(sessionUrl, expect.any(Object));
 
     // No POST yet (we haven't hit the 5-minute mark)
     expect(fetchSpy).not.toHaveBeenCalledWith(
-      '/session/heartbeat',
+      heartbeatUrl,
       expect.objectContaining({ method: 'POST' }),
     );
 
@@ -85,7 +82,7 @@ describe('useSession', () => {
 
     // Heartbeat should still be fired — backend will decide what to do
     expect(fetchSpy).toHaveBeenCalledWith(
-      '/session/heartbeat',
+      heartbeatUrl,
       expect.objectContaining({ method: 'POST' }),
     );
   });
@@ -95,7 +92,7 @@ describe('useSession', () => {
 
     expect(fetchSpy).toHaveBeenCalledTimes(1);
     expect(fetchSpy).toHaveBeenCalledWith(
-      '/session',
+      sessionUrl,
       expect.objectContaining({
         method: 'GET',
         credentials: 'include',
@@ -103,7 +100,7 @@ describe('useSession', () => {
     );
 
     expect(fetchSpy).not.toHaveBeenCalledWith(
-      '/session/heartbeat',
+      heartbeatUrl,
       expect.objectContaining({ method: 'POST' }),
     );
   });
@@ -118,7 +115,7 @@ describe('useSession', () => {
     // Still only 1 call should have happened
     expect(fetchSpy).toHaveBeenCalledTimes(1);
     expect(fetchSpy).not.toHaveBeenCalledWith(
-      '/session/heartbeat',
+      heartbeatUrl,
       expect.objectContaining({ method: 'POST' }),
     );
   });
@@ -141,7 +138,7 @@ describe('useSession', () => {
 
       // Initial mount should trigger GET /session
       expect(fetchSpy).toHaveBeenCalledWith(
-        '/session',
+        sessionUrl,
         expect.objectContaining({ method: 'GET' }),
       );
 
@@ -149,7 +146,7 @@ describe('useSession', () => {
       advanceMinutesAndMs(4);
       window.dispatchEvent(new Event(eventType));
       expect(fetchSpy).not.toHaveBeenCalledWith(
-        '/session/heartbeat',
+        heartbeatUrl,
         expect.objectContaining({ method: 'POST' }),
       );
 
@@ -159,7 +156,7 @@ describe('useSession', () => {
 
       // Now heartbeat POST should be called
       expect(fetchSpy).toHaveBeenCalledWith(
-        '/session/heartbeat',
+        heartbeatUrl,
         expect.objectContaining({ method: 'POST' }),
       );
 
@@ -172,7 +169,7 @@ describe('useSession', () => {
 
     // Initial GET on mount
     expect(fetchSpy).toHaveBeenCalledWith(
-      '/session',
+      sessionUrl,
       expect.objectContaining({ method: 'GET' }),
     );
 
@@ -187,7 +184,7 @@ describe('useSession', () => {
 
     // Should NOT have sent a POST yet
     expect(fetchSpy).not.toHaveBeenCalledWith(
-      '/session/heartbeat',
+      heartbeatUrl,
       expect.objectContaining({ method: 'POST' }),
     );
 
@@ -197,7 +194,7 @@ describe('useSession', () => {
 
     // Now it should send the heartbeat
     expect(fetchSpy).toHaveBeenCalledWith(
-      '/session/heartbeat',
+      heartbeatUrl,
       expect.objectContaining({ method: 'POST' }),
     );
 
@@ -211,7 +208,7 @@ describe('useSession', () => {
 
     // Initial call on mount (GET)
     expect(fetchSpy).toHaveBeenCalledWith(
-      '/session',
+      sessionUrl,
       expect.objectContaining({ method: 'GET' }),
     );
 
@@ -224,7 +221,7 @@ describe('useSession', () => {
     document.dispatchEvent(new Event('visibilitychange'));
 
     expect(fetchSpy).not.toHaveBeenCalledWith(
-      '/session/heartbeat',
+      heartbeatUrl,
       expect.objectContaining({ method: 'POST' }),
     );
 
@@ -234,7 +231,7 @@ describe('useSession', () => {
 
     // Now it should POST
     expect(fetchSpy).toHaveBeenCalledWith(
-      '/session/heartbeat',
+      heartbeatUrl,
       expect.objectContaining({ method: 'POST' }),
     );
 
@@ -270,13 +267,13 @@ describe('useSession', () => {
     });
 
     document.dispatchEvent(new Event('visibilitychange'));
-    expect(beaconSpy).toHaveBeenCalledWith('/session/heartbeat');
+    expect(beaconSpy).toHaveBeenCalledWith(heartbeatUrl);
   });
 
   it('calls navigator.sendBeacon on pagehide', () => {
     setupSessionHook();
 
     window.dispatchEvent(new Event('pagehide'));
-    expect(beaconSpy).toHaveBeenCalledWith('/session/heartbeat');
+    expect(beaconSpy).toHaveBeenCalledWith(heartbeatUrl);
   });
 });
