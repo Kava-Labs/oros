@@ -1,9 +1,7 @@
 import styles from './SearchChatHistory.module.css';
 import {
   formatContentSnippet,
-  formatConversationTitle,
   groupAndFilterConversations,
-  highlightMatch,
 } from '../utils/conversation/helpers';
 import React, { useRef } from 'react';
 import { ConversationHistory } from '../context/types';
@@ -11,6 +9,7 @@ import { useAppContext } from '../context/useAppContext';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
 import { X as CloseX } from 'lucide-react';
 import ButtonIcon from './ButtonIcon';
+import { formatConversationTitle, highlightMatch } from 'lib-kava-ai';
 
 interface SearchModalBodyProps {
   conversations: ConversationHistory[];

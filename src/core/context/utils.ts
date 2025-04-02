@@ -5,7 +5,7 @@ import { ConversationHistory } from './types';
 import OpenAI from 'openai';
 import { ModelConfig } from '../types/models';
 import { isContentChunk } from '../utils/streamUtils';
-import { formatConversationTitle } from '../utils/conversation/helpers';
+import { formatConversationTitle } from 'lib-kava-ai';
 import {
   ChatCompletionChunk,
   ChatCompletionContentPart,
