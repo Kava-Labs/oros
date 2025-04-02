@@ -23,7 +23,7 @@ import { useUploadingError } from '../hooks/useUploadingError';
 
 const DEFAULT_HEIGHT = '30px';
 
-interface ChatInputProps {
+export interface ChatInputProps {
   setShouldAutoScroll: (s: boolean) => void;
   supportsUpload: boolean;
 }
