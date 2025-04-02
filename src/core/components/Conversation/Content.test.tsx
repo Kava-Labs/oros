@@ -1,11 +1,11 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 import { Content, ContentComponent } from './Content';
-import { sanitizeContent } from '../../utils/sanitize';
+import { sanitizeContent } from 'lib-kava-ai';
 import { useAppContext } from '../../context/useAppContext';
 
 // Mock the required modules and hooks
-vi.mock('../../utils/sanitize');
+vi.mock('lib-kava-ai');
 vi.mock('../../context/useAppContext');
 
 describe('Content Component', () => {

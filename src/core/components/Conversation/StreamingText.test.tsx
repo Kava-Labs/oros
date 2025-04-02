@@ -1,6 +1,6 @@
 import { render, screen, act } from '@testing-library/react';
 import { StreamingText } from './StreamingText';
-import { TextStreamStore } from '../../stores/textStreamStore';
+import { TextStreamStore } from 'lib-kava-ai';
 
 describe('StreamingText', () => {
   it('renders with the initial snapshot of the store', () => {

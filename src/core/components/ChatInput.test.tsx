@@ -1,7 +1,7 @@
 import { fireEvent, render } from '@testing-library/react';
 import { ThemeProvider } from '../../shared/theme/themeProvider';
 import { AppContextProvider } from '../context/AppContextProvider';
-import { TextStreamStore } from '../stores/textStreamStore';
+import { TextStreamStore } from 'lib-kava-ai';
 import { MessageHistoryStore } from '../stores/messageHistoryStore';
 import ChatInput from './ChatInput';
 import { vi } from 'vitest';
