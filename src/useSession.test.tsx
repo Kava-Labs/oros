@@ -5,20 +5,24 @@ import { http, HttpResponse } from 'msw';
 import { useSession } from './useSession';
 
 // MSW handler for GET /session
-const sessionHandler = vi.fn((_req) => {
-  return new HttpResponse(null, { status: 204 });
-});
+const getSessionHandler = http.get(
+  '/session',
+  () => new HttpResponse(null, { status: 204 }),
+);
+const postHeartbeatHandler = http.post(
+  '/session/heartbeat',
+  () => new HttpResponse(null, { status: 204 }),
+);
+
+const server = setupServer(getSessionHandler, postHeartbeatHandler);
 
 const setupSessionHook = () => {
   return renderHook(() => useSession());
 };
 
-const server = setupServer(http.get('/session', sessionHandler));
-
 beforeAll(() => server.listen());
 afterEach(() => {
   server.resetHandlers();
-  sessionHandler.mockClear();
 });
 afterAll(() => server.close());
 
@@ -57,22 +61,33 @@ describe('useSession', () => {
   it('does not perform session tracking when GET /session fails on mount', () => {
     // Override the MSW handler to simulate API failure
     server.use(
-      http.get('/session', () => {
-        return new HttpResponse(null, { status: 500 });
-      }),
+      http.get('/session', () => new HttpResponse(null, { status: 500 })),
+      http.post(
+        '/session/heartbeat',
+        () => new HttpResponse(null, { status: 500 }),
+      ),
     );
 
-    // Mount the hook – this will try the initial GET /session
     setupSessionHook();
-    expect(fetchSpy).toHaveBeenCalledWith('/session', expect.any(Object));
-    expect(beaconSpy).not.toHaveBeenCalled();
 
-    // Simulate interaction to verify no side effects occur
+    // GET /session should have been attempted
+    expect(fetchSpy).toHaveBeenCalledWith('/session', expect.any(Object));
+
+    // No POST yet (we haven't hit the 5-minute mark)
+    expect(fetchSpy).not.toHaveBeenCalledWith(
+      '/session/heartbeat',
+      expect.objectContaining({ method: 'POST' }),
+    );
+
+    // Advance time and simulate user activity
     advanceMinutesAndMs(5);
     window.dispatchEvent(new Event('click'));
 
-    // Still no beacon activity — session tracking failed gracefully
-    expect(beaconSpy).not.toHaveBeenCalled();
+    // Heartbeat should still be fired — backend will decide what to do
+    expect(fetchSpy).toHaveBeenCalledWith(
+      '/session/heartbeat',
+      expect.objectContaining({ method: 'POST' }),
+    );
   });
 
   it('calls GET /session once on mount', () => {
@@ -86,6 +101,11 @@ describe('useSession', () => {
         credentials: 'include',
       }),
     );
+
+    expect(fetchSpy).not.toHaveBeenCalledWith(
+      '/session/heartbeat',
+      expect.objectContaining({ method: 'POST' }),
+    );
   });
 
   it('does not call GET /session again if no user interaction occurs after 5 minutes', () => {
@@ -97,6 +117,10 @@ describe('useSession', () => {
 
     // Still only 1 call should have happened
     expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(fetchSpy).not.toHaveBeenCalledWith(
+      '/session/heartbeat',
+      expect.objectContaining({ method: 'POST' }),
+    );
   });
 
   // Core interaction events
@@ -115,41 +139,69 @@ describe('useSession', () => {
     it(`calls GET /session on ${eventType} after 5 minutes`, () => {
       setupSessionHook();
 
-      // Initial call on mount
-      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      // Initial mount should trigger GET /session
+      expect(fetchSpy).toHaveBeenCalledWith(
+        '/session',
+        expect.objectContaining({ method: 'GET' }),
+      );
 
-      // Advance time to just under 5 minutes
+      // First interaction within throttle window – should NOT trigger POST
       advanceMinutesAndMs(4);
       window.dispatchEvent(new Event(eventType));
+      expect(fetchSpy).not.toHaveBeenCalledWith(
+        '/session/heartbeat',
+        expect.objectContaining({ method: 'POST' }),
+      );
 
-      // Should still be just the initial call
-      expect(fetchSpy).toHaveBeenCalledTimes(1);
-
-      // Advance to just past 5 minutes total
+      // Advance time to pass 5 minutes
       advanceMinutesAndMs(1, 1);
       window.dispatchEvent(new Event(eventType));
 
-      // Now the second call should happen
+      // Now heartbeat POST should be called
+      expect(fetchSpy).toHaveBeenCalledWith(
+        '/session/heartbeat',
+        expect.objectContaining({ method: 'POST' }),
+      );
+
       expect(fetchSpy).toHaveBeenCalledTimes(2);
     });
   });
 
   it('only calls GET /session once when multiple user events occur within 5 minutes', () => {
     setupSessionHook();
-    // Initial call on mount
-    expect(fetchSpy).toHaveBeenCalledTimes(1);
-    // Advance a safe amount — 1 minute
+
+    // Initial GET on mount
+    expect(fetchSpy).toHaveBeenCalledWith(
+      '/session',
+      expect.objectContaining({ method: 'GET' }),
+    );
+
+    // Trigger multiple events within 5 minutes
     advanceMinutesAndMs(1);
-    // Trigger multiple different events
     window.dispatchEvent(new Event('click'));
     window.dispatchEvent(new Event('scroll'));
     window.dispatchEvent(new Event('keydown'));
     window.dispatchEvent(new Event('mousemove'));
     window.dispatchEvent(new Event('wheel'));
-    // Still within 5-minute window — no additional call should happen
-    expect(fetchSpy).toHaveBeenCalledTimes(1);
-    advanceMinutesAndMs(4, 1); // total = 5:00.001 since initial
+    window.dispatchEvent(new Event('touchstart'));
+
+    // Should NOT have sent a POST yet
+    expect(fetchSpy).not.toHaveBeenCalledWith(
+      '/session/heartbeat',
+      expect.objectContaining({ method: 'POST' }),
+    );
+
+    // Now move past 5-minute mark and trigger one more event
+    advanceMinutesAndMs(4, 1); // t = 5:00.001
     window.dispatchEvent(new Event('keydown'));
+
+    // Now it should send the heartbeat
+    expect(fetchSpy).toHaveBeenCalledWith(
+      '/session/heartbeat',
+      expect.objectContaining({ method: 'POST' }),
+    );
+
+    // Total calls = 1 GET + 1 POST
     expect(fetchSpy).toHaveBeenCalledTimes(2);
   });
 
@@ -157,21 +209,36 @@ describe('useSession', () => {
   it('calls GET /session on visibilitychange to visible after 5 minutes', () => {
     setupSessionHook();
 
-    // Initial mount
-    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    // Initial call on mount (GET)
+    expect(fetchSpy).toHaveBeenCalledWith(
+      '/session',
+      expect.objectContaining({ method: 'GET' }),
+    );
 
-    // Advance time < 5 minutes
+    // Simulate visibilitychange to visible within 5 minutes — should NOT POST
     advanceMinutesAndMs(4);
     Object.defineProperty(document, 'visibilityState', {
       value: 'visible',
       configurable: true,
     });
     document.dispatchEvent(new Event('visibilitychange'));
-    expect(fetchSpy).toHaveBeenCalledTimes(1);
 
-    // Advance to pass 5 minutes
-    advanceMinutesAndMs(1, 1); // total = 5:00.001 since initial
+    expect(fetchSpy).not.toHaveBeenCalledWith(
+      '/session/heartbeat',
+      expect.objectContaining({ method: 'POST' }),
+    );
+
+    // Advance time past 5-minute threshold
+    advanceMinutesAndMs(1, 1);
     document.dispatchEvent(new Event('visibilitychange'));
+
+    // Now it should POST
+    expect(fetchSpy).toHaveBeenCalledWith(
+      '/session/heartbeat',
+      expect.objectContaining({ method: 'POST' }),
+    );
+
+    // Total calls: 1 GET on mount + 1 POST after 5 min
     expect(fetchSpy).toHaveBeenCalledTimes(2);
   });
 
@@ -203,13 +270,13 @@ describe('useSession', () => {
     });
 
     document.dispatchEvent(new Event('visibilitychange'));
-    expect(beaconSpy).toHaveBeenCalledWith('/session');
+    expect(beaconSpy).toHaveBeenCalledWith('/session/heartbeat');
   });
 
   it('calls navigator.sendBeacon on pagehide', () => {
     setupSessionHook();
 
     window.dispatchEvent(new Event('pagehide'));
-    expect(beaconSpy).toHaveBeenCalledWith('/session');
+    expect(beaconSpy).toHaveBeenCalledWith('/session/heartbeat');
   });
 });
