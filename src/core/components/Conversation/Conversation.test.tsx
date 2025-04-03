@@ -168,14 +168,13 @@ describe('Conversation', () => {
         subscribe: mockSubscribe,
         getSnapshot: () => '',
       },
-      isRequesting: true,
     });
 
     render(
       <Conversation
         onRendered={mockOnRendered}
         modelConfig={modelConfig}
-        isRequesting={false}
+        isRequesting={true}
       />,
     );
 
