@@ -17,6 +17,7 @@ describe('ChatInput', () => {
     setShouldAutoScroll: vi.fn(),
     supportsUpload: true,
     startNewChat: vi.fn(),
+    conversationID: 'foo',
   };
 
   test('input is focused by default', () => {

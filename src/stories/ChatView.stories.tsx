@@ -76,6 +76,7 @@ const args: ChatViewProps = {
   supportsUpload: true,
   showModelSelector: true,
   startNewChat: fn(),
+  conversationID: 'foo',
 };
 
 // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args

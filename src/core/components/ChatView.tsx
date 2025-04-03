@@ -14,6 +14,7 @@ export interface ChatViewProps {
   supportsUpload: boolean;
   showModelSelector: boolean;
   startNewChat: () => void;
+  conversationID: string;
 }
 
 export const ChatView = ({
@@ -23,6 +24,7 @@ export const ChatView = ({
   supportsUpload,
   showModelSelector,
   startNewChat,
+  conversationID,
 }: ChatViewProps) => {
   const { hasMessages } = useMessageHistory();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -99,6 +101,7 @@ export const ChatView = ({
               setShouldAutoScroll={setShouldAutoScroll}
               supportsUpload={supportsUpload}
               startNewChat={startNewChat}
+              conversationID={conversationID}
             />
             <div className={styles.importantInfo}>
               <span>{defaultCautionText}</span>

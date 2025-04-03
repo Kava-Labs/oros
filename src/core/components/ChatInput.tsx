@@ -27,6 +27,7 @@ export interface ChatInputProps {
   setShouldAutoScroll: (s: boolean) => void;
   supportsUpload: boolean;
   startNewChat: () => void;
+  conversationID: string;
 }
 
 export interface UploadingState {
@@ -47,6 +48,7 @@ const ChatInput = ({
   setShouldAutoScroll,
   supportsUpload,
   startNewChat,
+  conversationID,
 }: ChatInputProps) => {
   const [showInputAdornmentMessage, setShowInputAdornmentMessage] =
     useState(false);
@@ -78,13 +80,8 @@ const ChatInput = ({
     });
   }, []);
 
-  const {
-    isRequesting,
-    modelConfig,
-    handleChatCompletion,
-    handleCancel,
-    conversationID,
-  } = useAppContext();
+  const { isRequesting, modelConfig, handleChatCompletion, handleCancel } =
+    useAppContext();
 
   const { supportedFileTypes, maximumFileUploads, maximumFileBytes } =
     modelConfig;
