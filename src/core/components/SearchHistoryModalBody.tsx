@@ -5,7 +5,6 @@ import {
 } from '../utils/conversation/helpers';
 import React, { useRef } from 'react';
 import { ConversationHistory } from '../context/types';
-import { useAppContext } from '../context/useAppContext';
 import { useIsMobile } from '../../shared/theme/useIsMobile';
 import { X as CloseX } from 'lucide-react';
 import ButtonIcon from './ButtonIcon';
@@ -28,8 +27,6 @@ const SearchHistoryModalBody = ({
   setSearchTerm,
 }: SearchModalBodyProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const { conversationID } = useAppContext();
 
   const groupedConversations = groupAndFilterConversations(
     conversations,
@@ -90,7 +87,7 @@ const SearchHistoryModalBody = ({
                   <div
                     data-testid="search-chat-history-entry"
                     key={conversation.id}
-                    className={`${styles.conversationItem} ${conversationID === conversation.id ? styles.selected : ''}`}
+                    className={styles.conversationItem}
                     onClick={() => handleConversationClick(conversation)}
                   >
                     <p
