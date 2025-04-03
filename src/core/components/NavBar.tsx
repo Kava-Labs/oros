@@ -1,5 +1,5 @@
 import styles from './NavBar.module.css';
-import { useIsMobileLayout } from '../../shared/theme/useIsMobileLayout';
+import { useIsMobileLayout } from 'lib-kava-ai';
 import { Menu, PanelLeftOpen } from 'lucide-react';
 import ButtonIcon from './ButtonIcon';
 import { NewChatButton } from '../assets/NewChatButton';

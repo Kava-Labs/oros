@@ -5,10 +5,13 @@ import {
 } from '../utils/conversation/helpers';
 import React, { useRef } from 'react';
 import { ConversationHistory } from '../context/types';
-import { useIsMobileLayout } from '../../shared/theme/useIsMobileLayout';
 import { X as CloseX } from 'lucide-react';
 import ButtonIcon from './ButtonIcon';
-import { formatConversationTitle, highlightMatch } from 'lib-kava-ai';
+import {
+  formatConversationTitle,
+  highlightMatch,
+  useIsMobileLayout,
+} from 'lib-kava-ai';
 
 interface SearchModalBodyProps {
   conversations: ConversationHistory[];

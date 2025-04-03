@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ClipboardCheck, Copy } from 'lucide-react';
-import { useIsMobileLayout } from '../../../shared/theme/useIsMobileLayout';
+import { useIsMobileLayout } from 'lib-kava-ai';
 import styles from './Conversation.module.css';
 import { Content } from './Content';
 import { ThinkingContent } from './ThinkingContent';

@@ -1,11 +1,11 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { vi } from 'vitest';
 import AssistantMessage from './AssistantMessage';
-import { useIsMobileLayout } from '../../../shared/theme/useIsMobileLayout';
+import { useIsMobileLayout } from 'lib-kava-ai';
 import { MODEL_REGISTRY } from '../../config';
 
 // Mock the required modules and hooks
-vi.mock('../../../shared/theme/useIsMobileLayout');
+vi.mock('lib-kava-ai');
 
 /* Decided to mock these out instead of rendering them so we get
    a true unit test that isn't dependent on the other components.

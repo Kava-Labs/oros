@@ -1,13 +1,13 @@
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import { ModelSelector } from './ModelSelector';
 import { useAppContext } from '../context/useAppContext';
-import { useIsMobileLayout } from '../../shared/theme/useIsMobileLayout';
+import { useIsMobileLayout } from 'lib-kava-ai';
 import { getAllModels } from '../config/models/index';
 import { vi } from 'vitest';
 
 // Mock the required modules and hooks
 vi.mock('../context/useAppContext');
-vi.mock('../../shared/theme/useIsMobileLayout');
+vi.mock('lib-kava-ai');
 vi.mock('../config/models');
 
 // Mock icons
