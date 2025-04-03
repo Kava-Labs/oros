@@ -2,7 +2,7 @@ import { renderHook } from '@testing-library/react';
 import { vi, MockInstance } from 'vitest';
 import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
-import { useSession, sessionUrl, heartbeatUrl } from './useSession';
+import { useSession, sessionUrl } from './useSession';
 
 // MSW handler for GET /session
 const getSessionHandler = http.get(
@@ -10,7 +10,7 @@ const getSessionHandler = http.get(
   () => new HttpResponse(null, { status: 204 }),
 );
 const postHeartbeatHandler = http.post(
-  heartbeatUrl,
+  sessionUrl,
   () => new HttpResponse(null, { status: 204 }),
 );
 
@@ -62,7 +62,7 @@ describe('useSession', () => {
     // Override the MSW handler to simulate API failure
     server.use(
       http.get(sessionUrl, () => new HttpResponse(null, { status: 500 })),
-      http.post(heartbeatUrl, () => new HttpResponse(null, { status: 500 })),
+      http.post(sessionUrl, () => new HttpResponse(null, { status: 500 })),
     );
 
     setupSessionHook();
@@ -72,7 +72,7 @@ describe('useSession', () => {
 
     // No POST yet (we haven't hit the 5-minute mark)
     expect(fetchSpy).not.toHaveBeenCalledWith(
-      heartbeatUrl,
+      sessionUrl,
       expect.objectContaining({ method: 'POST' }),
     );
 
@@ -82,7 +82,7 @@ describe('useSession', () => {
 
     // Heartbeat should still be fired — backend will decide what to do
     expect(fetchSpy).toHaveBeenCalledWith(
-      heartbeatUrl,
+      sessionUrl,
       expect.objectContaining({ method: 'POST' }),
     );
   });
@@ -100,7 +100,7 @@ describe('useSession', () => {
     );
 
     expect(fetchSpy).not.toHaveBeenCalledWith(
-      heartbeatUrl,
+      sessionUrl,
       expect.objectContaining({ method: 'POST' }),
     );
   });
@@ -115,7 +115,7 @@ describe('useSession', () => {
     // Still only 1 call should have happened
     expect(fetchSpy).toHaveBeenCalledTimes(1);
     expect(fetchSpy).not.toHaveBeenCalledWith(
-      heartbeatUrl,
+      sessionUrl,
       expect.objectContaining({ method: 'POST' }),
     );
   });
@@ -146,7 +146,7 @@ describe('useSession', () => {
       advanceMinutesAndMs(4);
       window.dispatchEvent(new Event(eventType));
       expect(fetchSpy).not.toHaveBeenCalledWith(
-        heartbeatUrl,
+        sessionUrl,
         expect.objectContaining({ method: 'POST' }),
       );
 
@@ -156,7 +156,7 @@ describe('useSession', () => {
 
       // Now heartbeat POST should be called
       expect(fetchSpy).toHaveBeenCalledWith(
-        heartbeatUrl,
+        sessionUrl,
         expect.objectContaining({ method: 'POST' }),
       );
 
@@ -184,7 +184,7 @@ describe('useSession', () => {
 
     // Should NOT have sent a POST yet
     expect(fetchSpy).not.toHaveBeenCalledWith(
-      heartbeatUrl,
+      sessionUrl,
       expect.objectContaining({ method: 'POST' }),
     );
 
@@ -194,7 +194,7 @@ describe('useSession', () => {
 
     // Now it should send the heartbeat
     expect(fetchSpy).toHaveBeenCalledWith(
-      heartbeatUrl,
+      sessionUrl,
       expect.objectContaining({ method: 'POST' }),
     );
 
@@ -221,7 +221,7 @@ describe('useSession', () => {
     document.dispatchEvent(new Event('visibilitychange'));
 
     expect(fetchSpy).not.toHaveBeenCalledWith(
-      heartbeatUrl,
+      sessionUrl,
       expect.objectContaining({ method: 'POST' }),
     );
 
@@ -231,7 +231,7 @@ describe('useSession', () => {
 
     // Now it should POST
     expect(fetchSpy).toHaveBeenCalledWith(
-      heartbeatUrl,
+      sessionUrl,
       expect.objectContaining({ method: 'POST' }),
     );
 
@@ -267,13 +267,13 @@ describe('useSession', () => {
     });
 
     document.dispatchEvent(new Event('visibilitychange'));
-    expect(beaconSpy).toHaveBeenCalledWith(heartbeatUrl);
+    expect(beaconSpy).toHaveBeenCalledWith(sessionUrl);
   });
 
   it('calls navigator.sendBeacon on pagehide', () => {
     setupSessionHook();
 
     window.dispatchEvent(new Event('pagehide'));
-    expect(beaconSpy).toHaveBeenCalledWith(heartbeatUrl);
+    expect(beaconSpy).toHaveBeenCalledWith(sessionUrl);
   });
 });

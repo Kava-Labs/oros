@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react';
 
 const RAILS_API_BASE_URL = import.meta.env.VITE_RAILS_API_BASE_URL ?? '';
 export const sessionUrl = `${RAILS_API_BASE_URL}/session`;
-export const heartbeatUrl = `${sessionUrl}/heartbeat`;
 const FIVE_MINUTES = 5 * 60 * 1000;
 
 export function useSession() {
@@ -21,7 +20,7 @@ export function useSession() {
 
   const postHeartbeat = () => {
     lastPingTimeRef.current = Date.now();
-    fetch(heartbeatUrl, {
+    fetch(sessionUrl, {
       method: 'POST',
       credentials: 'include',
     }).catch(() => {
@@ -30,7 +29,7 @@ export function useSession() {
   };
 
   const sendBeacon = () => {
-    navigator.sendBeacon(heartbeatUrl);
+    navigator.sendBeacon(sessionUrl);
   };
 
   const handleUserActivity = () => {
