@@ -1,5 +1,5 @@
 import styles from './NavBar.module.css';
-import { useIsMobile } from '../../shared/theme/useIsMobile';
+import { useIsMobileLayout } from '../../shared/theme/useIsMobileLayout';
 import { Menu, PanelLeftOpen } from 'lucide-react';
 import ButtonIcon from './ButtonIcon';
 import { NewChatButton } from '../assets/NewChatButton';
@@ -20,12 +20,12 @@ export const NavBar = ({
   showModelSelector,
   startNewChat,
 }: NavBarProps) => {
-  const isMobile = useIsMobile();
+  const isMobileLayout = useIsMobileLayout();
 
   return (
     <div className={styles.nav}>
       <div className={styles.leftSection}>
-        {!isMobile ? (
+        {!isMobileLayout ? (
           <div className={styles.desktopControls}>
             {!isPanelOpen && (
               <ButtonIcon
@@ -60,11 +60,11 @@ export const NavBar = ({
       </div>
 
       <div className={styles.centerSection}>
-        {isMobile && showModelSelector && <ModelSelector />}
+        {isMobileLayout && showModelSelector && <ModelSelector />}
       </div>
 
       <div className={styles.rightSection}>
-        {isMobile && <NewChatButton onClick={startNewChat} />}
+        {isMobileLayout && <NewChatButton onClick={startNewChat} />}
       </div>
     </div>
   );

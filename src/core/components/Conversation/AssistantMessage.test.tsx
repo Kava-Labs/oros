@@ -1,11 +1,11 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { vi } from 'vitest';
 import AssistantMessage from './AssistantMessage';
-import { useIsMobile } from '../../../shared/theme/useIsMobile';
+import { useIsMobileLayout } from '../../../shared/theme/useIsMobileLayout';
 import { MODEL_REGISTRY } from '../../config';
 
 // Mock the required modules and hooks
-vi.mock('../../../shared/theme/useIsMobile');
+vi.mock('../../../shared/theme/useIsMobileLayout');
 
 /* Decided to mock these out instead of rendering them so we get
    a true unit test that isn't dependent on the other components.
@@ -33,7 +33,9 @@ describe('AssistantMessage', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useIsMobile as unknown as ReturnType<typeof vi.fn>).mockReturnValue(false);
+    (useIsMobileLayout as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+      false,
+    );
 
     // Mock clipboard API
     Object.assign(navigator, {
@@ -84,7 +86,9 @@ describe('AssistantMessage', () => {
   });
 
   it('always shows copy button on mobile', () => {
-    (useIsMobile as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    (useIsMobileLayout as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+      true,
+    );
     render(
       <AssistantMessage content={mockContent} modelConfig={modelConfig} />,
     );

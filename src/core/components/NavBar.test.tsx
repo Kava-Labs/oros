@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi } from 'vitest';
 import { NavBar, NavBarProps } from './NavBar';
-import { useIsMobile } from '../../shared/theme/useIsMobile';
+import { useIsMobileLayout } from '../../shared/theme/useIsMobileLayout';
 import { AppContextProvider } from '../context/AppContextProvider';
 import { TextStreamStore } from 'lib-kava-ai';
 import { MessageHistoryStore } from '../stores/messageHistoryStore';
@@ -12,7 +12,7 @@ const messageHistoryStore = new MessageHistoryStore();
 const thinkingStore = new TextStreamStore();
 const errorStore = new TextStreamStore();
 
-vi.mock('../../shared/theme/useIsMobile');
+vi.mock('../../shared/theme/useIsMobileLayout');
 
 /*
   Mock these components so we're truly unit testing this component
@@ -44,9 +44,9 @@ describe('NavBar', () => {
 
   describe('Desktop Layout', () => {
     beforeEach(() => {
-      (useIsMobile as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
-        false,
-      );
+      (
+        useIsMobileLayout as unknown as ReturnType<typeof vi.fn>
+      ).mockReturnValue(false);
     });
 
     it('renders desktop controls when not mobile', () => {
@@ -123,9 +123,9 @@ describe('NavBar', () => {
 
   describe('Mobile Layout', () => {
     beforeEach(() => {
-      (useIsMobile as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
-        true,
-      );
+      (
+        useIsMobileLayout as unknown as ReturnType<typeof vi.fn>
+      ).mockReturnValue(true);
     });
 
     it('renders mobile layout with menu button', () => {

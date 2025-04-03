@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ClipboardCheck, Copy } from 'lucide-react';
-import { useIsMobile } from '../../../shared/theme/useIsMobile';
+import { useIsMobileLayout } from '../../../shared/theme/useIsMobileLayout';
 import styles from './Conversation.module.css';
 import { Content } from './Content';
 import { ThinkingContent } from './ThinkingContent';
@@ -19,7 +19,7 @@ const AssistantMessage = ({
   const [hover, setHover] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const isMobile = useIsMobile();
+  const isMobileLayout = useIsMobileLayout();
 
   useEffect(() => {
     let id: NodeJS.Timeout;
@@ -74,7 +74,7 @@ const AssistantMessage = ({
         ) : null}
         <Content role="assistant" content={content} modelConfig={modelConfig} />
         <div className={styles.copyIconContainer}>
-          {isMobile ? copyIcon : hover ? copyIcon : null}
+          {isMobileLayout ? copyIcon : hover ? copyIcon : null}
         </div>
       </div>
     </div>
