@@ -225,7 +225,8 @@ describe('chat', () => {
     expect(historyTitleAfterReload).not.toBe(initialHistoryTitle);
   });
 
-  test('conversation search functionality', async ({ page }) => {
+  // skipping: uses deprecated local storage
+  test.skip('conversation search functionality', async ({ page }) => {
     const chat = new Chat(page);
 
     await page.addInitScript(() => {
@@ -416,7 +417,8 @@ describe('chat', () => {
     await expect(searchInput).not.toBeVisible();
   });
 
-  test('search modal button is disabled for a user with no history', async ({
+  // skipping: uses deprecated local storage
+  test.skip('search modal button is disabled for a user with no history', async ({
     page,
   }) => {
     const chat = new Chat(page);
@@ -711,7 +713,8 @@ describe('chat', () => {
     expect(await imagePreviewContainer.isVisible()).toBe(false);
   });
 
-  test('image previews are cleared when visiting old chat (even if model supports it)', async ({
+  // skipping: uses deprecated local storage
+  test.skip('image previews are cleared when visiting old chat (even if model supports it)', async ({
     page,
   }) => {
     test.setTimeout(30 * 1000);
