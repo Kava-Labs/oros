@@ -5,7 +5,7 @@ import {
 } from '../utils/conversation/helpers';
 import React, { useRef } from 'react';
 import { ConversationHistory } from '../context/types';
-import { useIsMobile } from '../../shared/theme/useIsMobile';
+import { useIsMobileLayout } from '../../shared/theme/useIsMobileLayout';
 import { X as CloseX } from 'lucide-react';
 import ButtonIcon from './ButtonIcon';
 import { formatConversationTitle, highlightMatch } from 'lib-kava-ai';
@@ -50,7 +50,7 @@ const SearchHistoryModalBody = ({
     closeModalAndResetInput();
   };
 
-  const isMobile = useIsMobile();
+  const isMobileLayout = useIsMobileLayout();
 
   return (
     <>
@@ -65,7 +65,7 @@ const SearchHistoryModalBody = ({
           onKeyDown={handleKeyDown}
         />
         {/*Mobile design uses the close icon within ModalWrapper*/}
-        {!isMobile && (
+        {!isMobileLayout && (
           <ButtonIcon
             className={styles.searchCloseIcon}
             icon={CloseX}

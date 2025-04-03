@@ -1,13 +1,13 @@
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import { ModelSelector } from './ModelSelector';
 import { useAppContext } from '../context/useAppContext';
-import { useIsMobile } from '../../shared/theme/useIsMobile';
+import { useIsMobileLayout } from '../../shared/theme/useIsMobileLayout';
 import { getAllModels } from '../config/models/index';
 import { vi } from 'vitest';
 
 // Mock the required modules and hooks
 vi.mock('../context/useAppContext');
-vi.mock('../../shared/theme/useIsMobile');
+vi.mock('../../shared/theme/useIsMobileLayout');
 vi.mock('../config/models');
 
 // Mock icons
@@ -56,7 +56,9 @@ describe('ModelSelector', () => {
       mockReasoningModel,
       mockBlockchainModel,
     ]);
-    (useIsMobile as unknown as ReturnType<typeof vi.fn>).mockReturnValue(false);
+    (useIsMobileLayout as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+      false,
+    );
     mockGetSnapshot.mockReturnValue([]);
   });
 

@@ -3,7 +3,7 @@ import { ChatView } from './core/components/ChatView';
 import { useAppContext } from './core/context/useAppContext';
 import styles from './App.module.css';
 import { ChatHistory } from './core/components/ChatHistory';
-import { useIsMobile } from './shared/theme/useIsMobile';
+import { useIsMobileLayout } from './shared/theme/useIsMobileLayout';
 import KavaAILogo from './core/assets/KavaAILogo';
 import { DesktopSideBar } from './core/components/DesktopSideBar';
 import { MobileSideBar } from './core/components/MobileSideBar';
@@ -19,7 +19,7 @@ export const App = () => {
     conversations,
   } = useAppContext();
   const { supportedFileTypes } = modelConfig;
-  const isMobile = useIsMobile();
+  const isMobileLayout = useIsMobileLayout();
 
   /*
    * Supports separate memorization of sidebar & history search states between mobile and desktop
@@ -44,7 +44,7 @@ export const App = () => {
             <div className={styles.sidebarHeader}>
               <KavaAILogo height={20} />
               <div className={styles.buttonGroup}>
-                {isMobile && isMobileSideBarOpen && (
+                {isMobileLayout && isMobileSideBarOpen && (
                   <MobileSideBar
                     isSearchHistoryOpen={isSearchHistoryOpen}
                     setIsSearchHistoryOpen={setIsSearchHistoryOpen}
@@ -53,7 +53,7 @@ export const App = () => {
                     conversations={conversations}
                   />
                 )}
-                {!isMobile && !isDesktopSideBarHidden && (
+                {!isMobileLayout && !isDesktopSideBarHidden && (
                   <DesktopSideBar
                     isSearchHistoryOpen={isSearchHistoryOpen}
                     setIsSearchHistoryOpen={setIsSearchHistoryOpen}
