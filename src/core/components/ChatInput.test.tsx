@@ -3,7 +3,7 @@ import { ThemeProvider } from '../../shared/theme/themeProvider';
 import { AppContextProvider } from '../context/AppContextProvider';
 import { TextStreamStore } from 'lib-kava-ai';
 import { MessageHistoryStore } from '../stores/messageHistoryStore';
-import ChatInput from './ChatInput';
+import ChatInput, { ChatInputProps } from './ChatInput';
 import { vi } from 'vitest';
 
 describe('ChatInput', () => {
@@ -13,10 +13,9 @@ describe('ChatInput', () => {
   const thinkingStore = new TextStreamStore();
   const errorStore = new TextStreamStore();
 
-  const props = {
+  const props: ChatInputProps = {
     setShouldAutoScroll: vi.fn(),
-    onCancel: vi.fn(),
-    onSubmit: vi.fn(),
+    supportsUpload: true,
   };
 
   test('input is focused by default', () => {

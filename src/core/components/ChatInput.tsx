@@ -23,8 +23,9 @@ import { useUploadingError } from '../hooks/useUploadingError';
 
 const DEFAULT_HEIGHT = '30px';
 
-interface ChatInputProps {
+export interface ChatInputProps {
   setShouldAutoScroll: (s: boolean) => void;
+  supportsUpload: boolean;
 }
 
 export interface UploadingState {
@@ -41,7 +42,7 @@ export type FileUpload = {
   page?: number;
 };
 
-const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
+const ChatInput = ({ setShouldAutoScroll, supportsUpload }: ChatInputProps) => {
   const [showInputAdornmentMessage, setShowInputAdornmentMessage] =
     useState(false);
   const [dismissWarning, setDismissWarning] = useState(false);
@@ -294,8 +295,6 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     ? currentConversation.tokensRemaining
     : modelConfig.contextLength;
 
-  const modelSupportsUpload = supportedFileTypes.length > 0;
-
   useDragAndDrop({
     hasAvailableUploads,
     processUploadedFile,
@@ -306,7 +305,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
   });
 
   useEffect(() => {
-    if (!modelSupportsUpload) {
+    if (!supportsUpload) {
       return;
     }
 
@@ -340,7 +339,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
   }, [
     processUploadedFile,
     hasAvailableUploads,
-    modelSupportsUpload,
+    supportsUpload,
     resetUploadState,
     maximumFileBytes,
     setUploadError,
@@ -426,7 +425,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
         </div>
         <div className={styles.buttonContainer}>
           <div className={styles.buttonWrapper}>
-            {modelSupportsUpload && (
+            {supportsUpload && (
               <>
                 <div className={styles.uploadInputFieldContainer}>
                   <input

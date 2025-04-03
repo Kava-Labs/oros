@@ -73,6 +73,7 @@ const args: ChatViewProps = {
   onMenu: fn(),
   onPanelOpen: fn(),
   isPanelOpen: false,
+  supportsUpload: true,
 };
 
 // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
