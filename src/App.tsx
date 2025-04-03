@@ -65,11 +65,8 @@ export const App = () => {
               onMenu={() => setIsMobileSideBarOpen(true)}
               onPanelOpen={() => setIsDesktopSideBarHidden(false)}
               isPanelOpen={!isDesktopSideBarHidden}
-<<<<<<< HEAD
               supportsUpload={supportedFileTypes.length > 0}
-=======
               showModelSelector={true}
->>>>>>> 19aab4a (refactor: lift up show model selector)
             />
           </div>
         </div>
