@@ -13,6 +13,7 @@ export interface ChatViewProps {
   isPanelOpen: boolean;
   supportsUpload: boolean;
   showModelSelector: boolean;
+  startNewChat: () => void;
 }
 
 export const ChatView = ({
@@ -21,6 +22,7 @@ export const ChatView = ({
   isPanelOpen,
   supportsUpload,
   showModelSelector,
+  startNewChat,
 }: ChatViewProps) => {
   const { hasMessages } = useMessageHistory();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -76,6 +78,7 @@ export const ChatView = ({
             isPanelOpen={isPanelOpen}
             onMenu={onMenu}
             showModelSelector={showModelSelector}
+            startNewChat={startNewChat}
           />
         </div>
 
@@ -95,6 +98,7 @@ export const ChatView = ({
             <ChatInput
               setShouldAutoScroll={setShouldAutoScroll}
               supportsUpload={supportsUpload}
+              startNewChat={startNewChat}
             />
             <div className={styles.importantInfo}>
               <span>{defaultCautionText}</span>

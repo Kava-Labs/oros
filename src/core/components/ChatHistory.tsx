@@ -17,11 +17,14 @@ import ButtonIcon from './ButtonIcon';
 
 interface ChatHistoryProps {
   onHistoryItemClick: Dispatch<SetStateAction<boolean>>;
+  startNewChat: () => void;
 }
 
-export const ChatHistory = ({ onHistoryItemClick }: ChatHistoryProps) => {
-  const { conversationID, loadConversation, conversations, startNewChat } =
-    useAppContext();
+export const ChatHistory = ({
+  onHistoryItemClick,
+  startNewChat,
+}: ChatHistoryProps) => {
+  const { conversationID, loadConversation, conversations } = useAppContext();
 
   const conversationsToRecord = (convs: ConversationHistory[]) => {
     const record: Record<string, ConversationHistory> = {};

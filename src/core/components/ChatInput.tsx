@@ -26,6 +26,7 @@ const DEFAULT_HEIGHT = '30px';
 export interface ChatInputProps {
   setShouldAutoScroll: (s: boolean) => void;
   supportsUpload: boolean;
+  startNewChat: () => void;
 }
 
 export interface UploadingState {
@@ -42,7 +43,11 @@ export type FileUpload = {
   page?: number;
 };
 
-const ChatInput = ({ setShouldAutoScroll, supportsUpload }: ChatInputProps) => {
+const ChatInput = ({
+  setShouldAutoScroll,
+  supportsUpload,
+  startNewChat,
+}: ChatInputProps) => {
   const [showInputAdornmentMessage, setShowInputAdornmentMessage] =
     useState(false);
   const [dismissWarning, setDismissWarning] = useState(false);
@@ -369,6 +374,7 @@ const ChatInput = ({ setShouldAutoScroll, supportsUpload }: ChatInputProps) => {
             setShowInputAdornmentMessage(false);
             setDismissWarning(true);
           }}
+          startNewChat={startNewChat}
         />
       )}
       {uploadedFiles.length > 0 && (
