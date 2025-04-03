@@ -97,7 +97,11 @@ describe('Conversation', () => {
 
   it('renders empty conversation correctly', () => {
     render(
-      <Conversation onRendered={mockOnRendered} modelConfig={modelConfig} />,
+      <Conversation
+        onRendered={mockOnRendered}
+        modelConfig={modelConfig}
+        isRequesting={false}
+      />,
     );
 
     expect(screen.getByTestId('conversation')).toBeInTheDocument();
@@ -112,7 +116,11 @@ describe('Conversation', () => {
     });
 
     render(
-      <Conversation onRendered={mockOnRendered} modelConfig={modelConfig} />,
+      <Conversation
+        onRendered={mockOnRendered}
+        modelConfig={modelConfig}
+        isRequesting={false}
+      />,
     );
 
     const userMessages = screen.getAllByTestId('user-message');
@@ -134,7 +142,11 @@ describe('Conversation', () => {
     });
 
     render(
-      <Conversation onRendered={mockOnRendered} modelConfig={modelConfig} />,
+      <Conversation
+        onRendered={mockOnRendered}
+        modelConfig={modelConfig}
+        isRequesting={false}
+      />,
     );
 
     const assistantMessages = screen.getAllByTestId('assistant-message');
@@ -160,7 +172,11 @@ describe('Conversation', () => {
     });
 
     render(
-      <Conversation onRendered={mockOnRendered} modelConfig={modelConfig} />,
+      <Conversation
+        onRendered={mockOnRendered}
+        modelConfig={modelConfig}
+        isRequesting={false}
+      />,
     );
 
     expect(screen.getByLabelText('Progress Icon')).toBeInTheDocument();
@@ -180,7 +196,11 @@ describe('Conversation', () => {
     });
 
     render(
-      <Conversation onRendered={mockOnRendered} modelConfig={modelConfig} />,
+      <Conversation
+        onRendered={mockOnRendered}
+        modelConfig={modelConfig}
+        isRequesting={false}
+      />,
     );
 
     expect(screen.queryByLabelText('Progress Icon')).not.toBeInTheDocument();
@@ -202,7 +222,11 @@ describe('Conversation', () => {
     });
 
     render(
-      <Conversation onRendered={mockOnRendered} modelConfig={modelConfig} />,
+      <Conversation
+        onRendered={mockOnRendered}
+        modelConfig={modelConfig}
+        isRequesting={false}
+      />,
     );
 
     const errorMessage = screen.getByTestId('error-message');

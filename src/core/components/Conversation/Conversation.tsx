@@ -13,15 +13,17 @@ import { ProgressIcon } from './ProgressIcon';
 import { ModelConfig } from '../../types/models';
 
 export interface ConversationProps {
+  isRequesting: boolean;
   onRendered(): void;
   modelConfig: ModelConfig;
 }
 
 const ConversationComponent = ({
+  isRequesting,
   onRendered,
   modelConfig,
 }: ConversationProps) => {
-  const { errorStore, isRequesting, messageStore } = useAppContext();
+  const { errorStore, messageStore } = useAppContext();
 
   const errorText: string = useSyncExternalStore(
     errorStore.subscribe,
