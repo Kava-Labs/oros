@@ -40,7 +40,6 @@ export type AppContextType = {
   messageHistoryStore: MessageHistoryStore;
   loadConversation: (convoHistory: ConversationHistory) => void;
   conversations: ConversationHistory[];
-  hasConversations: boolean;
 };
 
 export interface TextChatMessage {

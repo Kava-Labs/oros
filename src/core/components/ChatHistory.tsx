@@ -10,7 +10,6 @@ import {
   SetStateAction,
   useRef,
 } from 'react';
-import { useAppContext } from '../context/useAppContext';
 import { EllipsisVertical, Bot, Pencil, Trash2, X } from 'lucide-react';
 import { groupConversationsByTime } from '../utils/conversation/helpers';
 import ButtonIcon from './ButtonIcon';
@@ -20,6 +19,7 @@ interface ChatHistoryProps {
   onHistoryItemClick: Dispatch<SetStateAction<boolean>>;
   startNewChat: () => void;
   loadConversation: (conversationHistory: ConversationHistory) => void;
+  conversations: ConversationHistory[];
 }
 
 export const ChatHistory = ({
@@ -27,9 +27,8 @@ export const ChatHistory = ({
   onHistoryItemClick,
   startNewChat,
   loadConversation,
+  conversations,
 }: ChatHistoryProps) => {
-  const { conversations } = useAppContext();
-
   const conversationsToRecord = (convs: ConversationHistory[]) => {
     const record: Record<string, ConversationHistory> = {};
     convs.forEach((conv) => (record[conv.id] = conv));

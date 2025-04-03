@@ -2,7 +2,6 @@ import { TextSearch } from 'lucide-react';
 import ButtonIcon from '../components/ButtonIcon';
 import type { ButtonIconProps } from '../components/ButtonIcon';
 import SearchHistoryModal from '../components/SearchHistoryModal';
-import { useAppContext } from '../context/useAppContext';
 import { ConversationHistory } from '../context/types';
 
 // Only need to specify props specific to SearchChatButton
@@ -12,6 +11,7 @@ type SearchHistoryButtonProps = Omit<ButtonIconProps, 'icon' | 'aria-label'> & {
   setIsSearchHistoryOpen: (i: boolean) => void;
   setIsMobileSideBarOpen: (i: boolean) => void;
   loadConversation: (conversationHistory: ConversationHistory) => void;
+  conversations: ConversationHistory[];
 };
 export const SearchHistoryButton = ({
   isSearchHistoryOpen,
@@ -19,9 +19,10 @@ export const SearchHistoryButton = ({
   setIsMobileSideBarOpen,
   className,
   loadConversation,
+  conversations,
   ...buttonProps
 }: SearchHistoryButtonProps) => {
-  const { hasConversations } = useAppContext();
+  const hasConversations = conversations.length > 0;
   const onSearchHistoryButtonClick = () => {
     setIsSearchHistoryOpen(true);
   };
@@ -46,6 +47,7 @@ export const SearchHistoryButton = ({
           setIsSearchHistoryOpen={setIsSearchHistoryOpen}
           setIsMobileSideBarOpen={setIsMobileSideBarOpen}
           loadConversation={loadConversation}
+          conversations={conversations}
         />
       )}
     </>
