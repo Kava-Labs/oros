@@ -66,6 +66,7 @@ export const App = () => {
               onPanelOpen={() => setIsDesktopSideBarHidden(false)}
               isPanelOpen={!isDesktopSideBarHidden}
               supportsUpload={supportedFileTypes.length > 0}
+              showModelSelector={true}
             />
           </div>
         </div>
