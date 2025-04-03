@@ -16,7 +16,7 @@ import type {
   ChatCompletionUserMessageParam,
 } from 'openai/resources/index';
 import { useDragAndDrop } from '../hooks/useDragAndDrop';
-import { isSupportedFileType } from '../types/models';
+import { isSupportedFileType, ModelConfig } from '../types/models';
 import useProcessUploadedFile from '../hooks/useProcessUploadedFile';
 import { useAvailableUploads } from '../hooks/useAvailableUploads';
 import { useUploadingError } from '../hooks/useUploadingError';
@@ -28,6 +28,7 @@ export interface ChatInputProps {
   supportsUpload: boolean;
   startNewChat: () => void;
   conversationID: string;
+  modelConfig: ModelConfig;
 }
 
 export interface UploadingState {
@@ -49,6 +50,7 @@ const ChatInput = ({
   supportsUpload,
   startNewChat,
   conversationID,
+  modelConfig,
 }: ChatInputProps) => {
   const [showInputAdornmentMessage, setShowInputAdornmentMessage] =
     useState(false);
@@ -80,8 +82,7 @@ const ChatInput = ({
     });
   }, []);
 
-  const { isRequesting, modelConfig, handleChatCompletion, handleCancel } =
-    useAppContext();
+  const { isRequesting, handleChatCompletion, handleCancel } = useAppContext();
 
   const { supportedFileTypes, maximumFileUploads, maximumFileBytes } =
     modelConfig;

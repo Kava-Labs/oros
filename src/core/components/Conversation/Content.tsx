@@ -1,22 +1,23 @@
 import { useState, useEffect, memo } from 'react';
 import { sanitizeContent } from 'lib-kava-ai';
 import styles from './Content.module.css';
-import { useAppContext } from '../../context/useAppContext';
+import { ModelConfig } from '../../types/models';
 
 export interface ContentProps {
   content: string;
   onRendered?: () => void;
   role: string;
+  modelConfig: ModelConfig;
 }
 
 export const ContentComponent = ({
   content,
   onRendered,
   role,
+  modelConfig,
 }: ContentProps) => {
   const [hasError, setHasError] = useState(false);
   const [sanitizedContent, setSanitizedContent] = useState<string>('');
-  const { modelConfig } = useAppContext();
 
   useEffect(() => {
     let cancel = false;

@@ -1,14 +1,20 @@
 import { render, screen, act } from '@testing-library/react';
 import { StreamingText } from './StreamingText';
 import { TextStreamStore } from 'lib-kava-ai';
+import { MODEL_REGISTRY } from '../../config';
 
 describe('StreamingText', () => {
+  const modelConfig = MODEL_REGISTRY['o3-mini'];
   it('renders with the initial snapshot of the store', () => {
     const store = new TextStreamStore();
     store.setText('Initial Text');
 
     render(
-      <StreamingText store={store} onRendered={vi.fn()}>
+      <StreamingText
+        store={store}
+        modelConfig={modelConfig}
+        onRendered={vi.fn()}
+      >
         {(text) => <span data-testid="output">{text}</span>}
       </StreamingText>,
     );
@@ -21,7 +27,11 @@ describe('StreamingText', () => {
     store.setText('Initial');
 
     render(
-      <StreamingText store={store} onRendered={vi.fn()}>
+      <StreamingText
+        store={store}
+        modelConfig={modelConfig}
+        onRendered={vi.fn()}
+      >
         {(text) => <span data-testid="output">{text}</span>}
       </StreamingText>,
     );
@@ -40,7 +50,11 @@ describe('StreamingText', () => {
     store.setText('Hello');
 
     render(
-      <StreamingText store={store} onRendered={vi.fn()}>
+      <StreamingText
+        store={store}
+        modelConfig={modelConfig}
+        onRendered={vi.fn()}
+      >
         {(text) => <span data-testid="output">{text}</span>}
       </StreamingText>,
     );
@@ -58,7 +72,11 @@ describe('StreamingText', () => {
     const store = new TextStreamStore();
     // No setText called, so it should be an empty string
     render(
-      <StreamingText store={store} onRendered={vi.fn()}>
+      <StreamingText
+        store={store}
+        modelConfig={modelConfig}
+        onRendered={vi.fn()}
+      >
         {(text) => <span data-testid="output">{text}</span>}
       </StreamingText>,
     );
@@ -71,7 +89,11 @@ describe('StreamingText', () => {
     store.setText('Initial');
 
     render(
-      <StreamingText store={store} onRendered={vi.fn()}>
+      <StreamingText
+        store={store}
+        modelConfig={modelConfig}
+        onRendered={vi.fn()}
+      >
         {(text) => <span data-testid="output">{text}</span>}
       </StreamingText>,
     );
@@ -92,7 +114,11 @@ describe('StreamingText', () => {
     store.setText('Hello');
 
     render(
-      <StreamingText store={store} onRendered={vi.fn()}>
+      <StreamingText
+        store={store}
+        modelConfig={modelConfig}
+        onRendered={vi.fn()}
+      >
         {(text) => <strong data-testid="output">**{text}**</strong>}
       </StreamingText>,
     );
@@ -121,7 +147,11 @@ describe('StreamingText', () => {
     };
 
     const { unmount } = render(
-      <StreamingText store={store} onRendered={vi.fn()}>
+      <StreamingText
+        store={store}
+        modelConfig={modelConfig}
+        onRendered={vi.fn()}
+      >
         {(text) => <span>{text}</span>}
       </StreamingText>,
     );
@@ -137,7 +167,11 @@ describe('StreamingText', () => {
     const renderFn = vi.fn((text: string) => <span>{text}</span>);
 
     const { unmount } = render(
-      <StreamingText store={store} onRendered={vi.fn()}>
+      <StreamingText
+        store={store}
+        modelConfig={modelConfig}
+        onRendered={vi.fn()}
+      >
         {renderFn}
       </StreamingText>,
     );
@@ -167,7 +201,11 @@ describe('StreamingText', () => {
       parentRenderCount++;
       return (
         <div data-testid="parent">
-          <StreamingText store={store} onRendered={vi.fn()}>
+          <StreamingText
+            store={store}
+            modelConfig={modelConfig}
+            onRendered={vi.fn()}
+          >
             {(text) => <span data-testid="child">{text}</span>}
           </StreamingText>
           ,

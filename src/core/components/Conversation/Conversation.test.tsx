@@ -3,6 +3,7 @@ import { vi } from 'vitest';
 import { Conversation } from './Conversation';
 import { useAppContext } from '../../context/useAppContext';
 import { useMessageHistory } from '../../hooks/useMessageHistory';
+import { MODEL_REGISTRY } from '../../config';
 
 // Mock the required modules and hooks
 // TODO: Consider using AppContext so the data structure remains
@@ -69,6 +70,7 @@ vi.mock('./ErrorMessage', () => ({
 }));
 
 describe('Conversation', () => {
+  const modelConfig = MODEL_REGISTRY['o3-mini'];
   const mockOnRendered = vi.fn();
   const mockSubscribe = vi.fn();
   const mockGetSnapshot = vi.fn().mockReturnValue('');
@@ -94,7 +96,9 @@ describe('Conversation', () => {
   });
 
   it('renders empty conversation correctly', () => {
-    render(<Conversation onRendered={mockOnRendered} />);
+    render(
+      <Conversation onRendered={mockOnRendered} modelConfig={modelConfig} />,
+    );
 
     expect(screen.getByTestId('conversation')).toBeInTheDocument();
   });
@@ -107,7 +111,9 @@ describe('Conversation', () => {
       ],
     });
 
-    render(<Conversation onRendered={mockOnRendered} />);
+    render(
+      <Conversation onRendered={mockOnRendered} modelConfig={modelConfig} />,
+    );
 
     const userMessages = screen.getAllByTestId('user-message');
     expect(userMessages).toHaveLength(2);
@@ -127,7 +133,9 @@ describe('Conversation', () => {
       ],
     });
 
-    render(<Conversation onRendered={mockOnRendered} />);
+    render(
+      <Conversation onRendered={mockOnRendered} modelConfig={modelConfig} />,
+    );
 
     const assistantMessages = screen.getAllByTestId('assistant-message');
     expect(assistantMessages).toHaveLength(2);
@@ -151,7 +159,9 @@ describe('Conversation', () => {
       isRequesting: true,
     });
 
-    render(<Conversation onRendered={mockOnRendered} />);
+    render(
+      <Conversation onRendered={mockOnRendered} modelConfig={modelConfig} />,
+    );
 
     expect(screen.getByLabelText('Progress Icon')).toBeInTheDocument();
   });
@@ -169,7 +179,9 @@ describe('Conversation', () => {
       isRequesting: true,
     });
 
-    render(<Conversation onRendered={mockOnRendered} />);
+    render(
+      <Conversation onRendered={mockOnRendered} modelConfig={modelConfig} />,
+    );
 
     expect(screen.queryByLabelText('Progress Icon')).not.toBeInTheDocument();
   });
@@ -189,7 +201,9 @@ describe('Conversation', () => {
       isRequesting: false,
     });
 
-    render(<Conversation onRendered={mockOnRendered} />);
+    render(
+      <Conversation onRendered={mockOnRendered} modelConfig={modelConfig} />,
+    );
 
     const errorMessage = screen.getByTestId('error-message');
     expect(errorMessage).toBeInTheDocument();

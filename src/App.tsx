@@ -82,6 +82,7 @@ export const App = () => {
               showModelSelector={true}
               startNewChat={startNewChat}
               conversationID={conversationID}
+              modelConfig={modelConfig}
             />
           </div>
         </div>

@@ -10,6 +10,7 @@ import {
   ChatMessage,
   MessageHistoryStore,
 } from '../core/stores/messageHistoryStore';
+import { MODEL_REGISTRY } from '../core/config';
 
 const messageStore = new TextStreamStore();
 const progressStore = new TextStreamStore();
@@ -77,6 +78,7 @@ const args: ChatViewProps = {
   showModelSelector: true,
   startNewChat: fn(),
   conversationID: 'foo',
+  modelConfig: MODEL_REGISTRY['o3-mini'],
 };
 
 // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args

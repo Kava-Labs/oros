@@ -5,6 +5,7 @@ import { TextStreamStore } from 'lib-kava-ai';
 import { MessageHistoryStore } from '../stores/messageHistoryStore';
 import ChatInput, { ChatInputProps } from './ChatInput';
 import { vi } from 'vitest';
+import { MODEL_REGISTRY } from '../config';
 
 describe('ChatInput', () => {
   const messageStore = new TextStreamStore();
@@ -18,6 +19,7 @@ describe('ChatInput', () => {
     supportsUpload: true,
     startNewChat: vi.fn(),
     conversationID: 'foo',
+    modelConfig: MODEL_REGISTRY['o3-mini'],
   };
 
   test('input is focused by default', () => {

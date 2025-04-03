@@ -5,13 +5,16 @@ import styles from './Conversation.module.css';
 import { Content } from './Content';
 import { ThinkingContent } from './ThinkingContent';
 import ButtonIcon from '.././ButtonIcon';
+import { ModelConfig } from '../../types/models';
 
 const AssistantMessage = ({
   content,
   reasoningContent,
+  modelConfig,
 }: {
   content: string;
   reasoningContent?: string;
+  modelConfig: ModelConfig;
 }) => {
   const [hover, setHover] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -69,7 +72,7 @@ const AssistantMessage = ({
         {reasoningContent ? (
           <ThinkingContent content={reasoningContent} />
         ) : null}
-        <Content role="assistant" content={content} />
+        <Content role="assistant" content={content} modelConfig={modelConfig} />
         <div className={styles.copyIconContainer}>
           {isMobile ? copyIcon : hover ? copyIcon : null}
         </div>
