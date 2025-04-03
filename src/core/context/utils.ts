@@ -1,7 +1,11 @@
 import { v4 as uuidv4 } from 'uuid';
-import { TextStreamStore } from 'lib-kava-ai';
+import {
+  ConversationHistory,
+  getAllConversations,
+  saveConversation,
+  TextStreamStore,
+} from 'lib-kava-ai';
 import { MessageHistoryStore } from '../stores/messageHistoryStore';
-import { ConversationHistory } from './types';
 import OpenAI from 'openai';
 import { ModelConfig } from '../types/models';
 import { isContentChunk } from '../utils/streamUtils';
@@ -301,9 +305,7 @@ export async function syncWithLocalStorage(
 
   const { content } = firstUserMessage;
 
-  const allConversations: Record<string, ConversationHistory> = JSON.parse(
-    localStorage.getItem('conversations') ?? '{}',
-  );
+  const allConversations = await getAllConversations();
 
   const existingConversation = allConversations[conversationID];
 
@@ -327,12 +329,11 @@ export async function syncWithLocalStorage(
     id: conversationID,
     model: existingConversation ? existingConversation.model : id,
     title: existingConversation ? existingConversation.title : 'New Chat', // initial & fallback value
-    conversation: messages,
     lastSaved: new Date().valueOf(),
     tokensRemaining,
   };
 
-  if (existingConversation && existingConversation.conversation.length <= 4) {
+  if (existingConversation && messages.length <= 4) {
     try {
       const data = await client.chat.completions.create({
         stream: false,
@@ -370,6 +371,5 @@ export async function syncWithLocalStorage(
     }
   }
 
-  allConversations[conversationID] = history;
-  localStorage.setItem('conversations', JSON.stringify(allConversations));
+  await saveConversation(history, messages);
 }

@@ -1,14 +1,20 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AppContext } from './AppContext';
-import { TextStreamStore } from 'lib-kava-ai';
+import {
+  TextStreamStore,
+  getAllConversations,
+  ConversationHistories,
+  idbEventTarget,
+  updateConversation,
+  getConversationMessages,
+  deleteConversation,
+  getSearchableHistory,
+  SearchableChatHistories,
+} from 'lib-kava-ai';
 import { MessageHistoryStore } from '../../core/stores/messageHistoryStore';
 import { DEFAULT_MODEL_NAME, getModelConfig } from '../config';
-import {
-  SupportedModels,
-  ModelConfig,
-  isSupportedModel,
-} from '../types/models';
-import { ActiveConversation, ConversationHistory } from './types';
+import { SupportedModels, ModelConfig } from '../types/models';
+import { ActiveConversation } from './types';
 import { getToken } from '../../core/utils/token/token';
 import OpenAI from 'openai';
 import { v4 as uuidv4 } from 'uuid';
@@ -110,36 +116,78 @@ export const AppContextProvider = (props: {
     });
   }, []);
 
-  const [conversations, setConversations] = useState<ConversationHistory[]>(
-    () => {
-      const stored = localStorage.getItem('conversations');
-      if (!stored) return [];
-      try {
-        return Object.values(JSON.parse(stored)) as ConversationHistory[];
-      } catch (e) {
-        console.error('Error parsing conversations:', e);
-        return [];
+  const [conversationHistories, setConversationHistories] =
+    useState<ConversationHistories>({});
+
+  const fetchConversations = useCallback(() => {
+    getAllConversations()
+      .then((conversations) => {
+        setConversationHistories(conversations);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }, []);
+
+  useEffect(() => {
+    // do initial fetch
+    fetchConversations();
+
+    // set up event handler and refetch on update
+    const getUpdatedConversations = () => fetchConversations();
+
+    idbEventTarget.addEventListener(
+      'indexeddb-update',
+      getUpdatedConversations,
+    );
+
+    return () => {
+      idbEventTarget.removeEventListener(
+        'indexeddb-update',
+        getUpdatedConversations,
+      );
+    };
+  }, [fetchConversations]);
+
+  const onSelectConversation = useCallback(
+    async (id: string) => {
+      if (id === conversation.conversationID) return;
+      let activeConversation = activeConversationsRef.current?.get(id);
+      if (!activeConversation) {
+        const selectedConversation = conversationHistories[id];
+        if (selectedConversation) {
+          const messages = await getConversationMessages(id);
+          activeConversation = newConversation();
+          activeConversation.conversationID = id;
+          activeConversation.messageHistoryStore.loadConversation(
+            messages ? messages : [],
+          );
+        }
       }
+
+      if (activeConversation) setConversation(activeConversation);
     },
+    [conversation, conversationHistories],
   );
 
-  // Poll for conversation changes
-  useEffect(() => {
-    const load = () => {
-      // drop conversations with unsupported models
-      const storedConversations = (
-        Object.values(
-          JSON.parse(localStorage.getItem('conversations') ?? '{}'),
-        ) as ConversationHistory[]
-      ).filter((convo) => isSupportedModel(convo.model));
-      setConversations(storedConversations);
-    };
+  const onUpdateConversationTitle = useCallback(
+    async (id: string, newTitle: string) => {
+      await updateConversation(id, { title: newTitle });
+    },
+    [],
+  );
 
-    const id = setInterval(load, 1000);
-    return () => {
-      clearInterval(id);
-    };
-  }, []);
+  const [searchableHistory, setSearchableHistory] =
+    useState<SearchableChatHistories | null>(null);
+
+  const fetchSearchHistory = async () => {
+    try {
+      const history = await getSearchableHistory();
+      setSearchableHistory(history);
+    } catch (error) {
+      console.error('Failed to load search history:', error);
+    }
+  };
 
   const handleModelChange = useCallback(
     (modelName: SupportedModels) => {
@@ -157,29 +205,23 @@ export const AppContextProvider = (props: {
     [messageHistoryStore, ensureCorrectSystemPrompt],
   );
 
-  const loadConversation = useCallback(
-    (convoHistory: ConversationHistory) => {
-      handleModelChange(convoHistory.model as SupportedModels);
-      let activeConversation = activeConversationsRef.current?.get(
-        convoHistory.id,
-      );
-
-      if (!activeConversation) {
-        activeConversation = newConversation();
-        activeConversation.conversationID = convoHistory.id; // make sure to link the ids
-        activeConversation.messageHistoryStore.loadConversation(convoHistory);
-      }
-
-      setConversation(activeConversation);
-    },
-    [handleModelChange],
-  );
-
   const startNewChat = useCallback(() => {
     const newConv = newConversation();
     ensureCorrectSystemPrompt(newConv.messageHistoryStore, modelConfig);
     setConversation(newConv);
   }, [modelConfig, ensureCorrectSystemPrompt]);
+
+  const onDeleteConversation = useCallback(
+    async (id: string) => {
+      await deleteConversation(id);
+      activeConversationsRef.current?.delete(id);
+
+      if (id === conversation.conversationID) {
+        startNewChat();
+      }
+    },
+    [startNewChat, conversation],
+  );
 
   useEffect(() => {
     try {
@@ -301,10 +343,14 @@ export const AppContextProvider = (props: {
         handleChatCompletion,
         thinkingStore,
         errorStore,
-        loadConversation,
+        onSelectConversation,
+        onDeleteConversation,
+        onUpdateConversationTitle,
         isReady,
         isRequesting,
-        conversations,
+        fetchSearchHistory,
+        searchableHistory,
+        conversations: conversationHistories,
       }}
     >
       {children}

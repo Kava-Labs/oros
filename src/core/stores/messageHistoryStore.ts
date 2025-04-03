@@ -3,7 +3,6 @@ import type {
   ChatCompletionMessageParam,
   ChatCompletionToolMessageParam,
 } from 'openai/resources/index';
-import { ConversationHistory } from '../context/types';
 type Listener = () => void;
 
 export interface ReasoningAssistantMessage {
@@ -46,8 +45,8 @@ export class MessageHistoryStore {
     return this.currentValue;
   };
 
-  public loadConversation = (conversationHistory: ConversationHistory) => {
-    this.currentValue = conversationHistory.conversation;
+  public loadConversation = (messages: ChatMessage[]) => {
+    this.currentValue = messages;
     this.emitChange();
   };
 
