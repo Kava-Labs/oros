@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
 import { ErrorMessage } from './ErrorMessage';
+import { MODEL_REGISTRY } from '../../config';
 
 vi.mock('./Content', () => ({
   Content: ({
@@ -19,6 +20,7 @@ vi.mock('./Content', () => ({
 }));
 
 describe('ErrorMessage', () => {
+  const modelConfig = MODEL_REGISTRY['o3-mini'];
   const mockErrorText = 'An error occurred';
   const mockOnRendered = vi.fn();
 
@@ -28,7 +30,11 @@ describe('ErrorMessage', () => {
 
   it('renders with error text content', () => {
     render(
-      <ErrorMessage errorText={mockErrorText} onRendered={mockOnRendered} />,
+      <ErrorMessage
+        errorText={mockErrorText}
+        onRendered={mockOnRendered}
+        modelConfig={modelConfig}
+      />,
     );
     expect(screen.getByTestId('content')).toHaveTextContent(mockErrorText);
 

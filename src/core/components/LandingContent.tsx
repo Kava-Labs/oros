@@ -1,12 +1,12 @@
 import styles from './ChatView.module.css';
 import { useTheme } from '../../shared/theme/useTheme';
-import { useAppContext } from '../context/useAppContext';
 
-export const LandingContent = () => {
+interface LandingContentProps {
+  introText: string;
+}
+
+export const LandingContent = ({ introText }: LandingContentProps) => {
   const { logo: Logo } = useTheme();
-  const {
-    modelConfig: { introText },
-  } = useAppContext();
 
   return (
     <div className={styles.startContent}>

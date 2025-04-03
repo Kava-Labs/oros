@@ -2,6 +2,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import { vi } from 'vitest';
 import AssistantMessage from './AssistantMessage';
 import { useIsMobile } from '../../../shared/theme/useIsMobile';
+import { MODEL_REGISTRY } from '../../config';
 
 // Mock the required modules and hooks
 vi.mock('../../../shared/theme/useIsMobile');
@@ -25,6 +26,7 @@ vi.mock('./ThinkingContent', () => ({
 }));
 
 describe('AssistantMessage', () => {
+  const modelConfig = MODEL_REGISTRY['o3-mini'];
   const mockContent = 'Test message content';
   const mockReasoningContent = 'Test reasoning content';
   const mockWriteText = vi.fn();
@@ -42,7 +44,9 @@ describe('AssistantMessage', () => {
   });
 
   it('renders basic message content correctly', () => {
-    render(<AssistantMessage content={mockContent} />);
+    render(
+      <AssistantMessage content={mockContent} modelConfig={modelConfig} />,
+    );
 
     expect(screen.getByTestId('content')).toHaveTextContent(mockContent);
     expect(screen.queryByTestId('thinking-content')).not.toBeInTheDocument();
@@ -53,6 +57,7 @@ describe('AssistantMessage', () => {
       <AssistantMessage
         content={mockContent}
         reasoningContent={mockReasoningContent}
+        modelConfig={modelConfig}
       />,
     );
 
@@ -62,7 +67,9 @@ describe('AssistantMessage', () => {
   });
 
   it('shows copy button on hover in desktop mode', () => {
-    render(<AssistantMessage content={mockContent} />);
+    render(
+      <AssistantMessage content={mockContent} modelConfig={modelConfig} />,
+    );
 
     // Copy button should not be visible initially
     expect(screen.queryByLabelText('Copy Chat')).not.toBeInTheDocument();
@@ -78,13 +85,17 @@ describe('AssistantMessage', () => {
 
   it('always shows copy button on mobile', () => {
     (useIsMobile as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
-    render(<AssistantMessage content={mockContent} />);
+    render(
+      <AssistantMessage content={mockContent} modelConfig={modelConfig} />,
+    );
 
     expect(screen.getByLabelText('Copy Chat')).toBeInTheDocument();
   });
 
   it('copies content to clipboard when copy button is clicked', async () => {
-    render(<AssistantMessage content={mockContent} />);
+    render(
+      <AssistantMessage content={mockContent} modelConfig={modelConfig} />,
+    );
 
     // Show copy button
     fireEvent.mouseEnter(screen.getByTestId('content').parentElement!);
@@ -98,7 +109,9 @@ describe('AssistantMessage', () => {
 
   it('shows success state temporarily after copying', async () => {
     vi.useFakeTimers();
-    render(<AssistantMessage content={mockContent} />);
+    render(
+      <AssistantMessage content={mockContent} modelConfig={modelConfig} />,
+    );
 
     // Show and click copy button
     fireEvent.mouseEnter(screen.getByTestId('content').parentElement!);
@@ -119,7 +132,9 @@ describe('AssistantMessage', () => {
   });
 
   it('maintains hover state when switching between copy and success icons', () => {
-    render(<AssistantMessage content={mockContent} />);
+    render(
+      <AssistantMessage content={mockContent} modelConfig={modelConfig} />,
+    );
 
     const container = screen.getByTestId('content').parentElement!;
 

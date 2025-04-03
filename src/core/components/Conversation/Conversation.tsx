@@ -10,12 +10,17 @@ import { Content } from './Content';
 import { IdbImage } from '../IdbImage';
 import { ImageCarousel } from './ImageCarousel';
 import { ProgressIcon } from './ProgressIcon';
+import { ModelConfig } from '../../types/models';
 
 export interface ConversationProps {
   onRendered(): void;
+  modelConfig: ModelConfig;
 }
 
-const ConversationComponent = ({ onRendered }: ConversationProps) => {
+const ConversationComponent = ({
+  onRendered,
+  modelConfig,
+}: ConversationProps) => {
   const { errorStore, isRequesting, messageStore } = useAppContext();
 
   const errorText: string = useSyncExternalStore(
@@ -103,6 +108,7 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
                   role={message.role}
                   content={content}
                   data-testid="user-message"
+                  modelConfig={modelConfig}
                 />
               </div>
             </Fragment>
@@ -113,6 +119,7 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
           return (
             <AssistantMessage
               key={index}
+              modelConfig={modelConfig}
               content={message.content as string}
               reasoningContent={
                 'reasoningContent' in message
@@ -129,11 +136,15 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
       {isRequesting && assistantStream.length === 0 ? (
         <ProgressIcon />
       ) : (
-        <StreamingMessage onRendered={onRendered} />
+        <StreamingMessage onRendered={onRendered} modelConfig={modelConfig} />
       )}
 
       {errorText.length > 0 && (
-        <ErrorMessage errorText={errorText} onRendered={onRendered} />
+        <ErrorMessage
+          errorText={errorText}
+          onRendered={onRendered}
+          modelConfig={modelConfig}
+        />
       )}
     </div>
   );
