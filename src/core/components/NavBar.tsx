@@ -4,13 +4,13 @@ import { Menu, PanelLeftOpen } from 'lucide-react';
 import ButtonIcon from './ButtonIcon';
 import { NewChatButton } from '../assets/NewChatButton';
 import { ModelSelector } from './ModelSelector';
-import { useAppContext } from '../context/useAppContext';
 
 export interface NavBarProps {
-  onMenu(): void;
-  onPanelOpen(): void;
+  onMenu: () => void;
+  onPanelOpen: () => void;
   isPanelOpen: boolean;
   showModelSelector: boolean;
+  startNewChat: () => void;
 }
 
 export const NavBar = ({
@@ -18,10 +18,9 @@ export const NavBar = ({
   onPanelOpen,
   isPanelOpen,
   showModelSelector,
+  startNewChat,
 }: NavBarProps) => {
   const isMobile = useIsMobile();
-
-  const { startNewChat } = useAppContext();
 
   return (
     <div className={styles.nav}>

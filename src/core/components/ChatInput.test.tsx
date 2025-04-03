@@ -16,6 +16,7 @@ describe('ChatInput', () => {
   const props: ChatInputProps = {
     setShouldAutoScroll: vi.fn(),
     supportsUpload: true,
+    startNewChat: vi.fn(),
   };
 
   test('input is focused by default', () => {

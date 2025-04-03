@@ -35,6 +35,7 @@ describe('NavBar', () => {
     onPanelOpen: vi.fn(),
     isPanelOpen: false,
     showModelSelector: true,
+    startNewChat: vi.fn(),
   };
 
   beforeEach(() => {

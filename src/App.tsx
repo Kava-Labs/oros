@@ -10,7 +10,7 @@ import { MobileSideBar } from './core/components/MobileSideBar';
 import { MobileBackdrop } from './core/components/MobileBackdrop';
 
 export const App = () => {
-  const { isReady, modelConfig } = useAppContext();
+  const { isReady, modelConfig, startNewChat } = useAppContext();
   const { supportedFileTypes } = modelConfig;
   const isMobile = useIsMobile();
 
@@ -56,7 +56,10 @@ export const App = () => {
             </div>
 
             <div className={styles.sidebarContent}>
-              <ChatHistory onHistoryItemClick={setIsMobileSideBarOpen} />
+              <ChatHistory
+                onHistoryItemClick={setIsMobileSideBarOpen}
+                startNewChat={startNewChat}
+              />
             </div>
           </div>
 
@@ -67,6 +70,7 @@ export const App = () => {
               isPanelOpen={!isDesktopSideBarHidden}
               supportsUpload={supportedFileTypes.length > 0}
               showModelSelector={true}
+              startNewChat={startNewChat}
             />
           </div>
         </div>
