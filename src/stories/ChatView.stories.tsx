@@ -71,6 +71,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const args: ChatViewProps = {
+  isRequesting: false,
   onMenu: fn(),
   onPanelOpen: fn(),
   isPanelOpen: false,
@@ -79,6 +80,8 @@ const args: ChatViewProps = {
   startNewChat: fn(),
   conversationID: 'foo',
   modelConfig: MODEL_REGISTRY['o3-mini'],
+  handleCancel: fn(),
+  handleChatCompletion: fn(),
 };
 
 // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args

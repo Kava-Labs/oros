@@ -11,12 +11,15 @@ import { MobileBackdrop } from './core/components/MobileBackdrop';
 
 export const App = () => {
   const {
+    isRequesting,
     isReady,
     modelConfig,
     startNewChat,
     loadConversation,
     conversationID,
     conversations,
+    handleCancel,
+    handleChatCompletion,
   } = useAppContext();
   const { supportedFileTypes } = modelConfig;
   const isMobileLayout = useIsMobileLayout();
@@ -79,6 +82,7 @@ export const App = () => {
 
           <div className={styles.content}>
             <ChatView
+              isRequesting={isRequesting}
               onMenu={() => setIsMobileSideBarOpen(true)}
               onPanelOpen={() => setIsDesktopSideBarHidden(false)}
               isPanelOpen={!isDesktopSideBarHidden}
@@ -87,6 +91,8 @@ export const App = () => {
               startNewChat={startNewChat}
               conversationID={conversationID}
               modelConfig={modelConfig}
+              handleCancel={handleCancel}
+              handleChatCompletion={handleChatCompletion}
             />
           </div>
         </div>

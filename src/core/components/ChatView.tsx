@@ -7,8 +7,10 @@ import ChatInput from './ChatInput';
 import { LandingContent } from './LandingContent';
 import { defaultCautionText } from '../config/models/defaultPrompts';
 import { ModelConfig } from '../types/models';
+import type { ChatCompletionMessageParam } from 'openai/resources/index';
 
 export interface ChatViewProps {
+  isRequesting: boolean;
   onMenu(): void;
   onPanelOpen(): void;
   isPanelOpen: boolean;
@@ -17,9 +19,12 @@ export interface ChatViewProps {
   startNewChat: () => void;
   conversationID: string;
   modelConfig: ModelConfig;
+  handleCancel: () => void;
+  handleChatCompletion: (value: ChatCompletionMessageParam[]) => void;
 }
 
 export const ChatView = ({
+  isRequesting,
   onMenu,
   onPanelOpen,
   isPanelOpen,
@@ -28,6 +33,8 @@ export const ChatView = ({
   startNewChat,
   conversationID,
   modelConfig,
+  handleCancel,
+  handleChatCompletion,
 }: ChatViewProps) => {
   const { hasMessages } = useMessageHistory();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -93,6 +100,7 @@ export const ChatView = ({
           >
             {hasMessages && (
               <Conversation
+                isRequesting={isRequesting}
                 onRendered={handleContentRendered}
                 modelConfig={modelConfig}
               />
@@ -108,11 +116,14 @@ export const ChatView = ({
             )}
 
             <ChatInput
+              isRequesting={isRequesting}
               setShouldAutoScroll={setShouldAutoScroll}
               supportsUpload={supportsUpload}
               startNewChat={startNewChat}
               conversationID={conversationID}
               modelConfig={modelConfig}
+              handleCancel={handleCancel}
+              handleChatCompletion={handleChatCompletion}
             />
             <div className={styles.importantInfo}>
               <span>{defaultCautionText}</span>
