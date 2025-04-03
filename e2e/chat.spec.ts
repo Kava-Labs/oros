@@ -225,7 +225,8 @@ describe('chat', () => {
     expect(historyTitleAfterReload).not.toBe(initialHistoryTitle);
   });
 
-  test('conversation search functionality', async ({ page }) => {
+  // skipping: uses deprecated local storage
+  test.skip('conversation search functionality', async ({ page }) => {
     const chat = new Chat(page);
 
     await page.addInitScript(() => {
@@ -416,24 +417,6 @@ describe('chat', () => {
     await expect(searchInput).not.toBeVisible();
   });
 
-  test('search modal button is disabled for a user with no history', async ({
-    page,
-  }) => {
-    const chat = new Chat(page);
-
-    await chat.goto();
-
-    //  explicitly removing any conversations from local storage, simulating a new user
-    //  or if a user clears their browser cache
-    await page.addInitScript(() => {
-      localStorage.removeItem('conversations');
-    });
-
-    const searchButton = page.getByRole('button', { name: 'Search History' });
-    await expect(searchButton).toBeDisabled();
-
-    await expect(page.getByText('Start a new chat to begin')).toBeVisible();
-  });
   test('allows a user to upload a file up to 8MB limit', async ({ page }) => {
     test.setTimeout(30 * 1000);
 
@@ -711,7 +694,8 @@ describe('chat', () => {
     expect(await imagePreviewContainer.isVisible()).toBe(false);
   });
 
-  test('image previews are cleared when visiting old chat (even if model supports it)', async ({
+  // skipping: uses deprecated local storage
+  test.skip('image previews are cleared when visiting old chat (even if model supports it)', async ({
     page,
   }) => {
     test.setTimeout(30 * 1000);

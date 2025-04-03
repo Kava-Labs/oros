@@ -12,7 +12,16 @@ const messageHistoryStore = new MessageHistoryStore();
 const thinkingStore = new TextStreamStore();
 const errorStore = new TextStreamStore();
 
-vi.mock('lib-kava-ai');
+import * as useIsMobileLayoutModule from 'lib-kava-ai';
+
+vi.mock('lib-kava-ai', async () => {
+  const actual =
+    await vi.importActual<typeof useIsMobileLayoutModule>('lib-kava-ai');
+  return {
+    ...actual,
+    useIsMobileLayout: vi.fn(), // mock only this one
+  };
+});
 
 /*
   Mock these components so we're truly unit testing this component

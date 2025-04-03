@@ -3,7 +3,7 @@ import { CancelChatIcon, SendChatIcon } from '../assets';
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useAppContext } from '../context/useAppContext';
 import { InputAdornmentMessage } from './InputAdornmentMessage';
-import { ConversationHistory } from '../context/types';
+import { ConversationHistory, getConversation } from 'lib-kava-ai';
 import { hasSufficientRemainingTokens } from '../utils/conversation/hasSufficientRemainingTokens';
 import { useManageContextWarning } from '../hooks/useManageContextWarning';
 import { Paperclip, X } from 'lucide-react';
@@ -288,11 +288,14 @@ const ChatInput = ({
     }
   }, []);
 
-  const allConversations: Record<string, ConversationHistory> = JSON.parse(
-    localStorage.getItem('conversations') ?? '{}',
-  );
+  const [currentConversation, setCurrentConversation] =
+    useState<ConversationHistory | null>(null);
 
-  const currentConversation = allConversations[conversationID];
+  useEffect(() => {
+    getConversation(conversationID)
+      .then(setCurrentConversation)
+      .catch(console.error);
+  }, [conversationID]);
 
   const remainingContextWindow = currentConversation
     ? currentConversation.tokensRemaining
