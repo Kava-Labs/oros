@@ -4,7 +4,8 @@ import { useAppContext } from './core/context/useAppContext';
 import styles from './App.module.css';
 import { useIsMobileLayout } from 'lib-kava-ai';
 import KavaAILogo from './core/assets/KavaAILogo';
-import { SideBar, SearchHistoryModal } from 'lib-kava-ai';
+import { SearchHistoryModal } from 'lib-kava-ai';
+import { SideBar } from './core/components/SideBar';
 
 export const App = () => {
   const {
