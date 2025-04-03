@@ -15,11 +15,14 @@ describe('ChatInput', () => {
   const errorStore = new TextStreamStore();
 
   const props: ChatInputProps = {
+    isRequesting: false,
     setShouldAutoScroll: vi.fn(),
     supportsUpload: true,
     startNewChat: vi.fn(),
     conversationID: 'foo',
     modelConfig: MODEL_REGISTRY['o3-mini'],
+    handleCancel: vi.fn(),
+    handleChatCompletion: vi.fn(),
   };
 
   test('input is focused by default', () => {
