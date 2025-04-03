@@ -9,14 +9,16 @@ interface SearchHistoryProps {
   isSearchHistoryOpen: boolean;
   setIsSearchHistoryOpen: (i: boolean) => void;
   setIsMobileSideBarOpen: (i: boolean) => void;
+  loadConversation: (conversationHistory: ConversationHistory) => void;
 }
 
 const SearchHistoryModal = ({
   isSearchHistoryOpen,
   setIsSearchHistoryOpen,
   setIsMobileSideBarOpen,
+  loadConversation,
 }: SearchHistoryProps) => {
-  const { conversations, loadConversation } = useAppContext();
+  const { conversations } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
   const modalRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);

@@ -1,12 +1,14 @@
 import { SearchHistoryButton } from '../assets/SearchHistoryButton';
 import ButtonIcon from './ButtonIcon';
 import { PanelLeftClose } from 'lucide-react';
+import { ConversationHistory } from '../context/types';
 
 interface MobileSideBarProps {
   isSearchHistoryOpen: boolean;
   setIsSearchHistoryOpen: (i: boolean) => void;
   setIsMobileSideBarOpen: (i: boolean) => void;
   setIsDesktopSideBarHidden: (i: boolean) => void;
+  loadConversation: (conversation: ConversationHistory) => void;
 }
 
 export const DesktopSideBar = ({
@@ -14,6 +16,7 @@ export const DesktopSideBar = ({
   setIsSearchHistoryOpen,
   setIsMobileSideBarOpen,
   setIsDesktopSideBarHidden,
+  loadConversation,
 }: MobileSideBarProps) => {
   return (
     <>
@@ -21,6 +24,7 @@ export const DesktopSideBar = ({
         isSearchHistoryOpen={isSearchHistoryOpen}
         setIsSearchHistoryOpen={setIsSearchHistoryOpen}
         setIsMobileSideBarOpen={setIsMobileSideBarOpen}
+        loadConversation={loadConversation}
       />
       <ButtonIcon
         icon={PanelLeftClose}

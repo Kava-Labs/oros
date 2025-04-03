@@ -1,17 +1,20 @@
 import { SearchHistoryButton } from '../assets/SearchHistoryButton';
 import ButtonIcon from './ButtonIcon';
 import { X as CloseX } from 'lucide-react';
+import { ConversationHistory } from '../context/types';
 
 interface MobileSideBarProps {
   isSearchHistoryOpen: boolean;
   setIsSearchHistoryOpen: (i: boolean) => void;
   setIsMobileSideBarOpen: (i: boolean) => void;
+  loadConversation: (conversationHistory: ConversationHistory) => void;
 }
 
 export const MobileSideBar = ({
   isSearchHistoryOpen,
   setIsSearchHistoryOpen,
   setIsMobileSideBarOpen,
+  loadConversation,
 }: MobileSideBarProps) => {
   return (
     <>
@@ -19,6 +22,7 @@ export const MobileSideBar = ({
         isSearchHistoryOpen={isSearchHistoryOpen}
         setIsSearchHistoryOpen={setIsSearchHistoryOpen}
         setIsMobileSideBarOpen={setIsMobileSideBarOpen}
+        loadConversation={loadConversation}
       />
       <ButtonIcon
         icon={CloseX}
