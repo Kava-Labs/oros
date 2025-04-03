@@ -10,8 +10,13 @@ import { MobileSideBar } from './core/components/MobileSideBar';
 import { MobileBackdrop } from './core/components/MobileBackdrop';
 
 export const App = () => {
-  const { isReady, modelConfig, startNewChat, loadConversation } =
-    useAppContext();
+  const {
+    isReady,
+    modelConfig,
+    startNewChat,
+    loadConversation,
+    conversationID,
+  } = useAppContext();
   const { supportedFileTypes } = modelConfig;
   const isMobile = useIsMobile();
 
@@ -60,6 +65,7 @@ export const App = () => {
 
             <div className={styles.sidebarContent}>
               <ChatHistory
+                conversationID={conversationID}
                 onHistoryItemClick={setIsMobileSideBarOpen}
                 startNewChat={startNewChat}
                 loadConversation={loadConversation}
@@ -75,6 +81,7 @@ export const App = () => {
               supportsUpload={supportedFileTypes.length > 0}
               showModelSelector={true}
               startNewChat={startNewChat}
+              conversationID={conversationID}
             />
           </div>
         </div>

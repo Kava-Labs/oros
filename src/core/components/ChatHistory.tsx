@@ -16,17 +16,19 @@ import { groupConversationsByTime } from '../utils/conversation/helpers';
 import ButtonIcon from './ButtonIcon';
 
 interface ChatHistoryProps {
+  conversationID: string;
   onHistoryItemClick: Dispatch<SetStateAction<boolean>>;
   startNewChat: () => void;
   loadConversation: (conversationHistory: ConversationHistory) => void;
 }
 
 export const ChatHistory = ({
+  conversationID,
   onHistoryItemClick,
   startNewChat,
   loadConversation,
 }: ChatHistoryProps) => {
-  const { conversationID, conversations } = useAppContext();
+  const { conversations } = useAppContext();
 
   const conversationsToRecord = (convs: ConversationHistory[]) => {
     const record: Record<string, ConversationHistory> = {};
@@ -114,6 +116,7 @@ export const ChatHistory = ({
                 {conversations.map((conversation) => (
                   <HistoryItem
                     key={conversation.id}
+                    conversationID={conversationID}
                     conversation={conversation}
                     handleChatHistoryClick={handleChatHistoryClick}
                     deleteConversation={deleteConversation}
@@ -143,6 +146,7 @@ interface HistoryItemProps {
   deleteConversation: (id: string) => void;
   isMenuOpen: boolean;
   onMenuClick: () => void;
+  conversationID: string;
 }
 
 const HistoryItem = memo(
@@ -152,9 +156,9 @@ const HistoryItem = memo(
     deleteConversation,
     isMenuOpen,
     onMenuClick,
+    conversationID,
   }: HistoryItemProps) => {
     const { id, title } = conversation;
-    const { conversationID } = useAppContext();
     const isSelected = conversationID === id;
     const [editingTitle, setEditingTitle] = useState(false);
     const [newTitle, setNewTitle] = useState(title);
