@@ -8,6 +8,7 @@ interface MobileSideBarProps {
   setIsSearchHistoryOpen: (i: boolean) => void;
   setIsMobileSideBarOpen: (i: boolean) => void;
   loadConversation: (conversationHistory: ConversationHistory) => void;
+  conversations: ConversationHistory[];
 }
 
 export const MobileSideBar = ({
@@ -15,6 +16,7 @@ export const MobileSideBar = ({
   setIsSearchHistoryOpen,
   setIsMobileSideBarOpen,
   loadConversation,
+  conversations,
 }: MobileSideBarProps) => {
   return (
     <>
@@ -23,6 +25,7 @@ export const MobileSideBar = ({
         setIsSearchHistoryOpen={setIsSearchHistoryOpen}
         setIsMobileSideBarOpen={setIsMobileSideBarOpen}
         loadConversation={loadConversation}
+        conversations={conversations}
       />
       <ButtonIcon
         icon={CloseX}

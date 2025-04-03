@@ -16,6 +16,7 @@ export const App = () => {
     startNewChat,
     loadConversation,
     conversationID,
+    conversations,
   } = useAppContext();
   const { supportedFileTypes } = modelConfig;
   const isMobile = useIsMobile();
@@ -49,6 +50,7 @@ export const App = () => {
                     setIsSearchHistoryOpen={setIsSearchHistoryOpen}
                     setIsMobileSideBarOpen={setIsMobileSideBarOpen}
                     loadConversation={loadConversation}
+                    conversations={conversations}
                   />
                 )}
                 {!isMobile && !isDesktopSideBarHidden && (
@@ -58,6 +60,7 @@ export const App = () => {
                     setIsMobileSideBarOpen={setIsMobileSideBarOpen}
                     setIsDesktopSideBarHidden={setIsDesktopSideBarHidden}
                     loadConversation={loadConversation}
+                    conversations={conversations}
                   />
                 )}
               </div>
@@ -69,6 +72,7 @@ export const App = () => {
                 onHistoryItemClick={setIsMobileSideBarOpen}
                 startNewChat={startNewChat}
                 loadConversation={loadConversation}
+                conversations={conversations}
               />
             </div>
           </div>

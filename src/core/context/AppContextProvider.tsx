@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  useMemo,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AppContext } from './AppContext';
 import { TextStreamStore } from 'lib-kava-ai';
 import { MessageHistoryStore } from '../../core/stores/messageHistoryStore';
@@ -146,11 +140,6 @@ export const AppContextProvider = (props: {
       clearInterval(id);
     };
   }, []);
-
-  const hasConversations = useMemo(
-    () => conversations.length > 0,
-    [conversations],
-  );
 
   const handleModelChange = useCallback(
     (modelName: SupportedModels) => {
@@ -316,7 +305,6 @@ export const AppContextProvider = (props: {
         isReady,
         isRequesting,
         conversations,
-        hasConversations,
       }}
     >
       {children}

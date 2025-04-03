@@ -9,6 +9,7 @@ interface MobileSideBarProps {
   setIsMobileSideBarOpen: (i: boolean) => void;
   setIsDesktopSideBarHidden: (i: boolean) => void;
   loadConversation: (conversation: ConversationHistory) => void;
+  conversations: ConversationHistory[];
 }
 
 export const DesktopSideBar = ({
@@ -17,6 +18,7 @@ export const DesktopSideBar = ({
   setIsMobileSideBarOpen,
   setIsDesktopSideBarHidden,
   loadConversation,
+  conversations,
 }: MobileSideBarProps) => {
   return (
     <>
@@ -25,6 +27,7 @@ export const DesktopSideBar = ({
         setIsSearchHistoryOpen={setIsSearchHistoryOpen}
         setIsMobileSideBarOpen={setIsMobileSideBarOpen}
         loadConversation={loadConversation}
+        conversations={conversations}
       />
       <ButtonIcon
         icon={PanelLeftClose}

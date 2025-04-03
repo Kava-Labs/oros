@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import styles from './SearchChatHistory.module.css';
 import ModalWrapper from './ModalWrapper';
 import SearchHistoryModalBody from './SearchHistoryModalBody';
-import { useAppContext } from '../context/useAppContext';
 import { ConversationHistory } from '../context/types';
 
 interface SearchHistoryProps {
@@ -10,6 +9,7 @@ interface SearchHistoryProps {
   setIsSearchHistoryOpen: (i: boolean) => void;
   setIsMobileSideBarOpen: (i: boolean) => void;
   loadConversation: (conversationHistory: ConversationHistory) => void;
+  conversations: ConversationHistory[];
 }
 
 const SearchHistoryModal = ({
@@ -17,8 +17,8 @@ const SearchHistoryModal = ({
   setIsSearchHistoryOpen,
   setIsMobileSideBarOpen,
   loadConversation,
+  conversations,
 }: SearchHistoryProps) => {
-  const { conversations } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
   const modalRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
