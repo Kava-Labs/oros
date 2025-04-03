@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi } from 'vitest';
 import { NavBar, NavBarProps } from './NavBar';
-import { useIsMobileLayout } from '../../shared/theme/useIsMobileLayout';
+import { useIsMobileLayout } from 'lib-kava-ai';
 import { AppContextProvider } from '../context/AppContextProvider';
 import { TextStreamStore } from 'lib-kava-ai';
 import { MessageHistoryStore } from '../stores/messageHistoryStore';
@@ -12,7 +12,7 @@ const messageHistoryStore = new MessageHistoryStore();
 const thinkingStore = new TextStreamStore();
 const errorStore = new TextStreamStore();
 
-vi.mock('../../shared/theme/useIsMobileLayout');
+vi.mock('lib-kava-ai');
 
 /*
   Mock these components so we're truly unit testing this component

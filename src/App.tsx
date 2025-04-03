@@ -3,7 +3,7 @@ import { ChatView } from './core/components/ChatView';
 import { useAppContext } from './core/context/useAppContext';
 import styles from './App.module.css';
 import { ChatHistory } from './core/components/ChatHistory';
-import { useIsMobileLayout } from './shared/theme/useIsMobileLayout';
+import { useIsMobileLayout } from 'lib-kava-ai';
 import KavaAILogo from './core/assets/KavaAILogo';
 import { DesktopSideBar } from './core/components/DesktopSideBar';
 import { MobileSideBar } from './core/components/MobileSideBar';
