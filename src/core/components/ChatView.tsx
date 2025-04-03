@@ -100,6 +100,7 @@ export const ChatView = ({
           >
             {hasMessages && (
               <Conversation
+                isRequesting={isRequesting}
                 onRendered={handleContentRendered}
                 modelConfig={modelConfig}
               />
