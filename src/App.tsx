@@ -8,10 +8,13 @@ import KavaAILogo from './core/assets/KavaAILogo';
 import { DesktopSideBar } from './core/components/DesktopSideBar';
 import { MobileSideBar } from './core/components/MobileSideBar';
 import { MobileBackdrop } from './core/components/MobileBackdrop';
+import { useSession } from './useSession';
 
 export const App = () => {
   const { isReady } = useAppContext();
   const isMobile = useIsMobile();
+
+  useSession();
 
   /*
    * Supports separate memorization of sidebar & history search states between mobile and desktop
