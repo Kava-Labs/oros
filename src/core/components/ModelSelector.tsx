@@ -1,16 +1,22 @@
 import styles from './ModelSelector.module.css';
 import { useEffect, useState } from 'react';
-import { useAppContext } from '../context/useAppContext';
 import { getAllModels } from '../config';
-import { SupportedModels } from '../types/models';
+import { ModelConfig, SupportedModels } from '../types/models';
+import type { MessageHistoryStore } from '../stores/messageHistoryStore';
 
-export const ModelSelector = () => {
+export const ModelSelector = ({
+  modelConfig,
+  messageHistoryStore,
+  handleModelChange,
+}: {
+  handleModelChange: (modelName: SupportedModels) => void;
+  modelConfig: ModelConfig;
+  messageHistoryStore: MessageHistoryStore;
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(0); // For keyboard navigation
 
-  const { modelConfig, messageHistoryStore, handleModelChange } =
-    useAppContext();
   const SelectedModelIcon = modelConfig.icon;
   const models = getAllModels();
 

@@ -1,9 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
 import { Conversation } from './Conversation';
-import { useAppContext } from '../../context/useAppContext';
 import { useMessageHistory } from '../../hooks/useMessageHistory';
 import { MODEL_REGISTRY } from '../../config';
+import { MessageHistoryStore } from '../../stores/messageHistoryStore';
+import { TextStreamStore } from 'lib-kava-ai';
 
 // Mock the required modules and hooks
 // TODO: Consider using AppContext so the data structure remains
@@ -72,23 +73,9 @@ vi.mock('./ErrorMessage', () => ({
 describe('Conversation', () => {
   const modelConfig = MODEL_REGISTRY['o3-mini'];
   const mockOnRendered = vi.fn();
-  const mockSubscribe = vi.fn();
-  const mockGetSnapshot = vi.fn().mockReturnValue('');
 
   beforeEach(() => {
     vi.clearAllMocks();
-
-    (useAppContext as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-      errorStore: {
-        subscribe: mockSubscribe,
-        getSnapshot: mockGetSnapshot,
-      },
-      messageStore: {
-        subscribe: mockSubscribe,
-        getSnapshot: mockGetSnapshot,
-      },
-      isRequesting: false,
-    });
 
     (useMessageHistory as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
       messages: [],
@@ -98,9 +85,13 @@ describe('Conversation', () => {
   it('renders empty conversation correctly', () => {
     render(
       <Conversation
+        messageHistoryStore={new MessageHistoryStore()}
+        errorStore={new TextStreamStore()}
+        messageStore={new TextStreamStore()}
+        isRequesting={false}
+        thinkingStore={new TextStreamStore()}
         onRendered={mockOnRendered}
         modelConfig={modelConfig}
-        isRequesting={false}
       />,
     );
 
@@ -108,18 +99,21 @@ describe('Conversation', () => {
   });
 
   it.skip('renders user messages correctly', () => {
-    (useMessageHistory as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-      messages: [
-        { role: 'user', content: 'Hello' },
-        { role: 'user', content: 'How are you?' },
-      ],
-    });
+    const messageHistoryStore = new MessageHistoryStore();
+    messageHistoryStore.setMessages([
+      { role: 'user', content: 'Hello' },
+      { role: 'user', content: 'How are you?' },
+    ]);
 
     render(
       <Conversation
+        messageHistoryStore={messageHistoryStore}
+        errorStore={new TextStreamStore()}
+        messageStore={new TextStreamStore()}
+        isRequesting={false}
+        thinkingStore={new TextStreamStore()}
         onRendered={mockOnRendered}
         modelConfig={modelConfig}
-        isRequesting={false}
       />,
     );
 
@@ -143,9 +137,13 @@ describe('Conversation', () => {
 
     render(
       <Conversation
+        messageHistoryStore={new MessageHistoryStore()}
+        errorStore={new TextStreamStore()}
+        messageStore={new TextStreamStore()}
+        isRequesting={false}
+        thinkingStore={new TextStreamStore()}
         onRendered={mockOnRendered}
         modelConfig={modelConfig}
-        isRequesting={false}
       />,
     );
 
@@ -159,22 +157,15 @@ describe('Conversation', () => {
   });
 
   it('renders progress icon when isRequesting is true before assistant stream starts', () => {
-    (useAppContext as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-      errorStore: {
-        subscribe: mockSubscribe,
-        getSnapshot: mockGetSnapshot,
-      },
-      messageStore: {
-        subscribe: mockSubscribe,
-        getSnapshot: () => '',
-      },
-    });
-
     render(
       <Conversation
+        messageHistoryStore={new MessageHistoryStore()}
+        errorStore={new TextStreamStore()}
+        messageStore={new TextStreamStore()}
+        isRequesting={true}
+        thinkingStore={new TextStreamStore()}
         onRendered={mockOnRendered}
         modelConfig={modelConfig}
-        isRequesting={true}
       />,
     );
 
@@ -182,23 +173,15 @@ describe('Conversation', () => {
   });
 
   it('hides progress icon when isRequesting is true and assistant stream starts', () => {
-    (useAppContext as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-      errorStore: {
-        subscribe: mockSubscribe,
-        getSnapshot: mockGetSnapshot,
-      },
-      messageStore: {
-        subscribe: mockSubscribe,
-        getSnapshot: () => 'Hi',
-      },
-      isRequesting: true,
-    });
-
     render(
       <Conversation
+        messageHistoryStore={new MessageHistoryStore()}
+        errorStore={new TextStreamStore()}
+        messageStore={new TextStreamStore()}
+        isRequesting={false}
+        thinkingStore={new TextStreamStore()}
         onRendered={mockOnRendered}
         modelConfig={modelConfig}
-        isRequesting={false}
       />,
     );
 
@@ -208,23 +191,18 @@ describe('Conversation', () => {
   it('renders error message when error exists', () => {
     const mockErrorText = 'An error occurred';
 
-    (useAppContext as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-      errorStore: {
-        subscribe: mockSubscribe,
-        getSnapshot: vi.fn().mockReturnValue(mockErrorText),
-      },
-      messageStore: {
-        subscribe: mockSubscribe,
-        getSnapshot: () => '',
-      },
-      isRequesting: false,
-    });
+    const errorStore = new TextStreamStore();
+    errorStore.setText(mockErrorText);
 
     render(
       <Conversation
+        messageHistoryStore={new MessageHistoryStore()}
+        errorStore={errorStore}
+        messageStore={new TextStreamStore()}
+        isRequesting={false}
+        thinkingStore={new TextStreamStore()}
         onRendered={mockOnRendered}
         modelConfig={modelConfig}
-        isRequesting={false}
       />,
     );
 

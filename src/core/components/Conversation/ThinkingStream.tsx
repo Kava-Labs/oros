@@ -1,19 +1,19 @@
 import { StreamingText } from './StreamingText';
 import { ThinkingContent } from './ThinkingContent';
-import { useAppContext } from '../../context/useAppContext';
 import { ModelConfig } from '../../types/models';
+import { TextStreamStore } from 'lib-kava-ai';
 
 interface ThinkingStreamProps {
   onRendered: () => void;
   modelConfig: ModelConfig;
+  thinkingStore: TextStreamStore;
 }
 
 export const ThinkingStream = ({
   onRendered,
   modelConfig,
+  thinkingStore,
 }: ThinkingStreamProps) => {
-  const { thinkingStore } = useAppContext();
-
   return (
     <StreamingText
       store={thinkingStore}

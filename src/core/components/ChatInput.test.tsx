@@ -1,19 +1,10 @@
 import { fireEvent, render } from '@testing-library/react';
 import { ThemeProvider } from '../../shared/theme/themeProvider';
-import { AppContextProvider } from '../context/AppContextProvider';
-import { TextStreamStore } from 'lib-kava-ai';
-import { MessageHistoryStore } from '../stores/messageHistoryStore';
 import ChatInput, { ChatInputProps } from './ChatInput';
 import { vi } from 'vitest';
 import { MODEL_REGISTRY } from '../config';
 
 describe('ChatInput', () => {
-  const messageStore = new TextStreamStore();
-  const progressStore = new TextStreamStore();
-  const messageHistoryStore = new MessageHistoryStore();
-  const thinkingStore = new TextStreamStore();
-  const errorStore = new TextStreamStore();
-
   const props: ChatInputProps = {
     isRequesting: false,
     setShouldAutoScroll: vi.fn(),
@@ -28,15 +19,7 @@ describe('ChatInput', () => {
   test('input is focused by default', () => {
     const wrapper = render(
       <ThemeProvider>
-        <AppContextProvider
-          errorStore={errorStore}
-          thinkingStore={thinkingStore}
-          progressStore={progressStore}
-          messageStore={messageStore}
-          messageHistoryStore={messageHistoryStore}
-        >
-          <ChatInput {...props} />
-        </AppContextProvider>
+        <ChatInput {...props} />
       </ThemeProvider>,
     );
     const input = wrapper.getByTestId('chat-view-input');
@@ -45,15 +28,7 @@ describe('ChatInput', () => {
   test('send button is disabled when no input', () => {
     const wrapper = render(
       <ThemeProvider>
-        <AppContextProvider
-          errorStore={errorStore}
-          thinkingStore={thinkingStore}
-          progressStore={progressStore}
-          messageStore={messageStore}
-          messageHistoryStore={messageHistoryStore}
-        >
-          <ChatInput {...props} />
-        </AppContextProvider>
+        <ChatInput {...props} />
       </ThemeProvider>,
     );
     const input = wrapper.getByTestId('chat-view-input');
@@ -68,15 +43,7 @@ describe('ChatInput', () => {
   test('Inputs larger than the available context window disable the send button', () => {
     const wrapper = render(
       <ThemeProvider>
-        <AppContextProvider
-          errorStore={errorStore}
-          thinkingStore={thinkingStore}
-          progressStore={progressStore}
-          messageStore={messageStore}
-          messageHistoryStore={messageHistoryStore}
-        >
-          <ChatInput {...props} />
-        </AppContextProvider>
+        <ChatInput {...props} />
       </ThemeProvider>,
     );
     const input = wrapper.getByTestId('chat-view-input');
