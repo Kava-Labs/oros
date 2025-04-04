@@ -13,6 +13,9 @@ export function useSession() {
     fetch(sessionUrl, {
       method: 'GET',
       credentials: 'include',
+      headers: {
+        Accept: 'application/json',
+      },
     }).catch(() => {
       // silently fail
     });
@@ -23,6 +26,10 @@ export function useSession() {
     fetch(sessionUrl, {
       method: 'POST',
       credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
     }).catch(() => {
       // silently fail
     });
