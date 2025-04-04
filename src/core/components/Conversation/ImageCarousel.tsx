@@ -3,16 +3,11 @@ import styles from './ImageCarousel.module.css';
 import { IdbImage } from '../IdbImage';
 
 type ImageCarouselProps = {
-  isLoaded: boolean;
-  handleLoaded: () => void;
   imageIDs: string[];
 };
 
-export const ImageCarousel = ({
-  isLoaded,
-  handleLoaded,
-  imageIDs,
-}: ImageCarouselProps) => {
+export const ImageCarousel = ({ imageIDs }: ImageCarouselProps) => {
+  const [isLoaded, setIsLoaded] = useState(false);
   const [slideIndex, setSlideIndex] = useState(1);
 
   //  Function to show current slide
@@ -54,7 +49,7 @@ export const ImageCarousel = ({
               className={styles.image}
               aria-label="File upload chat message"
               //  we only need to update the loading state for the first file
-              onLoad={index === 0 ? handleLoaded : undefined}
+              onLoad={index === 0 ? () => setIsLoaded(true) : undefined}
             />
           </div>
         ))}

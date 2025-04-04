@@ -1,17 +1,12 @@
-import { TextStreamStore } from '../../core/stores/textStreamStore';
+import {
+  ConversationHistories,
+  TextStreamStore,
+  SearchableChatHistories,
+} from 'lib-kava-ai';
 import { MessageHistoryStore } from '../../core/stores/messageHistoryStore';
 import { ModelConfig, SupportedModels } from '../types/models';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import OpenAI from 'openai';
-
-export type ConversationHistory = {
-  id: string;
-  model: string;
-  title: string;
-  conversation: ChatCompletionMessageParam[];
-  lastSaved: number;
-  tokensRemaining: number;
-};
 
 export type ActiveConversation = {
   conversationID: string;
@@ -38,9 +33,12 @@ export type AppContextType = {
   errorStore: TextStreamStore;
   progressStore: TextStreamStore;
   messageHistoryStore: MessageHistoryStore;
-  loadConversation: (convoHistory: ConversationHistory) => void;
-  conversations: ConversationHistory[];
-  hasConversations: boolean;
+  onSelectConversation: (id: string) => Promise<void>;
+  onDeleteConversation: (id: string) => Promise<void>;
+  onUpdateConversationTitle: (id: string, newTitle: string) => Promise<void>;
+  fetchSearchHistory: () => Promise<void>;
+  searchableHistory: SearchableChatHistories | null;
+  conversations: ConversationHistories;
 };
 
 export interface TextChatMessage {

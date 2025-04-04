@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAppContext } from '../context/useAppContext';
-import { ConversationHistory } from '../context/types';
+import { ConversationHistory, getConversation } from 'lib-kava-ai';
 import { ModelConfig } from '../types/models';
 
 const isBelowContextThreshold = (
@@ -22,11 +22,14 @@ export const useManageContextWarning = (
 ) => {
   const { conversationID, modelConfig } = useAppContext();
 
-  const allConversations: Record<string, ConversationHistory> = JSON.parse(
-    localStorage.getItem('conversations') ?? '{}',
-  );
+  const [currentConversation, setCurrentConversation] =
+    useState<ConversationHistory | null>(null);
 
-  const currentConversation = allConversations[conversationID];
+  useEffect(() => {
+    getConversation(conversationID)
+      .then(setCurrentConversation)
+      .catch(console.error);
+  }, [conversationID]);
 
   //  when a user changes to another conversation (existing or new),
   //  reset all state
@@ -38,14 +41,14 @@ export const useManageContextWarning = (
   //  when an existing conversation goes below the threshold,
   //  show the warning, provided the user hasn't already seen it and toggled it off,
   //  but override that preference when they get dangerously low
-  const dangerouslyLowContext =
-    currentConversation &&
+  const dangerouslyLowContext: boolean =
+    currentConversation !== null &&
     currentConversation.tokensRemaining <
       modelConfig.conversationResetTokenThreshold;
 
   useEffect(() => {
-    const shouldShowWarning =
-      currentConversation &&
+    const shouldShowWarning: boolean =
+      currentConversation !== null &&
       ((!dismissWarning &&
         isBelowContextThreshold(currentConversation, modelConfig)) ||
         dangerouslyLowContext);

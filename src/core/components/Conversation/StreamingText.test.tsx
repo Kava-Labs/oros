@@ -1,17 +1,20 @@
 import { render, screen, act } from '@testing-library/react';
 import { StreamingText } from './StreamingText';
-import { TextStreamStore } from '../../stores/textStreamStore';
-import { AppContext } from '../../context/AppContext';
-import { AppContextType } from '../../context/types';
-import { ProgressStream } from './ProgressStream';
+import { TextStreamStore } from 'lib-kava-ai';
+import { MODEL_REGISTRY } from '../../config';
 
 describe('StreamingText', () => {
+  const modelConfig = MODEL_REGISTRY['o3-mini'];
   it('renders with the initial snapshot of the store', () => {
     const store = new TextStreamStore();
     store.setText('Initial Text');
 
     render(
-      <StreamingText store={store} onRendered={vi.fn()}>
+      <StreamingText
+        store={store}
+        modelConfig={modelConfig}
+        onRendered={vi.fn()}
+      >
         {(text) => <span data-testid="output">{text}</span>}
       </StreamingText>,
     );
@@ -24,7 +27,11 @@ describe('StreamingText', () => {
     store.setText('Initial');
 
     render(
-      <StreamingText store={store} onRendered={vi.fn()}>
+      <StreamingText
+        store={store}
+        modelConfig={modelConfig}
+        onRendered={vi.fn()}
+      >
         {(text) => <span data-testid="output">{text}</span>}
       </StreamingText>,
     );
@@ -43,7 +50,11 @@ describe('StreamingText', () => {
     store.setText('Hello');
 
     render(
-      <StreamingText store={store} onRendered={vi.fn()}>
+      <StreamingText
+        store={store}
+        modelConfig={modelConfig}
+        onRendered={vi.fn()}
+      >
         {(text) => <span data-testid="output">{text}</span>}
       </StreamingText>,
     );
@@ -61,7 +72,11 @@ describe('StreamingText', () => {
     const store = new TextStreamStore();
     // No setText called, so it should be an empty string
     render(
-      <StreamingText store={store} onRendered={vi.fn()}>
+      <StreamingText
+        store={store}
+        modelConfig={modelConfig}
+        onRendered={vi.fn()}
+      >
         {(text) => <span data-testid="output">{text}</span>}
       </StreamingText>,
     );
@@ -74,7 +89,11 @@ describe('StreamingText', () => {
     store.setText('Initial');
 
     render(
-      <StreamingText store={store} onRendered={vi.fn()}>
+      <StreamingText
+        store={store}
+        modelConfig={modelConfig}
+        onRendered={vi.fn()}
+      >
         {(text) => <span data-testid="output">{text}</span>}
       </StreamingText>,
     );
@@ -95,7 +114,11 @@ describe('StreamingText', () => {
     store.setText('Hello');
 
     render(
-      <StreamingText store={store} onRendered={vi.fn()}>
+      <StreamingText
+        store={store}
+        modelConfig={modelConfig}
+        onRendered={vi.fn()}
+      >
         {(text) => <strong data-testid="output">**{text}**</strong>}
       </StreamingText>,
     );
@@ -124,7 +147,11 @@ describe('StreamingText', () => {
     };
 
     const { unmount } = render(
-      <StreamingText store={store} onRendered={vi.fn()}>
+      <StreamingText
+        store={store}
+        modelConfig={modelConfig}
+        onRendered={vi.fn()}
+      >
         {(text) => <span>{text}</span>}
       </StreamingText>,
     );
@@ -140,7 +167,11 @@ describe('StreamingText', () => {
     const renderFn = vi.fn((text: string) => <span>{text}</span>);
 
     const { unmount } = render(
-      <StreamingText store={store} onRendered={vi.fn()}>
+      <StreamingText
+        store={store}
+        modelConfig={modelConfig}
+        onRendered={vi.fn()}
+      >
         {renderFn}
       </StreamingText>,
     );
@@ -170,7 +201,11 @@ describe('StreamingText', () => {
       parentRenderCount++;
       return (
         <div data-testid="parent">
-          <StreamingText store={store} onRendered={vi.fn()}>
+          <StreamingText
+            store={store}
+            modelConfig={modelConfig}
+            onRendered={vi.fn()}
+          >
             {(text) => <span data-testid="child">{text}</span>}
           </StreamingText>
           ,
@@ -192,46 +227,5 @@ describe('StreamingText', () => {
     expect(screen.getByTestId('child')).toHaveTextContent('Updated');
     // Check the parent's render count
     expect(parentRenderCount).toBe(1);
-  });
-
-  it('shows brain icon when progress store has text and hides when empty', () => {
-    const progressStore = new TextStreamStore();
-
-    const mockContext = {
-      progressStore,
-    } as unknown as AppContextType;
-
-    //  Render with empty progress store initially
-    const { rerender } = render(
-      <AppContext.Provider value={mockContext}>
-        <ProgressStream onRendered={() => {}} />
-      </AppContext.Provider>,
-    );
-
-    expect(screen.queryByTestId('brain-icon')).not.toBeInTheDocument();
-
-    act(() => {
-      progressStore.setText('Thinking...');
-    });
-
-    rerender(
-      <AppContext.Provider value={mockContext}>
-        <ProgressStream onRendered={() => {}} />
-      </AppContext.Provider>,
-    );
-
-    expect(screen.getByLabelText('Progress Icon')).toBeInTheDocument();
-
-    act(() => {
-      progressStore.setText('');
-    });
-
-    rerender(
-      <AppContext.Provider value={mockContext}>
-        <ProgressStream onRendered={() => {}} />
-      </AppContext.Provider>,
-    );
-
-    expect(screen.queryByLabelText('Progress Icon')).not.toBeInTheDocument();
   });
 });

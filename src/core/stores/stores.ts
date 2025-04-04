@@ -1,5 +1,5 @@
 import { MessageHistoryStore } from './messageHistoryStore';
-import { TextStreamStore } from './textStreamStore';
+import { TextStreamStore } from 'lib-kava-ai';
 
 export const messageStore = new TextStreamStore();
 export const thinkingStore = new TextStreamStore();

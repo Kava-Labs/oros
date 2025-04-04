@@ -5,11 +5,12 @@ import { mockChatMessages, markDownSpecChatMessages } from './mockdata';
 import type { Decorator } from '@storybook/react';
 import { ThemeProvider } from '../shared/theme/themeProvider';
 import { AppContextProvider } from '../core/context/AppContextProvider';
-import { TextStreamStore } from '../core/stores/textStreamStore';
+import { TextStreamStore } from 'lib-kava-ai';
 import {
   ChatMessage,
   MessageHistoryStore,
 } from '../core/stores/messageHistoryStore';
+import { MODEL_REGISTRY } from '../core/config';
 
 const messageStore = new TextStreamStore();
 const progressStore = new TextStreamStore();
@@ -73,6 +74,11 @@ const args: ChatViewProps = {
   onMenu: fn(),
   onPanelOpen: fn(),
   isPanelOpen: false,
+  supportsUpload: true,
+  showModelSelector: true,
+  startNewChat: fn(),
+  conversationID: 'foo',
+  modelConfig: MODEL_REGISTRY['o3-mini'],
 };
 
 // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args

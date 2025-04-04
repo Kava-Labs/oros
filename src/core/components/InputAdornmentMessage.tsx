@@ -2,19 +2,18 @@ import React from 'react';
 import styles from './InputAdornmentMessage.module.css';
 import ButtonIcon from './ButtonIcon';
 import { X as CloseX } from 'lucide-react';
-import { useAppContext } from '../context/useAppContext';
 
 interface InputAdornmentMessageProps {
   onCloseClick: () => void;
   shouldDisableChat: boolean;
+  startNewChat: () => void;
 }
 
 export const InputAdornmentMessage: React.FC<InputAdornmentMessageProps> = ({
   onCloseClick,
   shouldDisableChat,
+  startNewChat,
 }) => {
-  const { startNewChat } = useAppContext();
-
   const warningText = shouldDisableChat
     ? 'This conversation has exceeded the context limit'
     : 'This conversation is approaching the context limit';

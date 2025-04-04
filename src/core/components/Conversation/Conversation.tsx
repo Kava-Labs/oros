@@ -1,5 +1,5 @@
 import styles from './Conversation.module.css';
-import { Fragment, memo, useState } from 'react';
+import { Fragment, memo } from 'react';
 import { useSyncExternalStore } from 'react';
 import { StreamingMessage } from './StreamingMessage';
 import { ErrorMessage } from './ErrorMessage';
@@ -9,25 +9,31 @@ import { useMessageHistory } from '../../hooks/useMessageHistory';
 import { Content } from './Content';
 import { IdbImage } from '../IdbImage';
 import { ImageCarousel } from './ImageCarousel';
+import { ProgressIcon } from './ProgressIcon';
+import { ModelConfig } from '../../types/models';
 
 export interface ConversationProps {
   onRendered(): void;
+  modelConfig: ModelConfig;
 }
 
-const ConversationComponent = ({ onRendered }: ConversationProps) => {
-  const { errorStore, isRequesting } = useAppContext();
+const ConversationComponent = ({
+  onRendered,
+  modelConfig,
+}: ConversationProps) => {
+  const { errorStore, isRequesting, messageStore } = useAppContext();
 
   const errorText: string = useSyncExternalStore(
     errorStore.subscribe,
     errorStore.getSnapshot,
   );
 
-  const { messages } = useMessageHistory();
-  const [isLoaded, setIsLoaded] = useState(false);
+  const assistantStream = useSyncExternalStore(
+    messageStore.subscribe,
+    messageStore.getSnapshot,
+  );
 
-  const handleFileLoad = () => {
-    setIsLoaded(true);
-  };
+  const { messages } = useMessageHistory();
 
   return (
     <div className={styles.conversationContainer} data-testid="conversation">
@@ -85,24 +91,14 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
               {hasImage ? (
                 <div className={styles.chatImage}>
                   {imageIDs.length > 1 ? (
-                    <ImageCarousel
-                      imageIDs={imageIDs}
-                      isLoaded={isLoaded}
-                      handleLoaded={handleFileLoad}
-                    />
+                    <ImageCarousel imageIDs={imageIDs} />
                   ) : (
-                    <>
-                      {!isLoaded && (
-                        <div className={styles.imageSkeleton}></div>
-                      )}
-                      <IdbImage
-                        width="256px"
-                        height="256px"
-                        id={imageIDs[0]}
-                        aria-label="File upload chat message"
-                        onLoad={handleFileLoad}
-                      />
-                    </>
+                    <IdbImage
+                      width="256px"
+                      height="256px"
+                      id={imageIDs[0]}
+                      aria-label="File upload chat message"
+                    />
                   )}
                 </div>
               ) : null}
@@ -112,6 +108,7 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
                   role={message.role}
                   content={content}
                   data-testid="user-message"
+                  modelConfig={modelConfig}
                 />
               </div>
             </Fragment>
@@ -122,6 +119,7 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
           return (
             <AssistantMessage
               key={index}
+              modelConfig={modelConfig}
               content={message.content as string}
               reasoningContent={
                 'reasoningContent' in message
@@ -135,10 +133,18 @@ const ConversationComponent = ({ onRendered }: ConversationProps) => {
         return null;
       })}
 
-      {isRequesting && <StreamingMessage onRendered={onRendered} />}
+      {isRequesting && assistantStream.length === 0 ? (
+        <ProgressIcon />
+      ) : (
+        <StreamingMessage onRendered={onRendered} modelConfig={modelConfig} />
+      )}
 
       {errorText.length > 0 && (
-        <ErrorMessage errorText={errorText} onRendered={onRendered} />
+        <ErrorMessage
+          errorText={errorText}
+          onRendered={onRendered}
+          modelConfig={modelConfig}
+        />
       )}
     </div>
   );

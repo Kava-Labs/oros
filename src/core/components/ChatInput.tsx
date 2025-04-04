@@ -3,7 +3,7 @@ import { CancelChatIcon, SendChatIcon } from '../assets';
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useAppContext } from '../context/useAppContext';
 import { InputAdornmentMessage } from './InputAdornmentMessage';
-import { ConversationHistory } from '../context/types';
+import { ConversationHistory, getConversation } from 'lib-kava-ai';
 import { hasSufficientRemainingTokens } from '../utils/conversation/hasSufficientRemainingTokens';
 import { useManageContextWarning } from '../hooks/useManageContextWarning';
 import { Paperclip, X } from 'lucide-react';
@@ -16,15 +16,19 @@ import type {
   ChatCompletionUserMessageParam,
 } from 'openai/resources/index';
 import { useDragAndDrop } from '../hooks/useDragAndDrop';
-import { isSupportedFileType } from '../types/models';
+import { isSupportedFileType, ModelConfig } from '../types/models';
 import useProcessUploadedFile from '../hooks/useProcessUploadedFile';
 import { useAvailableUploads } from '../hooks/useAvailableUploads';
 import { useUploadingError } from '../hooks/useUploadingError';
 
 const DEFAULT_HEIGHT = '30px';
 
-interface ChatInputProps {
+export interface ChatInputProps {
   setShouldAutoScroll: (s: boolean) => void;
+  supportsUpload: boolean;
+  startNewChat: () => void;
+  conversationID: string;
+  modelConfig: ModelConfig;
 }
 
 export interface UploadingState {
@@ -41,7 +45,13 @@ export type FileUpload = {
   page?: number;
 };
 
-const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
+const ChatInput = ({
+  setShouldAutoScroll,
+  supportsUpload,
+  startNewChat,
+  conversationID,
+  modelConfig,
+}: ChatInputProps) => {
   const [showInputAdornmentMessage, setShowInputAdornmentMessage] =
     useState(false);
   const [dismissWarning, setDismissWarning] = useState(false);
@@ -72,13 +82,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     });
   }, []);
 
-  const {
-    isRequesting,
-    modelConfig,
-    handleChatCompletion,
-    handleCancel,
-    conversationID,
-  } = useAppContext();
+  const { isRequesting, handleChatCompletion, handleCancel } = useAppContext();
 
   const { supportedFileTypes, maximumFileUploads, maximumFileBytes } =
     modelConfig;
@@ -284,17 +288,18 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
     }
   }, []);
 
-  const allConversations: Record<string, ConversationHistory> = JSON.parse(
-    localStorage.getItem('conversations') ?? '{}',
-  );
+  const [currentConversation, setCurrentConversation] =
+    useState<ConversationHistory | null>(null);
 
-  const currentConversation = allConversations[conversationID];
+  useEffect(() => {
+    getConversation(conversationID)
+      .then(setCurrentConversation)
+      .catch(console.error);
+  }, [conversationID]);
 
   const remainingContextWindow = currentConversation
     ? currentConversation.tokensRemaining
     : modelConfig.contextLength;
-
-  const modelSupportsUpload = supportedFileTypes.length > 0;
 
   useDragAndDrop({
     hasAvailableUploads,
@@ -306,7 +311,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
   });
 
   useEffect(() => {
-    if (!modelSupportsUpload) {
+    if (!supportsUpload) {
       return;
     }
 
@@ -340,7 +345,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
   }, [
     processUploadedFile,
     hasAvailableUploads,
-    modelSupportsUpload,
+    supportsUpload,
     resetUploadState,
     maximumFileBytes,
     setUploadError,
@@ -370,6 +375,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
             setShowInputAdornmentMessage(false);
             setDismissWarning(true);
           }}
+          startNewChat={startNewChat}
         />
       )}
       {uploadedFiles.length > 0 && (
@@ -426,7 +432,7 @@ const ChatInput = ({ setShouldAutoScroll }: ChatInputProps) => {
         </div>
         <div className={styles.buttonContainer}>
           <div className={styles.buttonWrapper}>
-            {modelSupportsUpload && (
+            {supportsUpload && (
               <>
                 <div className={styles.uploadInputFieldContainer}>
                   <input

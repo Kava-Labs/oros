@@ -1,26 +1,31 @@
 import styles from './NavBar.module.css';
-import { useIsMobile } from '../../shared/theme/useIsMobile';
+import { useIsMobileLayout } from 'lib-kava-ai';
 import { Menu, PanelLeftOpen } from 'lucide-react';
 import ButtonIcon from './ButtonIcon';
 import { NewChatButton } from '../assets/NewChatButton';
 import { ModelSelector } from './ModelSelector';
-import { useAppContext } from '../context/useAppContext';
 
-interface NavBarProps {
-  onMenu(): void;
-  onPanelOpen(): void;
+export interface NavBarProps {
+  onMenu: () => void;
+  onPanelOpen: () => void;
   isPanelOpen: boolean;
+  showModelSelector: boolean;
+  startNewChat: () => void;
 }
 
-export const NavBar = ({ onMenu, onPanelOpen, isPanelOpen }: NavBarProps) => {
-  const isMobile = useIsMobile();
-
-  const { startNewChat } = useAppContext();
+export const NavBar = ({
+  onMenu,
+  onPanelOpen,
+  isPanelOpen,
+  showModelSelector,
+  startNewChat,
+}: NavBarProps) => {
+  const isMobileLayout = useIsMobileLayout();
 
   return (
     <div className={styles.nav}>
       <div className={styles.leftSection}>
-        {!isMobile ? (
+        {!isMobileLayout ? (
           <div className={styles.desktopControls}>
             {!isPanelOpen && (
               <ButtonIcon
@@ -37,7 +42,7 @@ export const NavBar = ({ onMenu, onPanelOpen, isPanelOpen }: NavBarProps) => {
               onClick={startNewChat}
               className={styles.newChatDesktop}
             />
-            <ModelSelector />
+            {showModelSelector && <ModelSelector />}
           </div>
         ) : (
           <div className={styles.menu}>
@@ -55,11 +60,11 @@ export const NavBar = ({ onMenu, onPanelOpen, isPanelOpen }: NavBarProps) => {
       </div>
 
       <div className={styles.centerSection}>
-        {isMobile && <ModelSelector />}
+        {isMobileLayout && showModelSelector && <ModelSelector />}
       </div>
 
       <div className={styles.rightSection}>
-        {isMobile && <NewChatButton onClick={startNewChat} />}
+        {isMobileLayout && <NewChatButton onClick={startNewChat} />}
       </div>
     </div>
   );

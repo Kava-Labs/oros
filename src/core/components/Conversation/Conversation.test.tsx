@@ -3,6 +3,7 @@ import { vi } from 'vitest';
 import { Conversation } from './Conversation';
 import { useAppContext } from '../../context/useAppContext';
 import { useMessageHistory } from '../../hooks/useMessageHistory';
+import { MODEL_REGISTRY } from '../../config';
 
 // Mock the required modules and hooks
 // TODO: Consider using AppContext so the data structure remains
@@ -69,6 +70,7 @@ vi.mock('./ErrorMessage', () => ({
 }));
 
 describe('Conversation', () => {
+  const modelConfig = MODEL_REGISTRY['o3-mini'];
   const mockOnRendered = vi.fn();
   const mockSubscribe = vi.fn();
   const mockGetSnapshot = vi.fn().mockReturnValue('');
@@ -81,6 +83,10 @@ describe('Conversation', () => {
         subscribe: mockSubscribe,
         getSnapshot: mockGetSnapshot,
       },
+      messageStore: {
+        subscribe: mockSubscribe,
+        getSnapshot: mockGetSnapshot,
+      },
       isRequesting: false,
     });
 
@@ -90,7 +96,9 @@ describe('Conversation', () => {
   });
 
   it('renders empty conversation correctly', () => {
-    render(<Conversation onRendered={mockOnRendered} />);
+    render(
+      <Conversation onRendered={mockOnRendered} modelConfig={modelConfig} />,
+    );
 
     expect(screen.getByTestId('conversation')).toBeInTheDocument();
   });
@@ -103,7 +111,9 @@ describe('Conversation', () => {
       ],
     });
 
-    render(<Conversation onRendered={mockOnRendered} />);
+    render(
+      <Conversation onRendered={mockOnRendered} modelConfig={modelConfig} />,
+    );
 
     const userMessages = screen.getAllByTestId('user-message');
     expect(userMessages).toHaveLength(2);
@@ -123,7 +133,9 @@ describe('Conversation', () => {
       ],
     });
 
-    render(<Conversation onRendered={mockOnRendered} />);
+    render(
+      <Conversation onRendered={mockOnRendered} modelConfig={modelConfig} />,
+    );
 
     const assistantMessages = screen.getAllByTestId('assistant-message');
     expect(assistantMessages).toHaveLength(2);
@@ -134,18 +146,44 @@ describe('Conversation', () => {
     expect(reasoningContent).toHaveTextContent('Thinking about response');
   });
 
-  it('renders streaming message when isRequesting is true', () => {
+  it('renders progress icon when isRequesting is true before assistant stream starts', () => {
     (useAppContext as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
       errorStore: {
         subscribe: mockSubscribe,
         getSnapshot: mockGetSnapshot,
       },
+      messageStore: {
+        subscribe: mockSubscribe,
+        getSnapshot: () => '',
+      },
       isRequesting: true,
     });
 
-    render(<Conversation onRendered={mockOnRendered} />);
+    render(
+      <Conversation onRendered={mockOnRendered} modelConfig={modelConfig} />,
+    );
 
-    expect(screen.getByTestId('streaming-message')).toBeInTheDocument();
+    expect(screen.getByLabelText('Progress Icon')).toBeInTheDocument();
+  });
+
+  it('hides progress icon when isRequesting is true and assistant stream starts', () => {
+    (useAppContext as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+      errorStore: {
+        subscribe: mockSubscribe,
+        getSnapshot: mockGetSnapshot,
+      },
+      messageStore: {
+        subscribe: mockSubscribe,
+        getSnapshot: () => 'Hi',
+      },
+      isRequesting: true,
+    });
+
+    render(
+      <Conversation onRendered={mockOnRendered} modelConfig={modelConfig} />,
+    );
+
+    expect(screen.queryByLabelText('Progress Icon')).not.toBeInTheDocument();
   });
 
   it('renders error message when error exists', () => {
@@ -156,10 +194,16 @@ describe('Conversation', () => {
         subscribe: mockSubscribe,
         getSnapshot: vi.fn().mockReturnValue(mockErrorText),
       },
+      messageStore: {
+        subscribe: mockSubscribe,
+        getSnapshot: () => '',
+      },
       isRequesting: false,
     });
 
-    render(<Conversation onRendered={mockOnRendered} />);
+    render(
+      <Conversation onRendered={mockOnRendered} modelConfig={modelConfig} />,
+    );
 
     const errorMessage = screen.getByTestId('error-message');
     expect(errorMessage).toBeInTheDocument();

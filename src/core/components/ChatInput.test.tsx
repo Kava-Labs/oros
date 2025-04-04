@@ -1,10 +1,11 @@
 import { fireEvent, render } from '@testing-library/react';
 import { ThemeProvider } from '../../shared/theme/themeProvider';
 import { AppContextProvider } from '../context/AppContextProvider';
-import { TextStreamStore } from '../stores/textStreamStore';
+import { TextStreamStore } from 'lib-kava-ai';
 import { MessageHistoryStore } from '../stores/messageHistoryStore';
-import ChatInput from './ChatInput';
+import ChatInput, { ChatInputProps } from './ChatInput';
 import { vi } from 'vitest';
+import { MODEL_REGISTRY } from '../config';
 
 describe('ChatInput', () => {
   const messageStore = new TextStreamStore();
@@ -13,10 +14,12 @@ describe('ChatInput', () => {
   const thinkingStore = new TextStreamStore();
   const errorStore = new TextStreamStore();
 
-  const props = {
+  const props: ChatInputProps = {
     setShouldAutoScroll: vi.fn(),
-    onCancel: vi.fn(),
-    onSubmit: vi.fn(),
+    supportsUpload: true,
+    startNewChat: vi.fn(),
+    conversationID: 'foo',
+    modelConfig: MODEL_REGISTRY['o3-mini'],
   };
 
   test('input is focused by default', () => {

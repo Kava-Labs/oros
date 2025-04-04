@@ -1,14 +1,16 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 import { Content, ContentComponent } from './Content';
-import { sanitizeContent } from '../../utils/sanitize';
+import { sanitizeContent } from 'lib-kava-ai';
 import { useAppContext } from '../../context/useAppContext';
+import { MODEL_REGISTRY } from '../../config';
 
 // Mock the required modules and hooks
-vi.mock('../../utils/sanitize');
+vi.mock('lib-kava-ai');
 vi.mock('../../context/useAppContext');
 
 describe('Content Component', () => {
+  const modelConfig = MODEL_REGISTRY['o3-mini'];
   const mockContent = 'Test content';
   const mockSanitizedContent = '<p>Sanitized content</p>';
   const mockOnRendered = vi.fn();
@@ -35,7 +37,13 @@ describe('Content Component', () => {
   });
 
   it('renders sanitized content correctly', async () => {
-    render(<ContentComponent content={mockContent} role="user" />);
+    render(
+      <ContentComponent
+        content={mockContent}
+        role="user"
+        modelConfig={modelConfig}
+      />,
+    );
 
     // Should call sanitizeContent with the content
     expect(sanitizeContent).toHaveBeenCalledWith(mockContent);
@@ -49,7 +57,9 @@ describe('Content Component', () => {
   });
 
   it('handles empty content', async () => {
-    render(<ContentComponent content="" role="user" />);
+    render(
+      <ContentComponent content="" role="user" modelConfig={modelConfig} />,
+    );
 
     expect(sanitizeContent).not.toHaveBeenCalled();
 
@@ -65,6 +75,7 @@ describe('Content Component', () => {
         content={mockContent}
         role="user"
         onRendered={mockOnRendered}
+        modelConfig={modelConfig}
       />,
     );
 
@@ -76,16 +87,20 @@ describe('Content Component', () => {
   it('uses model-specific processor if available', async () => {
     const mockPostProcess = vi.fn().mockReturnValue('Processed content');
 
-    // Update useAppContext mock to include a processor
-    (useAppContext as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-      modelConfig: {
-        messageProcessors: {
-          postProcess: mockPostProcess,
-        },
+    const modelConfigWithProcessor = {
+      ...modelConfig,
+      messageProcessors: {
+        postProcess: mockPostProcess,
       },
-    });
+    };
 
-    render(<ContentComponent content={mockContent} role="user" />);
+    render(
+      <ContentComponent
+        content={mockContent}
+        role="user"
+        modelConfig={modelConfigWithProcessor}
+      />,
+    );
 
     // Wait for async operations to complete
     await waitFor(() => {
@@ -93,9 +108,10 @@ describe('Content Component', () => {
       expect(sanitizeContent).toHaveBeenCalledWith('Processed content');
     });
   });
-
   it('memoizes correctly', async () => {
-    const { rerender } = render(<Content content={mockContent} role="user" />);
+    const { rerender } = render(
+      <Content content={mockContent} role="user" modelConfig={modelConfig} />,
+    );
 
     // Wait for the async state updates to complete
     await waitFor(() => {
@@ -103,7 +119,9 @@ describe('Content Component', () => {
     });
 
     // Rerender with the same props
-    rerender(<Content content={mockContent} role="user" />);
+    rerender(
+      <Content content={mockContent} role="user" modelConfig={modelConfig} />,
+    );
 
     // Wait again for any potential async updates
     await waitFor(() => {
@@ -112,7 +130,9 @@ describe('Content Component', () => {
     });
 
     // Rerender with different props
-    rerender(<Content content="New content" role="user" />);
+    rerender(
+      <Content content="New content" role="user" modelConfig={modelConfig} />,
+    );
 
     await waitFor(() => {
       expect(sanitizeContent).toHaveBeenCalledTimes(2);

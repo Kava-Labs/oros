@@ -6,17 +6,28 @@ import { useMessageHistory } from '../hooks/useMessageHistory';
 import ChatInput from './ChatInput';
 import { LandingContent } from './LandingContent';
 import { defaultCautionText } from '../config/models/defaultPrompts';
+import { ModelConfig } from '../types/models';
 
 export interface ChatViewProps {
   onMenu(): void;
   onPanelOpen(): void;
   isPanelOpen: boolean;
+  supportsUpload: boolean;
+  showModelSelector: boolean;
+  startNewChat: () => void;
+  conversationID: string;
+  modelConfig: ModelConfig;
 }
 
 export const ChatView = ({
   onMenu,
   onPanelOpen,
   isPanelOpen,
+  supportsUpload,
+  showModelSelector,
+  startNewChat,
+  conversationID,
+  modelConfig,
 }: ChatViewProps) => {
   const { hasMessages } = useMessageHistory();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -71,6 +82,8 @@ export const ChatView = ({
             onPanelOpen={onPanelOpen}
             isPanelOpen={isPanelOpen}
             onMenu={onMenu}
+            showModelSelector={showModelSelector}
+            startNewChat={startNewChat}
           />
         </div>
 
@@ -78,16 +91,29 @@ export const ChatView = ({
           <div
             className={`${styles.chatContent} ${hasMessages ? styles.fullHeight : ''}`}
           >
-            {hasMessages && <Conversation onRendered={handleContentRendered} />}
+            {hasMessages && (
+              <Conversation
+                onRendered={handleContentRendered}
+                modelConfig={modelConfig}
+              />
+            )}
           </div>
 
           <div
             className={`${styles.controlsContainer} ${hasMessages ? styles.positionSticky : ''}`}
             data-testid="controls"
           >
-            {!hasMessages && <LandingContent />}
+            {!hasMessages && (
+              <LandingContent introText={modelConfig.introText} />
+            )}
 
-            <ChatInput setShouldAutoScroll={setShouldAutoScroll} />
+            <ChatInput
+              setShouldAutoScroll={setShouldAutoScroll}
+              supportsUpload={supportsUpload}
+              startNewChat={startNewChat}
+              conversationID={conversationID}
+              modelConfig={modelConfig}
+            />
             <div className={styles.importantInfo}>
               <span>{defaultCautionText}</span>
             </div>
