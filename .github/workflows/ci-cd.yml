@@ -24,6 +24,8 @@ jobs:
       VITE_OPENAI_BASE_URL: https://kavachat-api.production.kava.io/openai/v1
       VITE_FEAT_UPDATED_DESIGN: true
       VITE_FEAT_QWEN: false
+      VITE_RAILS_API_BASE_URL: 'https://ai.kava.io'
+
     outputs:
       changed: ${{ steps.diff.outputs.diff != '' }}
     steps:
