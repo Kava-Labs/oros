@@ -32,15 +32,15 @@ export function useSession() {
     navigator.sendBeacon(sessionUrl);
   };
 
-  const handleUserActivity = () => {
-    const now = Date.now();
-    if (now - lastPingTimeRef.current >= FIVE_MINUTES) {
-      postHeartbeat();
-    }
-  };
-
   useEffect(() => {
     getSession(); // Initial session ping on mount
+
+    const handleUserActivity = () => {
+      const now = Date.now();
+      if (now - lastPingTimeRef.current >= FIVE_MINUTES) {
+        postHeartbeat();
+      }
+    };
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
