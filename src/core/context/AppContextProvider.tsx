@@ -117,7 +117,7 @@ export const AppContextProvider = (props: {
   }, []);
 
   const [conversationHistories, setConversationHistories] =
-    useState<ConversationHistories>({});
+    useState<ConversationHistories | null>(null);
 
   const fetchConversations = useCallback(() => {
     getAllConversations()
@@ -153,7 +153,7 @@ export const AppContextProvider = (props: {
     async (id: string) => {
       if (id === conversation.conversationID) return;
       let activeConversation = activeConversationsRef.current?.get(id);
-      if (!activeConversation) {
+      if (!activeConversation && conversationHistories) {
         const selectedConversation = conversationHistories[id];
         if (selectedConversation) {
           const messages = await getConversationMessages(id);

@@ -5,7 +5,7 @@ import { JSX } from 'react';
 
 export interface SideBarProps {
   activeConversationId: string | null;
-  conversationHistories: ConversationHistories;
+  conversationHistories: ConversationHistories | null;
   onSelectConversation: (id: string) => void;
   onDeleteConversation: (id: string) => void;
   onUpdateConversationTitle: (id: string, newTitle: string) => void;
@@ -33,8 +33,10 @@ export const SideBar = ({
     isMobileSideBarOpen ? styles.isOpen : ''
   } ${isDesktopSideBarOpen ? '' : styles.isHidden}`;
 
+  const conversationsLoaded = conversationHistories !== null;
+
   const hasNoConversationHistory =
-    Object.keys(conversationHistories).length === 0;
+    conversationsLoaded && Object.keys(conversationHistories).length === 0;
 
   return (
     <div className={sideBarStyles}>
@@ -50,13 +52,15 @@ export const SideBar = ({
       </div>
 
       <div className={styles.sidebarContent}>
-        <ChatHistory
-          chatHistories={conversationHistories}
-          onSelectConversation={onSelectConversation}
-          activeConversationId={activeConversationId}
-          onDeleteConversation={onDeleteConversation}
-          onUpdateConversationTitle={onUpdateConversationTitle}
-        />
+        {conversationsLoaded && (
+          <ChatHistory
+            chatHistories={conversationHistories}
+            onSelectConversation={onSelectConversation}
+            activeConversationId={activeConversationId}
+            onDeleteConversation={onDeleteConversation}
+            onUpdateConversationTitle={onUpdateConversationTitle}
+          />
+        )}
       </div>
     </div>
   );
