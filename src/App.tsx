@@ -2,10 +2,8 @@ import { useState } from 'react';
 import { ChatView } from './core/components/ChatView';
 import { useAppContext } from './core/context/useAppContext';
 import styles from './App.module.css';
-import { useIsMobileLayout } from 'lib-kava-ai';
 import KavaAILogo from './core/assets/KavaAILogo';
-import { SearchHistoryModal } from 'lib-kava-ai';
-import { SideBar } from './core/components/SideBar';
+import { SearchHistoryModal, SideBar, useIsMobileLayout } from 'lib-kava-ai';
 import { useSession } from './useSession';
 
 export const App = () => {
@@ -60,6 +58,7 @@ export const App = () => {
             onUpdateConversationTitle={onUpdateConversationTitle}
             isSideBarOpen={isSideBarOpen}
             SideBarLogo={<KavaAILogo height={20} />}
+            styles={styles}
           />
           <div className={styles.content}>
             <ChatView
