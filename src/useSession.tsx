@@ -8,7 +8,6 @@ export function useSession() {
   const lastPingTimeRef = useRef<number>(Date.now());
 
   const getSession = () => {
-    // update current time to track against last ping
     lastPingTimeRef.current = Date.now();
     fetch(sessionUrl, {
       method: 'GET',
@@ -21,22 +20,18 @@ export function useSession() {
     });
   };
 
-  const postHeartbeat = () => {
+  const postHeartbeat = (keepAlive = false) => {
     lastPingTimeRef.current = Date.now();
     fetch(sessionUrl, {
       method: 'POST',
       credentials: 'include',
       headers: {
-        'Content-Type': 'application/json',
         Accept: 'application/json',
       },
+      keepalive: keepAlive,
     }).catch(() => {
       // silently fail
     });
-  };
-
-  const sendBeacon = () => {
-    navigator.sendBeacon(sessionUrl);
   };
 
   useEffect(() => {
@@ -53,12 +48,12 @@ export function useSession() {
       if (document.visibilityState === 'visible') {
         handleUserActivity();
       } else if (document.visibilityState === 'hidden') {
-        sendBeacon();
+        postHeartbeat(true); // Send keepalive ping before tab closes
       }
     };
 
     const handlePagehide = () => {
-      sendBeacon();
+      postHeartbeat(true); // Also send keepalive on pagehide
     };
 
     const userActivityEvents = [
