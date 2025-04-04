@@ -6,6 +6,16 @@ export class Chat {
 
   constructor(page: Page) {
     this.page = page;
+
+    // Mock the /session endpoint for both GET and POST
+    this.page.route('**/session', async (route, request) => {
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({}),
+      });
+    });
+
     this.messageContainer = this.page.locator(
       `[data-testid="conversation"] div div`,
     );
