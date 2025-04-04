@@ -6,6 +6,7 @@ import { useIsMobileLayout } from 'lib-kava-ai';
 import KavaAILogo from './core/assets/KavaAILogo';
 import { SearchHistoryModal } from 'lib-kava-ai';
 import { SideBar } from './core/components/SideBar';
+import { useSession } from './useSession';
 
 export const App = () => {
   const {
@@ -24,6 +25,8 @@ export const App = () => {
   const [isMobileSideBarOpen, setIsMobileSideBarOpen] = useState(false);
   const [isDesktopSideBarOpen, setIsDesktopSideBarOpen] = useState(true);
   const [isSearchHistoryOpen, setIsSearchHistoryOpen] = useState(false);
+
+  useSession();
 
   const onOpenSearchModal = async () => {
     await fetchSearchHistory();
