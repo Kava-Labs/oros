@@ -38,7 +38,7 @@ export type AppContextType = {
   onUpdateConversationTitle: (id: string, newTitle: string) => Promise<void>;
   fetchSearchHistory: () => Promise<void>;
   searchableHistory: SearchableChatHistories | null;
-  conversations: ConversationHistories;
+  conversations: ConversationHistories | null;
 };
 
 export interface TextChatMessage {
