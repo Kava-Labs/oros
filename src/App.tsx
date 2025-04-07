@@ -71,6 +71,14 @@ export const App = () => {
           />
           <div className={styles.content}>
             <ChatViewContainer
+              handleModelChange={handleModelChange}
+              thinkingStore={thinkingStore}
+              messageHistoryStore={messageHistoryStore}
+              isRequesting={isRequesting}
+              errorStore={errorStore}
+              messageStore={messageStore}
+              handleCancel={handleCancel}
+              handleChatCompletion={handleChatCompletion}
               onMenu={() => setIsMobileSideBarOpen(true)}
               onPanelOpen={() => setIsDesktopSideBarOpen(true)}
               isPanelOpen={isDesktopSideBarOpen}
@@ -79,14 +87,6 @@ export const App = () => {
               startNewChat={startNewChat}
               conversationID={conversationID}
               modelConfig={modelConfig}
-              errorStore={errorStore}
-              messageStore={messageStore}
-              thinkingStore={thinkingStore}
-              messageHistoryStore={messageHistoryStore}
-              isRequesting={isRequesting}
-              handleChatCompletion={handleChatCompletion}
-              handleCancel={handleCancel}
-              handleModelChange={handleModelChange}
             />
           </div>
           {isSearchHistoryOpen && searchableHistory && (
