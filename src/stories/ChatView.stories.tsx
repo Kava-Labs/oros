@@ -67,7 +67,7 @@ const args: ChatViewProps = {
   startNewChat: fn(),
   conversationID: 'foo',
   modelConfig: MODEL_REGISTRY['o3-mini'],
-  messageHistoryStore: messageHistoryStore,
+  messages: [],
   errorStore: new TextStreamStore(),
   messageStore: new TextStreamStore(),
   thinkingStore: new TextStreamStore(),

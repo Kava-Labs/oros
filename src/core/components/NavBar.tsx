@@ -5,7 +5,6 @@ import ButtonIcon from './ButtonIcon';
 import { NewChatButton } from '../assets/NewChatButton';
 import { ModelSelector } from './ModelSelector';
 import type { SupportedModels, ModelConfig } from '../types/models';
-import type { MessageHistoryStore } from '../stores/messageHistoryStore';
 
 export interface NavBarProps {
   onMenu: () => void;
@@ -15,7 +14,7 @@ export interface NavBarProps {
   startNewChat: () => void;
   handleModelChange: (modelName: SupportedModels) => void;
   modelConfig: ModelConfig;
-  messageHistoryStore: MessageHistoryStore;
+  isModelSelectorDisabled: boolean;
 }
 
 export const NavBar = ({
@@ -26,7 +25,7 @@ export const NavBar = ({
   startNewChat,
   handleModelChange,
   modelConfig,
-  messageHistoryStore,
+  isModelSelectorDisabled,
 }: NavBarProps) => {
   const isMobileLayout = useIsMobileLayout();
 
@@ -54,7 +53,7 @@ export const NavBar = ({
               <ModelSelector
                 handleModelChange={handleModelChange}
                 modelConfig={modelConfig}
-                messageHistoryStore={messageHistoryStore}
+                isDisabled={isModelSelectorDisabled}
               />
             )}
           </div>
@@ -78,7 +77,7 @@ export const NavBar = ({
           <ModelSelector
             handleModelChange={handleModelChange}
             modelConfig={modelConfig}
-            messageHistoryStore={messageHistoryStore}
+            isDisabled={isModelSelectorDisabled}
           />
         )}
       </div>

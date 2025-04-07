@@ -1,25 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
 import { Conversation } from './Conversation';
-import { useMessageHistory } from '../../hooks/useMessageHistory';
 import { MODEL_REGISTRY } from '../../config';
-import { MessageHistoryStore } from '../../stores/messageHistoryStore';
+import { ChatMessage } from '../../stores/messageHistoryStore';
 import { TextStreamStore } from 'lib-kava-ai';
-
-// Mock the required modules and hooks
-// TODO: Consider using AppContext so the data structure remains
-//       the same instead of potentially producing false positives
-vi.mock('../../context/useAppContext');
-vi.mock('../../hooks/useMessageHistory');
-vi.mock('react', async () => {
-  const actual = await vi.importActual('react');
-  return {
-    ...actual,
-    useSyncExternalStore: vi
-      .fn()
-      .mockImplementation((_, getSnapshot) => getSnapshot()),
-  };
-});
 
 // Mock the child components to reduce other component dependencies
 vi.mock('./UserMessage', () => ({
@@ -76,16 +60,12 @@ describe('Conversation', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-
-    (useMessageHistory as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-      messages: [],
-    });
   });
 
   it('renders empty conversation correctly', () => {
     render(
       <Conversation
-        messageHistoryStore={new MessageHistoryStore()}
+        messages={[]}
         errorStore={new TextStreamStore()}
         messageStore={new TextStreamStore()}
         isRequesting={false}
@@ -99,15 +79,14 @@ describe('Conversation', () => {
   });
 
   it.skip('renders user messages correctly', () => {
-    const messageHistoryStore = new MessageHistoryStore();
-    messageHistoryStore.setMessages([
+    const mockMessages: ChatMessage[] = [
       { role: 'user', content: 'Hello' },
       { role: 'user', content: 'How are you?' },
-    ]);
+    ];
 
     render(
       <Conversation
-        messageHistoryStore={messageHistoryStore}
+        messages={mockMessages}
         errorStore={new TextStreamStore()}
         messageStore={new TextStreamStore()}
         isRequesting={false}
@@ -124,20 +103,18 @@ describe('Conversation', () => {
   });
 
   it('renders assistant messages correctly', () => {
-    (useMessageHistory as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-      messages: [
-        { role: 'assistant', content: 'I am an AI assistant' },
-        {
-          role: 'assistant',
-          content: 'How can I help?',
-          reasoningContent: 'Thinking about response',
-        },
-      ],
-    });
+    const mockMessages: ChatMessage[] = [
+      { role: 'assistant', content: 'I am an AI assistant' },
+      {
+        role: 'assistant',
+        content: 'How can I help?',
+        reasoningContent: 'Thinking about response',
+      },
+    ];
 
     render(
       <Conversation
-        messageHistoryStore={new MessageHistoryStore()}
+        messages={mockMessages}
         errorStore={new TextStreamStore()}
         messageStore={new TextStreamStore()}
         isRequesting={false}
@@ -159,7 +136,7 @@ describe('Conversation', () => {
   it('renders progress icon when isRequesting is true before assistant stream starts', () => {
     render(
       <Conversation
-        messageHistoryStore={new MessageHistoryStore()}
+        messages={[]}
         errorStore={new TextStreamStore()}
         messageStore={new TextStreamStore()}
         isRequesting={true}
@@ -175,7 +152,7 @@ describe('Conversation', () => {
   it('hides progress icon when isRequesting is true and assistant stream starts', () => {
     render(
       <Conversation
-        messageHistoryStore={new MessageHistoryStore()}
+        messages={[]}
         errorStore={new TextStreamStore()}
         messageStore={new TextStreamStore()}
         isRequesting={false}
@@ -196,7 +173,7 @@ describe('Conversation', () => {
 
     render(
       <Conversation
-        messageHistoryStore={new MessageHistoryStore()}
+        messages={[]}
         errorStore={errorStore}
         messageStore={new TextStreamStore()}
         isRequesting={false}

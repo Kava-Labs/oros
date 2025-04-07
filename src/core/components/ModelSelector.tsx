@@ -2,36 +2,21 @@ import styles from './ModelSelector.module.css';
 import { useEffect, useState } from 'react';
 import { getAllModels } from '../config';
 import { ModelConfig, SupportedModels } from '../types/models';
-import type { MessageHistoryStore } from '../stores/messageHistoryStore';
 
 export const ModelSelector = ({
   modelConfig,
-  messageHistoryStore,
+  isDisabled,
   handleModelChange,
 }: {
   handleModelChange: (modelName: SupportedModels) => void;
   modelConfig: ModelConfig;
-  messageHistoryStore: MessageHistoryStore;
+  isDisabled: boolean;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isDisabled, setIsDisabled] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(0); // For keyboard navigation
 
   const SelectedModelIcon = modelConfig.icon;
   const models = getAllModels();
-
-  // Check for existing messages to determine disabled state
-  const messages = messageHistoryStore.getSnapshot();
-  const hasUserMessages = messages.length > 1;
-
-  useEffect(() => {
-    if (hasUserMessages) {
-      setIsDisabled(true);
-      setIsOpen(false);
-    } else {
-      setIsDisabled(false);
-    }
-  }, [hasUserMessages]);
 
   // Handle click outside to close dropdown
   useEffect(() => {
