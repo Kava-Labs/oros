@@ -24,6 +24,7 @@ export const ModelSelector = ({
   const messages = messageHistoryStore.getSnapshot();
   const hasUserMessages = messages.length > 1;
 
+  console.log(hasUserMessages, messages)
   useEffect(() => {
     if (hasUserMessages) {
       setIsDisabled(true);

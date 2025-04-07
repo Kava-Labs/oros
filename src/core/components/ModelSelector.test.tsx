@@ -1,10 +1,10 @@
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import { ModelSelector } from './ModelSelector';
-// import { useAppContext } from '../context/useAppContext';
-// import { useIsMobileLayout } from 'lib-kava-ai';
-import { getAllModels, getModelConfig } from '../config/models/index';
+import { useIsMobileLayout } from 'lib-kava-ai';
+import { getAllModels } from '../config/models/index';
 import { vi } from 'vitest';
 import { MessageHistoryStore } from '../stores/messageHistoryStore';
+import { ModelConfig } from '../types/models';
 
 // Mock the required modules and hooks
 vi.mock('../context/useAppContext');
@@ -38,33 +38,29 @@ const mockBlockchainModel = {
   inputPlaceholderText: 'blockchain placeholder',
 };
 
-describe.skip('ModelSelector', () => {
+describe('ModelSelector', () => {
   const mockHandleModelChange = vi.fn();
-  const mockGetSnapshot = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
 
-    // // Default mock implementations
-    // (useAppContext as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-    //   modelConfig: mockReasoningModel,
-    //   messageHistoryStore: {
-    //     getSnapshot: mockGetSnapshot,
-    //   },
-    //   handleModelChange: mockHandleModelChange,
-    // });
-    // (getAllModels as unknown as ReturnType<typeof vi.fn>).mockReturnValue([
-    //   mockReasoningModel,
-    //   mockBlockchainModel,
-    // ]);
-    // (useIsMobileLayout as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
-    //   false,
-    // );
-    // mockGetSnapshot.mockReturnValue([]);
+    (getAllModels as unknown as ReturnType<typeof vi.fn>).mockReturnValue([
+      mockReasoningModel,
+      mockBlockchainModel,
+    ]);
+    (useIsMobileLayout as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+      false,
+    );
   });
 
   it('renders with initial closed state', () => {
-    render(<ModelSelector  handleModelChange={vi.fn()} modelConfig={getAllModels()[0]} messageHistoryStore={new MessageHistoryStore()}/>);
+    render(
+      <ModelSelector
+        handleModelChange={vi.fn()}
+        modelConfig={mockReasoningModel as unknown as ModelConfig}
+        messageHistoryStore={new MessageHistoryStore()}
+      />,
+    );
 
     const combobox = screen.getByRole('combobox', { name: 'Select Model' });
     expect(combobox).toBeInTheDocument();
@@ -76,7 +72,7 @@ describe.skip('ModelSelector', () => {
     render(
       <ModelSelector
         handleModelChange={vi.fn()}
-        modelConfig={getAllModels()[0]}
+        modelConfig={mockReasoningModel as unknown as ModelConfig}
         messageHistoryStore={new MessageHistoryStore()}
       />,
     );
@@ -122,7 +118,7 @@ describe.skip('ModelSelector', () => {
   it('selects a model when clicked', () => {
     render(
       <ModelSelector
-        handleModelChange={vi.fn()}
+        handleModelChange={mockHandleModelChange}
         modelConfig={getAllModels()[0]}
         messageHistoryStore={new MessageHistoryStore()}
       />,
@@ -152,16 +148,17 @@ describe.skip('ModelSelector', () => {
   });
 
   it('disables selector when chat has messages', () => {
-    mockGetSnapshot.mockReturnValue([
-      { id: '1', role: 'user', content: 'Hello' },
-      { id: '2', role: 'assistant', content: 'Hi' },
+    const messageHistoryStore = new MessageHistoryStore();
+    messageHistoryStore.setMessages([
+      { role: 'user', content: 'Hello' },
+      { role: 'assistant', content: 'Hi' },
     ]);
 
     render(
       <ModelSelector
-        handleModelChange={vi.fn()}
+        handleModelChange={mockHandleModelChange}
         modelConfig={getAllModels()[0]}
-        messageHistoryStore={new MessageHistoryStore()}
+        messageHistoryStore={messageHistoryStore}
       />,
     );
 
@@ -194,8 +191,8 @@ describe.skip('ModelSelector', () => {
   it('supports keyboard navigation with arrow keys', async () => {
     render(
       <ModelSelector
-        handleModelChange={vi.fn()}
-        modelConfig={getAllModels()[0]}
+        handleModelChange={mockHandleModelChange}
+        modelConfig={mockBlockchainModel as unknown as ModelConfig}
         messageHistoryStore={new MessageHistoryStore()}
       />,
     );
@@ -245,25 +242,16 @@ describe.skip('ModelSelector', () => {
     render(
       <ModelSelector
         handleModelChange={vi.fn()}
-        modelConfig={getAllModels()[0]}
+        modelConfig={mockReasoningModel as unknown as ModelConfig}
         messageHistoryStore={new MessageHistoryStore()}
       />,
     );
     expect(screen.getByTestId('kava-icon')).toBeInTheDocument();
 
-    // // Test with blockchain model
-    // (useAppContext as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-    //   modelConfig: mockBlockchainModel,
-    //   messageHistoryStore: {
-    //     getSnapshot: mockGetSnapshot,
-    //   },
-    //   handleModelChange: mockHandleModelChange,
-    // });
-
     render(
       <ModelSelector
         handleModelChange={vi.fn()}
-        modelConfig={getAllModels()[0]}
+        modelConfig={mockBlockchainModel as unknown as ModelConfig}
         messageHistoryStore={new MessageHistoryStore()}
       />,
     );
