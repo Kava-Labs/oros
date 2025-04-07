@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useAppContext } from '../context/useAppContext';
 import { ConversationHistory, getConversation } from 'lib-kava-ai';
 import { ModelConfig } from '../types/models';
 
@@ -19,9 +18,9 @@ export const useManageContextWarning = (
   dismissWarning: boolean,
   setDismissWarning: (dismiss: boolean) => void,
   setShowInputAdornmentMessage: (show: boolean) => void,
+  conversationID: string,
+  modelConfig: ModelConfig,
 ) => {
-  const { conversationID, modelConfig } = useAppContext();
-
   const [currentConversation, setCurrentConversation] =
     useState<ConversationHistory | null>(null);
 

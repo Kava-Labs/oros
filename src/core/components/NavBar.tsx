@@ -4,6 +4,8 @@ import { Menu, PanelLeftOpen } from 'lucide-react';
 import ButtonIcon from './ButtonIcon';
 import { NewChatButton } from '../assets/NewChatButton';
 import { ModelSelector } from './ModelSelector';
+import type { SupportedModels, ModelConfig } from '../types/models';
+import type { MessageHistoryStore } from '../stores/messageHistoryStore';
 
 export interface NavBarProps {
   onMenu: () => void;
@@ -11,6 +13,9 @@ export interface NavBarProps {
   isPanelOpen: boolean;
   showModelSelector: boolean;
   startNewChat: () => void;
+  handleModelChange: (modelName: SupportedModels) => void;
+  modelConfig: ModelConfig;
+  messageHistoryStore: MessageHistoryStore;
 }
 
 export const NavBar = ({
@@ -19,6 +24,9 @@ export const NavBar = ({
   isPanelOpen,
   showModelSelector,
   startNewChat,
+  handleModelChange,
+  modelConfig,
+  messageHistoryStore,
 }: NavBarProps) => {
   const isMobileLayout = useIsMobileLayout();
 
@@ -42,7 +50,13 @@ export const NavBar = ({
               onClick={startNewChat}
               className={styles.newChatDesktop}
             />
-            {showModelSelector && <ModelSelector />}
+            {showModelSelector && (
+              <ModelSelector
+                handleModelChange={handleModelChange}
+                modelConfig={modelConfig}
+                messageHistoryStore={messageHistoryStore}
+              />
+            )}
           </div>
         ) : (
           <div className={styles.menu}>
@@ -60,7 +74,13 @@ export const NavBar = ({
       </div>
 
       <div className={styles.centerSection}>
-        {isMobileLayout && showModelSelector && <ModelSelector />}
+        {isMobileLayout && showModelSelector && (
+          <ModelSelector
+            handleModelChange={handleModelChange}
+            modelConfig={modelConfig}
+            messageHistoryStore={messageHistoryStore}
+          />
+        )}
       </div>
 
       <div className={styles.rightSection}>

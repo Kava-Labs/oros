@@ -1,9 +1,10 @@
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import { ModelSelector } from './ModelSelector';
-import { useAppContext } from '../context/useAppContext';
 import { useIsMobileLayout } from 'lib-kava-ai';
 import { getAllModels } from '../config/models/index';
 import { vi } from 'vitest';
+import { MessageHistoryStore } from '../stores/messageHistoryStore';
+import { ModelConfig } from '../types/models';
 
 // Mock the required modules and hooks
 vi.mock('../context/useAppContext');
@@ -39,19 +40,10 @@ const mockBlockchainModel = {
 
 describe('ModelSelector', () => {
   const mockHandleModelChange = vi.fn();
-  const mockGetSnapshot = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
 
-    // Default mock implementations
-    (useAppContext as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-      modelConfig: mockReasoningModel,
-      messageHistoryStore: {
-        getSnapshot: mockGetSnapshot,
-      },
-      handleModelChange: mockHandleModelChange,
-    });
     (getAllModels as unknown as ReturnType<typeof vi.fn>).mockReturnValue([
       mockReasoningModel,
       mockBlockchainModel,
@@ -59,11 +51,16 @@ describe('ModelSelector', () => {
     (useIsMobileLayout as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
       false,
     );
-    mockGetSnapshot.mockReturnValue([]);
   });
 
   it('renders with initial closed state', () => {
-    render(<ModelSelector />);
+    render(
+      <ModelSelector
+        handleModelChange={vi.fn()}
+        modelConfig={mockReasoningModel as unknown as ModelConfig}
+        messageHistoryStore={new MessageHistoryStore()}
+      />,
+    );
 
     const combobox = screen.getByRole('combobox', { name: 'Select Model' });
     expect(combobox).toBeInTheDocument();
@@ -72,7 +69,13 @@ describe('ModelSelector', () => {
   });
 
   it('opens dropdown menu when clicked', () => {
-    render(<ModelSelector />);
+    render(
+      <ModelSelector
+        handleModelChange={vi.fn()}
+        modelConfig={mockReasoningModel as unknown as ModelConfig}
+        messageHistoryStore={new MessageHistoryStore()}
+      />,
+    );
 
     const combobox = screen.getByRole('combobox', { name: 'Select Model' });
     fireEvent.click(combobox);
@@ -82,7 +85,13 @@ describe('ModelSelector', () => {
   });
 
   it('displays all model options with correct content', () => {
-    render(<ModelSelector />);
+    render(
+      <ModelSelector
+        handleModelChange={vi.fn()}
+        modelConfig={getAllModels()[0]}
+        messageHistoryStore={new MessageHistoryStore()}
+      />,
+    );
 
     fireEvent.click(screen.getByRole('combobox', { name: 'Select Model' }));
     const dropdownMenu = screen.getByRole('listbox');
@@ -107,7 +116,13 @@ describe('ModelSelector', () => {
   });
 
   it('selects a model when clicked', () => {
-    render(<ModelSelector />);
+    render(
+      <ModelSelector
+        handleModelChange={mockHandleModelChange}
+        modelConfig={getAllModels()[0]}
+        messageHistoryStore={new MessageHistoryStore()}
+      />,
+    );
 
     fireEvent.click(screen.getByRole('combobox', { name: 'Select Model' }));
     fireEvent.click(screen.getAllByText('General Reasoning')[1]);
@@ -117,7 +132,13 @@ describe('ModelSelector', () => {
   });
 
   it('closes dropdown when clicking outside', () => {
-    render(<ModelSelector />);
+    render(
+      <ModelSelector
+        handleModelChange={vi.fn()}
+        modelConfig={getAllModels()[0]}
+        messageHistoryStore={new MessageHistoryStore()}
+      />,
+    );
 
     fireEvent.click(screen.getByRole('combobox', { name: 'Select Model' }));
     expect(screen.getByRole('listbox')).toBeInTheDocument();
@@ -127,12 +148,19 @@ describe('ModelSelector', () => {
   });
 
   it('disables selector when chat has messages', () => {
-    mockGetSnapshot.mockReturnValue([
-      { id: '1', role: 'user', content: 'Hello' },
-      { id: '2', role: 'assistant', content: 'Hi' },
+    const messageHistoryStore = new MessageHistoryStore();
+    messageHistoryStore.setMessages([
+      { role: 'user', content: 'Hello' },
+      { role: 'assistant', content: 'Hi' },
     ]);
 
-    render(<ModelSelector />);
+    render(
+      <ModelSelector
+        handleModelChange={mockHandleModelChange}
+        modelConfig={getAllModels()[0]}
+        messageHistoryStore={messageHistoryStore}
+      />,
+    );
 
     const combobox = screen.getByRole('combobox', { name: 'Select Model' });
     expect(combobox).toBeDisabled();
@@ -142,7 +170,13 @@ describe('ModelSelector', () => {
   });
 
   it('marks current model as selected', () => {
-    render(<ModelSelector />);
+    render(
+      <ModelSelector
+        handleModelChange={vi.fn()}
+        modelConfig={getAllModels()[0]}
+        messageHistoryStore={new MessageHistoryStore()}
+      />,
+    );
 
     fireEvent.click(screen.getByRole('combobox', { name: 'Select Model' }));
 
@@ -155,7 +189,13 @@ describe('ModelSelector', () => {
   });
 
   it('supports keyboard navigation with arrow keys', async () => {
-    render(<ModelSelector />);
+    render(
+      <ModelSelector
+        handleModelChange={mockHandleModelChange}
+        modelConfig={mockBlockchainModel as unknown as ModelConfig}
+        messageHistoryStore={new MessageHistoryStore()}
+      />,
+    );
 
     // Open the dropdown
     const combobox = screen.getByRole('combobox', { name: 'Select Model' });
@@ -199,19 +239,22 @@ describe('ModelSelector', () => {
 
   it('displays correct icon for selected model', () => {
     // Test with reasoning model
-    render(<ModelSelector />);
+    render(
+      <ModelSelector
+        handleModelChange={vi.fn()}
+        modelConfig={mockReasoningModel as unknown as ModelConfig}
+        messageHistoryStore={new MessageHistoryStore()}
+      />,
+    );
     expect(screen.getByTestId('kava-icon')).toBeInTheDocument();
 
-    // Test with blockchain model
-    (useAppContext as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-      modelConfig: mockBlockchainModel,
-      messageHistoryStore: {
-        getSnapshot: mockGetSnapshot,
-      },
-      handleModelChange: mockHandleModelChange,
-    });
-
-    render(<ModelSelector />);
+    render(
+      <ModelSelector
+        handleModelChange={vi.fn()}
+        modelConfig={mockBlockchainModel as unknown as ModelConfig}
+        messageHistoryStore={new MessageHistoryStore()}
+      />,
+    );
     expect(screen.getByTestId('oros-icon')).toBeInTheDocument();
   });
 });

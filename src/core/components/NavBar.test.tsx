@@ -2,17 +2,13 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { vi } from 'vitest';
 import { NavBar, NavBarProps } from './NavBar';
 import { useIsMobileLayout } from 'lib-kava-ai';
-import { AppContextProvider } from '../context/AppContextProvider';
-import { TextStreamStore } from 'lib-kava-ai';
+
 import { MessageHistoryStore } from '../stores/messageHistoryStore';
 
-const messageStore = new TextStreamStore();
-const progressStore = new TextStreamStore();
 const messageHistoryStore = new MessageHistoryStore();
-const thinkingStore = new TextStreamStore();
-const errorStore = new TextStreamStore();
 
 import * as useIsMobileLayoutModule from 'lib-kava-ai';
+import { getModelConfig } from '../config';
 
 vi.mock('lib-kava-ai', async () => {
   const actual =
@@ -45,6 +41,9 @@ describe('NavBar', () => {
     isPanelOpen: false,
     showModelSelector: true,
     startNewChat: vi.fn(),
+    messageHistoryStore,
+    handleModelChange: vi.fn(),
+    modelConfig: getModelConfig('o3-mini'),
   };
 
   beforeEach(() => {
@@ -59,17 +58,7 @@ describe('NavBar', () => {
     });
 
     it('renders desktop controls when not mobile', () => {
-      render(
-        <AppContextProvider
-          errorStore={errorStore}
-          thinkingStore={thinkingStore}
-          progressStore={progressStore}
-          messageStore={messageStore}
-          messageHistoryStore={messageHistoryStore}
-        >
-          <NavBar {...mockProps} />
-        </AppContextProvider>,
-      );
+      render(<NavBar {...mockProps} />);
 
       expect(
         screen.getByRole('button', { name: 'Open Menu' }),
@@ -79,17 +68,7 @@ describe('NavBar', () => {
     });
 
     it('hides panel open button when panel is open', () => {
-      render(
-        <AppContextProvider
-          errorStore={errorStore}
-          thinkingStore={thinkingStore}
-          progressStore={progressStore}
-          messageStore={messageStore}
-          messageHistoryStore={messageHistoryStore}
-        >
-          <NavBar {...mockProps} isPanelOpen={true} />
-        </AppContextProvider>,
-      );
+      render(<NavBar {...mockProps} isPanelOpen={true} />);
 
       expect(
         screen.queryByRole('button', { name: 'Open Menu' }),
@@ -97,34 +76,14 @@ describe('NavBar', () => {
     });
 
     it('calls onPanelOpen when panel button is clicked', () => {
-      render(
-        <AppContextProvider
-          errorStore={errorStore}
-          thinkingStore={thinkingStore}
-          progressStore={progressStore}
-          messageStore={messageStore}
-          messageHistoryStore={messageHistoryStore}
-        >
-          <NavBar {...mockProps} />
-        </AppContextProvider>,
-      );
+      render(<NavBar {...mockProps} />);
 
       fireEvent.click(screen.getByRole('button', { name: 'Open Menu' }));
       expect(mockProps.onPanelOpen).toHaveBeenCalledTimes(1);
     });
 
     it('calls onNewChat when new chat button is clicked', () => {
-      render(
-        <AppContextProvider
-          errorStore={errorStore}
-          thinkingStore={thinkingStore}
-          progressStore={progressStore}
-          messageStore={messageStore}
-          messageHistoryStore={messageHistoryStore}
-        >
-          <NavBar {...mockProps} />
-        </AppContextProvider>,
-      );
+      render(<NavBar {...mockProps} />);
 
       fireEvent.click(screen.getByTestId('new-chat-button'));
     });
@@ -138,17 +97,7 @@ describe('NavBar', () => {
     });
 
     it('renders mobile layout with menu button', () => {
-      render(
-        <AppContextProvider
-          errorStore={errorStore}
-          thinkingStore={thinkingStore}
-          progressStore={progressStore}
-          messageStore={messageStore}
-          messageHistoryStore={messageHistoryStore}
-        >
-          <NavBar {...mockProps} />
-        </AppContextProvider>,
-      );
+      render(<NavBar {...mockProps} />);
 
       expect(
         screen.getByRole('button', { name: 'Toggle Menu' }),
@@ -158,17 +107,7 @@ describe('NavBar', () => {
     });
 
     it('calls onMenu when menu button is clicked', () => {
-      render(
-        <AppContextProvider
-          errorStore={errorStore}
-          thinkingStore={thinkingStore}
-          progressStore={progressStore}
-          messageStore={messageStore}
-          messageHistoryStore={messageHistoryStore}
-        >
-          <NavBar {...mockProps} />
-        </AppContextProvider>,
-      );
+      render(<NavBar {...mockProps} />);
 
       fireEvent.click(screen.getByRole('button', { name: 'Toggle Menu' }));
       expect(mockProps.onMenu).toHaveBeenCalledTimes(1);

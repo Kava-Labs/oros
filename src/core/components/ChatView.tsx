@@ -6,11 +6,12 @@ import { useMessageHistory } from '../hooks/useMessageHistory';
 import ChatInput from './ChatInput';
 import { LandingContent } from './LandingContent';
 import { defaultCautionText } from '../config/models/defaultPrompts';
-import { ModelConfig } from '../types/models';
+import { ModelConfig, SupportedModels } from '../types/models';
+import type { TextStreamStore } from 'lib-kava-ai';
+import type { MessageHistoryStore } from '../stores/messageHistoryStore';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 
 export interface ChatViewProps {
-  isRequesting: boolean;
   onMenu(): void;
   onPanelOpen(): void;
   isPanelOpen: boolean;
@@ -19,12 +20,17 @@ export interface ChatViewProps {
   startNewChat: () => void;
   conversationID: string;
   modelConfig: ModelConfig;
-  handleCancel: () => void;
+  errorStore: TextStreamStore;
+  messageStore: TextStreamStore;
+  thinkingStore: TextStreamStore;
+  messageHistoryStore: MessageHistoryStore;
+  isRequesting: boolean;
   handleChatCompletion: (value: ChatCompletionMessageParam[]) => void;
+  handleCancel: () => void;
+  handleModelChange: (modelName: SupportedModels) => void;
 }
 
 export const ChatView = ({
-  isRequesting,
   onMenu,
   onPanelOpen,
   isPanelOpen,
@@ -33,10 +39,16 @@ export const ChatView = ({
   startNewChat,
   conversationID,
   modelConfig,
+  messageHistoryStore,
+  errorStore,
+  isRequesting,
+  messageStore,
+  thinkingStore,
   handleCancel,
   handleChatCompletion,
+  handleModelChange,
 }: ChatViewProps) => {
-  const { hasMessages } = useMessageHistory();
+  const { hasMessages } = useMessageHistory(messageHistoryStore);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Track if we should auto-scroll
@@ -86,6 +98,9 @@ export const ChatView = ({
       <div ref={containerRef} className={styles.scrollContainer}>
         <div className={styles.chatHeader}>
           <NavBar
+            handleModelChange={handleModelChange}
+            modelConfig={modelConfig}
+            messageHistoryStore={messageHistoryStore}
             onPanelOpen={onPanelOpen}
             isPanelOpen={isPanelOpen}
             onMenu={onMenu}
@@ -100,7 +115,11 @@ export const ChatView = ({
           >
             {hasMessages && (
               <Conversation
+                thinkingStore={thinkingStore}
                 isRequesting={isRequesting}
+                errorStore={errorStore}
+                messageHistoryStore={messageHistoryStore}
+                messageStore={messageStore}
                 onRendered={handleContentRendered}
                 modelConfig={modelConfig}
               />

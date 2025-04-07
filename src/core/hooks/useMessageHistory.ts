@@ -1,9 +1,7 @@
 import { useMemo, useSyncExternalStore } from 'react';
-import { useAppContext } from '../context/useAppContext';
+import { MessageHistoryStore } from '../stores/messageHistoryStore';
 
-export function useMessageHistory() {
-  const { messageHistoryStore } = useAppContext();
-
+export function useMessageHistory(messageHistoryStore: MessageHistoryStore) {
   const messages = useSyncExternalStore(
     messageHistoryStore.subscribe,
     messageHistoryStore.getSnapshot,

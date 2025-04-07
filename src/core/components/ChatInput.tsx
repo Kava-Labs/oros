@@ -23,14 +23,14 @@ import { useUploadingError } from '../hooks/useUploadingError';
 const DEFAULT_HEIGHT = '30px';
 
 export interface ChatInputProps {
-  isRequesting: boolean;
   setShouldAutoScroll: (s: boolean) => void;
   supportsUpload: boolean;
   startNewChat: () => void;
   conversationID: string;
   modelConfig: ModelConfig;
-  handleCancel: () => void;
+  isRequesting: boolean;
   handleChatCompletion: (value: ChatCompletionMessageParam[]) => void;
+  handleCancel: () => void;
 }
 
 export interface UploadingState {
@@ -53,8 +53,8 @@ const ChatInput = ({
   startNewChat,
   conversationID,
   modelConfig,
-  handleCancel,
   isRequesting,
+  handleCancel,
   handleChatCompletion,
 }: ChatInputProps) => {
   const [showInputAdornmentMessage, setShowInputAdornmentMessage] =
@@ -65,6 +65,8 @@ const ChatInput = ({
     dismissWarning,
     setDismissWarning,
     setShowInputAdornmentMessage,
+    conversationID,
+    modelConfig,
   );
 
   const [inputValue, setInputValue] = useState('');

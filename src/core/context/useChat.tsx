@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { AppContext } from './AppContext';
+import { useCallback, useEffect, useRef, useState } from 'react';
+
 import {
   TextStreamStore,
   getAllConversations,
@@ -23,16 +23,13 @@ import type { ChatCompletionMessageParam } from 'openai/resources/index';
 
 let client: OpenAI | null = null;
 
-export const AppContextProvider = (props: {
-  children: React.ReactNode;
-  thinkingStore: TextStreamStore;
-  errorStore: TextStreamStore;
-  messageStore: TextStreamStore;
-  progressStore: TextStreamStore;
-  messageHistoryStore: MessageHistoryStore;
+export const useChat = (props?: {
+  thinkingStore?: TextStreamStore;
+  errorStore?: TextStreamStore;
+  messageStore?: TextStreamStore;
+  progressStore?: TextStreamStore;
+  messageHistoryStore?: MessageHistoryStore;
 }) => {
-  const { children } = props;
-
   const [isReady, setIsReady] = useState(false);
 
   const [modelConfig, setModelConfig] = useState<ModelConfig>(() =>
@@ -66,11 +63,24 @@ export const AppContextProvider = (props: {
   const [conversation, setConversation] = useState<ActiveConversation>(() => {
     const newConv = {
       conversationID: uuidv4(),
-      messageHistoryStore: props.messageHistoryStore,
-      thinkingStore: props.thinkingStore,
-      progressStore: props.progressStore,
-      messageStore: props.messageStore,
-      errorStore: new TextStreamStore(),
+      messageHistoryStore:
+        props && props.messageHistoryStore
+          ? props.messageHistoryStore
+          : new MessageHistoryStore(),
+      thinkingStore:
+        props && props.thinkingStore
+          ? props.thinkingStore
+          : new TextStreamStore(),
+      progressStore:
+        props && props.progressStore
+          ? props.progressStore
+          : new TextStreamStore(),
+      messageStore:
+        props && props.messageStore
+          ? props.messageStore
+          : new TextStreamStore(),
+      errorStore:
+        props && props.errorStore ? props.errorStore : new TextStreamStore(),
       isRequesting: false,
     };
 
@@ -328,32 +338,26 @@ export const AppContextProvider = (props: {
     }
   }, [thinkingStore]);
 
-  return (
-    <AppContext.Provider
-      value={{
-        conversationID,
-        client,
-        messageHistoryStore,
-        messageStore,
-        progressStore,
-        modelConfig,
-        handleModelChange,
-        startNewChat,
-        handleCancel,
-        handleChatCompletion,
-        thinkingStore,
-        errorStore,
-        onSelectConversation,
-        onDeleteConversation,
-        onUpdateConversationTitle,
-        isReady,
-        isRequesting,
-        fetchSearchHistory,
-        searchableHistory,
-        conversations: conversationHistories,
-      }}
-    >
-      {children}
-    </AppContext.Provider>
-  );
+  return {
+    conversationID,
+    client,
+    messageHistoryStore,
+    messageStore,
+    progressStore,
+    modelConfig,
+    handleModelChange,
+    startNewChat,
+    handleCancel,
+    handleChatCompletion,
+    thinkingStore,
+    errorStore,
+    onSelectConversation,
+    onDeleteConversation,
+    onUpdateConversationTitle,
+    isReady,
+    isRequesting,
+    fetchSearchHistory,
+    searchableHistory,
+    conversations: conversationHistories,
+  };
 };

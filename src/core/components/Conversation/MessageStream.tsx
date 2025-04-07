@@ -1,19 +1,19 @@
 import { StreamingText } from './StreamingText';
 import { StreamingTextContent } from './StreamingTextContent';
-import { useAppContext } from '../../context/useAppContext';
 import { ModelConfig } from '../../types/models';
+import type { TextStreamStore } from 'lib-kava-ai';
 
 interface MessageStreamProps {
   onRendered: () => void;
   modelConfig: ModelConfig;
+  messageStore: TextStreamStore;
 }
 
 export const MessageStream = ({
   onRendered,
   modelConfig,
+  messageStore,
 }: MessageStreamProps) => {
-  const { messageStore } = useAppContext();
-
   return (
     <StreamingText
       store={messageStore}

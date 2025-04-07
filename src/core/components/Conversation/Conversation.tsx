@@ -4,27 +4,34 @@ import { useSyncExternalStore } from 'react';
 import { StreamingMessage } from './StreamingMessage';
 import { ErrorMessage } from './ErrorMessage';
 import AssistantMessage from './AssistantMessage';
-import { useAppContext } from '../../context/useAppContext';
 import { useMessageHistory } from '../../hooks/useMessageHistory';
 import { Content } from './Content';
 import { IdbImage } from '../IdbImage';
 import { ImageCarousel } from './ImageCarousel';
 import { ProgressIcon } from './ProgressIcon';
 import { ModelConfig } from '../../types/models';
+import { MessageHistoryStore } from '../../stores/messageHistoryStore';
+import { TextStreamStore } from 'lib-kava-ai';
 
 export interface ConversationProps {
   isRequesting: boolean;
   onRendered(): void;
   modelConfig: ModelConfig;
+  errorStore: TextStreamStore;
+  messageStore: TextStreamStore;
+  messageHistoryStore: MessageHistoryStore;
+  thinkingStore: TextStreamStore;
 }
 
 const ConversationComponent = ({
   isRequesting,
   onRendered,
   modelConfig,
+  errorStore,
+  messageStore,
+  messageHistoryStore,
+  thinkingStore,
 }: ConversationProps) => {
-  const { errorStore, messageStore } = useAppContext();
-
   const errorText: string = useSyncExternalStore(
     errorStore.subscribe,
     errorStore.getSnapshot,
@@ -35,7 +42,7 @@ const ConversationComponent = ({
     messageStore.getSnapshot,
   );
 
-  const { messages } = useMessageHistory();
+  const { messages } = useMessageHistory(messageHistoryStore);
 
   return (
     <div className={styles.conversationContainer} data-testid="conversation">
@@ -138,7 +145,12 @@ const ConversationComponent = ({
       {isRequesting && assistantStream.length === 0 ? (
         <ProgressIcon />
       ) : (
-        <StreamingMessage onRendered={onRendered} modelConfig={modelConfig} />
+        <StreamingMessage
+          thinkingStore={thinkingStore}
+          messageStore={messageStore}
+          onRendered={onRendered}
+          modelConfig={modelConfig}
+        />
       )}
 
       {errorText.length > 0 && (

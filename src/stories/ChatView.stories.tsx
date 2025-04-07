@@ -4,7 +4,6 @@ import { ChatView, ChatViewProps } from '../core/components/ChatView';
 import { mockChatMessages, markDownSpecChatMessages } from './mockdata';
 import type { Decorator } from '@storybook/react';
 import { ThemeProvider } from '../shared/theme/themeProvider';
-import { AppContextProvider } from '../core/context/AppContextProvider';
 import { TextStreamStore } from 'lib-kava-ai';
 import {
   ChatMessage,
@@ -12,11 +11,7 @@ import {
 } from '../core/stores/messageHistoryStore';
 import { MODEL_REGISTRY } from '../core/config';
 
-const messageStore = new TextStreamStore();
-const progressStore = new TextStreamStore();
 const messageHistoryStore = new MessageHistoryStore();
-const thinkingStore = new TextStreamStore();
-const errorStore = new TextStreamStore();
 
 const withProviders =
   (
@@ -35,15 +30,7 @@ const withProviders =
 
     return (
       <ThemeProvider>
-        <AppContextProvider
-          errorStore={errorStore}
-          thinkingStore={thinkingStore}
-          progressStore={progressStore}
-          messageStore={messageStore}
-          messageHistoryStore={messageHistoryStore}
-        >
-          <Story />
-        </AppContextProvider>
+        <Story />
       </ThemeProvider>
     );
   };
@@ -80,8 +67,13 @@ const args: ChatViewProps = {
   startNewChat: fn(),
   conversationID: 'foo',
   modelConfig: MODEL_REGISTRY['o3-mini'],
-  handleCancel: fn(),
-  handleChatCompletion: fn(),
+  messageHistoryStore: messageHistoryStore,
+  errorStore: new TextStreamStore(),
+  messageStore: new TextStreamStore(),
+  thinkingStore: new TextStreamStore(),
+  handleCancel: () => {},
+  handleChatCompletion: () => {},
+  handleModelChange: () => {},
 };
 
 // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args

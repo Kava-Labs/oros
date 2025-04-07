@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ChatView } from './core/components/ChatView';
-import { useAppContext } from './core/context/useAppContext';
+import { useChat } from './core/context/useChat';
 import styles from './App.module.css';
 import KavaAILogo from './core/assets/KavaAILogo';
 import { SearchHistoryModal, SideBar, useIsMobileLayout } from 'lib-kava-ai';
@@ -19,9 +19,15 @@ export const App = () => {
     conversations,
     searchableHistory,
     fetchSearchHistory,
+    messageHistoryStore,
+    errorStore,
+    messageStore,
     handleCancel,
     handleChatCompletion,
-  } = useAppContext();
+    thinkingStore,
+    handleModelChange,
+  } = useChat();
+
   const { supportedFileTypes } = modelConfig;
   const [isMobileSideBarOpen, setIsMobileSideBarOpen] = useState(false);
   const [isDesktopSideBarOpen, setIsDesktopSideBarOpen] = useState(true);
@@ -65,7 +71,14 @@ export const App = () => {
           />
           <div className={styles.content}>
             <ChatView
+              handleModelChange={handleModelChange}
+              thinkingStore={thinkingStore}
+              messageHistoryStore={messageHistoryStore}
               isRequesting={isRequesting}
+              errorStore={errorStore}
+              messageStore={messageStore}
+              handleCancel={handleCancel}
+              handleChatCompletion={handleChatCompletion}
               onMenu={() => setIsMobileSideBarOpen(true)}
               onPanelOpen={() => setIsDesktopSideBarOpen(true)}
               isPanelOpen={isDesktopSideBarOpen}
@@ -74,8 +87,6 @@ export const App = () => {
               startNewChat={startNewChat}
               conversationID={conversationID}
               modelConfig={modelConfig}
-              handleCancel={handleCancel}
-              handleChatCompletion={handleChatCompletion}
             />
           </div>
           {isSearchHistoryOpen && searchableHistory && (

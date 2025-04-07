@@ -24,14 +24,6 @@ import '@fontsource/inter/700-italic.css';
 //
 import { App } from './App.tsx';
 import { ThemeProvider } from './shared/theme/themeProvider.tsx';
-import { AppContextProvider } from './core/context/AppContextProvider.tsx';
-import {
-  progressStore,
-  messageHistoryStore,
-  messageStore,
-  thinkingStore,
-  errorStore,
-} from './core/stores/stores.ts';
 import { idbDatabase } from './core/utils/idb/idb.ts';
 
 idbDatabase()
@@ -50,15 +42,7 @@ const root = createRoot(document.getElementById('root')!);
 root.render(
   <StrictMode>
     <ThemeProvider>
-      <AppContextProvider
-        errorStore={errorStore}
-        progressStore={progressStore}
-        messageStore={messageStore}
-        thinkingStore={thinkingStore}
-        messageHistoryStore={messageHistoryStore}
-      >
-        <App />
-      </AppContextProvider>
+      <App />
     </ThemeProvider>
   </StrictMode>,
 );
