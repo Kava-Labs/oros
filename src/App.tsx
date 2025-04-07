@@ -73,7 +73,7 @@ export const App = () => {
             <ChatViewContainer
               onMenu={() => setIsMobileSideBarOpen(true)}
               onPanelOpen={() => setIsDesktopSideBarOpen(true)}
-              isPanelOpen={isDesktopSideBarOpen || isMobileSideBarOpen}
+              isPanelOpen={isDesktopSideBarOpen}
               supportsUpload={supportedFileTypes.length > 0}
               showModelSelector={true}
               startNewChat={startNewChat}
@@ -88,24 +88,6 @@ export const App = () => {
               handleCancel={handleCancel}
               handleModelChange={handleModelChange}
             />
-            {/*<ChatView*/}
-            {/*  handleModelChange={handleModelChange}*/}
-            {/*  thinkingStore={thinkingStore}*/}
-            {/*  messageHistoryStore={messageHistoryStore}*/}
-            {/*  isRequesting={isRequesting}*/}
-            {/*  errorStore={errorStore}*/}
-            {/*  messageStore={messageStore}*/}
-            {/*  handleCancel={handleCancel}*/}
-            {/*  handleChatCompletion={handleChatCompletion}*/}
-            {/*  onMenu={() => setIsMobileSideBarOpen(true)}*/}
-            {/*  onPanelOpen={() => setIsDesktopSideBarOpen(true)}*/}
-            {/*  isPanelOpen={isDesktopSideBarOpen}*/}
-            {/*  supportsUpload={supportedFileTypes.length > 0}*/}
-            {/*  showModelSelector={true}*/}
-            {/*  startNewChat={startNewChat}*/}
-            {/*  conversationID={conversationID}*/}
-            {/*  modelConfig={modelConfig}*/}
-            {/*/>*/}
           </div>
           {isSearchHistoryOpen && searchableHistory && (
             <SearchHistoryModal
