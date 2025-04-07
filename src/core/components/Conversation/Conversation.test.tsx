@@ -1,25 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
 import { Conversation } from './Conversation';
-import { useMessageHistory } from '../../hooks/useMessageHistory';
 import { MODEL_REGISTRY } from '../../config';
 import { ChatMessage } from '../../stores/messageHistoryStore';
 import { TextStreamStore } from 'lib-kava-ai';
-
-// Mock the required modules and hooks
-// TODO: Consider using AppContext so the data structure remains
-//       the same instead of potentially producing false positives
-vi.mock('../../context/useAppContext');
-vi.mock('../../hooks/useMessageHistory');
-vi.mock('react', async () => {
-  const actual = await vi.importActual('react');
-  return {
-    ...actual,
-    useSyncExternalStore: vi
-      .fn()
-      .mockImplementation((_, getSnapshot) => getSnapshot()),
-  };
-});
 
 // Mock the child components to reduce other component dependencies
 vi.mock('./UserMessage', () => ({
@@ -76,10 +60,6 @@ describe('Conversation', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-
-    (useMessageHistory as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-      messages: [],
-    });
   });
 
   it('renders empty conversation correctly', () => {
@@ -99,10 +79,10 @@ describe('Conversation', () => {
   });
 
   it.skip('renders user messages correctly', () => {
-    const mockMessages = [
+    const mockMessages: ChatMessage[] = [
       { role: 'user', content: 'Hello' },
       { role: 'user', content: 'How are you?' },
-    ] as ChatMessage[];
+    ];
 
     render(
       <Conversation
@@ -123,14 +103,14 @@ describe('Conversation', () => {
   });
 
   it('renders assistant messages correctly', () => {
-    const mockMessages = [
+    const mockMessages: ChatMessage[] = [
       { role: 'assistant', content: 'I am an AI assistant' },
       {
         role: 'assistant',
         content: 'How can I help?',
         reasoningContent: 'Thinking about response',
       },
-    ] as ChatMessage[];
+    ];
 
     render(
       <Conversation
