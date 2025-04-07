@@ -87,8 +87,6 @@ export const App = () => {
               startNewChat={startNewChat}
               conversationID={conversationID}
               modelConfig={modelConfig}
-              handleCancel={handleCancel}
-              handleChatCompletion={handleChatCompletion}
             />
           </div>
           {isSearchHistoryOpen && searchableHistory && (
