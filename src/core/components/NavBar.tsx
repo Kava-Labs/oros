@@ -53,7 +53,7 @@ export const NavBar = ({
               <ModelSelector
                 handleModelChange={handleModelChange}
                 modelConfig={modelConfig}
-                isModelSelectorDisabled={isModelSelectorDisabled}
+                isDisabled={isModelSelectorDisabled}
               />
             )}
           </div>
@@ -77,7 +77,7 @@ export const NavBar = ({
           <ModelSelector
             handleModelChange={handleModelChange}
             modelConfig={modelConfig}
-            isModelSelectorDisabled={isModelSelectorDisabled}
+            isDisabled={isModelSelectorDisabled}
           />
         )}
       </div>

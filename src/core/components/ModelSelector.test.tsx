@@ -57,7 +57,7 @@ describe('ModelSelector', () => {
       <ModelSelector
         handleModelChange={vi.fn()}
         modelConfig={mockReasoningModel as unknown as ModelConfig}
-        isModelSelectorDisabled={false}
+        isDisabled={false}
       />,
     );
 
@@ -72,7 +72,7 @@ describe('ModelSelector', () => {
       <ModelSelector
         handleModelChange={vi.fn()}
         modelConfig={mockReasoningModel as unknown as ModelConfig}
-        isModelSelectorDisabled={false}
+        isDisabled={false}
       />,
     );
 
@@ -88,7 +88,7 @@ describe('ModelSelector', () => {
       <ModelSelector
         handleModelChange={vi.fn()}
         modelConfig={getAllModels()[0]}
-        isModelSelectorDisabled={false}
+        isDisabled={false}
       />,
     );
 
@@ -119,7 +119,7 @@ describe('ModelSelector', () => {
       <ModelSelector
         handleModelChange={mockHandleModelChange}
         modelConfig={getAllModels()[0]}
-        isModelSelectorDisabled={false}
+        isDisabled={false}
       />,
     );
 
@@ -135,7 +135,7 @@ describe('ModelSelector', () => {
       <ModelSelector
         handleModelChange={vi.fn()}
         modelConfig={getAllModels()[0]}
-        isModelSelectorDisabled={false}
+        isDisabled={false}
       />,
     );
 
@@ -151,7 +151,7 @@ describe('ModelSelector', () => {
       <ModelSelector
         handleModelChange={vi.fn()}
         modelConfig={getAllModels()[0]}
-        isModelSelectorDisabled={false}
+        isDisabled={false}
       />,
     );
 
@@ -170,7 +170,7 @@ describe('ModelSelector', () => {
       <ModelSelector
         handleModelChange={mockHandleModelChange}
         modelConfig={mockBlockchainModel as unknown as ModelConfig}
-        isModelSelectorDisabled={false}
+        isDisabled={false}
       />,
     );
 
@@ -220,7 +220,7 @@ describe('ModelSelector', () => {
       <ModelSelector
         handleModelChange={vi.fn()}
         modelConfig={mockReasoningModel as unknown as ModelConfig}
-        isModelSelectorDisabled={false}
+        isDisabled={false}
       />,
     );
     expect(screen.getByTestId('kava-icon')).toBeInTheDocument();
@@ -229,7 +229,7 @@ describe('ModelSelector', () => {
       <ModelSelector
         handleModelChange={vi.fn()}
         modelConfig={mockBlockchainModel as unknown as ModelConfig}
-        isModelSelectorDisabled={false}
+        isDisabled={false}
       />,
     );
     expect(screen.getByTestId('oros-icon')).toBeInTheDocument();

@@ -5,12 +5,12 @@ import { ModelConfig, SupportedModels } from '../types/models';
 
 export const ModelSelector = ({
   modelConfig,
-  isModelSelectorDisabled,
+  isDisabled,
   handleModelChange,
 }: {
   handleModelChange: (modelName: SupportedModels) => void;
   modelConfig: ModelConfig;
-  isModelSelectorDisabled: boolean;
+  isDisabled: boolean;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(0); // For keyboard navigation
@@ -75,8 +75,8 @@ export const ModelSelector = ({
     <div className={styles.dropdownContainer}>
       <button
         className={styles.dropdownButton}
-        onClick={() => !isModelSelectorDisabled && setIsOpen(!isOpen)}
-        disabled={isModelSelectorDisabled}
+        onClick={() => !isDisabled && setIsOpen(!isOpen)}
+        disabled={isDisabled}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
         aria-label="Select Model"
