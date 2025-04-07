@@ -8,6 +8,7 @@ import { useSession } from './useSession';
 
 export const App = () => {
   const {
+    isRequesting,
     isReady,
     modelConfig,
     startNewChat,
@@ -18,6 +19,8 @@ export const App = () => {
     conversations,
     searchableHistory,
     fetchSearchHistory,
+    handleCancel,
+    handleChatCompletion,
   } = useAppContext();
   const { supportedFileTypes } = modelConfig;
   const [isMobileSideBarOpen, setIsMobileSideBarOpen] = useState(false);
@@ -62,6 +65,7 @@ export const App = () => {
           />
           <div className={styles.content}>
             <ChatView
+              isRequesting={isRequesting}
               onMenu={() => setIsMobileSideBarOpen(true)}
               onPanelOpen={() => setIsDesktopSideBarOpen(true)}
               isPanelOpen={isDesktopSideBarOpen}
@@ -70,6 +74,8 @@ export const App = () => {
               startNewChat={startNewChat}
               conversationID={conversationID}
               modelConfig={modelConfig}
+              handleCancel={handleCancel}
+              handleChatCompletion={handleChatCompletion}
             />
           </div>
           {isSearchHistoryOpen && searchableHistory && (

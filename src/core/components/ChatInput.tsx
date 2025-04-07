@@ -1,7 +1,6 @@
 import styles from './ChatInput.module.css';
 import { CancelChatIcon, SendChatIcon } from '../assets';
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
-import { useAppContext } from '../context/useAppContext';
 import { InputAdornmentMessage } from './InputAdornmentMessage';
 import { ConversationHistory, getConversation } from 'lib-kava-ai';
 import { hasSufficientRemainingTokens } from '../utils/conversation/hasSufficientRemainingTokens';
@@ -24,11 +23,14 @@ import { useUploadingError } from '../hooks/useUploadingError';
 const DEFAULT_HEIGHT = '30px';
 
 export interface ChatInputProps {
+  isRequesting: boolean;
   setShouldAutoScroll: (s: boolean) => void;
   supportsUpload: boolean;
   startNewChat: () => void;
   conversationID: string;
   modelConfig: ModelConfig;
+  handleCancel: () => void;
+  handleChatCompletion: (value: ChatCompletionMessageParam[]) => void;
 }
 
 export interface UploadingState {
@@ -51,6 +53,9 @@ const ChatInput = ({
   startNewChat,
   conversationID,
   modelConfig,
+  handleCancel,
+  isRequesting,
+  handleChatCompletion,
 }: ChatInputProps) => {
   const [showInputAdornmentMessage, setShowInputAdornmentMessage] =
     useState(false);
@@ -81,8 +86,6 @@ const ChatInput = ({
       errorMessage: '',
     });
   }, []);
-
-  const { isRequesting, handleChatCompletion, handleCancel } = useAppContext();
 
   const { supportedFileTypes, maximumFileUploads, maximumFileBytes } =
     modelConfig;
