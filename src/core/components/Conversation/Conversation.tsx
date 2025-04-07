@@ -4,14 +4,13 @@ import { useSyncExternalStore } from 'react';
 import { StreamingMessage } from './StreamingMessage';
 import { ErrorMessage } from './ErrorMessage';
 import AssistantMessage from './AssistantMessage';
-import { useMessageHistory } from '../../hooks/useMessageHistory';
 import { Content } from './Content';
 import { IdbImage } from '../IdbImage';
 import { ImageCarousel } from './ImageCarousel';
 import { ProgressIcon } from './ProgressIcon';
 import { ModelConfig } from '../../types/models';
-import { MessageHistoryStore } from '../../stores/messageHistoryStore';
 import { TextStreamStore } from 'lib-kava-ai';
+import { ChatMessage } from '../../stores/messageHistoryStore';
 
 export interface ConversationProps {
   isRequesting: boolean;
@@ -19,7 +18,7 @@ export interface ConversationProps {
   modelConfig: ModelConfig;
   errorStore: TextStreamStore;
   messageStore: TextStreamStore;
-  messageHistoryStore: MessageHistoryStore;
+  messages: ChatMessage[];
   thinkingStore: TextStreamStore;
 }
 
@@ -29,7 +28,7 @@ const ConversationComponent = ({
   modelConfig,
   errorStore,
   messageStore,
-  messageHistoryStore,
+  messages,
   thinkingStore,
 }: ConversationProps) => {
   const errorText: string = useSyncExternalStore(
@@ -41,8 +40,6 @@ const ConversationComponent = ({
     messageStore.subscribe,
     messageStore.getSnapshot,
   );
-
-  const { messages } = useMessageHistory(messageHistoryStore);
 
   return (
     <div className={styles.conversationContainer} data-testid="conversation">

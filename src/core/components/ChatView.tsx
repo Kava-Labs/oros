@@ -2,14 +2,13 @@ import { useRef, useState, useCallback, useEffect } from 'react';
 import styles from './ChatView.module.css';
 import { Conversation } from './Conversation/Conversation';
 import { NavBar } from './NavBar';
-import { useMessageHistory } from '../hooks/useMessageHistory';
 import ChatInput from './ChatInput';
 import { LandingContent } from './LandingContent';
 import { defaultCautionText } from '../config/models/defaultPrompts';
 import { ModelConfig, SupportedModels } from '../types/models';
 import type { TextStreamStore } from 'lib-kava-ai';
-import type { MessageHistoryStore } from '../stores/messageHistoryStore';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
+import { ChatMessage } from '../stores/messageHistoryStore';
 
 export interface ChatViewProps {
   onMenu(): void;
@@ -23,7 +22,7 @@ export interface ChatViewProps {
   errorStore: TextStreamStore;
   messageStore: TextStreamStore;
   thinkingStore: TextStreamStore;
-  messageHistoryStore: MessageHistoryStore;
+  messages: ChatMessage[];
   isRequesting: boolean;
   handleChatCompletion: (value: ChatCompletionMessageParam[]) => void;
   handleCancel: () => void;
@@ -39,7 +38,7 @@ export const ChatView = ({
   startNewChat,
   conversationID,
   modelConfig,
-  messageHistoryStore,
+  messages,
   errorStore,
   isRequesting,
   messageStore,
@@ -48,7 +47,6 @@ export const ChatView = ({
   handleChatCompletion,
   handleModelChange,
 }: ChatViewProps) => {
-  const { hasMessages } = useMessageHistory(messageHistoryStore);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Track if we should auto-scroll
@@ -93,6 +91,8 @@ export const ChatView = ({
     }
   }, [shouldAutoScroll, scrollToBottom]);
 
+  const isConversationStarted = messages.length > 0;
+
   return (
     <div className={styles.chatview} data-testid="chatview">
       <div ref={containerRef} className={styles.scrollContainer}>
@@ -100,7 +100,7 @@ export const ChatView = ({
           <NavBar
             handleModelChange={handleModelChange}
             modelConfig={modelConfig}
-            messageHistoryStore={messageHistoryStore}
+            isModelSelectorDisabled={isConversationStarted}
             onPanelOpen={onPanelOpen}
             isPanelOpen={isPanelOpen}
             onMenu={onMenu}
@@ -111,14 +111,14 @@ export const ChatView = ({
 
         <div className={styles.chatContainer}>
           <div
-            className={`${styles.chatContent} ${hasMessages ? styles.fullHeight : ''}`}
+            className={`${styles.chatContent} ${isConversationStarted ? styles.fullHeight : ''}`}
           >
-            {hasMessages && (
+            {isConversationStarted && (
               <Conversation
                 thinkingStore={thinkingStore}
                 isRequesting={isRequesting}
                 errorStore={errorStore}
-                messageHistoryStore={messageHistoryStore}
+                messages={messages}
                 messageStore={messageStore}
                 onRendered={handleContentRendered}
                 modelConfig={modelConfig}
@@ -127,10 +127,10 @@ export const ChatView = ({
           </div>
 
           <div
-            className={`${styles.controlsContainer} ${hasMessages ? styles.positionSticky : ''}`}
+            className={`${styles.controlsContainer} ${isConversationStarted ? styles.positionSticky : ''}`}
             data-testid="controls"
           >
-            {!hasMessages && (
+            {!isConversationStarted && (
               <LandingContent introText={modelConfig.introText} />
             )}
 

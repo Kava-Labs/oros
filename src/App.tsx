@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { ChatView } from './core/components/ChatView';
 import { useChat } from './core/context/useChat';
 import styles from './App.module.css';
 import KavaAILogo from './core/assets/KavaAILogo';
 import { SearchHistoryModal, SideBar, useIsMobileLayout } from 'lib-kava-ai';
 import { useSession } from './useSession';
+import { ChatViewContainer } from './core/components/ChatViewContainer';
 
 export const App = () => {
   const {
@@ -70,24 +70,42 @@ export const App = () => {
             styles={styles}
           />
           <div className={styles.content}>
-            <ChatView
-              handleModelChange={handleModelChange}
-              thinkingStore={thinkingStore}
-              messageHistoryStore={messageHistoryStore}
-              isRequesting={isRequesting}
-              errorStore={errorStore}
-              messageStore={messageStore}
-              handleCancel={handleCancel}
-              handleChatCompletion={handleChatCompletion}
+            <ChatViewContainer
               onMenu={() => setIsMobileSideBarOpen(true)}
               onPanelOpen={() => setIsDesktopSideBarOpen(true)}
-              isPanelOpen={isDesktopSideBarOpen}
+              isPanelOpen={isDesktopSideBarOpen || isMobileSideBarOpen}
               supportsUpload={supportedFileTypes.length > 0}
               showModelSelector={true}
               startNewChat={startNewChat}
               conversationID={conversationID}
               modelConfig={modelConfig}
+              errorStore={errorStore}
+              messageStore={messageStore}
+              thinkingStore={thinkingStore}
+              messageHistoryStore={messageHistoryStore}
+              isRequesting={isRequesting}
+              handleChatCompletion={handleChatCompletion}
+              handleCancel={handleCancel}
+              handleModelChange={handleModelChange}
             />
+            {/*<ChatView*/}
+            {/*  handleModelChange={handleModelChange}*/}
+            {/*  thinkingStore={thinkingStore}*/}
+            {/*  messageHistoryStore={messageHistoryStore}*/}
+            {/*  isRequesting={isRequesting}*/}
+            {/*  errorStore={errorStore}*/}
+            {/*  messageStore={messageStore}*/}
+            {/*  handleCancel={handleCancel}*/}
+            {/*  handleChatCompletion={handleChatCompletion}*/}
+            {/*  onMenu={() => setIsMobileSideBarOpen(true)}*/}
+            {/*  onPanelOpen={() => setIsDesktopSideBarOpen(true)}*/}
+            {/*  isPanelOpen={isDesktopSideBarOpen}*/}
+            {/*  supportsUpload={supportedFileTypes.length > 0}*/}
+            {/*  showModelSelector={true}*/}
+            {/*  startNewChat={startNewChat}*/}
+            {/*  conversationID={conversationID}*/}
+            {/*  modelConfig={modelConfig}*/}
+            {/*/>*/}
           </div>
           {isSearchHistoryOpen && searchableHistory && (
             <SearchHistoryModal
