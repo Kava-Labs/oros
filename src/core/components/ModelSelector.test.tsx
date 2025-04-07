@@ -3,7 +3,6 @@ import { ModelSelector } from './ModelSelector';
 import { useIsMobileLayout } from 'lib-kava-ai';
 import { getAllModels } from '../config/models/index';
 import { vi } from 'vitest';
-import { MessageHistoryStore } from '../stores/messageHistoryStore';
 import { ModelConfig } from '../types/models';
 
 // Mock the required modules and hooks
@@ -58,7 +57,7 @@ describe('ModelSelector', () => {
       <ModelSelector
         handleModelChange={vi.fn()}
         modelConfig={mockReasoningModel as unknown as ModelConfig}
-        messageHistoryStore={new MessageHistoryStore()}
+        isModelSelectorDisabled={false}
       />,
     );
 
@@ -73,7 +72,7 @@ describe('ModelSelector', () => {
       <ModelSelector
         handleModelChange={vi.fn()}
         modelConfig={mockReasoningModel as unknown as ModelConfig}
-        messageHistoryStore={new MessageHistoryStore()}
+        isModelSelectorDisabled={false}
       />,
     );
 
@@ -89,7 +88,7 @@ describe('ModelSelector', () => {
       <ModelSelector
         handleModelChange={vi.fn()}
         modelConfig={getAllModels()[0]}
-        messageHistoryStore={new MessageHistoryStore()}
+        isModelSelectorDisabled={false}
       />,
     );
 
@@ -120,7 +119,7 @@ describe('ModelSelector', () => {
       <ModelSelector
         handleModelChange={mockHandleModelChange}
         modelConfig={getAllModels()[0]}
-        messageHistoryStore={new MessageHistoryStore()}
+        isModelSelectorDisabled={false}
       />,
     );
 
@@ -136,7 +135,7 @@ describe('ModelSelector', () => {
       <ModelSelector
         handleModelChange={vi.fn()}
         modelConfig={getAllModels()[0]}
-        messageHistoryStore={new MessageHistoryStore()}
+        isModelSelectorDisabled={false}
       />,
     );
 
@@ -147,34 +146,12 @@ describe('ModelSelector', () => {
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
   });
 
-  it('disables selector when chat has messages', () => {
-    const messageHistoryStore = new MessageHistoryStore();
-    messageHistoryStore.setMessages([
-      { role: 'user', content: 'Hello' },
-      { role: 'assistant', content: 'Hi' },
-    ]);
-
-    render(
-      <ModelSelector
-        handleModelChange={mockHandleModelChange}
-        modelConfig={getAllModels()[0]}
-        messageHistoryStore={messageHistoryStore}
-      />,
-    );
-
-    const combobox = screen.getByRole('combobox', { name: 'Select Model' });
-    expect(combobox).toBeDisabled();
-
-    fireEvent.click(combobox);
-    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
-  });
-
   it('marks current model as selected', () => {
     render(
       <ModelSelector
         handleModelChange={vi.fn()}
         modelConfig={getAllModels()[0]}
-        messageHistoryStore={new MessageHistoryStore()}
+        isModelSelectorDisabled={false}
       />,
     );
 
@@ -193,7 +170,7 @@ describe('ModelSelector', () => {
       <ModelSelector
         handleModelChange={mockHandleModelChange}
         modelConfig={mockBlockchainModel as unknown as ModelConfig}
-        messageHistoryStore={new MessageHistoryStore()}
+        isModelSelectorDisabled={false}
       />,
     );
 
@@ -243,7 +220,7 @@ describe('ModelSelector', () => {
       <ModelSelector
         handleModelChange={vi.fn()}
         modelConfig={mockReasoningModel as unknown as ModelConfig}
-        messageHistoryStore={new MessageHistoryStore()}
+        isModelSelectorDisabled={false}
       />,
     );
     expect(screen.getByTestId('kava-icon')).toBeInTheDocument();
@@ -252,7 +229,7 @@ describe('ModelSelector', () => {
       <ModelSelector
         handleModelChange={vi.fn()}
         modelConfig={mockBlockchainModel as unknown as ModelConfig}
-        messageHistoryStore={new MessageHistoryStore()}
+        isModelSelectorDisabled={false}
       />,
     );
     expect(screen.getByTestId('oros-icon')).toBeInTheDocument();

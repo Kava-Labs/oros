@@ -2,11 +2,6 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { vi } from 'vitest';
 import { NavBar, NavBarProps } from './NavBar';
 import { useIsMobileLayout } from 'lib-kava-ai';
-
-import { MessageHistoryStore } from '../stores/messageHistoryStore';
-
-const messageHistoryStore = new MessageHistoryStore();
-
 import * as useIsMobileLayoutModule from 'lib-kava-ai';
 import { getModelConfig } from '../config';
 
@@ -41,7 +36,7 @@ describe('NavBar', () => {
     isPanelOpen: false,
     showModelSelector: true,
     startNewChat: vi.fn(),
-    messageHistoryStore,
+    isModelSelectorDisabled: false,
     handleModelChange: vi.fn(),
     modelConfig: getModelConfig('o3-mini'),
   };
