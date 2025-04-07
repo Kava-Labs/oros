@@ -11,8 +11,8 @@ import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { ChatMessage } from '../stores/messageHistoryStore';
 
 export interface ChatViewProps {
-  onMenu(): void;
-  onPanelOpen(): void;
+  onMenu: () => void;
+  onPanelOpen: () => void;
   isPanelOpen: boolean;
   supportsUpload: boolean;
   showModelSelector: boolean;
@@ -91,7 +91,8 @@ export const ChatView = ({
     }
   }, [shouldAutoScroll, scrollToBottom]);
 
-  const isConversationStarted = messages.length > 0;
+  //  don't include system prompt
+  const isConversationStarted = messages.length > 1;
 
   return (
     <div className={styles.chatview} data-testid="chatview">

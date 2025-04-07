@@ -6,8 +6,8 @@ import { useMessageHistory } from '../hooks/useMessageHistory';
 import { MessageHistoryStore } from '../stores/messageHistoryStore';
 
 interface ChatViewContainerProps {
-  onMenu(): void;
-  onPanelOpen(): void;
+  onMenu: () => void;
+  onPanelOpen: () => void;
   isPanelOpen: boolean;
   supportsUpload: boolean;
   showModelSelector: boolean;
