@@ -22,11 +22,6 @@ describe('Content Component', () => {
       mockSanitizedContent,
     );
 
-    // (useAppContext as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-    //   modelConfig: {
-    //     messageProcessors: null,
-    //   },
-    // });
 
     // Mock requestAnimationFrame
     vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
