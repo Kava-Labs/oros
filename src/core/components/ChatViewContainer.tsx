@@ -1,9 +1,8 @@
 import { ChatView } from './ChatView';
 import { ModelConfig, SupportedModels } from '../types/models';
-import type { TextStreamStore } from 'lib-kava-ai';
 import type { ChatCompletionMessageParam } from 'openai/resources';
 import { useMessageHistory } from '../hooks/useMessageHistory';
-import { MessageHistoryStore } from '../stores/messageHistoryStore';
+import { ActiveConversation } from '../context/types';
 
 interface ChatViewContainerProps {
   onMenu: () => void;
@@ -14,11 +13,7 @@ interface ChatViewContainerProps {
   startNewChat: () => void;
   conversationID: string;
   modelConfig: ModelConfig;
-  errorStore: TextStreamStore;
-  messageStore: TextStreamStore;
-  thinkingStore: TextStreamStore;
-  messageHistoryStore: MessageHistoryStore;
-  isRequesting: boolean;
+  activeConversation: ActiveConversation;
   handleChatCompletion: (value: ChatCompletionMessageParam[]) => void;
   handleCancel: () => void;
   handleModelChange: (modelName: SupportedModels) => void;
@@ -31,24 +26,22 @@ export const ChatViewContainer = ({
   handleModelChange,
   handleCancel,
   handleChatCompletion,
-  thinkingStore,
-  messageHistoryStore,
-  isRequesting,
-  errorStore,
-  messageStore,
+  activeConversation,
   startNewChat,
   modelConfig,
   conversationID,
 }: ChatViewContainerProps) => {
-  const { messages } = useMessageHistory(messageHistoryStore);
+  const { messages } = useMessageHistory(
+    activeConversation.messageHistoryStore,
+  );
 
   return (
     <ChatView
       handleModelChange={handleModelChange}
-      thinkingStore={thinkingStore}
-      isRequesting={isRequesting}
-      errorStore={errorStore}
-      messageStore={messageStore}
+      thinkingStore={activeConversation.thinkingStore}
+      isRequesting={activeConversation.isRequesting}
+      errorStore={activeConversation.errorStore}
+      messageStore={activeConversation.messageStore}
       handleCancel={handleCancel}
       handleChatCompletion={handleChatCompletion}
       onMenu={onMenu}

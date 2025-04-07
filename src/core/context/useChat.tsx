@@ -96,7 +96,6 @@ export const useChat = (props?: {
     messageStore,
     progressStore,
     thinkingStore,
-    errorStore,
   } = conversation;
 
   const activeConversationsRef = useRef<Map<string, ActiveConversation>>(null);
@@ -341,16 +340,11 @@ export const useChat = (props?: {
   return {
     conversationID,
     client,
-    messageHistoryStore,
-    messageStore,
-    progressStore,
     modelConfig,
     handleModelChange,
     startNewChat,
     handleCancel,
     handleChatCompletion,
-    thinkingStore,
-    errorStore,
     onSelectConversation,
     onDeleteConversation,
     onUpdateConversationTitle,
@@ -359,5 +353,6 @@ export const useChat = (props?: {
     fetchSearchHistory,
     searchableHistory,
     conversations: conversationHistories,
+    activeConversation: conversation,
   };
 };

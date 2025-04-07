@@ -8,7 +8,6 @@ import { ChatViewContainer } from './core/components/ChatViewContainer';
 
 export const App = () => {
   const {
-    isRequesting,
     isReady,
     modelConfig,
     startNewChat,
@@ -19,13 +18,10 @@ export const App = () => {
     conversations,
     searchableHistory,
     fetchSearchHistory,
-    messageHistoryStore,
-    errorStore,
-    messageStore,
     handleCancel,
     handleChatCompletion,
-    thinkingStore,
     handleModelChange,
+    activeConversation,
   } = useChat();
 
   const { supportedFileTypes } = modelConfig;
@@ -72,11 +68,7 @@ export const App = () => {
           <div className={styles.content}>
             <ChatViewContainer
               handleModelChange={handleModelChange}
-              thinkingStore={thinkingStore}
-              messageHistoryStore={messageHistoryStore}
-              isRequesting={isRequesting}
-              errorStore={errorStore}
-              messageStore={messageStore}
+              activeConversation={activeConversation}
               handleCancel={handleCancel}
               handleChatCompletion={handleChatCompletion}
               onMenu={() => setIsMobileSideBarOpen(true)}
