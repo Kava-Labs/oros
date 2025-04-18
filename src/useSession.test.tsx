@@ -2,7 +2,12 @@ import { renderHook } from '@testing-library/react';
 import { vi, MockInstance } from 'vitest';
 import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
-import { useSession, sessionUrl } from './useSession';
+import {
+  useSession,
+  sessionUrl,
+  buildSessionUrlWithQueryParams,
+  resetLandingPageUrlQueryParams,
+} from './useSession';
 
 // MSW handler for GET /session
 const getSessionHandler = http.get(
@@ -12,26 +17,36 @@ const getSessionHandler = http.get(
 
 const server = setupServer(getSessionHandler);
 
+const MOCK_RAILS_URL = 'http://localhost:3000/session';
+const MOCK_ROOT_APP_URL = 'https://chat.kava.io';
+const LANDING_URL = MOCK_ROOT_APP_URL + '?utm_source=twitter&utm_campaign=test';
+const REFERRER_URL = 'https://referrer.com/some/path';
+
 const setupSessionHook = () => {
   return renderHook(() => useSession());
 };
 
-beforeAll(() => server.listen());
-afterEach(() => {
-  server.resetHandlers();
-});
-afterAll(() => server.close());
-
 const advanceMinutesAndMs = (minutes: number, ms: number = 0) => {
   vi.advanceTimersByTime(minutes * 60 * 1000 + ms);
 };
+
+beforeAll(() => server.listen());
+afterAll(() => server.close());
+
+afterEach(() => {
+  server.resetHandlers();
+  vi.restoreAllMocks();
+});
 
 describe('useSession', () => {
   let fetchSpy: MockInstance;
 
   beforeEach(() => {
     vi.useFakeTimers();
+    vi.restoreAllMocks();
     fetchSpy = vi.spyOn(globalThis, 'fetch');
+    // Simulate a local, same-origin URL so replaceState doesn't throw
+    window.history.pushState({}, '', '?utm_source=twitter&utm_campaign=test');
   });
 
   afterEach(() => {
@@ -47,16 +62,26 @@ describe('useSession', () => {
     setupSessionHook();
 
     expect(fetchSpy).toHaveBeenCalledWith(
+<<<<<<< HEAD
       sessionUrl,
       expect.objectContaining({ method: 'GET' }),
+=======
+      expect.stringContaining(sessionUrl),
+      expect.any(Object),
+>>>>>>> 360cd51 (feat: add impression information to session requests)
     );
 
     advanceMinutesAndMs(5);
     window.dispatchEvent(new Event('click'));
 
     expect(fetchSpy).toHaveBeenCalledWith(
+<<<<<<< HEAD
       sessionUrl,
       expect.objectContaining({ method: 'GET' }),
+=======
+      expect.stringContaining(sessionUrl),
+      expect.objectContaining({ method: 'POST' }),
+>>>>>>> 360cd51 (feat: add impression information to session requests)
     );
   });
 
@@ -65,12 +90,79 @@ describe('useSession', () => {
 
     expect(fetchSpy).toHaveBeenCalledTimes(1);
     expect(fetchSpy).toHaveBeenCalledWith(
-      sessionUrl,
+      expect.stringContaining(sessionUrl),
       expect.objectContaining({
         method: 'GET',
         credentials: 'include',
       }),
     );
+
+    expect(fetchSpy).not.toHaveBeenCalledWith(
+      expect.stringContaining(sessionUrl),
+      expect.objectContaining({ method: 'POST' }),
+    );
+  });
+
+  it('sends GET /session without query params if none are present', () => {
+    Object.defineProperty(document, 'referrer', {
+      value: '',
+      configurable: true,
+    });
+
+    const expectedUrl = buildSessionUrlWithQueryParams(
+      MOCK_RAILS_URL,
+      window.location.href,
+      'null',
+    );
+
+    setupSessionHook();
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      expectedUrl,
+      expect.objectContaining({
+        method: 'GET',
+        credentials: 'include',
+      }),
+    );
+  });
+
+  it('sends GET /session with landing_page_url and referrer_url as query params and resets the url', () => {
+    const pushSpy = vi.spyOn(window.history, 'replaceState');
+    const queryParams = '/?utm_source=twitter&utm_campaign=test';
+    window.history.pushState({}, '', queryParams);
+    const campaignUrl = window.location.href + queryParams;
+
+    Object.defineProperty(document, 'referrer', {
+      value: REFERRER_URL,
+      configurable: true,
+    });
+
+    const expectedUrl = buildSessionUrlWithQueryParams(
+      MOCK_RAILS_URL,
+      window.location.href,
+      REFERRER_URL,
+    );
+
+    setupSessionHook();
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      expectedUrl,
+      expect.objectContaining({
+        method: 'GET',
+        credentials: 'include',
+      }),
+    );
+
+    expect(fetchSpy).not.toHaveBeenCalledWith(
+      sessionUrl,
+      expect.objectContaining({ method: 'POST' }),
+    );
+
+    const cleaned = resetLandingPageUrlQueryParams(campaignUrl);
+    expect(pushSpy).toHaveBeenCalledWith({}, '', cleaned);
+    expect(cleaned).toBe(window.location.href);
   });
 
   it('does not call GET /session again if no user interaction occurs after 5 minutes', () => {
@@ -93,19 +185,31 @@ describe('useSession', () => {
       setupSessionHook();
 
       expect(fetchSpy).toHaveBeenCalledWith(
-        sessionUrl,
+        expect.stringContaining(sessionUrl),
         expect.objectContaining({ method: 'GET' }),
       );
 
       advanceMinutesAndMs(4);
       window.dispatchEvent(new Event(eventType));
+<<<<<<< HEAD
+=======
+      expect(fetchSpy).not.toHaveBeenCalledWith(
+        expect.stringContaining(sessionUrl),
+        expect.objectContaining({ method: 'POST' }),
+      );
+>>>>>>> 360cd51 (feat: add impression information to session requests)
 
       advanceMinutesAndMs(1, 1);
       window.dispatchEvent(new Event(eventType));
 
       expect(fetchSpy).toHaveBeenCalledWith(
+<<<<<<< HEAD
         sessionUrl,
         expect.objectContaining({ method: 'GET' }),
+=======
+        expect.stringContaining(sessionUrl),
+        expect.objectContaining({ method: 'POST' }),
+>>>>>>> 360cd51 (feat: add impression information to session requests)
       );
 
       expect(fetchSpy).toHaveBeenCalledTimes(2);
@@ -116,7 +220,7 @@ describe('useSession', () => {
     setupSessionHook();
 
     expect(fetchSpy).toHaveBeenCalledWith(
-      sessionUrl,
+      expect.stringContaining(sessionUrl),
       expect.objectContaining({ method: 'GET' }),
     );
 
@@ -128,12 +232,25 @@ describe('useSession', () => {
     window.dispatchEvent(new Event('wheel'));
     window.dispatchEvent(new Event('touchstart'));
 
+<<<<<<< HEAD
+=======
+    expect(fetchSpy).not.toHaveBeenCalledWith(
+      expect.stringContaining(sessionUrl),
+      expect.objectContaining({ method: 'POST' }),
+    );
+
+>>>>>>> 360cd51 (feat: add impression information to session requests)
     advanceMinutesAndMs(4, 1);
     window.dispatchEvent(new Event('keydown'));
 
     expect(fetchSpy).toHaveBeenCalledWith(
+<<<<<<< HEAD
       sessionUrl,
       expect.objectContaining({ method: 'GET' }),
+=======
+      expect.stringContaining(sessionUrl),
+      expect.objectContaining({ method: 'POST' }),
+>>>>>>> 360cd51 (feat: add impression information to session requests)
     );
 
     expect(fetchSpy).toHaveBeenCalledTimes(2);
@@ -143,7 +260,7 @@ describe('useSession', () => {
     setupSessionHook();
 
     expect(fetchSpy).toHaveBeenCalledWith(
-      sessionUrl,
+      expect.stringContaining(sessionUrl),
       expect.objectContaining({ method: 'GET' }),
     );
 
@@ -154,12 +271,25 @@ describe('useSession', () => {
     });
     document.dispatchEvent(new Event('visibilitychange'));
 
+<<<<<<< HEAD
+=======
+    expect(fetchSpy).not.toHaveBeenCalledWith(
+      expect.stringContaining(sessionUrl),
+      expect.objectContaining({ method: 'POST' }),
+    );
+
+>>>>>>> 360cd51 (feat: add impression information to session requests)
     advanceMinutesAndMs(1, 1);
     document.dispatchEvent(new Event('visibilitychange'));
 
     expect(fetchSpy).toHaveBeenCalledWith(
+<<<<<<< HEAD
       sessionUrl,
       expect.objectContaining({ method: 'GET' }),
+=======
+      expect.stringContaining(sessionUrl),
+      expect.objectContaining({ method: 'POST' }),
+>>>>>>> 360cd51 (feat: add impression information to session requests)
     );
 
     expect(fetchSpy).toHaveBeenCalledTimes(2);
@@ -211,5 +341,42 @@ describe('useSession', () => {
         keepalive: true,
       }),
     );
+  });
+});
+
+describe('buildSessionUrlWithQueryParams', () => {
+  it('includes encoded landing_page_url and referrer_url', () => {
+    const result = buildSessionUrlWithQueryParams(
+      MOCK_RAILS_URL,
+      LANDING_URL,
+      REFERRER_URL,
+    );
+
+    expect(result).toContain(encodeURIComponent(LANDING_URL));
+    expect(result).toContain(encodeURIComponent(REFERRER_URL));
+  });
+
+  it('uses "null" if referrer_url is missing', () => {
+    const result = buildSessionUrlWithQueryParams(
+      MOCK_RAILS_URL,
+      LANDING_URL,
+      'null',
+    );
+    expect(result).toContain('referrer_url=null');
+  });
+});
+
+describe('resetLandingPageUrlQueryParams', () => {
+  it('removes utm_* params but preserves others', () => {
+    const dirtyUrl =
+      'https://example.com?utm_source=twitter&utm_campaign=test&ref=abc&debug=true';
+    const cleaned = resetLandingPageUrlQueryParams(dirtyUrl);
+    expect(cleaned).toBe('https://example.com/?ref=abc&debug=true');
+  });
+
+  it('returns original url if no query params exist', () => {
+    const url = 'https://example.com/';
+    const cleaned = resetLandingPageUrlQueryParams(url);
+    expect(cleaned).toBe(url);
   });
 });
