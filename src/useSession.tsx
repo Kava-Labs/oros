@@ -9,7 +9,16 @@ export function useSession() {
 
   const getSession = () => {
     lastPingTimeRef.current = Date.now();
-    fetch(sessionUrl, {
+
+    const landingUrl = window.location.href;
+    const referrerUrl = document.referrer || 'null';
+    const urlWithParams = buildSessionUrlWithQueryParams(
+      sessionUrl,
+      landingUrl,
+      referrerUrl,
+    );
+
+    fetch(urlWithParams, {
       method: 'GET',
       credentials: 'include',
       headers: {
@@ -18,6 +27,9 @@ export function useSession() {
     }).catch(() => {
       // silently fail
     });
+
+    const cleanedUrl = resetLandingPageUrlQueryParams(landingUrl);
+    window.history.replaceState({}, '', cleanedUrl);
   };
 
   const postHeartbeat = (keepAlive = false) => {
@@ -81,3 +93,30 @@ export function useSession() {
     };
   }, []);
 }
+
+export const buildSessionUrlWithQueryParams = (
+  baseUrl: string,
+  landingPageUrl: string,
+  referrerUrl: string,
+): string => {
+  const sessionUrl = new URL(baseUrl);
+  sessionUrl.searchParams.set('landing_page_url', landingPageUrl);
+  sessionUrl.searchParams.set('referrer_url', referrerUrl);
+  return sessionUrl.toString();
+};
+
+export const resetLandingPageUrlQueryParams = (urlString: string): string => {
+  const url = new URL(urlString);
+  const params = url.searchParams;
+  const keysToRemove = [];
+
+  for (const key of params.keys()) {
+    if (key.toLowerCase().startsWith('utm_')) {
+      keysToRemove.push(key);
+    }
+  }
+
+  keysToRemove.forEach((key) => params.delete(key));
+
+  return `${url.origin}${url.pathname}${params.toString() ? '?' + params.toString() : ''}`;
+};
