@@ -64,6 +64,12 @@ export const App = () => {
             isSideBarOpen={isSideBarOpen}
             SideBarLogo={<KavaAILogo height={20} />}
             styles={styles}
+            links={[
+              {
+                title: 'Oros',
+                url: 'https://oros.kava.io/',
+              },
+            ]}
           />
           <div className={styles.content}>
             <ChatViewContainer

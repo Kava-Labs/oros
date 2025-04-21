@@ -108,3 +108,35 @@
   display: flex;
   gap: var(--spacing-xs);
 }
+
+.sidebarLinkContainer {
+  width: 100%;
+  color: var(--colors-textSecondary);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.sidebarLinkContainer:hover {
+  background-color: var(--colors-bgTertiary);
+}
+
+.sidebarLink {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding-left: 1.6rem;
+  padding-right: 1.2rem;
+  padding-bottom: 0.8rem;
+  padding-top: 0.8rem;
+}
+
+
+.sidebarLinkItemContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
