@@ -166,7 +166,9 @@ export async function doChat(
       {
         model: id,
         messages: messagesWithoutReasoningContent,
-        tools: tools,
+        // Only include tools if they exist and are non-empty.
+        // An empty array of tools can cause models to misbehave and return invalid output or loop
+        ...(tools && tools.length ? { tools } : {}),
         stream: true,
         stream_options: { include_usage: modelConfig.includeUsageInStream },
       },
