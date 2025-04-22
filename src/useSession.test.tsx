@@ -356,13 +356,13 @@ describe('buildSessionUrlWithQueryParams', () => {
     expect(result).toContain(encodeURIComponent(REFERRER_URL));
   });
 
-  it('uses "null" if referrer_url is missing', () => {
+  it('uses "nil" if referrer_url is missing', () => {
     const result = buildSessionUrlWithQueryParams(
       MOCK_RAILS_URL,
       LANDING_URL,
-      'null',
+      'nil',
     );
-    expect(result).toContain('referrer_url=null');
+    expect(result).toContain('referrer_url=nil');
   });
 });
 

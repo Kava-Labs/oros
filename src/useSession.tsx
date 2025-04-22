@@ -11,7 +11,7 @@ export function useSession() {
     lastPingTimeRef.current = Date.now();
 
     const landingUrl = window.location.href;
-    const referrerUrl = document.referrer || 'null';
+    const referrerUrl = document.referrer || 'nil';
     const urlWithParams = buildSessionUrlWithQueryParams(
       sessionUrl,
       landingUrl,
