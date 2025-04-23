@@ -5,10 +5,12 @@ import { join } from 'path';
 
 const { describe } = test;
 
-test.beforeEach(async ({ page }) => {
-  // This guarantees /session won't cause ERR_CONNECTION_REFUSED
-  await page.route('**/session**', (route) => {
-    route.fulfill({ status: 204, body: '' });
+test.beforeEach(async ({ context }) => {
+  await context.route('**/session**', (route) => {
+    route.fulfill({
+      status: 204,
+      body: '',
+    });
   });
 });
 
