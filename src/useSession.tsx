@@ -7,23 +7,10 @@ const FIVE_MINUTES = 5 * 60 * 1000;
 export function useSession() {
   const lastPingTimeRef = useRef<number>(Date.now());
 
-  const getSession = () => {
+  const getSession = (keepAlive = false) => {
     lastPingTimeRef.current = Date.now();
     fetch(sessionUrl, {
       method: 'GET',
-      credentials: 'include',
-      headers: {
-        Accept: 'application/json',
-      },
-    }).catch(() => {
-      // silently fail
-    });
-  };
-
-  const postHeartbeat = (keepAlive = false) => {
-    lastPingTimeRef.current = Date.now();
-    fetch(sessionUrl, {
-      method: 'POST',
       credentials: 'include',
       headers: {
         Accept: 'application/json',
@@ -40,7 +27,7 @@ export function useSession() {
     const handleUserActivity = () => {
       const now = Date.now();
       if (now - lastPingTimeRef.current >= FIVE_MINUTES) {
-        postHeartbeat();
+        getSession(true);
       }
     };
 
@@ -48,12 +35,12 @@ export function useSession() {
       if (document.visibilityState === 'visible') {
         handleUserActivity();
       } else if (document.visibilityState === 'hidden') {
-        postHeartbeat(true); // Send keepalive ping before tab closes
+        getSession(true); // Send keepalive ping before tab closes
       }
     };
 
     const handlePagehide = () => {
-      postHeartbeat(true); // Also send keepalive on pagehide
+      getSession(true); // Also send keepalive on pagehide
     };
 
     const userActivityEvents = [
