@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"time"
@@ -77,6 +78,10 @@ func (w *TimeToFirstByteResponseWriter) Write(b []byte) (int, error) {
 
 	i, err := w.ResponseWriter.Write(b)
 	if err != nil && w.ResponseSpan != nil {
+		// Check if error is due to client cancellation
+		if errors.Is(err, context.Canceled) {
+			return i, err
+		}
 		// Record error in child span
 		w.ResponseSpan.SetStatus(codes.Error, "response write error")
 		w.ResponseSpan.RecordError(err)
@@ -166,6 +171,16 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		r.Body,
 	)
 	if err != nil {
+		// Check if error is due to client cancellation
+		if errors.Is(err, context.Canceled) {
+			h.logger.Info().Msgf(
+				"request to backend %s was cancelled by client",
+				backend.Name,
+			)
+
+			return
+		}
+
 		h.logger.Error().Msgf(
 			"error forwarding request to backend %s: %s",
 			backend.Name, err.Error(),
@@ -190,10 +205,22 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Forward response body, straight copy from response which includes streaming
 	bytesWritten, err := io.Copy(responseWriter, apiResponse.Body)
 	if err != nil {
+		// Check if error is due to client cancellation
+		if errors.Is(err, context.Canceled) {
+			h.logger.Info().Msgf(
+				"response streaming to client was cancelled",
+			)
+
+			return
+		}
+
 		h.logger.Error().Msgf(
 			"error forwarding response body to client: %s",
 			err.Error(),
 		)
+		// Only record as error if not context cancellation
+		proxySpan.SetStatus(codes.Error, "response forwarding error")
+		proxySpan.RecordError(err)
 	}
 
 	proxySpan.SetAttributes(attribute.Int64("response_bytes", bytesWritten))
