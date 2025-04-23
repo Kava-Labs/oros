@@ -5,6 +5,13 @@ import { join } from 'path';
 
 const { describe } = test;
 
+test.beforeEach(async ({ page }) => {
+  // This guarantees /session won't cause ERR_CONNECTION_REFUSED
+  await page.route('**/session**', (route) => {
+    route.fulfill({ status: 204, body: '' });
+  });
+});
+
 describe('chat', () => {
   test('renders intro messages by model', async ({ page }) => {
     const initialIntroMessage = 'What can I help you with?';
