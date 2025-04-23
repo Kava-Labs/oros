@@ -22,7 +22,6 @@ describe('Content Component', () => {
       mockSanitizedContent,
     );
 
-
     // Mock requestAnimationFrame
     vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
       callback(0);

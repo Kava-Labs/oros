@@ -8,7 +8,7 @@ export class Chat {
     this.page = page;
 
     // Mock the /session endpoint for both GET and POST
-    this.page.route('**/session', async (route, request) => {
+    this.page.route('**/session', async (route, _request) => {
       route.fulfill({
         status: 200,
         contentType: 'application/json',
