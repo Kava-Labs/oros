@@ -112,7 +112,7 @@ describe('useSession', () => {
     const expectedUrl = buildSessionUrlWithQueryParams(
       MOCK_RAILS_URL,
       window.location.href,
-      'null',
+      'nil',
     );
 
     setupSessionHook();
