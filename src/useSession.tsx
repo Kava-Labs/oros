@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 
-const RAILS_API_BASE_URL = import.meta.env.VITE_RAILS_API_BASE_URL ?? '';
+const RAILS_API_BASE_URL =
+  import.meta.env.VITE_RAILS_API_BASE_URL || 'http://localhost:3000';
 export const sessionUrl = `${RAILS_API_BASE_URL}/session`;
 const FIVE_MINUTES = 5 * 60 * 1000;
 
