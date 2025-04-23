@@ -35,7 +35,7 @@ func NewOpenAIClient(baseURL, apiKey string) *OpenAIPassthroughClient {
 			Transport: otelhttp.NewTransport(
 				http.DefaultTransport,
 				otelhttp.WithClientTrace(func(ctx context.Context) *httptrace.ClientTrace {
-					return otelhttptrace.NewClientTrace(ctx)
+					return otelhttptrace.NewClientTrace(ctx, otelhttptrace.WithoutSubSpans())
 				}),
 				otelhttp.WithMetricAttributesFn(func(r *http.Request) []attribute.KeyValue {
 					attrs := []attribute.KeyValue{}
