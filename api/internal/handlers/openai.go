@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"syscall"
 	"time"
 
 	"github.com/kava-labs/kavachat/api/internal/config"
@@ -78,10 +79,16 @@ func (w *TimeToFirstByteResponseWriter) Write(b []byte) (int, error) {
 
 	i, err := w.ResponseWriter.Write(b)
 	if err != nil && w.ResponseSpan != nil {
-		// Check if error is due to client cancellation
-		if errors.Is(err, context.Canceled) {
+		// Check if error is specifically due to client disconnection -- don't
+		// mark span as error
+		if errors.Is(err, syscall.EPIPE) || errors.Is(err, syscall.ECONNRESET) {
+			// Client disconnected, don't mark as error
+			return i, err
+		} else if errors.Is(err, context.Canceled) {
+			// Context cancelled, might be client disconnection
 			return i, err
 		}
+
 		// Record error in child span
 		w.ResponseSpan.SetStatus(codes.Error, "response write error")
 		w.ResponseSpan.RecordError(err)
@@ -171,10 +178,17 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		r.Body,
 	)
 	if err != nil {
-		// Check if error is due to client cancellation
-		if errors.Is(err, context.Canceled) {
+		// Check if error is specifically due to client disconnection
+		if errors.Is(err, syscall.EPIPE) || errors.Is(err, syscall.ECONNRESET) {
 			h.logger.Info().Msgf(
-				"request to backend %s was cancelled by client",
+				"client disconnected during request to backend %s (connection reset/broken pipe)",
+				backend.Name,
+			)
+
+			return
+		} else if errors.Is(err, context.Canceled) {
+			h.logger.Info().Msgf(
+				"request to backend %s was cancelled (might be client disconnection)",
 				backend.Name,
 			)
 
@@ -205,12 +219,16 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Forward response body, straight copy from response which includes streaming
 	bytesWritten, err := io.Copy(responseWriter, apiResponse.Body)
 	if err != nil {
-		// Check if error is due to client cancellation
-		if errors.Is(err, context.Canceled) {
+		// Check if error is specifically due to client disconnection
+		if errors.Is(err, syscall.EPIPE) || errors.Is(err, syscall.ECONNRESET) {
 			h.logger.Info().Msgf(
-				"response streaming to client was cancelled",
+				"client disconnected during response streaming (connection reset/broken pipe)",
 			)
-
+			return
+		} else if errors.Is(err, context.Canceled) {
+			h.logger.Info().Msgf(
+				"response streaming to client was cancelled (might be client disconnection)",
+			)
 			return
 		}
 
