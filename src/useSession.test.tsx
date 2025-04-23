@@ -62,26 +62,16 @@ describe('useSession', () => {
     setupSessionHook();
 
     expect(fetchSpy).toHaveBeenCalledWith(
-<<<<<<< HEAD
       sessionUrl,
       expect.objectContaining({ method: 'GET' }),
-=======
-      expect.stringContaining(sessionUrl),
-      expect.any(Object),
->>>>>>> 360cd51 (feat: add impression information to session requests)
     );
 
     advanceMinutesAndMs(5);
     window.dispatchEvent(new Event('click'));
 
     expect(fetchSpy).toHaveBeenCalledWith(
-<<<<<<< HEAD
       sessionUrl,
       expect.objectContaining({ method: 'GET' }),
-=======
-      expect.stringContaining(sessionUrl),
-      expect.objectContaining({ method: 'POST' }),
->>>>>>> 360cd51 (feat: add impression information to session requests)
     );
   });
 
@@ -112,7 +102,7 @@ describe('useSession', () => {
     const expectedUrl = buildSessionUrlWithQueryParams(
       MOCK_RAILS_URL,
       window.location.href,
-      'nil',
+      'null',
     );
 
     setupSessionHook();
@@ -191,25 +181,13 @@ describe('useSession', () => {
 
       advanceMinutesAndMs(4);
       window.dispatchEvent(new Event(eventType));
-<<<<<<< HEAD
-=======
-      expect(fetchSpy).not.toHaveBeenCalledWith(
-        expect.stringContaining(sessionUrl),
-        expect.objectContaining({ method: 'POST' }),
-      );
->>>>>>> 360cd51 (feat: add impression information to session requests)
 
       advanceMinutesAndMs(1, 1);
       window.dispatchEvent(new Event(eventType));
 
       expect(fetchSpy).toHaveBeenCalledWith(
-<<<<<<< HEAD
         sessionUrl,
         expect.objectContaining({ method: 'GET' }),
-=======
-        expect.stringContaining(sessionUrl),
-        expect.objectContaining({ method: 'POST' }),
->>>>>>> 360cd51 (feat: add impression information to session requests)
       );
 
       expect(fetchSpy).toHaveBeenCalledTimes(2);
@@ -232,25 +210,12 @@ describe('useSession', () => {
     window.dispatchEvent(new Event('wheel'));
     window.dispatchEvent(new Event('touchstart'));
 
-<<<<<<< HEAD
-=======
-    expect(fetchSpy).not.toHaveBeenCalledWith(
-      expect.stringContaining(sessionUrl),
-      expect.objectContaining({ method: 'POST' }),
-    );
-
->>>>>>> 360cd51 (feat: add impression information to session requests)
     advanceMinutesAndMs(4, 1);
     window.dispatchEvent(new Event('keydown'));
 
     expect(fetchSpy).toHaveBeenCalledWith(
-<<<<<<< HEAD
       sessionUrl,
       expect.objectContaining({ method: 'GET' }),
-=======
-      expect.stringContaining(sessionUrl),
-      expect.objectContaining({ method: 'POST' }),
->>>>>>> 360cd51 (feat: add impression information to session requests)
     );
 
     expect(fetchSpy).toHaveBeenCalledTimes(2);
@@ -271,25 +236,12 @@ describe('useSession', () => {
     });
     document.dispatchEvent(new Event('visibilitychange'));
 
-<<<<<<< HEAD
-=======
-    expect(fetchSpy).not.toHaveBeenCalledWith(
-      expect.stringContaining(sessionUrl),
-      expect.objectContaining({ method: 'POST' }),
-    );
-
->>>>>>> 360cd51 (feat: add impression information to session requests)
     advanceMinutesAndMs(1, 1);
     document.dispatchEvent(new Event('visibilitychange'));
 
     expect(fetchSpy).toHaveBeenCalledWith(
-<<<<<<< HEAD
       sessionUrl,
       expect.objectContaining({ method: 'GET' }),
-=======
-      expect.stringContaining(sessionUrl),
-      expect.objectContaining({ method: 'POST' }),
->>>>>>> 360cd51 (feat: add impression information to session requests)
     );
 
     expect(fetchSpy).toHaveBeenCalledTimes(2);
@@ -356,13 +308,13 @@ describe('buildSessionUrlWithQueryParams', () => {
     expect(result).toContain(encodeURIComponent(REFERRER_URL));
   });
 
-  it('uses "nil" if referrer_url is missing', () => {
+  it('uses "null" if referrer_url is missing', () => {
     const result = buildSessionUrlWithQueryParams(
       MOCK_RAILS_URL,
       LANDING_URL,
-      'nil',
+      'null',
     );
-    expect(result).toContain('referrer_url=nil');
+    expect(result).toContain('referrer_url=null');
   });
 });
 
