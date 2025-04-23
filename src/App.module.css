@@ -116,6 +116,9 @@
   display: flex;
   flex-direction: column;
   position: relative;
+  margin-bottom: 1.6rem;
+  font-size: 1.33333rem;
+  font-weight: 400;
 }
 
 .sidebarLinkContainer:hover {
