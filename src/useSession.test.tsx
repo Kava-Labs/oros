@@ -9,12 +9,8 @@ const getSessionHandler = http.get(
   sessionUrl,
   () => new HttpResponse(null, { status: 204 }),
 );
-const postHeartbeatHandler = http.post(
-  sessionUrl,
-  () => new HttpResponse(null, { status: 204 }),
-);
 
-const server = setupServer(getSessionHandler, postHeartbeatHandler);
+const server = setupServer(getSessionHandler);
 
 const setupSessionHook = () => {
   return renderHook(() => useSession());
@@ -46,19 +42,21 @@ describe('useSession', () => {
   it('does not perform session tracking when GET /session fails on mount', () => {
     server.use(
       http.get(sessionUrl, () => new HttpResponse(null, { status: 500 })),
-      http.post(sessionUrl, () => new HttpResponse(null, { status: 500 })),
     );
 
     setupSessionHook();
 
-    expect(fetchSpy).toHaveBeenCalledWith(sessionUrl, expect.any(Object));
+    expect(fetchSpy).toHaveBeenCalledWith(
+      sessionUrl,
+      expect.objectContaining({ method: 'GET' }),
+    );
 
     advanceMinutesAndMs(5);
     window.dispatchEvent(new Event('click'));
 
     expect(fetchSpy).toHaveBeenCalledWith(
       sessionUrl,
-      expect.objectContaining({ method: 'POST' }),
+      expect.objectContaining({ method: 'GET' }),
     );
   });
 
@@ -73,11 +71,6 @@ describe('useSession', () => {
         credentials: 'include',
       }),
     );
-
-    expect(fetchSpy).not.toHaveBeenCalledWith(
-      sessionUrl,
-      expect.objectContaining({ method: 'POST' }),
-    );
   });
 
   it('does not call GET /session again if no user interaction occurs after 5 minutes', () => {
@@ -86,10 +79,6 @@ describe('useSession', () => {
 
     advanceMinutesAndMs(6);
     expect(fetchSpy).toHaveBeenCalledTimes(1);
-    expect(fetchSpy).not.toHaveBeenCalledWith(
-      sessionUrl,
-      expect.objectContaining({ method: 'POST' }),
-    );
   });
 
   describe.each([
@@ -110,17 +99,13 @@ describe('useSession', () => {
 
       advanceMinutesAndMs(4);
       window.dispatchEvent(new Event(eventType));
-      expect(fetchSpy).not.toHaveBeenCalledWith(
-        sessionUrl,
-        expect.objectContaining({ method: 'POST' }),
-      );
 
       advanceMinutesAndMs(1, 1);
       window.dispatchEvent(new Event(eventType));
 
       expect(fetchSpy).toHaveBeenCalledWith(
         sessionUrl,
-        expect.objectContaining({ method: 'POST' }),
+        expect.objectContaining({ method: 'GET' }),
       );
 
       expect(fetchSpy).toHaveBeenCalledTimes(2);
@@ -143,17 +128,12 @@ describe('useSession', () => {
     window.dispatchEvent(new Event('wheel'));
     window.dispatchEvent(new Event('touchstart'));
 
-    expect(fetchSpy).not.toHaveBeenCalledWith(
-      sessionUrl,
-      expect.objectContaining({ method: 'POST' }),
-    );
-
     advanceMinutesAndMs(4, 1);
     window.dispatchEvent(new Event('keydown'));
 
     expect(fetchSpy).toHaveBeenCalledWith(
       sessionUrl,
-      expect.objectContaining({ method: 'POST' }),
+      expect.objectContaining({ method: 'GET' }),
     );
 
     expect(fetchSpy).toHaveBeenCalledTimes(2);
@@ -174,17 +154,12 @@ describe('useSession', () => {
     });
     document.dispatchEvent(new Event('visibilitychange'));
 
-    expect(fetchSpy).not.toHaveBeenCalledWith(
-      sessionUrl,
-      expect.objectContaining({ method: 'POST' }),
-    );
-
     advanceMinutesAndMs(1, 1);
     document.dispatchEvent(new Event('visibilitychange'));
 
     expect(fetchSpy).toHaveBeenCalledWith(
       sessionUrl,
-      expect.objectContaining({ method: 'POST' }),
+      expect.objectContaining({ method: 'GET' }),
     );
 
     expect(fetchSpy).toHaveBeenCalledTimes(2);
@@ -218,7 +193,7 @@ describe('useSession', () => {
     expect(fetchSpy).toHaveBeenCalledWith(
       sessionUrl,
       expect.objectContaining({
-        method: 'POST',
+        method: 'GET',
         keepalive: true,
       }),
     );
@@ -232,7 +207,7 @@ describe('useSession', () => {
     expect(fetchSpy).toHaveBeenCalledWith(
       sessionUrl,
       expect.objectContaining({
-        method: 'POST',
+        method: 'GET',
         keepalive: true,
       }),
     );
