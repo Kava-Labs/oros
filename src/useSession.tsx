@@ -1,14 +1,13 @@
 import { useEffect, useRef } from 'react';
 
-const RAILS_API_BASE_URL =
-  import.meta.env.VITE_RAILS_API_BASE_URL || 'http://localhost:3000';
+const RAILS_API_BASE_URL = import.meta.env.VITE_RAILS_API_BASE_URL ?? '';
 export const sessionUrl = `${RAILS_API_BASE_URL}/session`;
 const FIVE_MINUTES = 5 * 60 * 1000;
 
 export function useSession() {
   const lastPingTimeRef = useRef<number>(Date.now());
 
-  const getSession = (keepAlive = false) => {
+  const getSession = (keepAlive = true) => {
     lastPingTimeRef.current = Date.now();
 
     const landingUrl = window.location.href;
@@ -29,6 +28,9 @@ export function useSession() {
     }).catch(() => {
       // silently fail
     });
+
+    const cleanedUrl = resetLandingPageUrlQueryParams(landingUrl);
+    window.history.replaceState({}, '', cleanedUrl);
   };
 
   useEffect(() => {
@@ -37,7 +39,7 @@ export function useSession() {
     const handleUserActivity = () => {
       const now = Date.now();
       if (now - lastPingTimeRef.current >= FIVE_MINUTES) {
-        getSession(true);
+        getSession();
       }
     };
 
@@ -45,12 +47,12 @@ export function useSession() {
       if (document.visibilityState === 'visible') {
         handleUserActivity();
       } else if (document.visibilityState === 'hidden') {
-        getSession(true); // Send keepalive ping before tab closes
+        getSession(); // Send keepalive ping before tab closes
       }
     };
 
     const handlePagehide = () => {
-      getSession(true); // Also send keepalive on pagehide
+      getSession(); // Also send keepalive on pagehide
     };
 
     const userActivityEvents = [

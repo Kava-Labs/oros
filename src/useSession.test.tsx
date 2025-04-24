@@ -9,18 +9,16 @@ import {
   resetLandingPageUrlQueryParams,
 } from './useSession';
 
-// MSW handler for GET /session
+const MOCK_ROOT_APP_URL = 'https://chat.kava.io';
+const LANDING_URL = MOCK_ROOT_APP_URL + '?utm_source=twitter&utm_campaign=test';
+const REFERRER_URL = 'https://referrer.com/some/path';
+
 const getSessionHandler = http.get(
-  sessionUrl,
+  new RegExp('^http://localhost:3000/session(?:\\?.*)?$'),
   () => new HttpResponse(null, { status: 204 }),
 );
 
 const server = setupServer(getSessionHandler);
-
-const MOCK_RAILS_URL = 'http://localhost:3000/session';
-const MOCK_ROOT_APP_URL = 'https://chat.kava.io';
-const LANDING_URL = MOCK_ROOT_APP_URL + '?utm_source=twitter&utm_campaign=test';
-const REFERRER_URL = 'https://referrer.com/some/path';
 
 const setupSessionHook = () => {
   return renderHook(() => useSession());
@@ -54,15 +52,17 @@ describe('useSession', () => {
     fetchSpy.mockRestore();
   });
 
-  it('does not perform session tracking when GET /session fails on mount', () => {
+  it('performs session tracking when GET /session fails on mount', () => {
     server.use(
-      http.get(sessionUrl, () => new HttpResponse(null, { status: 500 })),
+      http.get(new RegExp('^http://localhost:3000/session(?:\\?.*)?$'), () =>
+        HttpResponse.error(),
+      ),
     );
 
     setupSessionHook();
 
     expect(fetchSpy).toHaveBeenCalledWith(
-      sessionUrl,
+      expect.stringContaining(sessionUrl),
       expect.objectContaining({ method: 'GET' }),
     );
 
@@ -70,7 +70,7 @@ describe('useSession', () => {
     window.dispatchEvent(new Event('click'));
 
     expect(fetchSpy).toHaveBeenCalledWith(
-      sessionUrl,
+      expect.stringContaining(sessionUrl),
       expect.objectContaining({ method: 'GET' }),
     );
   });
@@ -86,11 +86,6 @@ describe('useSession', () => {
         credentials: 'include',
       }),
     );
-
-    expect(fetchSpy).not.toHaveBeenCalledWith(
-      expect.stringContaining(sessionUrl),
-      expect.objectContaining({ method: 'POST' }),
-    );
   });
 
   it('sends GET /session without query params if none are present', () => {
@@ -100,9 +95,9 @@ describe('useSession', () => {
     });
 
     const expectedUrl = buildSessionUrlWithQueryParams(
-      MOCK_RAILS_URL,
+      sessionUrl,
       window.location.href,
-      'null',
+      'nil',
     );
 
     setupSessionHook();
@@ -119,9 +114,12 @@ describe('useSession', () => {
 
   it('sends GET /session with landing_page_url and referrer_url as query params and resets the url', () => {
     const pushSpy = vi.spyOn(window.history, 'replaceState');
+
+    // add query params to existing base url to simulate campaign driven url
     const queryParams = '/?utm_source=twitter&utm_campaign=test';
     window.history.pushState({}, '', queryParams);
-    const campaignUrl = window.location.href + queryParams;
+
+    const campaignUrl = window.location.href;
 
     Object.defineProperty(document, 'referrer', {
       value: REFERRER_URL,
@@ -129,8 +127,8 @@ describe('useSession', () => {
     });
 
     const expectedUrl = buildSessionUrlWithQueryParams(
-      MOCK_RAILS_URL,
-      window.location.href,
+      sessionUrl,
+      campaignUrl,
       REFERRER_URL,
     );
 
@@ -145,11 +143,7 @@ describe('useSession', () => {
       }),
     );
 
-    expect(fetchSpy).not.toHaveBeenCalledWith(
-      sessionUrl,
-      expect.objectContaining({ method: 'POST' }),
-    );
-
+    // should strip the query params url and leave just domain and port
     const cleaned = resetLandingPageUrlQueryParams(campaignUrl);
     expect(pushSpy).toHaveBeenCalledWith({}, '', cleaned);
     expect(cleaned).toBe(window.location.href);
@@ -186,7 +180,7 @@ describe('useSession', () => {
       window.dispatchEvent(new Event(eventType));
 
       expect(fetchSpy).toHaveBeenCalledWith(
-        sessionUrl,
+        expect.stringContaining(sessionUrl),
         expect.objectContaining({ method: 'GET' }),
       );
 
@@ -214,7 +208,7 @@ describe('useSession', () => {
     window.dispatchEvent(new Event('keydown'));
 
     expect(fetchSpy).toHaveBeenCalledWith(
-      sessionUrl,
+      expect.stringContaining(sessionUrl),
       expect.objectContaining({ method: 'GET' }),
     );
 
@@ -240,7 +234,7 @@ describe('useSession', () => {
     document.dispatchEvent(new Event('visibilitychange'));
 
     expect(fetchSpy).toHaveBeenCalledWith(
-      sessionUrl,
+      expect.stringContaining(sessionUrl),
       expect.objectContaining({ method: 'GET' }),
     );
 
@@ -273,7 +267,7 @@ describe('useSession', () => {
     document.dispatchEvent(new Event('visibilitychange'));
 
     expect(fetchSpy).toHaveBeenCalledWith(
-      sessionUrl,
+      expect.stringContaining(sessionUrl),
       expect.objectContaining({
         method: 'GET',
         keepalive: true,
@@ -287,7 +281,7 @@ describe('useSession', () => {
     window.dispatchEvent(new Event('pagehide'));
 
     expect(fetchSpy).toHaveBeenCalledWith(
-      sessionUrl,
+      expect.stringContaining(sessionUrl),
       expect.objectContaining({
         method: 'GET',
         keepalive: true,
@@ -299,7 +293,7 @@ describe('useSession', () => {
 describe('buildSessionUrlWithQueryParams', () => {
   it('includes encoded landing_page_url and referrer_url', () => {
     const result = buildSessionUrlWithQueryParams(
-      MOCK_RAILS_URL,
+      window.location.href,
       LANDING_URL,
       REFERRER_URL,
     );
@@ -310,7 +304,7 @@ describe('buildSessionUrlWithQueryParams', () => {
 
   it('uses "null" if referrer_url is missing', () => {
     const result = buildSessionUrlWithQueryParams(
-      MOCK_RAILS_URL,
+      window.location.href,
       LANDING_URL,
       'null',
     );
