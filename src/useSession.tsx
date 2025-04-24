@@ -96,15 +96,12 @@ export const buildSessionUrlWithQueryParams = (
 export const resetLandingPageUrlQueryParams = (urlString: string): string => {
   const url = new URL(urlString);
   const params = url.searchParams;
-  const keysToRemove = [];
 
-  for (const key of params.keys()) {
+  for (const key of Array.from(params.keys())) {
     if (key.toLowerCase().startsWith('utm_')) {
-      keysToRemove.push(key);
+      params.delete(key);
     }
   }
-
-  keysToRemove.forEach((key) => params.delete(key));
 
   return `${url.origin}${url.pathname}${params.toString() ? '?' + params.toString() : ''}`;
 };
