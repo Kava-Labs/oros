@@ -5,6 +5,22 @@ import { join } from 'path';
 
 const { describe } = test;
 
+test.beforeEach(async ({ page, context }) => {
+  await context.route('**/session**', (route) => {
+    route.fulfill({ status: 204, body: '' });
+  });
+
+  // 🚨 Log browser console output to see errors
+  page.on('console', (msg) => {
+    console.log(`[browser][${msg.type()}] ${msg.text()}`);
+  });
+
+  // 🧪 Also catch page errors
+  page.on('pageerror', (err) => {
+    console.log('[browser][pageerror]', err);
+  });
+});
+
 describe('chat', () => {
   test('renders intro messages by model', async ({ page }) => {
     const initialIntroMessage = 'What can I help you with?';
