@@ -3,10 +3,9 @@ import styles from './ChatView.module.css';
 import { Conversation } from './Conversation/Conversation';
 import { NavBar } from './NavBar';
 import ChatInput from './ChatInput';
-import { LandingContent } from './LandingContent';
 import { defaultCautionText } from '../config/models/defaultPrompts';
 import { ModelConfig, SupportedModels } from '../types/models';
-import type { TextStreamStore } from 'lib-kava-ai';
+import { LandingContent, TextStreamStore } from 'lib-kava-ai';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { ChatMessage } from '../stores/messageHistoryStore';
 
