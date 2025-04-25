@@ -8,19 +8,14 @@
   position: fixed;
   top: 0;
   left: 0;
-
   display: flex;
   flex-direction: column;
-
   height: 100vh;
   height: 100dvh;
   width: var(--layout-sidebarWidth);
-
   transform: translateX(calc(var(--layout-sidebarWidth) * -1));
   transition: transform 0.3s ease;
-
   z-index: 100;
-
   background: var(--colors-bgSecondary);
 }
 
@@ -31,7 +26,6 @@
 .sidebarHeader {
   height: var(--layout-headerHeight);
   flex-shrink: 0;
-
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -42,14 +36,10 @@
 
 .sidebarContent {
   position: relative;
-
   flex: 1;
-
   margin-right: var(--spacing-xs);
-
   overflow-x: hidden;
   overflow-y: auto;
-
   scrollbar-color: var(--colors-bgTertiary) var(--colors-bgSecondary);
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
@@ -79,7 +69,6 @@
 .content {
   background: var(--colors-bgPrimary);
   transition: margin-left 0.3s ease;
-
   flex: 1;
   display: flex;
   flex-direction: column;
