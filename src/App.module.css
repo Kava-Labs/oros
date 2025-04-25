@@ -86,6 +86,15 @@
   min-height: 0;
 }
 
+.linkArrowIcon {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.sidebarLink:hover .linkArrowIcon {
+  opacity: 1;
+}
+
 @media (min-width: 768px) {
   .sidebar {
     transform: translateX(0);
