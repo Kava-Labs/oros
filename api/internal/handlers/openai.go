@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -160,6 +161,27 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	proxySpan.SetAttributes(attribute.String("model", model))
 
+	// Buffer and log the request body
+	var bodyBytes []byte
+	if r.Body != nil {
+		var err error
+		bodyBytes, err = io.ReadAll(r.Body)
+		if err != nil {
+			h.logger.Error().Err(err).Msg("error reading request body for proxy")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		r.Body.Close()
+	}
+
+	h.logger.Debug().
+		Str("method", r.Method).
+		Str("url", client.BaseURL+h.endpoint).
+		Str("backend", backend.Name).
+		Any("headers", r.Header).
+		Str("body", string(bodyBytes)).
+		Msg("proxying to backend URL")
+
 	// This creates a child span for the TTFB
 	responseWriter := NewTimeToFirstByteResponseWriter(
 		ctx,
@@ -170,12 +192,12 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	)
 	defer responseWriter.End()
 
-	// Forward request to OpenAI API
+	// Forward request with a new ReadCloser
 	apiResponse, err := client.DoRequest(
 		ctx,
 		r.Method,
 		h.endpoint,
-		r.Body,
+		io.NopCloser(bytes.NewReader(bodyBytes)),
 	)
 	if err != nil {
 		// Check if error is specifically due to client disconnection
