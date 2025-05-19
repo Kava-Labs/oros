@@ -55,6 +55,10 @@ func newHttpMockServer(authHeader string) *httptest.Server {
 					headersMatch = false
 				}
 			}
+			// Panic if Content-Length header does not exist
+			if r.Header.Get("Content-Length") == "" {
+				panic("Content-Length header is missing")
+			}
 			if !headersMatch {
 				continue
 			}
