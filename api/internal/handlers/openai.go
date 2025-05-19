@@ -192,12 +192,12 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	)
 	defer responseWriter.End()
 
-	// Forward request with a new ReadCloser
+	// Forward request
 	apiResponse, err := client.DoRequest(
 		ctx,
 		r.Method,
 		h.endpoint,
-		io.NopCloser(bytes.NewReader(bodyBytes)),
+		bytes.NewReader(bodyBytes),
 	)
 	if err != nil {
 		// Check if error is specifically due to client disconnection

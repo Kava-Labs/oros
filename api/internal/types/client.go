@@ -1,9 +1,9 @@
 package types
 
 import (
+	"bytes"
 	"context"
 	"fmt"
-	"io"
 	"net/http"
 	"net/http/httptrace"
 	"net/http/httputil"
@@ -66,7 +66,7 @@ func (c *OpenAIPassthroughClient) DoRequest(
 	ctx context.Context,
 	method,
 	path string,
-	body io.ReadCloser,
+	body *bytes.Reader, // *bytes.Reader which sets the Content-Length header
 ) (*http.Response, error) {
 	// To properly build URL:
 	// BaseURL should NOT have a trailing slash
@@ -98,7 +98,7 @@ func (c *OpenAIPassthroughClient) DoRequest(
 
 	// Dump the raw outgoing HTTP request for debugging
 	if dump, err := httputil.DumpRequestOut(req, true); err == nil {
-		fmt.Printf("RAW BACKEND REQUEST:\n%s\n", string(dump))
+		fmt.Printf("RAW BACKEND REQUEST:\n%q\n", string(dump))
 	} else {
 		fmt.Printf("Failed to dump request: %v\n", err)
 	}
