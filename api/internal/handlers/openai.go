@@ -231,6 +231,12 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	defer apiResponse.Body.Close()
 
+	h.logger.Debug().
+		Str("http_proto", apiResponse.Proto).
+		Int("status_code", apiResponse.StatusCode).
+		Str("backend", backend.Name).
+		Msg("response from backend")
+
 	// Response headers
 	w.Header().Set("Content-Type", apiResponse.Header.Get("Content-Type"))
 	w.Header().Set("Transfer-Encoding", "identity")
