@@ -79,6 +79,13 @@ func (w *TimeToFirstByteResponseWriter) Write(b []byte) (int, error) {
 	}
 
 	i, err := w.ResponseWriter.Write(b)
+
+	// Flush after each write if possible to prevent any buffering in
+	// SSE streaming.
+	if flusher, ok := w.ResponseWriter.(http.Flusher); ok {
+		flusher.Flush()
+	}
+
 	if err != nil && w.ResponseSpan != nil {
 		// Check if error is specifically due to client disconnection -- don't
 		// mark span as error
@@ -94,6 +101,7 @@ func (w *TimeToFirstByteResponseWriter) Write(b []byte) (int, error) {
 		w.ResponseSpan.SetStatus(codes.Error, "response write error")
 		w.ResponseSpan.RecordError(err)
 	}
+
 	return i, err
 }
 
