@@ -174,14 +174,6 @@ func (h openaiProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		r.Body.Close()
 	}
 
-	h.logger.Debug().
-		Str("method", r.Method).
-		Str("url", client.BaseURL+h.endpoint).
-		Str("backend", backend.Name).
-		Any("headers", r.Header).
-		Str("body", string(bodyBytes)).
-		Msg("proxying to backend URL")
-
 	// This creates a child span for the TTFB
 	responseWriter := NewTimeToFirstByteResponseWriter(
 		ctx,
