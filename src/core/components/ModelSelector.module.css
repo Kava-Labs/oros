@@ -52,10 +52,9 @@
 }
 
 .dropdownMenu {
-  width: 100%;
   position: absolute;
   top: 100%;
-  left: 50%;
+  left: 55%;
   transform: translateX(-50%);
   background-color: var(--colors-bgSecondary);
   border-radius: var(--borderRadius-sm);
@@ -123,6 +122,7 @@
   font-size: 0.85em; /* TODO adjust the globa.css file to accommodate and remove me */
   color: var(--colors-textTertiary);
   margin-top: var(--spacing-xs);
+  text-wrap: auto;
 }
 
 .chatHistoryTitle:hover {
