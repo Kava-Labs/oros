@@ -11,6 +11,7 @@ export const supportedModels = [
   // 'deepseek-r1',
   // 'gpt-4o',
   'o3-mini',
+  'Qwen/Qwen3-30B-A3B-FP8',
 ] as const;
 
 export type SupportedModels = (typeof supportedModels)[number];
