@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptrace"
-	"net/http/httputil"
 
 	"go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
@@ -95,13 +94,6 @@ func (c *OpenAIPassthroughClient) DoRequest(
 
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", c.APIKey))
 	req.Header.Add("Content-Type", "application/json")
-
-	// Dump the raw outgoing HTTP request for debugging
-	if dump, err := httputil.DumpRequestOut(req, true); err == nil {
-		fmt.Printf("RAW BACKEND REQUEST:\n%q\n", string(dump))
-	} else {
-		fmt.Printf("Failed to dump request: %v\n", err)
-	}
 
 	return c.client.Do(req)
 }
