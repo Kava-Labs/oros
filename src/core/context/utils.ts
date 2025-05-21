@@ -8,7 +8,7 @@ import {
 import { MessageHistoryStore } from '../stores/messageHistoryStore';
 import OpenAI from 'openai';
 import { ModelConfig } from '../types/models';
-import { isContentChunk } from '../utils/streamUtils';
+import { isContentChunk, isReasoningChunk } from '../utils/streamUtils';
 import { formatConversationTitle } from 'lib-kava-ai';
 import {
   ChatCompletionChunk,
@@ -180,6 +180,7 @@ export async function doChat(
     let thinkingEnd = -1;
     let hasCloseTag = false;
     let openTagFound = false;
+    let isReasoning = false;
 
     for await (const chunk of stream) {
       //  Get the usage info (in the final chunk)
@@ -193,6 +194,15 @@ export async function doChat(
 
       //  todo: chance to clean up into a helper similar to assembleToolCallFromStream
       if (isContentChunk(chunk)) {
+        const openTag = '<think>';
+        const closeTag = '</think>';
+        // if we were previously reasoning via reasoning_content, reset the content to capture
+        // actual response. this assumes all thinking is done prior to the actual response.
+        if (isReasoning) {
+          isReasoning = false;
+          content = `${openTag}${content}${closeTag}`;
+        }
+
         //  Add content from chunks that have it and not the final usage chunk if it exists
         if (chunk.choices.length) {
           content += chunk['choices'][0]['delta']['content'];
@@ -201,9 +211,6 @@ export async function doChat(
         switch (true) {
           case isReasoningModel(modelConfig.id) &&
             modelConfig.id !== 'o3-mini': {
-            const openTag = '<think>';
-            const closeTag = '</think>';
-
             if (!openTagFound && content.includes(openTag)) {
               openTagFound = true;
               //  Remove the initial opening tag if present
@@ -233,6 +240,10 @@ export async function doChat(
             break;
           }
         }
+      } else if (isReasoningChunk(chunk)) {
+        content += chunk.choices[0].delta.reasoning_content;
+        isReasoning = true;
+        thinkingStore.setText(content);
       }
     }
 
@@ -353,7 +364,7 @@ export async function syncWithLocalStorage(
                         if (msg.role !== 'user' && msg.role !== 'assistant')
                           return;
 
-                        return `Role: ${msg.role} 
+                        return `Role: ${msg.role}
                                       ${msg.content}
                         `;
                       })}
