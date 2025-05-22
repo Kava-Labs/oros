@@ -106,6 +106,25 @@ export const MODEL_REGISTRY: Record<SupportedModels, ModelConfig> = {
   //   introText: defaultIntroText,
   //   inputPlaceholderText: defaultInputPlaceholderText,
   // },
+  'Qwen/Qwen3-30B-A3B-FP8': {
+    id: 'Qwen/Qwen3-30B-A3B-FP8',
+    name: 'Experimental: Qwen3-30B-A3B',
+    reasoningModel: true,
+    icon: KavaIcon,
+    description: 'Experimental reasoning model using mixture-of-experts.',
+    includeUsageInStream: true,
+    tools: [],
+    supportedFileTypes: [],
+    maximumFileUploads: 0,
+    maximumFileBytes: 0,
+    contextLength: 32768,
+    contextLimitMonitor: calculateFinalChunkTokenUsage,
+    contextWarningThresholdPercentage: 5,
+    conversationResetTokenThreshold: 100,
+    systemPrompt: defaultSystemPrompt,
+    introText: defaultIntroText,
+    inputPlaceholderText: defaultInputPlaceholderText,
+  },
 };
 
 export function isReasoningModel(modelId: SupportedModels): boolean {
