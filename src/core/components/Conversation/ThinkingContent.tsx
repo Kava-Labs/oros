@@ -25,12 +25,6 @@ export const ThinkingContent = ({
     }
   }, [onRendered, content]);
 
-  useEffect(() => {
-    if (isStreaming) {
-      setIsExpanded(true);
-    }
-  }, [isStreaming]);
-
   // If there's no thinking content, don't render anything
   if (!content || !content.trim()) {
     return null;
@@ -60,7 +54,7 @@ export const ThinkingContent = ({
   return (
     <div className={styles.thinkingSection}>
       <button
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={() => setIsExpanded((t) => !t)}
         className={styles.header}
       >
         <div
@@ -75,7 +69,7 @@ export const ThinkingContent = ({
         >
           <BrainIcon
             color={colors.accentTwo}
-            className={`${styles.icon} ${showLoadingState ? styles.pulsing : ''}`}
+            className={`${styles.icon} ${showLoadingState || isStreaming ? styles.pulsing : ''}`}
             style={{
               opacity: isExpanded ? 1 : 0.7,
             }}

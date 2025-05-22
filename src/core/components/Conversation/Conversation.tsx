@@ -139,16 +139,12 @@ const ConversationComponent = ({
         return null;
       })}
 
-      {isRequesting && assistantStream.length === 0 ? (
-        <ProgressIcon />
-      ) : (
-        <StreamingMessage
-          thinkingStore={thinkingStore}
-          messageStore={messageStore}
-          onRendered={onRendered}
-          modelConfig={modelConfig}
-        />
-      )}
+      <StreamingMessage
+        thinkingStore={thinkingStore}
+        messageStore={messageStore}
+        onRendered={onRendered}
+        modelConfig={modelConfig}
+      />
 
       {errorText.length > 0 && (
         <ErrorMessage
