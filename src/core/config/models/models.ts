@@ -106,8 +106,8 @@ export const MODEL_REGISTRY: Record<SupportedModels, ModelConfig> = {
   //   introText: defaultIntroText,
   //   inputPlaceholderText: defaultInputPlaceholderText,
   // },
-  'Qwen/Qwen3-30B-A3B-FP8': {
-    id: 'Qwen/Qwen3-30B-A3B-FP8',
+  'qwen3-30b-a3b': {
+    id: 'qwen3-30b-a3b', // NOTE: this model has a different id if not served via litellm
     name: 'Experimental: Qwen3-30B-A3B',
     reasoningModel: true,
     icon: KavaIcon,
