@@ -1,23 +1,27 @@
-import { v4 as uuidv4 } from 'uuid';
 import {
   ConversationHistory,
+  formatConversationTitle,
   getAllConversations,
   saveConversation,
   TextStreamStore,
 } from 'lib-kava-ai';
-import { MessageHistoryStore } from '../stores/messageHistoryStore';
 import OpenAI from 'openai';
-import { ModelConfig } from '../types/models';
-import { isContentChunk, isReasoningChunk } from '../utils/streamUtils';
-import { formatConversationTitle } from 'lib-kava-ai';
 import {
   ChatCompletionChunk,
   ChatCompletionContentPart,
   ChatCompletionMessageParam,
 } from 'openai/resources/index';
-import { getImage } from '../utils/idb/idb';
+import { v4 as uuidv4 } from 'uuid';
+import {
+  CONVERSATION_TITLE_MODEL,
+  IMAGE_ANALYSIS_MODEL,
+  isReasoningModel,
+} from '../config/models';
 import { visionModelPrompt } from '../config/models/defaultPrompts';
-import { isReasoningModel } from '../config/models';
+import { MessageHistoryStore } from '../stores/messageHistoryStore';
+import { ModelConfig } from '../types/models';
+import { getImage } from '../utils/idb/idb';
+import { isContentChunk, isReasoningChunk } from '../utils/streamUtils';
 
 export const newConversation = () => {
   return {
@@ -36,7 +40,7 @@ const analyzeImage = async (
   msg: ChatCompletionMessageParam,
 ) => {
   const data = await client.chat.completions.create({
-    model: 'qwen2.5-vl-7b-instruct',
+    model: IMAGE_ANALYSIS_MODEL,
     messages: [msg],
   });
 
@@ -371,7 +375,7 @@ export async function syncWithLocalStorage(
                       `,
           },
         ],
-        model: 'gpt-4o-mini',
+        model: CONVERSATION_TITLE_MODEL,
       });
 
       // Apply truncation only when we get the AI-generated title
