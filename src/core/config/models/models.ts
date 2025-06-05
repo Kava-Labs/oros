@@ -1,13 +1,17 @@
+import KavaIcon from '../../assets/KavaIcon';
 import { ModelConfig, SupportedModels } from '../../types/models';
 import {
+  defaultInputPlaceholderText,
   defaultIntroText,
   defaultSystemPrompt,
-  defaultInputPlaceholderText,
 } from './defaultPrompts';
-import KavaIcon from '../../assets/KavaIcon';
 import { calculateFinalChunkTokenUsage } from './helpers';
 // import { calculateGptContextMetrics } from '../../utils/conversation/helpers';
 
+/** The model used to analyze images */
+export const IMAGE_ANALYSIS_MODEL = 'gpt-4o-mini';
+/** The model used to generate titles for user conversations */
+export const CONVERSATION_TITLE_MODEL = 'gpt-4o-mini';
 export const MODEL_REGISTRY: Record<SupportedModels, ModelConfig> = {
   'qwq-32b-bnb-4bit': {
     id: 'qwq-32b-bnb-4bit',
